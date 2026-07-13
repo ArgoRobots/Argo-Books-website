@@ -1,10 +1,10 @@
 :root {
   --white: #ffffff;
   --whiteBackground: #f9fafb;
-  --primary-blue: #3b82f6;
-  --blue-600: #2563eb;
-  --primary-blue-dark: #1e40af;
-  --secondary-blue: #60a5fa;
+  --primary-blue: #3f63e8;
+  --blue-600: #2f4fd6;
+  --primary-blue-dark: #233a93;
+  --secondary-blue: #6985f0;
   --success-green: #4ade80;
   --red: #ef4444;
   --red-50: #fef2f2;
@@ -79,16 +79,16 @@
   --amber-800: #92400e;
   --amber-900: #78350f;
 
-  /* Blue palette */
-  --blue-50: #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-200: #bfdbfe;
-  --blue-300: #93c5fd;
-  --blue-400: #60a5fa;
-  --blue-500: #3b82f6;
-  --blue-700: #1d4ed8;
-  --blue-800: #1e40af;
-  --blue-900: #1e3a8a;
+  /* Blue palette - cobalt/indigo brand ramp (shifted off the Tailwind defaults) */
+  --blue-50: #eef2fe;
+  --blue-100: #dde4fd;
+  --blue-200: #c2cffb;
+  --blue-300: #9bb0f7;
+  --blue-400: #6985f0;
+  --blue-500: #3f63e8;
+  --blue-700: #2740b5;
+  --blue-800: #233a93;
+  --blue-900: #1f3275;
 
   /* Sky blue */
   --sky-50: #f0f9ff;
@@ -115,6 +115,12 @@
 
   /* Additional neutrals */
   --black: #000000;
+  /* Theme-aware primary text: black in light theme, white in dark theme.
+     Use this for body/label/heading text instead of --black so it flips
+     automatically. The dark value is set in the [data-theme="dark"] block below. */
+  --admin-text: var(--black);
+  /* Single monospace stack for code/IDs/values across admin pages. */
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
   --neutral-111827: #111827;
   --neutral-f8f9fa: #f8f9fa;
   --neutral-f7f7f8: #f7f7f8;
@@ -265,4 +271,10 @@
   --hero-gradient-end: #1e293b;
   --hero-badge-bg: rgba(255, 255, 255, 0.1);
   --hero-badge-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme: primary text flips to white. Keep this in sync with --admin-text
+   above so body/label/heading text reads correctly on dark backgrounds. */
+[data-theme="dark"] {
+  --admin-text: var(--white);
 }

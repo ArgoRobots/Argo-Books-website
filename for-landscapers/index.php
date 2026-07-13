@@ -40,7 +40,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Landscapers&subtitle=Bookkeeping+for+the+way+landscapers+actually+work%3A+deposits%2C+materials%2C+and+seasonal+cashflow&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -49,7 +49,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="twitter:title" content="Argo Books for Landscapers: Bookkeeping Built for the Way You Bill">
     <meta name="twitter:description"
         content="Deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free desktop app for landscaping businesses.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Landscapers&subtitle=Bookkeeping+for+the+way+landscapers+actually+work%3A+deposits%2C+materials%2C+and+seasonal+cashflow&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -421,6 +421,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 </div>
             </div>
         </div>
+    </section>
+
+    <section class="container" style="max-width:720px;text-align:center;padding-bottom:48px;">
+        <p>Want the bookkeeping side in plain language? Read our guide to <a href="../bookkeeping-for-landscapers/">bookkeeping for landscapers</a>.</p>
     </section>
 
     </main>

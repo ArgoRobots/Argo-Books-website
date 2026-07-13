@@ -37,13 +37,6 @@ function settings_tab_get_state($pdo, $key, $default = null)
 
 function settings_tab_set_state($pdo, $key, $value)
 {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        state_key VARCHAR(100) NOT NULL UNIQUE,
-        state_value TEXT,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
     $stmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
         ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
     $stmt->execute([$key, $value]);
@@ -110,6 +103,26 @@ function settings_tab_handle_post($pdo)
 
         settings_tab_set_state($pdo, 'followup_sequence_config', json_encode($cfg, JSON_UNESCAPED_SLASHES));
         $_SESSION['message'] = 'Follow-up sequence saved (' . count($cfg) . ' touch' . (count($cfg) === 1 ? '' : 'es') . ').';
+        $_SESSION['message_type'] = 'success';
+        header('Location: index.php?tab=settings'); exit;
+    }
+
+    if ($action === 'set_max_review_count') {
+        $raw = trim((string) ($_POST['max_review_count'] ?? ''));
+        // Blank or 0 means "use the env/default fallback": clear the override.
+        if ($raw === '' || $raw === '0') {
+            settings_tab_set_state($pdo, 'max_review_count', '');
+            $_SESSION['message'] = 'Review-count ceiling reset to the default.';
+            $_SESSION['message_type'] = 'success';
+            header('Location: index.php?tab=settings'); exit;
+        }
+        if (!ctype_digit($raw) || (int) $raw < 1 || (int) $raw > 2000) {
+            $_SESSION['message'] = 'Review-count ceiling must be a whole number between 1 and 2000 (or blank to use the default).';
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php?tab=settings'); exit;
+        }
+        settings_tab_set_state($pdo, 'max_review_count', (string) (int) $raw);
+        $_SESSION['message'] = 'Review-count ceiling set to ' . (int) $raw . '.';
         $_SESSION['message_type'] = 'success';
         header('Location: index.php?tab=settings'); exit;
     }
@@ -274,6 +287,51 @@ function settings_tab_render($pdo)
                     </button>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <?php
+    // ─── Discovery filters panel ───
+    // Review-count ceiling: lower = skews discovery toward newer / smaller
+    // businesses (chains and long-established operators accrue lots of reviews).
+    $reviewStateRaw = trim((string) settings_tab_get_state($pdo, 'max_review_count', ''));
+    $reviewEnvRaw   = trim((string) ($_ENV['OUTREACH_MAX_REVIEW_COUNT'] ?? ''));
+    $reviewIsOverride = ($reviewStateRaw !== '' && ctype_digit($reviewStateRaw) && (int) $reviewStateRaw > 0);
+    if ($reviewIsOverride) {
+        $reviewEffective = (int) $reviewStateRaw;
+        $reviewSource = 'this Settings value';
+    } elseif (ctype_digit($reviewEnvRaw) && (int) $reviewEnvRaw > 0) {
+        $reviewEffective = (int) $reviewEnvRaw;
+        $reviewSource = 'OUTREACH_MAX_REVIEW_COUNT in .env';
+    } else {
+        $reviewEffective = 15;
+        $reviewSource = 'the built-in default';
+    }
+    ?>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Discovery filters</h2>
+        </div>
+        <div class="panel-content">
+            <p class="hint" style="margin-top:0;">
+                The Google Places channel skips businesses with more Google reviews than this ceiling. A low number biases discovery toward newer, smaller businesses (chains and long-established shops pile up reviews and usually already run accounting software). Leave blank to use <?php echo htmlspecialchars($reviewSource === 'OUTREACH_MAX_REVIEW_COUNT in .env' ? 'the .env value' : 'the default'); ?>.
+            </p>
+            <form method="POST" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+                <input type="hidden" name="tab" value="settings">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                <input type="hidden" name="action" value="set_max_review_count">
+                <div class="form-group" style="margin:0;">
+                    <label for="maxReviewCount">Max Google reviews (1-2000, blank = default)</label>
+                    <input type="number" id="maxReviewCount" name="max_review_count" min="1" max="2000"
+                           value="<?php echo $reviewIsOverride ? (int) $reviewStateRaw : ''; ?>"
+                           placeholder="<?php echo (int) $reviewEffective; ?>">
+                </div>
+                <button type="submit" class="btn btn-blue">Save</button>
+            </form>
+            <p class="hint" style="margin-bottom:0;">
+                Currently using <strong><?php echo (int) $reviewEffective; ?></strong> (from <?php echo htmlspecialchars($reviewSource); ?>).
+            </p>
         </div>
     </div>
 

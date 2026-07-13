@@ -13,6 +13,10 @@ include __DIR__ . '/../../docs-header.php';
 
             <p>Bank statement lines are reference data only. Importing a statement never creates expenses or revenue, and it never changes your transactions. The only thing matching does is mark a record as matched to a statement line.</p>
 
+            <div class="info-box">
+                <strong>Looking to add transactions instead?</strong> Bank Matching only verifies your books. To <em>create</em> expenses and revenue from a statement, use <a href="bank-statement-import.php" class="link">Bank Statement Import</a>.
+            </div>
+
             <h2>How Bank Matching Works</h2>
             <ol class="steps-list">
                 <li>Open <strong>Bank Matching</strong> from the sidebar, under Transactions</li>
@@ -59,9 +63,9 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="invoicing.php" class="nav-button prev">
+                <a href="bank-statement-import.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Invoicing & Payments</span>
+                    <span class="nav-title">&larr; Bank Statement Import</span>
                 </a>
                 <a href="rental.php" class="nav-button next">
                     <span class="nav-label">Next</span>

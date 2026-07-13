@@ -1,15 +1,16 @@
 <?php
 /**
- * Reddit posted-reply status checker.
+ * reddit_status_check.php
  *
- * Runs every 2 hours. For each thread with status='replied', re-checks the
- * posted comment via Reddit API on a staggered schedule (30min / 2h / 6h /
- * 24h / 72h after posting), classifies reply_status, captures engagement
- * (upvotes + replies), then rolls up per-subreddit removal stats and
- * applies the auto-disable rule.
+ * For each thread with status='replied', re-checks the posted comment via
+ * Reddit API on a staggered schedule (30min / 2h / 6h / 24h / 72h after
+ * posting), classifies reply_status, captures engagement (upvotes + replies),
+ * then rolls up per-subreddit removal stats and applies the auto-disable rule.
+ * Idempotent: each row tracks its own check_count + last_checked_at so we never
+ * over-check.
  *
- * Idempotent: safe to run on any schedule. Each row tracks its own
- * check_count + last_checked_at so we never over-check.
+ * Schedule: every 2 hours.
+ *   0 *\/2 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_status_check.php
  */
 
 set_time_limit(600);
@@ -26,6 +27,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/reddit_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file ───
 
@@ -43,7 +45,10 @@ const CHECK_OFFSETS_SEC = [1800, 7200, 21600, 86400, 259200];
 
 $startedAt = date('Y-m-d H:i:s');
 $updated = 0;
+$removedCount = 0;
 $lastError = null;
+
+$runId = cron_run_start($pdo, 'reddit_status_check');
 
 try {
     // Find candidates: replied, comment id known, check_count < 5
@@ -93,6 +98,9 @@ try {
             $row['id'],
         ]);
         $updated++;
+        if (in_array($status, ['removed', 'removed_or_shadowbanned'], true)) {
+            $removedCount++;
+        }
     }
 
     // ─── Roll up per-subreddit removal rates ───
@@ -149,10 +157,16 @@ try {
     $upd = $pdo->prepare("UPDATE reddit_settings SET last_status_check_at = ? WHERE id = 1");
     $upd->execute([$startedAt]);
 
+    cron_metric_set('replies_checked', $updated);
+    cron_metric_set('replies_removed', $removedCount);
+    cron_run_finish($pdo, $runId, 'ok');
     echo "Reddit status check complete: $updated reply rows updated, " . count($rollup) . " subreddits rolled up.\n";
 } catch (Throwable $e) {
     $lastError = $e->getMessage();
     reddit_log("Status check crashed: $lastError");
+    cron_metric_set('replies_checked', $updated);
+    cron_metric_set('replies_removed', $removedCount);
+    cron_run_finish($pdo, $runId, 'error', $lastError);
     echo "Reddit status check FAILED: $lastError\n";
     exit(1);
 } finally {

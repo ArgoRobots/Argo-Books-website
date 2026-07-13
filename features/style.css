@@ -517,33 +517,44 @@ body {
   padding: 100px 0;
 }
 
+/* Two columns of icon-left rows rather than a grid of floating cards.
+   Paired cells share a grid row height, so the hairline dividers line up
+   across both columns. */
 .benefits-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 56px;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 
 .benefit-card {
-  padding: 28px;
-  border-radius: 16px;
-  border: 1px solid var(--gray-200);
-  background: var(--white);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 18px;
+  padding: 28px 2px;
+  border-bottom: 1px solid var(--gray-200);
 }
 
-.benefit-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+/* The bottom row carries no divider. */
+.benefit-card:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.benefit-card:hover h3 {
+  color: var(--primary-blue);
 }
 
 .benefit-card-icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: 11px;
   display: grid;
   place-items: center;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
+  background: var(--blue-50);
   color: var(--primary-blue);
 }
 
@@ -552,42 +563,33 @@ body {
   height: 22px;
 }
 
-.benefit-card-icon.green {
-  background: linear-gradient(135deg, var(--green-50), var(--green-100));
-  color: var(--emerald-500);
-}
-
-.benefit-card-icon.purple {
-  background: linear-gradient(135deg, var(--purple-50), var(--purple-100));
-  color: var(--purple-500);
-}
-
-.benefit-card-icon.amber {
-  background: linear-gradient(135deg, var(--amber-50), var(--amber-100));
-  color: var(--amber-500);
-}
-
-.benefit-card-icon.cyan {
-  background: linear-gradient(135deg, var(--cyan-50), var(--cyan-100));
-  color: var(--cyan-500);
-}
-
+/* One brand ink across every row. The per-card rainbow was the section's
+   loudest "AI-generated" tell, so the color modifiers all resolve to it. */
+.benefit-card-icon.green,
+.benefit-card-icon.purple,
+.benefit-card-icon.amber,
+.benefit-card-icon.cyan,
 .benefit-card-icon.red {
-  background: linear-gradient(135deg, var(--red-50), var(--red-100));
-  color: var(--red-500);
+  background: var(--blue-50);
+  color: var(--primary-blue);
 }
 
 .benefit-card h3 {
+  grid-column: 2;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--gray-900);
-  margin-bottom: 8px;
+  margin: 1px 0 6px;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
 }
 
 .benefit-card p {
+  grid-column: 2;
   font-size: 0.9rem;
-  color: var(--black);
-  line-height: 1.7;
+  color: var(--gray-600);
+  line-height: 1.65;
+  margin: 0;
 }
 
 /* ========================================
@@ -734,6 +736,16 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+}
+
+/* Center a related-card grid that holds exactly two cards (on desktop, where
+   the grid is multi-column) so they don't sit left with an empty third slot.
+   Below 900px the grid is already a single centered column. */
+@media (min-width: 901px) {
+  .related-grid:has(> .related-card:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 340px));
+    justify-content: center;
+  }
 }
 
 .related-card {
@@ -1070,6 +1082,15 @@ body {
     grid-template-columns: 1fr;
     max-width: 500px;
     margin: 0 auto;
+  }
+
+  /* Single column: every row keeps its divider except the very last. */
+  .benefit-card:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .benefit-card:last-child {
+    border-bottom: none;
   }
 
   .highlight-grid {

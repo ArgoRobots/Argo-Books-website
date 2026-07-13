@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../resources/icons.php';
+<?php
+require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../config/pricing.php';
+$pricing = get_pricing_config();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,10 +32,10 @@
     <meta name="twitter:title" content="What's New - Argo Books | Latest Features & Updates">
     <meta name="twitter:description"
         content="Latest updates and new features in Argo Books. Download the latest release.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -85,6 +88,82 @@
 
     <div class="container">
         <div class="version-grid">
+
+            <!-- Version 2.0.10 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.10</span>
+                        <span class="date-tag">July 6 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Redesigned invoice editor:</strong> Build invoices right on the invoice itself, so what you see on screen is exactly what your customer receives. Click any part of the invoice to edit line items, dates, or notes, and pick products and services from a dropdown as you type. No more filling out a separate form and hoping the layout looks right.</li>
+                                <li><strong>Recurring invoices, expenses, and revenue:</strong> Set any invoice, expense, or revenue entry to repeat on a schedule you choose. Perfect for retainers, subscriptions, rent, and any regular bill or income. Argo Books creates each one automatically, so your books stay up to date without the repeat data entry.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Multi-currency precision:</strong> Amounts stay accurate to the cent across every currency, so your totals, charts, and summary cards always agree.</li>
+                                <li><strong>Smoother data imports:</strong> Importing from spreadsheets, bank statements, and receipts is more reliable, including unusual date and currency formats.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes &amp; Improvements</h4>
+                            <p class="changelog-intro">This release also brings a large round of fixes, performance gains, and general refinements throughout the app. Plenty of small polish to keep everything running smoothly and reliably.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version 2.0.9 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.9</span>
+                        <span class="date-tag">June 29 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Bank statement import:</strong> Import a bank statement and Argo Books turns each line into a categorized expense or revenue, filling in the product, category, and supplier or customer for you. A quick way to catch up on your books or stay on top of them each month, with no bank login or connection required.</li>
+                                <li><strong>Sales by Product analytics:</strong> A new Sales by Product tab and report on the Analytics page shows exactly which products bring in the most revenue.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Smarter spreadsheet imports:</strong> The spreadsheet importer is now better at reading unusual spreadsheet layouts and matching entries to your existing data.</li>
+                                <li><strong>Quick "Create one":</strong> Add a new category, supplier, customer, or product right from the dropdown you're filling in, without leaving the form.</li>
+                                <li><strong>Multi-currency spreadsheet import:</strong> Spreadsheet import now support spreadsheets that use multiple difference currencies.</li>
+                                <li><strong>Smoother performance:</strong> The interface stays responsive in more situations. Opening companies is now around 5 times faster.</li>
+                                <li><strong>Clearer offline messages:</strong> When a feature needs the internet, you'll see one consistent message across the app.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>More reliable receipt scanning:</strong> Longer, more detailed receipts now scan more reliably.</li>
+                                <li><strong>Readable tooltips in light mode:</strong> Tooltip text now displays clearly against light backgrounds.</li>
+                                <li><strong>Clearer save messages:</strong> If your save location isn't available, Argo Books now shows a helpful message explaining what to do.</li>
+                                <li>Various stability improvements, and additional fixes.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Version 2.0.8 -->
             <div class="version-card">
@@ -227,7 +306,7 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>AI receipt scanning for everyone:</strong> AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
+                                <li><strong>AI receipt scanning for everyone:</strong> AI-powered receipt scanning is now available in the free plan with a <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipt per month usage limit.</li>
                                 <li><strong>Company name in payment portal:</strong> Directly control which business name your customers see in the payment portal. There is now a dedicated control for this in the settings.</li>
                                 <li><strong>Export world map to Excel:</strong> The world map on the Analytics page can now be exported to Excel.</li>
                             </ul>

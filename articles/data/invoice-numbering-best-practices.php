@@ -19,7 +19,7 @@ return [
   'hub_weight' => 30,
 
   'published' => '2026-05-30',
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 7,
 
@@ -37,13 +37,14 @@ HTML,
       'h2' => 'Why invoice numbers matter',
       'anchor' => 'why-it-matters',
       'html' => <<<'HTML'
-<p>Every invoice you send needs its own unique number. That number is what your client writes on the cheque, what your bank statement quotes when the payment lands, and what you or your accountant use to tie a sale to a deposit.</p>
+<p>Every invoice you send needs its own unique number. That number is <a href="/how-to-invoice-clients/">what your client writes on the cheque</a>, what your bank statement quotes when the payment lands, and what you or your accountant use to tie a sale to a deposit.</p>
 <p>Three concrete reasons the number matters:</p>
 <ul>
   <li><strong>Tax audits.</strong> Tax offices in most countries can ask to see a continuous list of invoices for a given year. They're checking that you didn't quietly skip a sale. In Australia, the UK, Canada, and most of the EU, gaps in your numbering are a flag to look closer. In the US, the IRS doesn't require sequential numbers by federal rule, but state sales-tax auditors often expect them, and a clean sequence is much easier to defend than a messy one either way.</li>
   <li><strong>Finding the invoice in an email thread.</strong> A client emails you saying "I paid invoice 47 last week, why are you chasing me?" If you have one invoice numbered 47, you can pull it up in two seconds. If you reset your numbers every January and have three different invoice 47s sitting in your sent folder, you'll waste time trying to figure it out.</li>
   <li><strong>Double-billing.</strong> If you ever accidentally send the same invoice twice with two different numbers, the client may pay it twice, and you have a refund to issue. A clean numbering scheme makes duplicates obvious before they go out.</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>The good news: this is a one-time decision. Pick a system in the next five minutes, write it down somewhere you'll see it again, and you're done. The rest of this guide are the five rules that make the choice almost automatic.</p>
 HTML,
     ],
@@ -55,7 +56,7 @@ HTML,
       'step_name' => 'Pick a starting number',
       'step_text' => 'Choose your first invoice number. 1001, 0001, or INV-2026-001 all work. Higher starting numbers can look more established, but the format you pick matters more than the digit you start at.',
       'html' => <<<'HTML'
-<p>Your first decision is what number invoice number one will actually be. There are three common choices and none of them are wrong.</p>
+<p>Your first decision is what number to give your very first invoice. There are three common choices and none of them are wrong.</p>
 <ul>
   <li><strong>Start at 1001.</strong> This is what most consultants and freelancers do. It avoids the optics of sending a client "Invoice 1", which some people worry signals you just started out. Whether a client actually notices is a different question (more on that in the FAQ below), but 1001 is a safe, common starting point.</li>
   <li><strong>Start at 0001.</strong> Padded with zeros so the number is always four digits. Looks tidy in a spreadsheet because every row is the same width. The downside: once you cross 9999, you have to add a fifth digit, which can look odd next to the older ones.</li>
@@ -85,7 +86,7 @@ HTML,
       'h2' => 'Step 3: Never reuse a number',
       'anchor' => 'never-reuse',
       'step_name' => 'Never reuse a number',
-      'step_text' => 'Each invoice number must be unique forever. If you void an invoice, mark it voided and move on to the next number. Do not reissue the old number to a different invoice.',
+      'step_text' => 'Each invoice number must be unique forever. If you void an invoice, mark it voided and move on to the next number. Don\'t reissue the old number to a different invoice.',
       'html' => <<<'HTML'
 <p>This is the one hard rule. Every invoice number you ever issue points to exactly one invoice, forever. Once you've used 1024, it's taken. Even if you void that invoice five minutes later, you don't reuse 1024 for the next one. The next invoice is 1025.</p>
 <p>Why this matters in practice:</p>
@@ -109,7 +110,7 @@ HTML,
       'h2' => 'Step 4: Keep them sequential',
       'anchor' => 'keep-them-sequential',
       'step_name' => 'Keep them sequential',
-      'step_text' => 'Run your numbers in order with no gaps. If you void 1024, mark it voided in your records but do not skip from 1023 to 1025 with nothing in between. Auditors will ask about gaps.',
+      'step_text' => 'Run your numbers in order with no gaps. If you void 1024, mark it voided in your records but don\'t skip from 1023 to 1025 with nothing in between. Auditors will ask about gaps.',
       'html' => <<<'HTML'
 <p>Step 3 says never reuse a number. Step 4 says the flip side: don't skip numbers either. The sequence should run 1001, 1002, 1003, 1004, with every number accounted for.</p>
 <p>This matters mainly for tax purposes. In the UK, Australia, Canada, the EU, and most other countries with a VAT or GST system, your invoice register is expected to be a continuous run of numbers. A gap between 1023 and 1025 with no 1024 anywhere raises the question: was there a sale you forgot to record? In the US, the federal rules are looser, but state sales-tax audits and most accountants still want a clean continuous list.</p>
@@ -130,7 +131,7 @@ HTML,
       'step_name' => 'Match what your accounting software expects',
       'step_text' => 'Pick a numbering format that can be imported into accounting tools later. Plain numbers and number-with-prefix formats import cleanly. Heavy use of slashes, spaces, or symbols often does not.',
       'html' => <<<'HTML'
-<p>Even if you're sending invoices from a free generator or a Word template today, there's a good chance you'll move to dedicated accounting software at some point. Maybe you start using Argo Books, or your accountant asks you to switch to QuickBooks, Xero, FreshBooks, or Wave. Almost all of these tools can import an existing list of invoices, but they're pickier than you might expect about what an invoice number can look like.</p>
+<p>Even if you're <a href="/how-to-send-an-invoice-for-free/">sending invoices from a free generator or a Word template</a> today, there's a good chance you'll move to dedicated accounting software at some point. Maybe you start using Argo Books, or your accountant asks you to switch to QuickBooks, Xero, FreshBooks, or Wave. Almost all of these tools can import an existing list of invoices, but they're pickier than you might expect about what an invoice number can look like.</p>
 <p>Formats that import cleanly into almost everything:</p>
 <ul>
   <li>Plain digits: <code>1001</code>, <code>1002</code>, <code>1003</code>.</li>
@@ -140,10 +141,11 @@ HTML,
 <p>Formats that often cause import problems:</p>
 <ul>
   <li>Slashes inside the number: <code>2026/05/001</code>. Some tools interpret the slash as a path separator and fail.</li>
-  <li>Spaces: <code>INV 1001</code>. Get stripped or replaced inconsistently between tools.</li>
+  <li>Spaces: <code>INV 1001</code>. They get stripped or replaced inconsistently between tools.</li>
   <li>Symbols beyond the hyphen: <code>#1001</code>, <code>1001*</code>, <code>1001!</code>. Often rejected by stricter validators.</li>
   <li>Mixed case in unpredictable spots: <code>Inv-1001</code> in some, <code>INV-1002</code> in others. Importers may treat these as different prefixes.</li>
 </ul>
+{{illustration:checklist}}
 <p>Two practical rules. First, stick to letters, digits, and hyphens. Second, be consistent: if you start with INV-1001, keep INV- on every invoice. Don't mix INV-1001 with 1002 with #1003. A consistent format imports in one click. A mixed bag means you spend an evening cleaning up a spreadsheet before the import will run.</p>
 <p>Even if you have no plans to switch tools, this rule is also a kindness to your future self. A consistent format sorts properly in a spreadsheet, searches cleanly, and copies into emails without any quoting weirdness.</p>
 HTML,

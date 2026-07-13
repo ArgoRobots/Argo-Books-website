@@ -1,17 +1,12 @@
 /* Stat Cards */
 .stat-card {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px var(--shadow-default);
-  border: 1px solid var(--gray-border);
   text-align: center;
 }
 
 .stat-card h3 {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--admin-text);
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -20,7 +15,7 @@
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--gray-800);
+  color: var(--admin-text);
   line-height: 1;
 }
 
@@ -46,7 +41,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--admin-text);
 }
 
 /* Search Form */
@@ -54,28 +49,12 @@
   width: 100%;
 }
 
-.search-form {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
+/* Layout tweaks layered on top of the shared .control-bar: let the search box
+   stretch to fill the row. Base styling (padding, border, focus) comes from
+   .control-input in admin/common-style.css. */
 .search-input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
   flex: 3;
   min-width: 300px;
-  height: 38px;
-  box-sizing: border-box;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
 .search-button {
@@ -107,7 +86,7 @@
 .clear-button {
   padding: 0.5rem 1rem;
   background: var(--gray-100);
-  color: var(--gray-500);
+  color: var(--admin-text);
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -121,52 +100,12 @@
 
 .clear-button:hover {
   background: var(--gray-border);
-  color: var(--gray-700);
+  color: var(--admin-text);
 }
 
-/* Filter Groups (inline with search) */
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.filter-group label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.filter-group select,
-.filter-group input[type="date"] {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: var(--white);
-  min-width: 150px;
-  height: 38px;
-  box-sizing: border-box;
-}
-
-.filter-group select:focus,
-.filter-group input[type="date"]:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--blue-alpha-10);
-}
-
-/* The shared dark-theme input rules only cover text/number/email/password, so
-   the date pickers keep their white background here; style them explicitly. */
-[data-theme="dark"] .filter-group input[type="date"] {
-  background: var(--gray-700);
-  border-color: var(--black);
-  color: var(--gray-200);
-}
-
-[data-theme="dark"] .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+/* The shared .control-input dark-theme rule sets the background/border, but the
+   native date picker icon still needs inverting to stay visible on dark. */
+[data-theme="dark"] .custom-date-range input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
 
@@ -209,7 +148,7 @@
 
 .selection-info {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--admin-text);
   font-weight: 500;
 }
 
@@ -265,11 +204,120 @@
   background: var(--red-600);
 }
 
+.btn-ban {
+  background: var(--amber-500, #f59e0b);
+  color: var(--white);
+}
+
+.btn-ban:not(:disabled):hover {
+  background: var(--amber-600, #d97706);
+}
+
+/* Ban modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.modal-content {
+  background: var(--white);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--admin-text);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body .form-group {
+  margin-bottom: 14px;
+}
+
+.modal-body label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.modal-body select,
+.modal-body textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.modal-note {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin: 4px 0 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--gray-border);
+}
+
+.btn-secondary {
+  background: var(--gray-bg-light);
+  color: var(--admin-text);
+  border: 1px solid var(--gray-border);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .modal-body select,
+[data-theme="dark"] .modal-body textarea {
+  background: var(--gray-700);
+  border-color: var(--gray-600);
+  color: var(--white);
+}
+
 /* No Results */
 .no-results {
   padding: 3rem 2rem;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--admin-text);
 }
 
 .no-results svg {
@@ -311,12 +359,12 @@
     justify-content: center;
   }
 
-  .filter-group {
+  .control-group {
     width: 100%;
   }
 
-  .filter-group select,
-  .filter-group input[type="date"] {
+  .control-group .control-select,
+  .control-group .control-input {
     width: 100%;
   }
 

@@ -37,10 +37,10 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
     <meta name="twitter:title" content="Argo Books vs ZipBooks: More Features, Lower Price, Local Data">
     <meta name="twitter:description"
         content="Compare Argo Books and ZipBooks side by side. Both are simple and free to start. See how Argo Books offers more for less.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -72,7 +72,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features, with no AI capabilities, no inventory management, and no offline access."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features, with no AI capabilities, no inventory management, and no offline access."
                     }
                 },
                 {
@@ -395,7 +395,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>ZipBooks also has a free tier, but it's more limited: no AI capabilities, no inventory management, and no offline access.</p>
                         </div>
                     </div>

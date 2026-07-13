@@ -100,7 +100,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-form h2 {
   margin-bottom: 20px;
-  color: var(--blue-900);
+  color: var(--black);
   border-bottom: 1px solid var(--gray-border);
   padding-bottom: 15px;
 }
@@ -175,7 +175,7 @@ header .header-inner .menu-container .menu .community:after {
 .form-section-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--blue-900);
+  color: var(--black);
   margin-bottom: 15px;
   display: flex;
   align-items: center;
@@ -232,7 +232,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .preview-toggle button.active {
   background: var(--white);
-  color: var(--blue-900);
+  color: var(--black);
   box-shadow: 0 1px 2px var(--shadow-default);
 }
 

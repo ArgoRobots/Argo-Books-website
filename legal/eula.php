@@ -21,10 +21,10 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="End User License Agreement - Argo Books">
     <meta name="twitter:description" content="Read the Argo Books End User License Agreement for our desktop accounting software.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/legal/eula.php">
@@ -142,7 +142,7 @@
 
             <h2>5. Third-Party Services</h2>
             <p>The Software may use third-party services for certain functionality, including but not limited to Google
-                Sheets, Google Gemini, Microsoft Translator, Open Exchange Rates, Stripe, PayPal, and Square. Your use of these services through the
+                Sheets, Google Gemini, Open Exchange Rates, Stripe, PayPal, and Square. Your use of these services through the
                 Software is subject to the respective terms and conditions of those services.</p>
 
             <h2>6. Warranty Disclaimer</h2>
@@ -152,44 +152,62 @@
                     will meet your requirements or that the operation of the Software will be uninterrupted or
                     error-free.</strong></p>
 
-            <h2>7. Limitation of Liability</h2>
+            <h2>7. No Professional Advice</h2>
+            <p><strong>Argo Books is a tool to help you record and organize your own financial information. It is
+                    not a substitute for professional accounting, bookkeeping, tax, legal, or financial advice, and
+                    Licensor is not acting as your accountant, bookkeeper, or tax advisor.</strong> You are solely
+                responsible for the accuracy and completeness of the information you enter and for reviewing and
+                verifying any calculations, reports, tax figures, or other output before relying on them or submitting
+                them to any authority or third party. Licensor does not warrant that any output is accurate, complete,
+                or suitable for your circumstances or compliant with the laws that apply to you, and recommends that
+                you consult a qualified professional for advice specific to your situation. To the fullest extent
+                permitted by law, Licensor is not liable for any financial, tax, accounting, or business decision
+                made, or any loss, penalty, or liability incurred, in reliance on the Software or its output.</p>
+
+            <h2>8. Limitation of Liability</h2>
             <p><strong>In no event shall Licensor be liable for any special, incidental, indirect, or consequential
                     damages whatsoever (including, without limitation, damages for loss of business profits, business
                     interruption, loss of business information, or any other pecuniary loss) arising out of the use of
                     or inability to use the Software, even if Licensor has been advised of the possibility of such
                     damages.</strong></p>
 
-            <h2>8. Term and Termination</h2>
+            <h2>9. Indemnification</h2>
+            <p>You agree to defend, indemnify, and hold harmless Licensor, and its directors, employees, and agents,
+                from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable
+                legal fees) arising out of or connected with your use of the Software, your breach of this Agreement,
+                your violation of any law, or your infringement of the rights of any third party.</p>
 
-            <h3>8.1 Term</h3>
+            <h2>10. Term and Termination</h2>
+
+            <h3>10.1 Term</h3>
             <p>This Agreement is effective until terminated.</p>
 
-            <h3>8.2 Termination</h3>
+            <h3>10.2 Termination</h3>
             <p>Your rights under this Agreement will terminate automatically without notice if you fail to comply with
                 any of its terms. Upon termination, you must cease all use of the Software and destroy all copies, full
                 or partial, of the Software.</p>
 
-            <h2>9. Export Regulations</h2>
+            <h2>11. Export Regulations</h2>
             <p>You agree to comply with all applicable international and national laws that apply to the Software,
                 including the export regulations of your country.</p>
 
-            <h2>10. Governing Law</h2>
+            <h2>12. Governing Law</h2>
             <p>This Agreement shall be governed by the laws of Canada, excluding its conflicts of law rules. Any
                 disputes arising under or in connection with this Agreement shall be subject to the exclusive
                 jurisdiction of the courts located in Canada.</p>
 
-            <h2>11. Entire Agreement</h2>
+            <h2>13. Entire Agreement</h2>
             <p>This Agreement constitutes the entire agreement between you and Licensor concerning the Software and
                 supersedes all prior or contemporaneous oral or written communications, proposals, and representations
                 with respect to the Software or any other subject matter covered by this Agreement.</p>
 
-            <h2>12. Contact Information</h2>
+            <h2>14. Contact Information</h2>
             <p>If you have any questions about this Agreement, please contact:</p>
             <ul>
                 <li>Email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: May 21, 2026</p>
+            <p class="last-updated">Last updated: July 8, 2026</p>
         </div>
     </div>
 

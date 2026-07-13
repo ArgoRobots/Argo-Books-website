@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_sender.php';
 
@@ -32,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     }
 }
 
+// Release the session lock now that auth + CSRF have been read. PHP's default
+// file session handler holds an EXCLUSIVE lock from session_start() until the
+// request ends, so without this a long-running action (discovery can run for
+// minutes; shopify_run_dork even sets a 300s time limit) blocks every other
+// request carrying the same session cookie at its own session_start() — admin
+// pages AND public pages like the landing page would hang until it finished,
+// and concurrent discovery runs would serialize instead of overlapping. No
+// handler below writes to $_SESSION, so closing it here is safe.
+session_write_close();
+
 // Ensure tables exist
 
 // Check if the cron pipeline is currently running
@@ -54,7 +64,7 @@ function is_pipeline_running(): bool
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // Block actions that conflict with a running pipeline
-$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import'];
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import', 'editorial_run_discovery', 'editorial_import', 'editorial_add_url', 'creator_run_discovery', 'creator_import', 'creator_add_url'];
 if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
@@ -91,8 +101,8 @@ switch ($action) {
     case 'get_lead':
         get_lead($pdo);
         break;
-    case 'create_lead':
-        create_lead($pdo);
+    case 'create_lead_from_website':
+        create_lead_from_website($pdo);
         break;
     case 'update_lead':
         update_lead($pdo);
@@ -121,6 +131,37 @@ switch ($action) {
         break;
     case 'shopify_import':
         shopify_import($pdo);
+        break;
+
+    // Editorial / roundup discovery
+    case 'editorial_get_status':
+        editorial_get_status($pdo);
+        break;
+    case 'editorial_run_discovery':
+        editorial_run_discovery($pdo);
+        break;
+    case 'editorial_import':
+        editorial_import($pdo);
+        break;
+    case 'editorial_add_url':
+        editorial_add_url($pdo);
+        break;
+
+    // Creators / affiliate-partner discovery
+    case 'creator_get_status':
+        creator_get_status($pdo);
+        break;
+    case 'creator_run_discovery':
+        creator_run_discovery($pdo);
+        break;
+    case 'creator_import':
+        creator_import($pdo);
+        break;
+    case 'creator_add_url':
+        creator_add_url($pdo);
+        break;
+    case 'creator_set_email':
+        creator_set_email($pdo);
         break;
 
     // AI draft
@@ -189,14 +230,14 @@ switch ($action) {
     case 'reddit_get_threads':
         reddit_api_get_threads($pdo);
         break;
+    case 'reddit_add_thread':
+        reddit_api_add_thread($pdo);
+        break;
     case 'reddit_get_thread':
         reddit_api_get_thread($pdo);
         break;
     case 'reddit_get_stats':
         reddit_api_get_stats($pdo);
-        break;
-    case 'reddit_pipeline_status':
-        reddit_api_pipeline_status();
         break;
     case 'reddit_pipeline_progress':
         reddit_api_pipeline_progress();
@@ -206,9 +247,6 @@ switch ($action) {
         break;
     case 'reddit_mark_replied':
         reddit_api_mark_replied($pdo);
-        break;
-    case 'reddit_mark_not_fit':
-        reddit_api_mark_not_fit($pdo);
         break;
     case 'reddit_mark_skipped':
         reddit_api_mark_skipped($pdo);
@@ -292,6 +330,11 @@ function get_leads($pdo)
             $where[] = 'ol.source = ?';
             $params[] = $source;
         }
+    } else {
+        // Editorial and Creator leads have their own channel tabs (their source
+        // is requested explicitly there). Keep them out of the default Email
+        // leads list so the channels stay organized and separate.
+        $where[] = "ol.source NOT IN ('editorial_auto', 'creator_auto')";
     }
     if ($search) {
         $where[] = '(ol.business_name LIKE ? OR ol.email LIKE ? OR ol.contact_name LIKE ? OR ol.city LIKE ? OR ol.category LIKE ?)';
@@ -349,37 +392,72 @@ function bulk_get_leads($pdo)
     json_response(['success' => true, 'leads' => $leads]);
 }
 
-function create_lead($pdo)
+/**
+ * Create a lead from just a website URL: fetch the site, auto-fill business
+ * name / email / phone / category / city / summary via enrich_lead_from_website,
+ * then insert. Backs the slimmed-down "Add Lead" modal (one website field).
+ */
+function create_lead_from_website($pdo)
 {
     $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $website = trim((string) ($data['website'] ?? ''));
 
-    if (empty($data['business_name'])) {
-        json_response(['success' => false, 'message' => 'Business name is required'], 400);
+    if ($website === '') {
+        json_response(['success' => false, 'message' => 'Website is required'], 400);
+    }
+    if (!preg_match('#^https?://#i', $website)) {
+        $website = 'https://' . $website;
+    }
+    if (!filter_var($website, FILTER_VALIDATE_URL)) {
+        json_response(['success' => false, 'message' => "That doesn't look like a valid website URL"], 400);
+    }
+
+    // Enrichment fetches the site + makes one Gemini call, so give it room.
+    @set_time_limit(60);
+    $enriched = enrich_lead_from_website($website);
+
+    $finalWebsite = $enriched['website'] ?: $website;
+    $email = $enriched['email'] ?: null;
+
+    // Dedup by website (and email when we found one), like the other channels.
+    if ($email) {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? OR email = ? LIMIT 1");
+        $check->execute([$finalWebsite, $email]);
+    } else {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $check->execute([$finalWebsite]);
+    }
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this website or email already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
     }
 
     $stmt = $pdo->prepare("INSERT INTO outreach_leads
-        (business_name, contact_name, email, phone, website, address, category, city, source, status, notes, contact_page_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
+        (business_name, email, phone, website, address, category, city, source, status, business_summary)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'manual', 'new', ?)");
     $stmt->execute([
-        $data['business_name'],
-        $data['contact_name'] ?? null,
-        $data['email'] ?? null,
-        $data['phone'] ?? null,
-        $data['website'] ?? null,
-        $data['address'] ?? null,
-        $data['category'] ?? null,
-        $data['city'] ?? null,
-        $data['source'] ?? 'manual',
-        $data['status'] ?? 'new',
-        $data['notes'] ?? null,
-        $data['contact_page_url'] ?? null,
+        $enriched['business_name'] ?: $finalWebsite,
+        $email,
+        $enriched['phone'] ?: null,
+        $finalWebsite,
+        $enriched['address'] ?: null,
+        $enriched['category'] ?: null,
+        $enriched['city'] ?: null,
+        $enriched['business_summary'] ?: null,
     ]);
 
-    $id = $pdo->lastInsertId();
-    log_activity($pdo, $id, 'lead_created', 'Lead created: ' . $data['business_name']);
+    $id = (int) $pdo->lastInsertId();
+    log_activity($pdo, $id, 'lead_created', 'Lead auto-added from website: ' . $finalWebsite);
 
-    json_response(['success' => true, 'id' => $id, 'message' => 'Lead created']);
+    json_response([
+        'success'  => true,
+        'id'       => $id,
+        'enriched' => $enriched,
+        'message'  => 'Lead added: ' . ($enriched['business_name'] ?: $finalWebsite),
+    ]);
 }
 
 function update_lead($pdo)
@@ -484,9 +562,6 @@ function get_stats($pdo)
         SUM(status = 'replied') as replied,
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
-
-    // Follow-ups pending review (drafted, awaiting admin approval)
-    $rows['followups_pending'] = (int) $pdo->query("SELECT COUNT(*) FROM outreach_followups WHERE status = 'drafted'")->fetchColumn();
 
     // Count distinct leads clicked. SUBSTRING_INDEX collapses "outreach-42-v7" → "outreach-42"
     // so a lead that received multiple variants and had any of them clicked counts once.
@@ -672,6 +747,10 @@ function shopify_run_dork($pdo)
     // keep hitting the same query.
     $cursor               = (int) _shopify_state_get($pdo, 'shopify_dork_cursor', '0');
     $poolSize             = count(SHOPIFY_DORK_POOL);
+    $pages                = json_decode(_shopify_state_get($pdo, 'shopify_dork_pages', '{}'), true);
+    if (!is_array($pages)) {
+        $pages = [];
+    }
     $fits                 = [];
     $rejectedCount        = 0;
     $rejectReasons        = [];
@@ -679,28 +758,76 @@ function shopify_run_dork($pdo)
     $totalEvaluated       = 0;
     $queriesRun           = [];
 
-    while (count($fits) < $limit && $callsToday < $serpapiLimit) {
-        $query = SHOPIFY_DORK_POOL[$cursor % $poolSize];
+    // Per-run guardrails (mirror the editorial channel): a SerpAPI-call budget so
+    // one Run can't drain the daily quota, a page-depth cap per dork, and a
+    // dry-streak exit so we stop once the whole pool stops yielding new stores.
+    $serpCallsThisRun = 0;
+    $perRunSerpBudget = max(1, (int) ($_ENV['SERPAPI_MAX_CALLS_PER_RUN'] ?? 12));
+    $maxPageDepth     = max(1, (int) ($_ENV['SHOPIFY_MAX_PAGE_DEPTH'] ?? 3));
+    $pageSize         = 100;
+    $maxStart         = ($maxPageDepth - 1) * $pageSize;
+    $dryQueries       = 0;
+    $stopReason       = 'target_reached';
+
+    // Within-run dedup. The same store surfaces across multiple dork queries
+    // (and via different deep links that all canonicalize to one origin), so
+    // without these we'd show (and re-evaluate) the same storefront many times.
+    //   $seenCanonicals: skip a canonical URL we've already processed this run,
+    //                    BEFORE the expensive evaluator call.
+    //   $seenIdentities: backstop for the case where two different canonical
+    //                    URLs resolve to the same final store + email (e.g. a
+    //                    .myshopify.com link and a custom-domain link for the
+    //                    same shop). Keyed on final-URL host + harvested email.
+    $seenCanonicals = [];
+    $seenIdentities = [];
+
+    while (true) {
+        if (count($fits) >= $limit)                 { $stopReason = 'target_reached'; break; }
+        if ($callsToday >= $serpapiLimit)           { $stopReason = 'daily_quota';    break; }
+        if ($serpCallsThisRun >= $perRunSerpBudget) { $stopReason = 'run_budget';     break; }
+        if ($dryQueries >= $poolSize)               { $stopReason = 'exhausted';      break; }
+
+        $idx   = $cursor % $poolSize;
+        $query = SHOPIFY_DORK_POOL[$idx];
         $cursor++;
         _shopify_state_set($pdo, 'shopify_dork_cursor', (string) $cursor);
 
+        $start = (int) ($pages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            $dryQueries++;
+            continue;
+        }
+
         $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
-        $queryResult = serpapi_query_cached($queryWithExclusions, $apiKey, 100, $pdo);
+        $queryResult = serpapi_query_cached($queryWithExclusions, $apiKey, $pageSize, $pdo, $start);
         $serpResults = $queryResult['results'];
         if (!$queryResult['from_cache']) {
             $callsToday++;
+            $serpCallsThisRun++;
             _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
         }
-        $queriesRun[] = $query;
+        $pages[(string) $idx] = $start + $pageSize;
+        _shopify_state_set($pdo, 'shopify_dork_pages', json_encode($pages));
+        $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
 
-        if (empty($serpResults)) continue;
+        if (empty($serpResults)) {
+            $dryQueries++;
+            continue;
+        }
         $totalEvaluated += count($serpResults);
 
+        $foundNew = false;
         foreach ($serpResults as $r) {
-            if (count($fits) >= $limit) break 2;
+            if (count($fits) >= $limit) break;
 
             $canonical = shopify_canonical_url($r['link'] ?? '');
             if ($canonical === '') continue;
+
+            // Skip canonicals already handled this run (dup SERP hits / deep
+            // links to the same store). Marked seen even if it later rejects,
+            // so we never pay to evaluate the same origin twice.
+            if (isset($seenCanonicals[$canonical])) continue;
+            $seenCanonicals[$canonical] = true;
 
             // Already-imported check FIRST, before the expensive evaluator
             // call. Uses outreach_shopify_candidates.canonical_url (stable,
@@ -715,6 +842,7 @@ function shopify_run_dork($pdo)
                 continue;
             }
 
+            $foundNew = true;
             $result = evaluate_shopify_candidate($canonical);
 
             if (empty($result['fit'])) {
@@ -725,17 +853,35 @@ function shopify_run_dork($pdo)
             }
 
             $meta = $result['metadata'] ?? [];
+            $finalUrl = $result['final_url'] ?? $canonical;
+
+            // Identity dedup: two different canonical URLs can resolve to the
+            // same shop (the Scholar's Choice case: many .myshopify.com links
+            // all redirect to scholarschoice.ca with the same email). Key on
+            // final-URL host + email so we only surface the store once.
+            $identityHost = parse_url($finalUrl, PHP_URL_HOST) ?: $canonical;
+            $identityHost = strtolower(preg_replace('/^www\./', '', (string) $identityHost));
+            $identityKey  = $identityHost . '|' . strtolower(trim((string) ($meta['email'] ?? '')));
+            if (isset($seenIdentities[$identityKey])) continue;
+            $seenIdentities[$identityKey] = true;
+
             $fits[] = [
                 'canonical_url'    => $canonical,
                 'serp_title'       => $r['title'] ?? '',
                 'fit'              => true,
-                'final_url'        => $result['final_url'] ?? $canonical,
+                'final_url'        => $finalUrl,
                 'business_name'    => $meta['business_name'] ?? '',
                 'email'            => $meta['email'] ?? '',
                 'products_count'   => $meta['products_count'] ?? null,
                 'first_product_at' => $meta['first_product_created_at'] ?? null,
                 'country'          => $meta['country'] ?? '',
             ];
+        }
+
+        if ($foundNew) {
+            $dryQueries = 0;
+        } else {
+            $dryQueries++;
         }
     }
 
@@ -745,12 +891,15 @@ function shopify_run_dork($pdo)
         'success'                => true,
         'results'                => $fits,
         'requested_limit'        => $limit,
+        'found_count'            => count($fits),
+        'stop_reason'            => $stopReason,
         'quota_exhausted'        => $quotaExhausted,
         'rejected_count'         => $rejectedCount,
         'reject_reasons'         => $rejectReasons,
         'already_imported_count' => $alreadyImportedCount,
         'total_evaluated'        => $totalEvaluated,
         'queries_run'            => $queriesRun,
+        'serpapi_calls_this_run' => $serpCallsThisRun,
         'serpapi_calls_today'    => $callsToday,
         'serpapi_limit'          => $serpapiLimit,
         'imports_today'          => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
@@ -865,6 +1014,810 @@ function shopify_import($pdo)
         outreach_log("Shopify import failed: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
+}
+
+// ─── Editorial / roundup discovery ───
+// Finds "best free accounting software" / "QuickBooks alternatives" listicles
+// and their authors, so we can pitch getting Argo Books added. Mirrors the
+// Shopify discovery handlers. Shares the SerpAPI daily budget with Shopify.
+
+function editorial_get_status($pdo)
+{
+    _shopify_reset_daily_counters_if_needed($pdo);
+    json_response([
+        'success'             => true,
+        'enabled'             => ($_ENV['OUTREACH_EDITORIAL_ENABLED'] ?? 'false') === 'true',
+        'has_key'             => !empty($_ENV['SERPAPI_KEY']),
+        'has_hunter'          => !empty($_ENV['HUNTER_API_KEY']),
+        'serpapi_calls_today' => (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0'),
+        'serpapi_limit'       => (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3),
+    ]);
+}
+
+function editorial_run_discovery($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
+
+    // Each candidate does a page fetch + a Gemini extraction + a Hunter/scrape
+    // lookup, so a run can take a few minutes. The daily SerpAPI quota bounds it.
+    @set_time_limit(300);
+
+    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $limit = min(30, max(1, (int) ($data['limit'] ?? 8)));
+
+    $apiKey = $_ENV['SERPAPI_KEY'] ?? '';
+    if ($apiKey === '') {
+        json_response(['success' => false, 'message' => 'SerpAPI key not configured. Set SERPAPI_KEY in .env'], 500);
+    }
+
+    _shopify_reset_daily_counters_if_needed($pdo);
+    $serpapiLimit = (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3);
+    $callsToday   = (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0');
+    if ($callsToday >= $serpapiLimit) {
+        json_response([
+            'success' => false,
+            'message' => "SerpAPI daily limit reached ($callsToday/$serpapiLimit). Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.",
+        ], 429);
+    }
+
+    $cursor               = (int) _shopify_state_get($pdo, 'editorial_query_cursor', '0');
+    $poolSize             = count(EDITORIAL_QUERY_POOL);
+    $pages                = json_decode(_shopify_state_get($pdo, 'editorial_pages', '{}'), true);
+    if (!is_array($pages)) {
+        $pages = [];
+    }
+
+    $fits                 = [];
+    $rejectedCount        = 0;
+    $rejectReasons        = [];
+    $alreadyImportedCount = 0;
+    $alreadyRejectedCount = 0;
+    $totalEvaluated       = 0;
+    $queriesRun           = [];
+    $seen                 = [];
+
+    // Target-count loop: keep pulling deeper result pages and rotating queries
+    // until we've collected $limit NEW fits, bounded by guardrails so a run can't
+    // time out or run up the SerpAPI/AI bill. Everything that makes this resumable
+    // is persisted (query cursor + per-query page offset), so clicking Run again
+    // continues from where this left off instead of re-scanning page 1.
+    $evaluated        = 0;
+    $serpCallsThisRun = 0;
+    $maxEval          = max(1, (int) ($_ENV['EDITORIAL_MAX_EVAL_PER_RUN'] ?? 20));   // Gemini/scrape ceiling per run
+    $perRunSerpBudget = max(1, (int) ($_ENV['SERPAPI_MAX_CALLS_PER_RUN'] ?? 12));    // SerpAPI calls per run
+    $maxPageDepth     = max(1, (int) ($_ENV['EDITORIAL_MAX_PAGE_DEPTH'] ?? 6));      // how deep per query before it's "tapped out"
+    $pageSize         = 15;
+    $maxStart         = ($maxPageDepth - 1) * $pageSize;
+    $deadline         = microtime(true) + 50;
+    $dryQueries       = 0;   // consecutive queries that yielded no NEW candidate
+    $stopReason       = 'target_reached';
+
+    while (true) {
+        if (count($fits) >= $limit)                 { $stopReason = 'target_reached'; break; }
+        if ($callsToday >= $serpapiLimit)           { $stopReason = 'daily_quota';    break; }
+        if ($serpCallsThisRun >= $perRunSerpBudget) { $stopReason = 'run_budget';     break; }
+        if ($evaluated >= $maxEval)                 { $stopReason = 'eval_cap';       break; }
+        if (microtime(true) >= $deadline)           { $stopReason = 'time';           break; }
+        if ($dryQueries >= $poolSize)               { $stopReason = 'exhausted';      break; }
+
+        $idx   = $cursor % $poolSize;
+        $query = EDITORIAL_QUERY_POOL[$idx];
+        $cursor++;
+        _shopify_state_set($pdo, 'editorial_query_cursor', (string) $cursor);
+
+        // Key the page offset by the query text (not its index) so editing the
+        // query pool never misaligns cursors: new queries start at page 1, and an
+        // existing query keeps its own depth regardless of where it sits now.
+        $pageKey = substr(hash('sha1', $query), 0, 12);
+        $start = (int) ($pages[$pageKey] ?? 0);
+        if ($start > $maxStart) {
+            // This query is tapped out to our page-depth cap; skip without a call.
+            $dryQueries++;
+            continue;
+        }
+
+        $searchResult = editorial_search($query, $apiKey, $pageSize, $pdo, $start);
+        if (!$searchResult['from_cache']) {
+            $callsToday++;
+            $serpCallsThisRun++;
+            _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        }
+        // Advance this query's page offset so the next iteration/run goes deeper.
+        $pages[$pageKey] = $start + $pageSize;
+        _shopify_state_set($pdo, 'editorial_pages', json_encode($pages));
+        $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
+
+        $serpResults = $searchResult['results'];
+        if (empty($serpResults)) {
+            $dryQueries++;
+            continue;
+        }
+        $totalEvaluated += count($serpResults);
+
+        $foundNew = false;
+        foreach ($serpResults as $r) {
+            if (count($fits) >= $limit || $evaluated >= $maxEval || microtime(true) >= $deadline) {
+                break;
+            }
+
+            $canonical = $r['url'];
+            if (isset($seen[$canonical])) continue;
+            $seen[$canonical] = true;
+
+            // Pre-dedup BEFORE spending any AI: skip already-imported or recently
+            // rejected articles so we never pay Gemini/Hunter to re-evaluate a
+            // candidate we've already handled.
+            $existing = $pdo->prepare("SELECT status FROM outreach_editorial_candidates
+                WHERE canonical_url = ?
+                  AND (status = 'imported'
+                       OR (status = 'rejected' AND checked_at > DATE_SUB(NOW(), INTERVAL 14 DAY)))
+                LIMIT 1");
+            $existing->execute([$canonical]);
+            $existingStatus = $existing->fetchColumn();
+            if ($existingStatus !== false) {
+                if ($existingStatus === 'imported') {
+                    $alreadyImportedCount++;
+                } else {
+                    $alreadyRejectedCount++;
+                }
+                continue;
+            }
+
+            $foundNew = true;
+            $evaluated++;
+            try {
+                $result = evaluate_editorial_candidate($canonical, $pdo, $r['title'] ?? '');
+            } catch (Throwable $e) {
+                outreach_log("Editorial evaluate error for $canonical: " . $e->getMessage());
+                $result = ['fit' => false, 'reason' => 'eval_error', 'detail' => $e->getMessage()];
+            }
+
+            if (empty($result['fit'])) {
+                $rejectedCount++;
+                $reason = $result['reason'] ?? 'unknown';
+                $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+                // Persist the rejection so future runs skip this article.
+                $up = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+                    (canonical_url, status, reject_reason, reject_detail, last_query)
+                    VALUES (?, 'rejected', ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE status = 'rejected',
+                        reject_reason = VALUES(reject_reason),
+                        reject_detail = VALUES(reject_detail),
+                        checked_at = NOW()");
+                $up->execute([
+                    $canonical,
+                    mb_substr($reason, 0, 100),
+                    mb_substr((string) ($result['detail'] ?? ''), 0, 500),
+                    mb_substr($query, 0, 255),
+                ]);
+                continue;
+            }
+
+            $meta = $result['metadata'] ?? [];
+            $fits[] = [
+                'canonical_url'    => $canonical,
+                'serp_title'       => $r['title'] ?? '',
+                'outlet_name'      => $meta['outlet_name'] ?? '',
+                'author_name'      => $meta['author_name'] ?? '',
+                'email'            => $meta['email'] ?? '',
+                'email_source'     => $meta['email_source'] ?? '',
+                'listed_tools'     => implode(', ', array_slice($meta['listed_tools'] ?? [], 0, 8)),
+                'business_summary' => $meta['business_summary'] ?? '',
+            ];
+        }
+
+        // A query that surfaced no new candidate counts toward exhaustion; one
+        // that did resets the dry streak so we keep mining productive queries.
+        if ($foundNew) {
+            $dryQueries = 0;
+        } else {
+            $dryQueries++;
+        }
+    }
+
+    $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
+
+    json_response([
+        'success'                => true,
+        'results'                => $fits,
+        'requested_limit'        => $limit,
+        'found_count'            => count($fits),
+        'stop_reason'            => $stopReason,
+        'quota_exhausted'        => $quotaExhausted,
+        'rejected_count'         => $rejectedCount,
+        'reject_reasons'         => $rejectReasons,
+        'already_imported_count' => $alreadyImportedCount,
+        'already_rejected_count' => $alreadyRejectedCount,
+        'total_evaluated'        => $totalEvaluated,
+        'queries_run'            => $queriesRun,
+        'serpapi_calls_this_run' => $serpCallsThisRun,
+        'serpapi_calls_today'    => $callsToday,
+        'serpapi_limit'          => $serpapiLimit,
+    ]);
+}
+
+function editorial_add_url($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
+    @set_time_limit(120);
+
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $url  = trim($data['url'] ?? '');
+    if ($url !== '' && !preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        json_response(['success' => false, 'message' => 'A valid article URL is required'], 400);
+    }
+
+    $canonical = editorial_canonical_url($url);
+
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+    $check->execute([$canonical]);
+    if ($existing = $check->fetchColumn()) {
+        json_response(['success' => false, 'message' => 'This article is already a lead', 'existing_lead_id' => (int) $existing], 409);
+    }
+
+    // Best-effort research in forced mode: a URL the operator added by hand gets
+    // imported even if it is blocked, borderline, or already mentions Argo. We
+    // keep whatever the evaluator extracts (outlet, author, listed tools, email,
+    // summary); a missing email is fine, the operator can fill it in on the lead.
+    $meta = [];
+    try {
+        $result = evaluate_editorial_candidate($canonical, $pdo, '', true);
+        $meta = $result['metadata'] ?? [];
+    } catch (Throwable $e) {
+        outreach_log("Editorial add-url evaluate error for $canonical: " . $e->getMessage());
+    }
+
+    $domain  = editorial_domain_from_url($canonical);
+    $outlet  = trim((string) ($meta['outlet_name'] ?? '')) ?: ucfirst($domain);
+    $author  = trim((string) ($meta['author_name'] ?? ''));
+    $email   = trim((string) ($meta['email'] ?? ''));
+    $summary = trim((string) ($meta['business_summary'] ?? ''));
+    if ($summary === '') {
+        $summary = "Roundup/listicle to pitch: {$canonical}. Goal: get Argo Books added to the list.";
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'editorial_auto', ?, ?, 'editorial', 'US')");
+        $stmt->execute([
+            $outlet,
+            $author !== '' ? $author : null,
+            $email !== '' ? $email : null,
+            $canonical,
+            $canonical,
+            $summary,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+            (canonical_url, status, lead_id, outlet_name, author_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-url')
+            ON DUPLICATE KEY UPDATE status = 'imported', lead_id = VALUES(lead_id),
+                outlet_name = VALUES(outlet_name), author_name = VALUES(author_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonical, $leadId, $outlet, $author, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Added by URL to the Editorial channel');
+        json_response([
+            'success'   => true,
+            'lead_id'   => $leadId,
+            'outlet'    => $outlet,
+            'author'    => $author,
+            'email'     => $email,
+            'has_email' => $email !== '',
+        ]);
+    } catch (Exception $e) {
+        outreach_log("Editorial add-url import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+function editorial_import($pdo)
+{
+    $data         = json_decode(file_get_contents('php://input'), true) ?: [];
+    $canonicalUrl = trim($data['canonical_url'] ?? '');
+    $email        = trim($data['email'] ?? '');
+    $outlet       = trim($data['outlet_name'] ?? '');
+    $author       = trim($data['author_name'] ?? '');
+    $summary      = trim($data['business_summary'] ?? '');
+    $articleUrl   = $canonicalUrl;
+
+    // Import from the data the discovery run already computed, rather than
+    // re-evaluating. The editorial evaluator does a live page fetch plus a
+    // non-deterministic Gemini extraction, so re-running it here is slow and
+    // flaky (a borderline page can flip its roundup verdict on the second pass,
+    // which was causing spurious import failures). This is an authenticated
+    // admin action reviewing results it just generated, so trusting them is the
+    // right tradeoff; we still validate the email and dedup against existing leads.
+    if ($canonicalUrl === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        json_response(['success' => false, 'message' => 'canonical_url and a valid email are required'], 400);
+    }
+    if ($summary === '') {
+        $summary = 'Roundup article' . ($outlet !== '' ? " on {$outlet}" : '') . '. Goal: get Argo Books added to the list.';
+    }
+
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1");
+    $check->execute([$email, $articleUrl]);
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this email or article already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'editorial_auto', ?, ?, 'editorial', 'US')");
+        $stmt->execute([
+            $outlet ?: $canonicalUrl,
+            $author !== '' ? $author : null,
+            $email,
+            $articleUrl,
+            $articleUrl,
+            $summary,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+            (canonical_url, status, lead_id, outlet_name, author_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-ui')
+            ON DUPLICATE KEY UPDATE
+                status          = 'imported',
+                lead_id         = VALUES(lead_id),
+                outlet_name     = VALUES(outlet_name),
+                author_name     = VALUES(author_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonicalUrl, $leadId, $outlet, $author, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Imported from Editorial discovery UI');
+        json_response(['success' => true, 'lead_id' => $leadId]);
+    } catch (Exception $e) {
+        outreach_log("Editorial import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+// ─── Creators / affiliate-partner discovery ───
+// Finds YouTubers, newsletter writers, and niche bloggers whose audience is small
+// businesses / freelancers, so we can recruit them as affiliate partners. Mirrors
+// the editorial handlers (paginated, resumable target-count loop) but with the
+// affiliate pitch. Shares the SerpAPI daily budget with the other channels.
+
+function creator_get_status($pdo)
+{
+    _shopify_reset_daily_counters_if_needed($pdo);
+    json_response([
+        'success'             => true,
+        'enabled'             => ($_ENV['OUTREACH_CREATOR_ENABLED'] ?? 'false') === 'true',
+        'has_key'             => !empty($_ENV['SERPAPI_KEY']),
+        'has_hunter'          => !empty($_ENV['HUNTER_API_KEY']),
+        'serpapi_calls_today' => (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0'),
+        'serpapi_limit'       => (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3),
+    ]);
+}
+
+function creator_run_discovery($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/creator_discovery.php';
+    @set_time_limit(300);
+
+    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $limit = min(30, max(1, (int) ($data['limit'] ?? 8)));
+
+    $apiKey = $_ENV['SERPAPI_KEY'] ?? '';
+    if ($apiKey === '') {
+        json_response(['success' => false, 'message' => 'SerpAPI key not configured. Set SERPAPI_KEY in .env'], 500);
+    }
+
+    _shopify_reset_daily_counters_if_needed($pdo);
+    $serpapiLimit = (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3);
+    $callsToday   = (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0');
+    if ($callsToday >= $serpapiLimit) {
+        json_response([
+            'success' => false,
+            'message' => "SerpAPI daily limit reached ($callsToday/$serpapiLimit). Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.",
+        ], 429);
+    }
+
+    $cursor               = (int) _shopify_state_get($pdo, 'creator_query_cursor', '0');
+    $poolSize             = count(CREATOR_QUERY_POOL);
+    $pages                = json_decode(_shopify_state_get($pdo, 'creator_pages', '{}'), true);
+    if (!is_array($pages)) {
+        $pages = [];
+    }
+
+    $fits                 = [];
+    $rejectedCount        = 0;
+    $rejectReasons        = [];
+    $alreadyImportedCount = 0;
+    $alreadyRejectedCount = 0;
+    $totalEvaluated       = 0;
+    $queriesRun           = [];
+    $seen                 = [];
+
+    // Resumable target-count loop (same shape as the editorial channel): keep
+    // paging deeper and rotating queries until $limit NEW fits, bounded so a run
+    // can't time out or run up the SerpAPI/AI bill.
+    $evaluated        = 0;
+    $serpCallsThisRun = 0;
+    $maxEval          = max(1, (int) ($_ENV['CREATOR_MAX_EVAL_PER_RUN'] ?? 20));
+    $perRunSerpBudget = max(1, (int) ($_ENV['SERPAPI_MAX_CALLS_PER_RUN'] ?? 12));
+    $maxPageDepth     = max(1, (int) ($_ENV['CREATOR_MAX_PAGE_DEPTH'] ?? 6));
+    $pageSize         = 15;
+    $maxStart         = ($maxPageDepth - 1) * $pageSize;
+    $deadline         = microtime(true) + 50;
+    $dryQueries       = 0;
+    $stopReason       = 'target_reached';
+
+    while (true) {
+        if (count($fits) >= $limit)                 { $stopReason = 'target_reached'; break; }
+        if ($callsToday >= $serpapiLimit)           { $stopReason = 'daily_quota';    break; }
+        if ($serpCallsThisRun >= $perRunSerpBudget) { $stopReason = 'run_budget';     break; }
+        if ($evaluated >= $maxEval)                 { $stopReason = 'eval_cap';       break; }
+        if (microtime(true) >= $deadline)           { $stopReason = 'time';           break; }
+        if ($dryQueries >= $poolSize)               { $stopReason = 'exhausted';      break; }
+
+        $idx   = $cursor % $poolSize;
+        $query = CREATOR_QUERY_POOL[$idx];
+        $cursor++;
+        _shopify_state_set($pdo, 'creator_query_cursor', (string) $cursor);
+
+        $start = (int) ($pages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            $dryQueries++;
+            continue;
+        }
+
+        $searchResult = creator_search($query, $apiKey, $pageSize, $pdo, $start);
+        if (!$searchResult['from_cache']) {
+            $callsToday++;
+            $serpCallsThisRun++;
+            _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        }
+        $pages[(string) $idx] = $start + $pageSize;
+        _shopify_state_set($pdo, 'creator_pages', json_encode($pages));
+        $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
+
+        $serpResults = $searchResult['results'];
+        if (empty($serpResults)) {
+            $dryQueries++;
+            continue;
+        }
+        $totalEvaluated += count($serpResults);
+
+        $foundNew = false;
+        foreach ($serpResults as $r) {
+            if (count($fits) >= $limit || $evaluated >= $maxEval || microtime(true) >= $deadline) {
+                break;
+            }
+
+            $canonical = $r['url'];
+            if (isset($seen[$canonical])) continue;
+            $seen[$canonical] = true;
+
+            // Pre-dedup before any AI spend.
+            $existing = $pdo->prepare("SELECT status FROM outreach_creator_candidates
+                WHERE canonical_url = ?
+                  AND (status = 'imported'
+                       OR (status = 'rejected' AND checked_at > DATE_SUB(NOW(), INTERVAL 14 DAY)))
+                LIMIT 1");
+            $existing->execute([$canonical]);
+            $existingStatus = $existing->fetchColumn();
+            if ($existingStatus !== false) {
+                if ($existingStatus === 'imported') {
+                    $alreadyImportedCount++;
+                } else {
+                    $alreadyRejectedCount++;
+                }
+                continue;
+            }
+
+            $foundNew = true;
+            $evaluated++;
+            try {
+                $result = evaluate_creator_candidate($canonical, $pdo, $r['title'] ?? '');
+            } catch (Throwable $e) {
+                outreach_log("Creator evaluate error for $canonical: " . $e->getMessage());
+                $result = ['fit' => false, 'reason' => 'eval_error', 'detail' => $e->getMessage()];
+            }
+
+            if (empty($result['fit'])) {
+                $rejectedCount++;
+                $reason = $result['reason'] ?? 'unknown';
+                $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+                $up = $pdo->prepare("INSERT INTO outreach_creator_candidates
+                    (canonical_url, status, reject_reason, reject_detail, platform, last_query)
+                    VALUES (?, 'rejected', ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE status = 'rejected',
+                        reject_reason = VALUES(reject_reason),
+                        reject_detail = VALUES(reject_detail),
+                        checked_at = NOW()");
+                $up->execute([
+                    $canonical,
+                    mb_substr($reason, 0, 100),
+                    mb_substr((string) ($result['detail'] ?? ''), 0, 500),
+                    mb_substr((string) ($result['metadata']['platform'] ?? $r['platform'] ?? ''), 0, 20),
+                    mb_substr($query, 0, 255),
+                ]);
+                continue;
+            }
+
+            $meta = $result['metadata'] ?? [];
+            $fits[] = [
+                'canonical_url'    => $canonical,
+                'profile_url'      => !empty($meta['channel_url']) ? $meta['channel_url'] : $canonical,
+                'serp_title'       => $r['title'] ?? '',
+                'platform'         => $meta['platform'] ?? ($r['platform'] ?? ''),
+                'creator_name'     => $meta['creator_name'] ?? '',
+                'audience'         => $meta['audience'] ?? '',
+                'topics'           => implode(', ', array_slice($meta['topics'] ?? [], 0, 6)),
+                'email'            => $meta['email'] ?? '',
+                'email_source'     => $meta['email_source'] ?? '',
+                'needs_manual_email' => !empty($meta['needs_manual_email']),
+                'business_summary' => $meta['business_summary'] ?? '',
+            ];
+        }
+
+        if ($foundNew) {
+            $dryQueries = 0;
+        } else {
+            $dryQueries++;
+        }
+    }
+
+    $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
+
+    json_response([
+        'success'                => true,
+        'results'                => $fits,
+        'requested_limit'        => $limit,
+        'found_count'            => count($fits),
+        'stop_reason'            => $stopReason,
+        'quota_exhausted'        => $quotaExhausted,
+        'rejected_count'         => $rejectedCount,
+        'reject_reasons'         => $rejectReasons,
+        'already_imported_count' => $alreadyImportedCount,
+        'already_rejected_count' => $alreadyRejectedCount,
+        'total_evaluated'        => $totalEvaluated,
+        'queries_run'            => $queriesRun,
+        'serpapi_calls_this_run' => $serpCallsThisRun,
+        'serpapi_calls_today'    => $callsToday,
+        'serpapi_limit'          => $serpapiLimit,
+    ]);
+}
+
+function creator_add_url($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/creator_discovery.php';
+    @set_time_limit(120);
+
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $url  = trim($data['url'] ?? '');
+    if ($url !== '' && !preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        json_response(['success' => false, 'message' => 'A valid creator URL is required'], 400);
+    }
+
+    $canonical = creator_canonical_url($url);
+
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+    $check->execute([$canonical]);
+    if ($existing = $check->fetchColumn()) {
+        json_response(['success' => false, 'message' => 'This creator is already a lead', 'existing_lead_id' => (int) $existing], 409);
+    }
+
+    // Forced evaluate: a hand-added URL is imported even if borderline or with no
+    // email found (common for YouTube). The operator can fill in the email later.
+    $meta = [];
+    try {
+        $result = evaluate_creator_candidate($canonical, $pdo, '', true);
+        $meta = $result['metadata'] ?? [];
+    } catch (Throwable $e) {
+        outreach_log("Creator add-url evaluate error for $canonical: " . $e->getMessage());
+    }
+
+    $platform = trim((string) ($meta['platform'] ?? creator_platform_from_url($canonical)));
+    $name     = trim((string) ($meta['creator_name'] ?? '')) ?: editorial_domain_from_url($canonical);
+    $email    = trim((string) ($meta['email'] ?? ''));
+    $summary  = trim((string) ($meta['business_summary'] ?? ''));
+    if ($summary === '') {
+        $summary = "Creator to recruit as an affiliate: {$canonical} (platform: {$platform}). Goal: recruit as an Argo Books affiliate partner.";
+    }
+    // Prefer the resolved channel/profile URL as the lead website (its About page
+    // is where the email lives), otherwise the URL as given.
+    $channelUrl = trim((string) ($meta['channel_url'] ?? ''));
+    $website = ($channelUrl !== '' && filter_var($channelUrl, FILTER_VALIDATE_URL)) ? $channelUrl : $canonical;
+    if ($website !== $canonical) {
+        $dupe = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $dupe->execute([$website]);
+        if ($existing = $dupe->fetchColumn()) {
+            json_response(['success' => false, 'message' => 'This creator is already a lead', 'existing_lead_id' => (int) $existing], 409);
+        }
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'creator_auto', ?, ?, ?, 'US')");
+        $stmt->execute([
+            $name,
+            $name !== '' ? $name : null,
+            $email !== '' ? $email : null,
+            $website,
+            $website,
+            $summary,
+            'creator:' . $platform,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_creator_candidates
+            (canonical_url, status, lead_id, platform, creator_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-url')
+            ON DUPLICATE KEY UPDATE status = 'imported', lead_id = VALUES(lead_id),
+                platform = VALUES(platform), creator_name = VALUES(creator_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonical, $leadId, $platform, $name, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Added by URL to the Creators channel');
+        json_response([
+            'success'   => true,
+            'lead_id'   => $leadId,
+            'platform'  => $platform,
+            'name'      => $name,
+            'email'     => $email,
+            'has_email' => $email !== '',
+        ]);
+    } catch (Exception $e) {
+        outreach_log("Creator add-url import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+function creator_import($pdo)
+{
+    $data         = json_decode(file_get_contents('php://input'), true) ?: [];
+    $canonicalUrl = trim($data['canonical_url'] ?? '');
+    $profileUrl   = trim($data['profile_url'] ?? '');
+    $email        = trim($data['email'] ?? '');
+    $platform     = trim($data['platform'] ?? '');
+    $name         = trim($data['creator_name'] ?? '');
+    $summary      = trim($data['business_summary'] ?? '');
+
+    // Import from the discovery-computed data (no re-evaluate). Unlike editorial,
+    // an email is NOT required: many creators (especially YouTubers) have no
+    // auto-harvestable email and are worked from the lead's Get email button.
+    if ($canonicalUrl === '') {
+        json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
+    }
+    // The lead's website is the channel/profile when we resolved one (its About
+    // page is where the email lives), otherwise the original canonical URL.
+    $website = ($profileUrl !== '' && filter_var($profileUrl, FILTER_VALIDATE_URL)) ? $profileUrl : $canonicalUrl;
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        json_response(['success' => false, 'message' => 'The provided email is not valid'], 400);
+    }
+    if ($platform === '') {
+        require_once __DIR__ . '/../../cron/lib/creator_discovery.php';
+        $platform = creator_platform_from_url($canonicalUrl);
+    }
+    if ($name === '') {
+        $name = $canonicalUrl;
+    }
+    if ($summary === '') {
+        $summary = 'Creator to recruit as an affiliate' . ($platform !== '' ? " (platform: {$platform})" : '') . '. Goal: recruit as an Argo Books affiliate partner.';
+    }
+
+    // Dedup by the lead website (channel/profile) always, and by email only when
+    // one was provided (empty email must not collide with other email-less leads).
+    if ($email !== '') {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? OR email = ? LIMIT 1");
+        $check->execute([$website, $email]);
+    } else {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $check->execute([$website]);
+    }
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this creator or email already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'creator_auto', ?, ?, ?, 'US')");
+        $stmt->execute([
+            $name,
+            $name,
+            $email !== '' ? $email : null,
+            $website,
+            $website,
+            $summary,
+            'creator:' . $platform,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_creator_candidates
+            (canonical_url, status, lead_id, platform, creator_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-ui')
+            ON DUPLICATE KEY UPDATE
+                status          = 'imported',
+                lead_id         = VALUES(lead_id),
+                platform        = VALUES(platform),
+                creator_name    = VALUES(creator_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonicalUrl, $leadId, $platform, $name, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Imported from Creators discovery UI');
+        json_response(['success' => true, 'lead_id' => $leadId]);
+    } catch (Exception $e) {
+        outreach_log("Creator import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+// Apply an email captured via the lead's "Get email" button back onto a creator
+// lead. Accepts a single {lead_id, email}, or {results: [{lead_id, url, email}]}.
+function creator_set_email($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    if (is_array($data) && array_is_list($data)) {
+        // Raw top-level array (the helper's output.json posted directly).
+        $results = $data;
+    } else {
+        $results = $data['results'] ?? null;
+        if (!is_array($results)) {
+            // Single-item form.
+            if (isset($data['email'])) {
+                $results = [['lead_id' => $data['lead_id'] ?? null, 'url' => $data['url'] ?? null, 'email' => $data['email']]];
+            } else {
+                json_response(['success' => false, 'message' => 'Provide results[] or a single {lead_id/url, email}'], 400);
+            }
+        }
+    }
+
+    $updated = 0;
+    $skipped = 0;
+    foreach ($results as $row) {
+        $email = trim((string) ($row['email'] ?? ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $skipped++; continue; }
+
+        $leadId = (int) ($row['lead_id'] ?? 0);
+        $url    = trim((string) ($row['url'] ?? ''));
+
+        if ($leadId > 0) {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET email = ? WHERE id = ? AND source = 'creator_auto' AND (email IS NULL OR email = '')");
+            $stmt->execute([$email, $leadId]);
+        } elseif ($url !== '') {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET email = ? WHERE website = ? AND source = 'creator_auto' AND (email IS NULL OR email = '')");
+            $stmt->execute([$email, $url]);
+        } else {
+            $skipped++;
+            continue;
+        }
+
+        if ($stmt->rowCount() > 0) {
+            $updated++;
+            // Mirror onto the candidate row's harvested_email where we can match it.
+            if ($url !== '') {
+                $c = $pdo->prepare("UPDATE outreach_creator_candidates SET harvested_email = ? WHERE canonical_url = ?");
+                $c->execute([$email, $url]);
+            }
+        } else {
+            $skipped++;
+        }
+    }
+
+    json_response(['success' => true, 'updated' => $updated, 'skipped' => $skipped]);
 }
 
 // ─── AI Draft Generation ───
@@ -1436,7 +2389,7 @@ function reddit_api_get_threads($pdo)
         $params[] = $subreddit;
     }
 
-    if (in_array($source, ['watchlist', 'keyword', 'both'], true)) {
+    if (in_array($source, ['watchlist', 'keyword', 'both', 'manual'], true)) {
         $where[] = 'discovery_source = ?';
         $params[] = $source;
     }
@@ -1466,6 +2419,108 @@ function reddit_api_get_threads($pdo)
     }
 
     json_response(['success' => true, 'threads' => $threads]);
+}
+
+/**
+ * Manually add a Reddit thread to the queue from the Threads tab.
+ *
+ * Takes a Reddit post URL (required) plus optional subreddit/title/body the
+ * admin can type in. Parses the post id + subreddit from the URL, then makes a
+ * best-effort fetch of the live post (works under OAuth, or public mode from a
+ * non-blocked IP) to auto-fill title/body/author; typed fields win when the
+ * fetch can't reach Reddit. Inserts as discovery_source='manual',
+ * status='drafted_pending' so it lands in the actionable queue and can be
+ * drafted on demand via the existing "Generate draft" button.
+ */
+function reddit_api_add_thread($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $url            = trim((string) ($data['url'] ?? ''));
+    $manualSub      = trim((string) ($data['subreddit'] ?? ''));
+    $manualTitle    = trim((string) ($data['title'] ?? ''));
+    $manualBody     = trim((string) ($data['body'] ?? ''));
+
+    if ($url === '') {
+        json_response(['success' => false, 'message' => 'Reddit post URL is required'], 400);
+    }
+
+    // Extract the base-36 post id from a comments URL or a redd.it short link.
+    if (!preg_match('#(?:/comments/|redd\.it/)([a-z0-9]{4,12})#i', $url, $m)) {
+        json_response(['success' => false, 'message' => "Couldn't find a Reddit post ID in that URL. It should look like reddit.com/r/<sub>/comments/<id>/..."], 400);
+    }
+    $redditId = strtolower($m[1]);
+
+    // Subreddit: typed value wins, else parse from the URL.
+    $subreddit = $manualSub;
+    if ($subreddit === '' && preg_match('#/r/([A-Za-z0-9_]+)#', $url, $ms)) {
+        $subreddit = $ms[1];
+    }
+    $subreddit = preg_replace('#^/?r/#i', '', trim($subreddit));
+
+    // Already in the queue? reddit_id is UNIQUE; report the existing row.
+    $check = $pdo->prepare("SELECT id, status FROM reddit_threads WHERE reddit_id = ? LIMIT 1");
+    $check->execute([$redditId]);
+    if ($existing = $check->fetch()) {
+        json_response([
+            'success'     => false,
+            'message'     => 'This thread is already in the queue (status: ' . $existing['status'] . ').',
+            'existing_id' => (int) $existing['id'],
+        ], 409);
+    }
+
+    // Best-effort live fetch to auto-fill the details.
+    $title        = $manualTitle;
+    $body         = $manualBody !== '' ? $manualBody : null;
+    $author       = null;
+    $postedAt     = null;
+    $commentCount = 0;
+    $canonicalUrl = $url;
+
+    try {
+        $info = reddit_api_get($pdo, '/api/info', ['id' => 't3_' . $redditId]);
+        $post = $info['data']['children'][0]['data'] ?? null;
+        if (is_array($post) && !empty($post['id'])) {
+            $n = reddit_normalize_post($post, 'manual');
+            if ($subreddit === '')                       $subreddit    = $n['subreddit'];
+            if ($title === '')                           $title        = $n['title'];
+            if ($body === null && !empty($n['body']))    $body         = $n['body'];
+            if (!empty($n['url']))                       $canonicalUrl = $n['url'];
+            $author       = $n['author'];
+            $postedAt     = $n['posted_at'];
+            $commentCount = (int) $n['comment_count'];
+        }
+    } catch (Throwable $e) {
+        // Reddit unreachable / blocked: fall back to the typed fields below.
+    }
+
+    if ($subreddit === '') {
+        json_response(['success' => false, 'message' => 'Subreddit could not be detected from the URL. Please enter it.'], 400);
+    }
+    if ($title === '') {
+        json_response(['success' => false, 'message' => "Couldn't fetch the post automatically. Please enter the title manually."], 400);
+    }
+
+    $title = mb_substr($title, 0, 500);
+    if ($postedAt === null) $postedAt = date('Y-m-d H:i:s');
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO reddit_threads
+            (reddit_id, subreddit, title, body, url, author, post_score, comment_count,
+             posted_at, discovery_source, rules_score, ai_relevance, ai_relevance_reason,
+             status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 'manual', 0, NULL, 'Manually added by admin',
+                    'drafted_pending', 'Manually added from the Threads tab')");
+        $stmt->execute([
+            $redditId, $subreddit, $title, $body, $canonicalUrl, $author, $commentCount, $postedAt,
+        ]);
+        json_response(['success' => true, 'id' => (int) $pdo->lastInsertId(), 'reddit_id' => $redditId]);
+    } catch (PDOException $e) {
+        // Unique-key race: the cron inserted the same thread between our check and insert.
+        if ($e->getCode() === '23000') {
+            json_response(['success' => false, 'message' => 'This thread is already in the queue.'], 409);
+        }
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
 }
 
 function reddit_api_get_thread($pdo)
@@ -1539,11 +2594,6 @@ function reddit_api_get_stats($pdo)
     }
 }
 
-function reddit_api_pipeline_status()
-{
-    json_response(['success' => true, 'running' => is_reddit_monitor_running()]);
-}
-
 function reddit_api_pipeline_progress()
 {
     json_response([
@@ -1555,59 +2605,26 @@ function reddit_api_pipeline_progress()
 
 function reddit_api_run_now($pdo)
 {
-    // Shared-hosting friendly: many hosts disable exec/shell_exec/proc_open via
-    // disable_functions. Instead of spawning a subprocess, we send the HTTP
-    // response immediately, detach from the client, then run the cron inline
-    // in this same PHP process. $pdo is brought in as a parameter so it stays
-    // in scope when we `require` the cron from inside this function (PHP
-    // doesn't auto-import globals into function scope for included files).
-    $cronPath = realpath(__DIR__ . '/../../cron/reddit_monitor.php');
-    if (!$cronPath) {
-        json_response(['success' => false, 'message' => 'Cron script not found'], 500);
-    }
+    // This host disables exec/shell_exec/proc_open, so we can't spawn a CLI
+    // subprocess, and running the full discovery inline in this web request is
+    // hard-killed by PHP-FPM's request_terminate_timeout (~30s) long before it
+    // finishes. Instead we record a run request; the reddit_run_dispatcher cron
+    // (every 2 min) claims it and runs discovery via CLI, which has no such time
+    // limit. A manual request runs even when the master enable toggle is off.
+    $pdo->prepare("UPDATE reddit_settings SET manual_run_requested_at = NOW() WHERE id = 1")->execute();
 
-    // Let the work run as long as it needs and survive client disconnect.
-    @set_time_limit(600);
-    @ignore_user_abort(true);
+    // Show "queued" in the progress UI the Reddit threads tab polls, so the
+    // admin sees immediate feedback before the dispatcher picks it up.
+    reddit_progress_reset([
+        'message'    => 'Queued — discovery will start within ~2 minutes…',
+        'started_at' => date('Y-m-d H:i:s'),
+    ]);
 
-    // Send the JSON response now so the admin UI doesn't hang while the cron runs.
-    http_response_code(200);
-    header('Content-Type: application/json');
-    echo json_encode(['success' => true, 'message' => 'Reddit discovery started. Refresh in a minute or two to see new threads.']);
-
-    // Release the session lock BEFORE running the inline cron. PHP's default
-    // file-based session handler holds an exclusive lock on the session file
-    // for the duration of the request, so without this close, page reloads and
-    // the JS progress polling block for the full multi-minute cron runtime.
-    if (function_exists('session_write_close')) {
-        @session_write_close();
-    }
-
-    // Detach from the client. fastcgi_finish_request is PHP-FPM only; fall back
-    // to flushing buffers on other SAPIs (work continues either way thanks to
-    // ignore_user_abort).
-    if (function_exists('fastcgi_finish_request')) {
-        fastcgi_finish_request();
-    } else {
-        while (function_exists('ob_get_level') && ob_get_level() > 0) {
-            @ob_end_flush();
-        }
-        @flush();
-    }
-
-    outreach_log('Reddit monitor triggered manually from admin (inline)');
-
-    // Bypass the cron's CLI-only guard and run the pipeline inline. After the
-    // cron file finishes, control returns here and PHP exits normally.
-    if (!defined('REDDIT_MONITOR_INLINE')) {
-        define('REDDIT_MONITOR_INLINE', true);
-    }
-    try {
-        require $cronPath;
-    } catch (Throwable $e) {
-        outreach_log('Inline Reddit monitor crashed: ' . $e->getMessage());
-    }
-    exit;
+    outreach_log('Reddit discovery run requested from admin (queued for dispatcher)');
+    json_response([
+        'success' => true,
+        'message' => 'Discovery queued. It starts within a couple of minutes — watch this tab for progress.',
+    ]);
 }
 
 function reddit_api_mark_replied($pdo)
@@ -1663,17 +2680,6 @@ function reddit_api_mark_replied($pdo)
         json_response(['success' => false, 'message' => 'Thread not found'], 404);
     }
 
-    json_response(['success' => true]);
-}
-
-function reddit_api_mark_not_fit($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
-    $id = (int) ($data['id'] ?? 0);
-    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
-
-    $stmt = $pdo->prepare("UPDATE reddit_threads SET status = 'not_fit' WHERE id = ?");
-    $stmt->execute([$id]);
     json_response(['success' => true]);
 }
 

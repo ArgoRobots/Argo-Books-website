@@ -56,92 +56,89 @@ function reddit_threads_tab_render($pdo)
     </div>
 
     <!-- Secondary stats row -->
-    <div class="stats-row" id="redditStatsRow">
+    <div class="stats-grid" id="redditStatsRow">
         <div class="stat-card">
-            <div class="stat-label">Total Threads</div>
+            <h3>Total Threads</h3>
             <div class="stat-value" id="redditStatTotal">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Drafted (ready)</div>
+            <h3>Drafted (ready)</h3>
             <div class="stat-value stat-new" id="redditStatDrafted">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Drafted-pending</div>
+            <h3>Drafted-pending</h3>
             <div class="stat-value stat-pending" id="redditStatPending">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Replied (7d)</div>
+            <h3>Replied (7d)</h3>
             <div class="stat-value" id="redditStatReplied7d">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Reply Survival</div>
+            <h3>Reply Survival</h3>
             <div class="stat-value" id="redditStatSurvival">—</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Avg Upvotes / Reply</div>
+            <h3>Avg Upvotes / Reply</h3>
             <div class="stat-value" id="redditStatAvgUpvotes">—</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Profile-Link Clicks (30d)</div>
+            <h3>Profile-Link Clicks (30d)</h3>
             <div class="stat-value" id="redditStatProfileClicks">0</div>
         </div>
     </div>
 
     <!-- Filters + Run Now -->
-    <div class="filters-bar">
-        <div class="filters-container">
-            <div class="filters-row">
-                <div class="filter-group">
-                    <label for="redditFilterStatus">Status</label>
-                    <select id="redditFilterStatus" onchange="loadRedditThreads()">
-                        <option value="actionable">Actionable (drafted)</option>
-                        <option value="all">All</option>
-                        <option value="drafted">Drafted</option>
-                        <option value="drafted_pending">Drafted-pending</option>
-                        <option value="replied">Replied</option>
-                        <option value="reply_removed">Reply Removed</option>
-                        <option value="skipped">Skipped</option>
-                        <option value="not_fit">Not Fit</option>
-                        <option value="expired">Expired</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="redditFilterSubreddit">Subreddit</label>
-                    <select id="redditFilterSubreddit" onchange="loadRedditThreads()">
-                        <option value="">All</option>
-                        <?php foreach (reddit_threads_tab_list_subreddits($pdo) as $sub): ?>
-                            <option value="<?= htmlspecialchars($sub) ?>">r/<?= htmlspecialchars($sub) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="redditFilterSource">Discovery</label>
-                    <select id="redditFilterSource" onchange="loadRedditThreads()">
-                        <option value="">Any</option>
-                        <option value="watchlist">Watchlist</option>
-                        <option value="keyword">Keyword</option>
-                        <option value="both">Both</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="redditFilterDays">Discovered</label>
-                    <select id="redditFilterDays" onchange="loadRedditThreads()">
-                        <option value="7">Last 7 days</option>
-                        <option value="14">Last 14 days</option>
-                        <option value="30" selected>Last 30 days</option>
-                        <option value="0">All time</option>
-                    </select>
-                </div>
-                <div class="filter-group form-group-btn">
-                    <button class="btn btn-blue" onclick="runRedditDiscoveryNow()" id="redditRunNowBtn">Run discovery now</button>
-                </div>
+    <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="redditFilterStatus" onchange="loadRedditThreads()">
+                    <option value="actionable">Actionable (drafted)</option>
+                    <option value="all">All</option>
+                    <option value="drafted">Drafted</option>
+                    <option value="drafted_pending">Drafted-pending</option>
+                    <option value="replied">Replied</option>
+                    <option value="reply_removed">Reply Removed</option>
+                    <option value="skipped">Skipped</option>
+                    <option value="expired">Expired</option>
+                </select>
             </div>
-        </div>
+            <div class="control-group">
+                <span class="control-label">Subreddit</span>
+                <select class="control-select" id="redditFilterSubreddit" onchange="loadRedditThreads()">
+                    <option value="">All</option>
+                    <?php foreach (reddit_threads_tab_list_subreddits($pdo) as $sub): ?>
+                        <option value="<?= htmlspecialchars($sub) ?>">r/<?= htmlspecialchars($sub) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Discovery</span>
+                <select class="control-select" id="redditFilterSource" onchange="loadRedditThreads()">
+                    <option value="">Any</option>
+                    <option value="watchlist">Watchlist</option>
+                    <option value="keyword">Keyword</option>
+                    <option value="both">Both</option>
+                    <option value="manual">Manual</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Discovered</span>
+                <select class="control-select" id="redditFilterDays" onchange="loadRedditThreads()">
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30" selected>Last 30 days</option>
+                    <option value="0">All time</option>
+                </select>
+            </div>
+            <div class="control-group control-spacer">
+                <button class="control-pill" onclick="showAddRedditThreadModal()">+ Add thread</button>
+                <button class="control-pill" onclick="runRedditDiscoveryNow()" id="redditRunNowBtn">Run discovery now</button>
+            </div>
     </div>
 
     <!-- Threads table -->
     <div class="reddit-table-wrapper">
-        <table class="data-table reddit-table">
+        <table class="data-table reddit-table" data-paginate="25">
             <thead>
                 <tr>
                     <th>Subreddit</th>

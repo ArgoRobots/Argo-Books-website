@@ -41,6 +41,7 @@ function handleReport(reportId, action, contentType = null, contentId = null) {
     }
 
     const formData = new FormData();
+    formData.append('csrf_token', window.REPORTS_CSRF || '');
     formData.append('report_id', reportId);
     formData.append('action', action);
     if (contentType) formData.append('content_type', contentType);
@@ -82,6 +83,7 @@ function submitBan() {
     }
 
     const formData = new FormData();
+    formData.append('csrf_token', window.REPORTS_CSRF || '');
     formData.append('report_id', reportId);
     formData.append('action', 'ban');
     formData.append('user_id', userId);
@@ -158,6 +160,7 @@ function submitResetUsername() {
     }
 
     const formData = new FormData();
+    formData.append('csrf_token', window.REPORTS_CSRF || '');
     formData.append('report_id', reportId);
     formData.append('action', 'reset_username');
     formData.append('user_id', userId);
@@ -233,6 +236,7 @@ function submitClearBio() {
     }
 
     const formData = new FormData();
+    formData.append('csrf_token', window.REPORTS_CSRF || '');
     formData.append('report_id', reportId);
     formData.append('action', 'clear_bio');
     formData.append('user_id', userId);

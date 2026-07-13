@@ -20,6 +20,16 @@ function marketing_contexts(): array
 }
 
 /**
+ * Marketing contexts driven by the no-account opt-in list (marketing_subscribers)
+ * rather than community_users.email_pref_* columns. A send is allowed only when a
+ * 'confirmed' row exists for that (email, context) and nothing suppresses it.
+ */
+function marketing_subscriber_contexts(): array
+{
+    return ['newsletter'];
+}
+
+/**
  * Decide whether a marketing email may be sent to $email for $context.
  *
  * Rules (see plan: Send-time gate):
@@ -40,7 +50,8 @@ function should_send_marketing_email(string $email, string $context): bool
     }
 
     $contexts = marketing_contexts();
-    if (!isset($contexts[$context])) {
+    $subscriberContexts = marketing_subscriber_contexts();
+    if (!isset($contexts[$context]) && !in_array($context, $subscriberContexts, true)) {
         return false;
     }
 
@@ -56,6 +67,13 @@ function should_send_marketing_email(string $email, string $context): bool
     $stmt->execute([$email, $context]);
     if ($stmt->fetchColumn()) {
         return false;
+    }
+
+    // Subscriber-list path (e.g. 'newsletter'): require a confirmed opt-in row.
+    if (in_array($context, $subscriberContexts, true)) {
+        $stmt = $pdo->prepare("SELECT 1 FROM marketing_subscribers WHERE email = ? AND context = ? AND status = 'confirmed' LIMIT 1");
+        $stmt->execute([$email, $context]);
+        return (bool) $stmt->fetchColumn();
     }
 
     // Reviews path: license-key holder gets the ask by default
@@ -228,4 +246,201 @@ function send_feedback_request_email(int $licenseId, string $email): bool
         mark_marketing_sent($email, 'reviews', $licenseId);
     }
     return $sent;
+}
+
+/* ===========================================================================
+ * No-account opt-in list (marketing_subscribers): double opt-in lifecycle.
+ *
+ * Flow: create_pending_subscriber() inserts a 'pending' row + sends a confirm
+ * email -> the visitor clicks the link -> confirm_subscriber() flips it to
+ * 'confirmed'. Only 'confirmed' rows receive broadcasts (enforced by
+ * should_send_marketing_email('...','newsletter')). One-click unsubscribe is
+ * handled by unsubscribe_subscriber_by_token(), reachable from
+ * /unsubscribe/marketing.php?s=<token>.
+ * ========================================================================= */
+
+/** Absolute URL a subscriber clicks to confirm their opt-in. */
+function subscriber_confirm_url(string $token): string
+{
+    return site_url('/subscribe/confirm.php?t=' . urlencode($token));
+}
+
+/** Absolute one-click unsubscribe URL for a no-account subscriber. */
+function subscriber_unsubscribe_url(string $token): string
+{
+    return site_url('/unsubscribe/marketing.php?s=' . urlencode($token));
+}
+
+/**
+ * Create (or refresh) a pending opt-in row and send the confirmation email.
+ *
+ * Idempotent and safe to call repeatedly: an already-confirmed subscriber is
+ * left alone (no duplicate confirm email); a pending/unsubscribed/new email gets
+ * a fresh confirm token and a new confirmation email.
+ *
+ * @return string One of: 'sent' (confirm email sent), 'already_confirmed',
+ *                'invalid' (bad email), 'error' (DB/send failure).
+ */
+function create_pending_subscriber(string $email, string $source = 'profit_analyzer', string $context = 'newsletter', ?string $ip = null): string
+{
+    global $pdo;
+
+    $email = strtolower(trim($email));
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return 'invalid';
+    }
+
+    // Already on the list and confirmed: nothing to do, don't re-confirm.
+    $stmt = $pdo->prepare("SELECT id, status, unsubscribe_token FROM marketing_subscribers WHERE email = ? AND context = ? LIMIT 1");
+    $stmt->execute([$email, $context]);
+    $existing = $stmt->fetch();
+    if ($existing && $existing['status'] === 'confirmed') {
+        return 'already_confirmed';
+    }
+
+    $confirmToken = bin2hex(random_bytes(24));
+    $unsubToken = ($existing && $existing['unsubscribe_token']) ? $existing['unsubscribe_token'] : bin2hex(random_bytes(24));
+
+    try {
+        // Upsert to 'pending' with a fresh confirm token. The unique key on
+        // (email, context) makes a repeat opt-in update the same row.
+        $stmt = $pdo->prepare(
+            "INSERT INTO marketing_subscribers (email, context, status, source, confirm_token, unsubscribe_token, ip, created_at)
+             VALUES (?, ?, 'pending', ?, ?, ?, ?, NOW())
+             ON DUPLICATE KEY UPDATE status = 'pending', confirm_token = VALUES(confirm_token),
+                 unsubscribe_token = COALESCE(unsubscribe_token, VALUES(unsubscribe_token)),
+                 source = VALUES(source), ip = VALUES(ip)"
+        );
+        $stmt->execute([$email, $context, $source, $confirmToken, $unsubToken, $ip]);
+    } catch (PDOException $e) {
+        error_log('create_pending_subscriber failed: ' . $e->getMessage());
+        return 'error';
+    }
+
+    return send_subscription_confirm_email($email, $confirmToken) ? 'sent' : 'error';
+}
+
+/** Send the "please confirm your subscription" double opt-in email. */
+function send_subscription_confirm_email(string $email, string $confirmToken): bool
+{
+    $confirm_url = subscriber_confirm_url($confirmToken);
+    $confirm_safe = htmlspecialchars($confirm_url, ENT_QUOTES, 'UTF-8');
+
+    $body = <<<HTML
+        <h2>Confirm your subscription</h2>
+        <p>Thanks for your interest in Argo Books. Please confirm you'd like to receive occasional tips and product updates by clicking the button below.</p>
+        <p style="margin: 24px 0;">
+            <a href="{$confirm_safe}" class="btn-primary" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Confirm subscription</a>
+        </p>
+        <p style="font-size:13px;color:#6b7280;">If the button doesn't work, copy and paste this link into your browser:<br>{$confirm_safe}</p>
+        <p style="font-size:13px;color:#6b7280;">If you didn't request this, you can ignore this email and you won't be added to the list.</p>
+        HTML;
+
+    return send_styled_email(
+        $email,
+        'Confirm your Argo Books subscription',
+        $body,
+        'blue',
+        'noreply@argorobots.com',
+        'Argo Books',
+        'contact@argorobots.com'
+    );
+}
+
+/**
+ * Confirm a pending opt-in by its confirm token. Flips the row to 'confirmed'
+ * and clears any prior newsletter-context suppression (the visitor is actively
+ * opting back in). Returns the subscriber's email on success, or null.
+ */
+function confirm_subscriber(string $token): ?string
+{
+    global $pdo;
+
+    if (!preg_match('/^[a-f0-9]{24,128}$/', $token)) {
+        return null;
+    }
+
+    $stmt = $pdo->prepare('SELECT id, email, context, status FROM marketing_subscribers WHERE confirm_token = ? LIMIT 1');
+    $stmt->execute([$token]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return null;
+    }
+
+    if ($row['status'] !== 'confirmed') {
+        $upd = $pdo->prepare("UPDATE marketing_subscribers SET status = 'confirmed', confirmed_at = NOW() WHERE id = ?");
+        $upd->execute([$row['id']]);
+
+        // A fresh, explicit opt-in clears a stale per-context suppression so the
+        // send-time gate won't keep blocking them. all_marketing is left intact.
+        $del = $pdo->prepare('DELETE FROM email_suppressions WHERE email = ? AND context = ?');
+        $del->execute([strtolower(trim($row['email'])), $row['context']]);
+    }
+
+    return $row['email'];
+}
+
+/**
+ * One-click unsubscribe for a no-account subscriber. Marks the row
+ * 'unsubscribed' and records a per-context suppression so the gate blocks future
+ * sends even if a confirmed row somehow lingers. Returns the email, or null.
+ */
+function unsubscribe_subscriber_by_token(string $token): ?string
+{
+    global $pdo;
+
+    if (!preg_match('/^[a-f0-9]{24,128}$/', $token)) {
+        return null;
+    }
+
+    $stmt = $pdo->prepare('SELECT id, email, context FROM marketing_subscribers WHERE unsubscribe_token = ? LIMIT 1');
+    $stmt->execute([$token]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return null;
+    }
+
+    $email = strtolower(trim($row['email']));
+
+    $upd = $pdo->prepare("UPDATE marketing_subscribers SET status = 'unsubscribed', unsubscribed_at = NOW() WHERE id = ?");
+    $upd->execute([$row['id']]);
+
+    $check = $pdo->prepare('SELECT 1 FROM email_suppressions WHERE email = ? AND context = ? LIMIT 1');
+    $check->execute([$email, $row['context']]);
+    if (!$check->fetchColumn()) {
+        $ins = $pdo->prepare('INSERT INTO email_suppressions (email, context, reason, source_id) VALUES (?, ?, ?, ?)');
+        $ins->execute([$email, $row['context'], 'one-click unsubscribe (subscriber)', $row['id']]);
+    }
+
+    return $email;
+}
+
+/**
+ * Build the correct unsubscribe URL for a broadcast recipient, branching on the
+ * audience context: 'newsletter' uses the marketing_subscribers token; a
+ * community context uses the community_users token. Returns null if no token
+ * source is found (the cron then falls back to a generic preferences link).
+ */
+function marketing_unsubscribe_url_for(string $email, string $context): ?string
+{
+    global $pdo;
+
+    $email = strtolower(trim($email));
+
+    if (in_array($context, marketing_subscriber_contexts(), true)) {
+        $stmt = $pdo->prepare('SELECT unsubscribe_token FROM marketing_subscribers WHERE email = ? AND context = ? LIMIT 1');
+        $stmt->execute([$email, $context]);
+        $token = $stmt->fetchColumn();
+        return $token ? subscriber_unsubscribe_url($token) : null;
+    }
+
+    // Community-user contexts: reuse the existing per-user token flow.
+    $stmt = $pdo->prepare('SELECT id FROM community_users WHERE email = ? LIMIT 1');
+    $stmt->execute([$email]);
+    $userId = $stmt->fetchColumn();
+    if ($userId) {
+        return community_user_unsubscribe_url((int) $userId, $context);
+    }
+
+    return null;
 }

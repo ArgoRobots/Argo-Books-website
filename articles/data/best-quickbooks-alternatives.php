@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-31',
 
-  'updated' => '2026-05-31',
+  'updated' => '2026-06-29',
 
   'reading_time_min' => 10,
 
@@ -40,11 +40,12 @@ HTML,
       'html' => <<<'HTML'
 <p>It helps to be clear about which problem you're actually trying to solve, because each one points at a different replacement.</p>
 <ul>
-<li><strong>Price.</strong> The most common reason. Entry plans start around ${quickbooks_easystart} CAD a month, but the features most businesses want sit in Plus, closer to ${quickbooks_plus} CAD a month, and the published price tends to rise each year. If cost is the driver, free and low-cost options below will feel like a different world.</li>
+<li><strong>Price.</strong> The most common reason. Entry plans start around ${quickbooks_easystart} CAD a month, but the features most businesses want sit in Plus, closer to ${quickbooks_plus} CAD a month, and the published price keeps climbing: the popular Plus plan rose by around two-thirds in the five years to 2025 (<a href="https://report.woodard.com/articles/intuit-announces-2025-quickbooks-price-increases-fpwr" target="_blank" rel="noopener nofollow">pricing updates</a>), and the full plan-by-plan breakdown is in the guide on <a href="/quickbooks-price-increases/">QuickBooks price increases</a>. If cost is the driver, free and low-cost options below will feel like a different world.</li>
 <li><strong>Complexity.</strong> QuickBooks is built to do almost everything, which makes it slow and busy if you only need a fraction of it. If you spend more time hunting through menus than doing the task, a simpler tool will save you hours.</li>
 <li><strong>Feature gatekeeping.</strong> Things you'd consider basic, like more detailed reports or certain integrations, are often held back for higher tiers. If you're paying for Plus to unlock one feature you use, a different tool may include it lower down.</li>
 <li><strong>You've outgrown it the other way.</strong> Less common, but some businesses leave because they need something more specialized, like heavy inventory or a specific industry workflow QuickBooks doesn't handle well.</li>
 </ul>
+{{illustration:price-trend}}
 <p>Write down which of these is yours. "QuickBooks is expensive" and "QuickBooks is too complicated" lead to different shortlists, and chasing both at once is how people end up unhappy with whatever they switch to.</p>
 HTML,
     ],
@@ -80,6 +81,20 @@ HTML,
       'anchor' => 'alternatives',
       'html' => <<<'HTML'
 <p>Order roughly follows how broad the appeal is, not preference. Match these to the feature list you wrote earlier rather than picking the most popular name.</p>
+<p>At a glance, here is how the main alternatives stack up. The detail on each follows below.</p>
+<table>
+<thead>
+<tr><th>Tool</th><th>Free tier</th><th>Best for</th><th>Built-in payroll</th><th>Paid from</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Wave</strong></td><td>Yes, no time limit</td><td>Sole proprietors who want free</td><td>Paid add-on</td><td>~${wave_pro}/mo (Pro)</td></tr>
+<tr><td><strong>FreshBooks</strong></td><td>No, trial only</td><td>Freelancers who bill by time</td><td>No</td><td>~${freshbooks_lite}/mo</td></tr>
+<tr><td><strong>Xero</strong></td><td>No, trial only</td><td>Closest to QuickBooks</td><td>Add-on</td><td>~${xero_starter}/mo</td></tr>
+<tr><td><strong>Zoho Books</strong></td><td>Yes, smallest businesses</td><td>Zoho users, automation</td><td>No</td><td>Low-cost tiers</td></tr>
+<tr><td><strong>ZipBooks</strong></td><td>Yes, starter tier</td><td>Simple, light needs</td><td>No</td><td>~${zipbooks_smarter}/mo</td></tr>
+<tr><td><strong>Argo Books</strong></td><td>Yes, no time limit</td><td>Free, with data on your machine</td><td>No</td><td>~${argo_premium_monthly}/mo</td></tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Wave.</strong> The obvious free pick. Core invoicing and accounting are genuinely free, with no time limit. You pay for card payments, payroll, and the Pro tier (around ${wave_pro} CAD a month). Best for sole proprietors and small service businesses that want to stop paying for software entirely. The trade-offs: thinner support, less active development than it once had, and some features have moved from free to Pro over time.</li>
 <li><strong>FreshBooks.</strong> The friendliest to learn, built for freelancers and service businesses. Strong time tracking, project profitability, and a clean client portal. Plans start around ${freshbooks_lite} CAD a month for Lite, with Plus nearer ${freshbooks_plus} CAD. The trade-off: lower tiers cap your number of billable clients, and a long client list pushes you up the tiers.</li>
@@ -87,9 +102,13 @@ HTML,
 <li><strong>Zoho Books.</strong> Full accounting with strong automation, especially if you already use other Zoho products. Reasonable pricing and a real free tier for the smallest businesses. The trade-off: it works best when you're inside the wider Zoho world, and the suite has a learning curve of its own.</li>
 <li><strong>ZipBooks.</strong> Simpler and lighter than QuickBooks, with a free starter tier and a clean interface, paid plans from around ${zipbooks_smarter} CAD a month. Good for a small service business that wants basics without bulk. The trade-off: fewer advanced features and a smaller ecosystem than the bigger names.</li>
 <li><strong>Odoo.</strong> Not just accounting, a whole modular business suite. The accounting app is free on its own as a single app, with paid plans once you add modules. Powerful if you want inventory, CRM, and more in one system. The trade-off: it's far more than most small businesses need, and the power comes with setup work.</li>
-<li><strong>Argo Books.</strong> Newer, freemium, with a generous free tier (25 invoices a month, basic bookkeeping, free <a href="/best-free-ai-receipt-scanner/">receipt scans</a>, no time limit) and Premium at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher volumes, more receipt scanning, and advanced features. Built as a desktop app (Windows, Linux, and macOS) so your data lives on your machine. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older players, and no built-in payroll, so it suits businesses that don't run payroll through their accounting tool.</li>
+<li><strong>Argo Books.</strong> Newer, freemium, with a generous free tier ({argo_free_invoice_limit} invoices a month, basic bookkeeping, free <a href="/best-free-ai-receipt-scanner/">receipt scans</a>, no time limit) and Premium at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher volumes, more receipt scanning, and advanced features. Built as a desktop app (Windows, Linux, and macOS) so your data lives on your machine. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older players, and no built-in payroll, so it suits businesses that don't run payroll through their accounting tool.</li>
 </ul>
 <p>For most people the real shortlist is two or three of these. If you want free and simple, look at Wave and Argo Books. If you're a service business that values ease of use, FreshBooks. If you want the nearest thing to QuickBooks itself, Xero. Pick one, try it for a month on a free trial or free tier, and switch if it's wrong.</p>
+<figure class="article-figure">
+<img src="/resources/images/dashboard-1200.webp" alt="The Argo Books dashboard showing income, expenses, and recent invoices" width="1200" height="764" loading="lazy">
+<figcaption>Argo Books keeps invoicing, expenses, and receipts in one app, with a free tier and no time limit.</figcaption>
+</figure>
 HTML,
     ],
 
@@ -114,6 +133,7 @@ HTML,
       'h2' => 'How to switch without losing your history',
       'anchor' => 'how-to-switch',
       'html' => <<<'HTML'
+{{illustration:spreadsheet-to-books}}
 <p>The migration is usually smaller than the dread of it, but a few moves keep it clean:</p>
 <ul>
 <li><strong>Switch at the start of a fiscal year if you can.</strong> Close out the old year in QuickBooks, run every report you'll want for tax time, and start the new year in the new tool. Mid-year switches leave your annual reports split across two systems and hand your accountant a stitching job.</li>
@@ -136,7 +156,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Yes, partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you do not need.',
+      'a' => 'Yes, partly, and you should read it that way. It\'s on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you don\'t need.',
     ],
     [
       'q' => 'Will my accountant accept a QuickBooks alternative?',
@@ -148,11 +168,11 @@ HTML,
     ],
     [
       'q' => 'Is a free QuickBooks alternative actually good enough?',
-      'a' => 'For many small businesses, yes. Wave and Argo Books both have free tiers that handle invoicing and basic bookkeeping with no time limit, and plenty of sole proprietors and small service businesses run on them for years. Free stops being enough when you need built-in payroll, heavy inventory, complex multi-entity reporting, or a large team in the books at once. If you need those, you are comparing paid tools, not free ones. If you do not, a free tier can genuinely replace a paid QuickBooks plan and the saving is real.',
+      'a' => 'For many small businesses, yes. Wave and Argo Books both have free tiers that handle invoicing and basic bookkeeping with no time limit, and plenty of sole proprietors and small service businesses run on them for years. Free stops being enough when you need built-in payroll, heavy inventory, complex multi-entity reporting, or a large team in the books at once. If you need those, you are comparing paid tools, not free ones. If you don\'t, a free tier can genuinely replace a paid QuickBooks plan and the saving is real.',
     ],
     [
       'q' => 'Which alternative is closest to QuickBooks itself?',
-      'a' => 'Xero is generally the nearest in scope and feel: full double-entry accounting, strong bank feeds, a large accountant network, and a comparable feature set, with an interface many people find cleaner. It is the usual pick for someone who wants QuickBooks-level capability without QuickBooks. The catch is that Xero is paid, with invoice caps on lower tiers, so it solves the complexity complaint more than the cost one. If price is your main reason for leaving, a free tool like Wave or Argo Books is a bigger change than Xero, but a bigger saving too.',
+      'a' => 'Xero is generally the nearest in scope and feel: full double-entry accounting, strong bank feeds, a large accountant network, and a comparable feature set, with an interface many people find cleaner. It\'s the usual pick for someone who wants QuickBooks-level capability without QuickBooks. The catch is that Xero is paid, with invoice caps on lower tiers, so it solves the complexity complaint more than the cost one. If price is your main reason for leaving, a free tool like Wave or Argo Books is a bigger change than Xero, but a bigger saving too.',
     ],
   ],
 

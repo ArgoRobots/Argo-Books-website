@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -79,6 +79,7 @@ HTML,
 <li><strong>Set tax money aside as you earn it.</strong> The tax on a profitable summer is owed later, often when cash is tight. Park a percentage of income as it comes in so the bill isn't a crisis.</li>
 <li><strong>Watch what you're owed.</strong> Unpaid invoices hurt most going into the slow season. Chase overdue payments while the client is still thinking about the work, not in November.</li>
 </ul>
+{{illustration:cashflow-cycle}}
 <p>Bookkeeping is what makes this possible, because you can only set aside the right amount if you know your real numbers. A landscaper who tracks income and costs through the season knows what winter needs; one who doesn't is guessing, and usually guesses short.</p>
 HTML,
     ],
@@ -103,6 +104,7 @@ HTML,
       'anchor' => 'crew-and-tax',
       'html' => <<<'HTML'
 <p>Once you take on help, labour becomes your biggest cost and your biggest paperwork job. Whether your workers are employees or subcontractors is set by law and the working relationship, not by what you call them, and it changes your obligations significantly, so it's worth confirming with an accountant. Employees usually mean running payroll, with tax withheld and paid across; genuine subcontractors invoice you, but you still keep records of who you paid and report it. Either way, collect details up front and keep a clean record of every payment, because it's all deductible cost that has to be captured.</p>
+{{illustration:calendar-due}}
 <p>Pull it together with a short monthly routine and tax time is calm:</p>
 <ol>
 <li><strong>Once a month, check your records against the bank</strong> and confirm everything's recorded and tagged, ideally to the right job.</li>
@@ -133,7 +135,7 @@ HTML,
     ],
     [
       'q' => 'Do I need to track each job separately?',
-      'a' => 'It is worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You do not need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
+      'a' => 'It\'s worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You don\'t need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
     ],
     [
       'q' => 'Are my crew employees or subcontractors?',
@@ -141,7 +143,7 @@ HTML,
     ],
     [
       'q' => 'Is this guide trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits here do not depend on our tool. Separating your accounts, tracking costs by job, setting aside money for the off-season and for tax, logging mileage, and keeping crew records all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you ride the seasons with clean books and claim every deduction than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits here don\'t depend on our tool. Separating your accounts, tracking costs by job, setting aside money for the off-season and for tax, logging mileage, and keeping crew records all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you ride the seasons with clean books and claim every deduction than buy software you don\'t need.',
     ],
   ],
 
@@ -153,6 +155,7 @@ HTML,
 
   'related_article_slugs' => [
     'bookkeeping-for-contractors',
+    'bookkeeping-for-cleaning-companies',
     'how-to-track-business-expenses-without-spreadsheets',
     'small-business-tax-deductions',
   ],

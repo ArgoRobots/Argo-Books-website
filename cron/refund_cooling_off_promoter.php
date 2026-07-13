@@ -8,7 +8,7 @@ declare(strict_types=1);
  * cooling_off_until elapses, then invokes the provider API.
  *
  * Schedule: every 1 minute.
- *   * * * * * php /var/www/argo-books-website/cron/refund_cooling_off_promoter.php
+ *   * * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_cooling_off_promoter.php
  */
 
 // Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).

@@ -38,10 +38,10 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
     <meta name="twitter:title" content="Argo Books vs QuickBooks: A Simpler, More Affordable Alternative">
     <meta name="twitter:description"
         content="Compare Argo Books and QuickBooks side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -73,7 +73,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial."
                     }
                 },
                 {
@@ -167,7 +167,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>No price creep</h3>
-                    <p>QuickBooks has raised their prices twice since we launched this comparison page, and we've had to update these numbers each time. Their cheapest plan is now $<?= $qb_easystart ?> CAD/month. Argo Books has a free version with core features, and Premium is $<?= $argo_monthly ?> CAD/month.</p>
+                    <p>QuickBooks has raised their prices twice since we launched this comparison page, and we've had to update these numbers each time. They increased their prices by 70% in the last 5 years. How much will they increase it in the next 5 years?</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -301,7 +301,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $<?= $qb_easystart ?> to $<?= $qb_advanced ?> CAD/month depending on the plan, and those prices keep climbing every year (we've had to update this page twice already to keep up). Argo Books keeps it simple with predictable, affordable pricing.</p>
+                <p class="section-desc">QuickBooks charges $<?= $qb_easystart ?> to $<?= $qb_advanced ?> CAD/month depending on the plan, and those prices keep climbing every year (70% in the last 5 years!). We've had to update this page twice already to keep up. Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -395,6 +395,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                 <span class="section-label">An Honest Take</span>
                 <h2>QuickBooks is powerful, but is it right for you?</h2>
                 <p class="section-desc">QuickBooks is a mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, it's a solid choice. But as a publicly traded company, Intuit's priorities don't always align with small business owners, and it shows in the rising prices, aggressive feature gating, and complexity you don't need. Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
+                <p class="section-desc">Still weighing your options? Read our roundup of the <a class="link" href="../../best-quickbooks-alternatives/">best QuickBooks alternatives</a>, an honest look at Wave, Xero, FreshBooks, Zoho, and more, with where each one fits best.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -417,7 +418,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>QuickBooks does not offer a free plan. Pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial.</p>
                         </div>
                     </div>

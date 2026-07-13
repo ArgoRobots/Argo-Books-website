@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -65,6 +65,7 @@ HTML,
 <p>Because most of your income is the same clients on a schedule, the bookkeeping question is keeping clear which invoices went out and which were paid. A handful of regular clients is easy to hold in your head; twenty or thirty is not, and that's where money goes uncollected.</p>
 <p>For a small client list, a simple record works: a row per client with what they're billed and when they pay. Once the list grows, billing the same clients every cycle by hand becomes a chore that's easy to forget, and a missed invoice is income you never collected. That's the point where <a href="/recurring-invoices-when-to-use-them/">recurring invoices</a> earn their place, sending the regular bill automatically so nothing is missed. Whatever you use, the rule is the same: every invoice has a number, you can see at a glance which are unpaid, and you follow up on the ones that go overdue.</p>
 <p>The unpaid ones matter. A steady-looking cleaning business can still be short of cash if a few clients are quietly behind, so knowing who owes you, and chasing it, is part of the books, not separate from them.</p>
+{{illustration:cashflow-cycle}}
 HTML,
     ],
 
@@ -79,7 +80,7 @@ HTML,
 <li><strong>Equipment.</strong> Vacuums, machines, and larger gear. Smaller items are often claimed in full the year you buy them; bigger ones may be claimed over several years depending on your country's rules. Keep the receipts so the right treatment can be applied.</li>
 <li><strong>Other running costs.</strong> The business share of your phone, any scheduling or invoicing software, insurance, and uniforms or branded workwear. Small individually, real across a year.</li>
 </ul>
-<p>The theme is the one that runs through all bookkeeping: the deduction is only as good as the record. A receipt-scanning app helps here because the volume of small receipts is exactly what makes manual entry tedious, but a photo into a labelled folder works too. Capture as you go and you claim everything; reconstruct at tax time and you'll undercount.</p>
+<p>The theme is the one that runs through all bookkeeping: the deduction is only as good as the record. A receipt-scanning app helps here because the volume of small receipts is exactly what makes manual entry tedious, but a photo dropped into a labelled folder works too. Capture as you go and you claim everything; reconstruct at tax time and you'll undercount.</p>
 HTML,
     ],
 
@@ -107,6 +108,7 @@ HTML,
 <li><strong>Set tax money aside as you're paid.</strong> Steady income makes this easy to skip, but the tax is still owed. Moving a percentage of each payment into a separate account as it lands means the bill isn't a shock.</li>
 <li><strong>Hand your accountant clean totals.</strong> Income, costs by category, mileage, and what you paid your cleaners, with receipts available. Accountants bill by the hour, so clean records mean a smaller bill and every deduction claimed.</li>
 </ol>
+{{illustration:calendar-due}}
 <p>It's a handful of habits, not a second job. The cleaning businesses that dread tax season are the ones who left it all for the end; the ones who spend a few minutes a week keeping it current barely notice it.</p>
 HTML,
     ],
@@ -138,7 +140,7 @@ HTML,
     ],
     [
       'q' => 'Is this guide trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits in this guide do not depend on our tool. Separating your accounts, capturing supply receipts as you go, logging mileage, tracking recurring invoices, and recording what you pay your cleaners all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you keep clean books and claim every deduction than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits in this guide don\'t depend on our tool. Separating your accounts, capturing supply receipts as you go, logging mileage, tracking recurring invoices, and recording what you pay your cleaners all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you keep clean books and claim every deduction than buy software you don\'t need.',
     ],
   ],
 
@@ -150,6 +152,7 @@ HTML,
 
   'related_article_slugs' => [
     'bookkeeping-for-contractors',
+    'bookkeeping-for-landscapers',
     'how-to-track-business-expenses-without-spreadsheets',
     'best-free-ai-receipt-scanner',
   ],

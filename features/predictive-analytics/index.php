@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Predictive Analytics | Argo Books">
     <meta name="twitter:description"
         content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -622,6 +622,48 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     </div>
                     <h3>Spreadsheet Import</h3>
                     <p>Import your full transaction history to give the analytics engine a head start. More historical data means more accurate forecasts from day one.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Learn the thinking behind the forecasts.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../how-to-forecast-cash-flow-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>How to forecast cash flow</h3>
+                    <p>Build a forecast from your real numbers, without a spreadsheet.</p>
+                </a>
+                <a href="../../how-to-forecast-revenue-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>How to forecast revenue</h3>
+                    <p>Three simple ways to predict next month's sales.</p>
+                </a>
+                <a href="../../how-to-spot-seasonal-trends-in-your-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Spot your seasonal trends</h3>
+                    <p>Find your busy and slow cycles and plan for them.</p>
+                </a>
+                <a href="../../free-cash-flow-forecast-template/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Free cash flow forecast template</h3>
+                    <p>Build a simple template, and know when to outgrow it.</p>
+                </a>
+                <a href="../../cash-flow-forecasting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Cash flow forecasting software</h3>
+                    <p>Native, add-on, or all-in-one: what to look for.</p>
+                </a>
+                <a href="../../predictive-analytics-for-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Predictive analytics, explained</h3>
+                    <p>Is the "AI" real? How to judge a forecast.</p>
                 </a>
             </div>
         </div>

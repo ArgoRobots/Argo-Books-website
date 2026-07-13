@@ -115,7 +115,7 @@ function detectBrowserForGuide(): string
 $smartScreenGuides = [
     'edge' => [
         'browser_name' => 'Microsoft Edge',
-        'intro' => 'Edge may ask you to confirm this download. This is a normal extra step for new app. Here\'s how to keep the installer:',
+        'intro' => 'Edge sometimes flags new apps before they are widely downloaded. Here\'s how to keep the installer:',
         'steps' => [
             [
                 'title' => 'Open the Downloads panel, hover the file, and click the ⋯ menu',
@@ -134,6 +134,20 @@ $smartScreenGuides = [
             ],
         ],
     ],
+];
+
+// Only Edge gets an illustrated, browser-specific keep-guide: Edge reliably nags
+// on downloads and we have accurate screenshots for it. Other browsers (Chrome,
+// Firefox, etc.) rarely warn on a signed installer, and we can't verify their
+// exact dialogs, so they fall through to the Windows launch step alone.
+
+// Windows launch step. Appended as the final step of the walkthrough (after the
+// browser's "keep" steps), because the "Windows protected your PC" prompt appears
+// when the installer is opened. One combined step on purpose.
+$windowsLaunchStep = [
+    'title' => 'Open the installer. If Windows shows "Windows protected your PC", click More info, then Run anyway.',
+    'image' => '../resources/images/smartscreen-guide/windows-step.svg',
+    'alt'   => 'Windows protected your PC dialog showing Argo Books Installer, publisher Evan Di Placido, with the Run anyway button highlighted',
 ];
 
 $browserKey = detectBrowserForGuide();
@@ -168,10 +182,10 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
     <meta name="twitter:title" content="Download Argo Books | Windows, macOS & Linux">
     <meta name="twitter:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -280,28 +294,52 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
             </div>
         </div>
 
-        <!-- SmartScreen / browser download warning guide -->
-        <?php if ($smartScreenGuide): ?>
-        <div class="smartscreen-guide" id="smartScreenGuide" data-browser="<?php echo htmlspecialchars($browserKey); ?>" hidden>
-            <div class="smartscreen-guide-header">
-                <div class="smartscreen-status">
-                    <?= svg_icon('check', 16) ?>
-                    <span>Your download is starting</span>
-                </div>
-                <h2><?php echo htmlspecialchars($smartScreenGuide['browser_name']); ?> has an extra confirmation step</h2>
-                <p><?php echo htmlspecialchars($smartScreenGuide['intro']); ?></p>
-            </div>
-            <ol class="smartscreen-steps">
-                <?php foreach ($smartScreenGuide['steps'] as $i => $step): ?>
-                <li class="smartscreen-step">
-                    <div class="smartscreen-step-number"><?php echo $i + 1; ?></div>
-                    <p class="smartscreen-step-title"><?php echo htmlspecialchars($step['title']); ?></p>
-                    <div class="smartscreen-step-image">
-                        <img src="<?php echo htmlspecialchars($step['image']); ?>" alt="<?php echo htmlspecialchars($step['alt']); ?>" loading="lazy">
+        <!-- Post-download walkthrough: the browser's "keep" steps (when the browser
+             warns) followed by a final Windows launch step, as one continuous
+             numbered list. Revealed after a Windows download click. -->
+        <?php
+        if ($smartScreenGuide) {
+            $guideHeading = $smartScreenGuide['browser_name'] . ' has an extra confirmation step';
+            $guideIntro   = $smartScreenGuide['intro'];
+            $guideSteps   = $smartScreenGuide['steps'];
+        } else {
+            // Browser without a keep-guide: still show the Windows launch step alone.
+            $guideHeading = 'Opening Argo Books on Windows';
+            $guideIntro   = 'Windows may warn you because Argo Books is a newer app, not because it is unsafe. After the download finishes, here is the last step to open it:';
+            $guideSteps   = [];
+        }
+        // Append the Windows launch step as the final numbered step.
+        if (!empty($windowsLaunchStep)) {
+            $guideSteps[] = $windowsLaunchStep;
+        }
+        ?>
+        <?php if ($guideSteps): ?>
+        <div class="download-guides" id="downloadGuides" data-browser="<?php echo htmlspecialchars($browserKey); ?>" style="--step-count: <?php echo count($guideSteps); ?>;" hidden>
+            <div class="smartscreen-guide">
+                <div class="smartscreen-guide-header">
+                    <div class="smartscreen-status">
+                        <?= svg_icon('check', 16) ?>
+                        <span>Your download is starting</span>
                     </div>
-                </li>
-                <?php endforeach; ?>
-            </ol>
+                    <h2><?php echo htmlspecialchars($guideHeading); ?></h2>
+                    <p><?php echo htmlspecialchars($guideIntro); ?></p>
+                </div>
+                <ol class="smartscreen-steps" style="--step-count: <?php echo count($guideSteps); ?>;">
+                    <?php foreach ($guideSteps as $i => $step): ?>
+                    <li class="smartscreen-step">
+                        <?php if (count($guideSteps) > 1): ?>
+                        <div class="smartscreen-step-number"><?php echo $i + 1; ?></div>
+                        <?php endif; ?>
+                        <p class="smartscreen-step-title"><?php echo htmlspecialchars($step['title']); ?></p>
+                        <?php if (!empty($step['image'])): ?>
+                        <div class="smartscreen-step-image">
+                            <img src="<?php echo htmlspecialchars($step['image']); ?>" alt="<?php echo htmlspecialchars($step['alt'] ?? ''); ?>" loading="lazy">
+                        </div>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
         </div>
         <?php endif; ?>
 
@@ -372,7 +410,7 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 <li>In the <strong>Permissions</strong> tab, check <strong>"Allow executing file as program"</strong> (the wording varies slightly between distros).</li>
                 <li>Double-click the file to launch Argo Books.</li>
             </ol>
-            <p class="install-modal-alt">Prefer the terminal? Run <code>chmod +x ArgoBooks-<?php echo $latestVersion ? htmlspecialchars($latestVersion['version']) : 'X.X.X'; ?>-linux-x64.AppImage</code> instead of steps 2 and 3.</p>
+            <p class="install-modal-alt">Prefer the terminal? Run <code>chmod +x ArgoBooks-<?php echo $latestVersion ? htmlspecialchars($latestVersion['version']) : 'X.X.X'; ?>-linux-x64.AppImage</code> instead.</p>
             <p class="install-modal-note">AppImages are self-contained: there's nothing else to install, and you can keep the file anywhere you like. See the <a href="../documentation/pages/getting-started/installation.php">full installation guide</a> for more.</p>
         </div>
     </div>
@@ -382,7 +420,7 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
     </footer>
 
     <script>
-        const smartScreenGuide = document.getElementById('smartScreenGuide');
+        const downloadGuides = document.getElementById('downloadGuides');
 
         // Add download tracking + reveal SmartScreen guide for Windows downloads
         document.querySelectorAll('.download-btn:not(.disabled)').forEach(function(btn) {
@@ -399,12 +437,13 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                     gtag('event', 'conversion', {'send_to': 'AW-17210317271/niGZCJv2vbkbENezwo5A'});
                 }
 
-                if (platform === 'windows' && smartScreenGuide) {
-                    smartScreenGuide.hidden = false;
+                if (platform === 'windows' && downloadGuides) {
+                    downloadGuides.hidden = false;
                     requestAnimationFrame(function() {
-                        smartScreenGuide.classList.add('is-visible');
+                        downloadGuides.querySelectorAll('.smartscreen-guide')
+                            .forEach(function(g) { g.classList.add('is-visible'); });
                         setTimeout(function() {
-                            const targetY = smartScreenGuide.getBoundingClientRect().top
+                            const targetY = downloadGuides.getBoundingClientRect().top
                                 + window.pageYOffset - 130;
                             window.scrollTo({ top: targetY, behavior: 'smooth' });
                         }, 120);

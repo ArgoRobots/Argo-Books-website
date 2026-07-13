@@ -145,6 +145,13 @@ function track_referral_event(string $event_type, array $opts = []): bool
         return false;
     }
 
+    // Same IP exclusion as the visit/page-view trackers: owner's own
+    // connection + crawler netblocks. allow_bot (CLI / desktop app) bypasses
+    // it too, since those legitimately post from server-side / app contexts.
+    if (!$allow_bot && is_nontracked_ip($_SERVER['REMOTE_ADDR'] ?? null)) {
+        return false;
+    }
+
     global $pdo;
     if (!$pdo) {
         return false;
@@ -219,6 +226,35 @@ function backfill_visitor_events(string $visitor_id, string $subscription_id, ?i
         $stmt->execute([$subscription_id, $user_id, $visitor_id]);
     } catch (PDOException $e) {
         error_log('backfill_visitor_events failed: ' . $e->getMessage());
+    }
+}
+
+/**
+ * First-touch referral source for a visitor, read from their recorded events.
+ * A durable fallback for when $_SESSION['referral_source'] was lost between the
+ * ?source= landing and the purchase (e.g. the buyer created an account or
+ * logged in in between, which resets the PHP session). Environment-scoped so it
+ * never crosses sandbox/production.
+ */
+function get_referral_source_for_visitor(string $visitor_id): ?string
+{
+    global $pdo;
+    if (!$pdo || empty($visitor_id)) {
+        return null;
+    }
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT source_code FROM referral_events
+              WHERE visitor_id = ? AND source_code IS NOT NULL AND environment = ?
+              ORDER BY created_at ASC, id ASC
+              LIMIT 1'
+        );
+        $stmt->execute([$visitor_id, current_environment()]);
+        $src = $stmt->fetchColumn();
+        return ($src !== false && $src !== null) ? (string) $src : null;
+    } catch (PDOException $e) {
+        error_log('get_referral_source_for_visitor failed: ' . $e->getMessage());
+        return null;
     }
 }
 

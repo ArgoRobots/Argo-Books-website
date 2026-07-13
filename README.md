@@ -104,7 +104,7 @@ You need to create a MySQL database and import the schema.
 1. Open Laragon and click **Start All**
 2. Navigate to http://localhost/argo-books-website in your browser (adjust the folder name if different)
 3. The website should now be running locally
-4. To view emails sent by the application, open http://localhost:8025 (requires MailHog setup, see [Local email setup](read-me/Local%20email%20setup.md))
+4. To view emails sent by the application, open http://localhost:8025 (requires MailHog setup, see [Local email setup](read-me/setup/Local%20email%20setup.md))
 
 ## Publishing a new version of Argo Books
 1. Create a new folder in `resources/downloads` named whatever the version number is

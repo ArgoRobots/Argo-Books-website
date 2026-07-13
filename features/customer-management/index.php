@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Customer+Management&subtitle=Keep+a+complete+record+of+every+customer.+Contacts%2C+addresses%2C+purchase+history%2C+and+notes+in+one+place.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Customer Management | Argo Books">
     <meta name="twitter:description"
         content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Customer+Management&subtitle=Keep+a+complete+record+of+every+customer.+Contacts%2C+addresses%2C+purchase+history%2C+and+notes+in+one+place.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

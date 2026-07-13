@@ -70,44 +70,62 @@ $base_path = $in_subdir ? '../' : '';
                     </a>
                 </div>
 
+                <?php
+                // Grouped desktop navigation. Each group renders as a hover dropdown;
+                // entries with a single null-keyed item render as a standalone link.
+                // Keys are the directory names matched against $current_dir for highlighting.
+                $nav_groups = [
+                    'Sales' => [
+                        'license'  => 'Licenses',
+                        'payments' => 'Payment Portal',
+                    ],
+                    'Growth' => [
+                        'referral-links'   => 'Referrals',
+                        'affiliates'       => 'Affiliates',
+                        'marketing-funnel' => 'Funnel',
+                        'marketing'        => 'Marketing',
+                        'outreach'         => 'Outreach',
+                        'reviews'          => 'Reviews',
+                    ],
+                    'Analytics' => [
+                        'app-stats'     => 'App Stats',
+                        'website-stats' => 'Website Stats',
+                    ],
+                    'Community' => [
+                        'users'   => 'Users',
+                        'reports' => 'Reports',
+                    ],
+                    'System' => [
+                        'crons'    => 'Crons',
+                        'settings' => '2FA',
+                    ],
+                ];
+                ?>
                 <!-- Center: Desktop Navigation -->
                 <nav class="header-nav desktop-nav">
-                    <a href="<?php echo $base_path; ?>license/" class="header-link <?php echo $current_dir === 'license' ? 'active' : ''; ?>">
-                        Licenses
-                    </a>
-                    <a href="<?php echo $base_path; ?>payments/" class="header-link <?php echo $current_dir === 'payments' ? 'active' : ''; ?>">
-                        Payment Portal
-                    </a>
-                    <a href="<?php echo $base_path; ?>app-stats/" class="header-link <?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">
-                        App Stats
-                    </a>
-                    <a href="<?php echo $base_path; ?>website-stats/" class="header-link <?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">
-                        Website Stats
-                    </a>
-                    <a href="<?php echo $base_path; ?>referral-links/" class="header-link <?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">
-                        Referrals
-                    </a>
-                    <a href="<?php echo $base_path; ?>marketing-funnel/" class="header-link <?php echo $current_dir === 'marketing-funnel' ? 'active' : ''; ?>">
-                        Funnel
-                    </a>
-                    <a href="<?php echo $base_path; ?>users/" class="header-link <?php echo $current_dir === 'users' ? 'active' : ''; ?>">
-                        Users
-                    </a>
-                    <a href="<?php echo $base_path; ?>reports/" class="header-link <?php echo $current_dir === 'reports' ? 'active' : ''; ?>">
-                        Reports
-                    </a>
-                    <a href="<?php echo $base_path; ?>outreach/" class="header-link <?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">
-                        Outreach
-                    </a>
-                    <a href="<?php echo $base_path; ?>reviews/" class="header-link <?php echo $current_dir === 'reviews' ? 'active' : ''; ?>">
-                        Reviews
-                    </a>
-                    <a href="<?php echo $base_path; ?>crons/" class="header-link <?php echo $current_dir === 'crons' ? 'active' : ''; ?>">
-                        Crons
-                    </a>
-                    <a href="<?php echo $base_path; ?>settings/" class="header-link <?php echo $current_dir === 'settings' ? 'active' : ''; ?>">
-                        2FA
-                    </a>
+                    <?php foreach ($nav_groups as $label => $items): ?>
+                        <?php if (count($items) === 1): ?>
+                            <?php $dir = array_key_first($items); ?>
+                            <a href="<?php echo $base_path . $dir; ?>/" class="header-link <?php echo $current_dir === $dir ? 'active' : ''; ?>">
+                                <?php echo htmlspecialchars($items[$dir]); ?>
+                            </a>
+                        <?php else: ?>
+                            <?php $group_active = array_key_exists($current_dir, $items); ?>
+                            <div class="nav-group">
+                                <button type="button" class="header-link nav-group-toggle <?php echo $group_active ? 'active' : ''; ?>" aria-haspopup="true" aria-expanded="false">
+                                    <?php echo htmlspecialchars($label); ?>
+                                    <span class="nav-caret" aria-hidden="true">&#9662;</span>
+                                </button>
+                                <div class="nav-dropdown" role="menu">
+                                    <?php foreach ($items as $dir => $text): ?>
+                                        <a href="<?php echo $base_path . $dir; ?>/" role="menuitem" class="nav-dropdown-link <?php echo $current_dir === $dir ? 'active' : ''; ?>">
+                                            <?php echo htmlspecialchars($text); ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </nav>
 
                 <!-- Right: Desktop Actions (Logout) -->
@@ -139,18 +157,20 @@ $base_path = $in_subdir ? '../' : '';
                         </a>
                     </li>
                     <li><a href="<?php echo $base_path; ?>index.php" class="<?php echo $current_dir === 'admin' ? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="<?php echo $base_path; ?>license/" class="<?php echo $current_dir === 'license' ? 'active' : ''; ?>">Licenses</a></li>
-                    <li><a href="<?php echo $base_path; ?>payments/" class="<?php echo $current_dir === 'payments' ? 'active' : ''; ?>">Payment Portal</a></li>
-                    <li><a href="<?php echo $base_path; ?>app-stats/" class="<?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">App Stats</a></li>
-                    <li><a href="<?php echo $base_path; ?>website-stats/" class="<?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">Website Stats</a></li>
-                    <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referrals</a></li>
-                    <li><a href="<?php echo $base_path; ?>marketing-funnel/" class="<?php echo $current_dir === 'marketing-funnel' ? 'active' : ''; ?>">Funnel</a></li>
-                    <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
-                    <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
-                    <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>
-                    <li><a href="<?php echo $base_path; ?>reviews/" class="<?php echo $current_dir === 'reviews' ? 'active' : ''; ?>">Reviews</a></li>
-                    <li><a href="<?php echo $base_path; ?>crons/" class="<?php echo $current_dir === 'crons' ? 'active' : ''; ?>">Crons</a></li>
-                    <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA</a></li>
+                    <?php // Built from the same $nav_groups as the desktop nav, so the two
+                          // never drift. On mobile every group is expanded under its label
+                          // instead of being a hover dropdown.
+                    foreach ($nav_groups as $label => $items): ?>
+                        <?php if (count($items) === 1): ?>
+                            <?php $dir = array_key_first($items); ?>
+                            <li><a href="<?php echo $base_path . $dir; ?>/" class="<?php echo $current_dir === $dir ? 'active' : ''; ?>"><?php echo htmlspecialchars($items[$dir]); ?></a></li>
+                        <?php else: ?>
+                            <li class="mobile-nav-group-label"><?php echo htmlspecialchars($label); ?></li>
+                            <?php foreach ($items as $dir => $text): ?>
+                                <li><a href="<?php echo $base_path . $dir; ?>/" class="<?php echo $current_dir === $dir ? 'active' : ''; ?>"><?php echo htmlspecialchars($text); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>
             </div>

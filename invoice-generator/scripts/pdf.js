@@ -34,6 +34,11 @@ const BASE = (typeof window !== 'undefined' && window.INVGEN_BASE) || '';
 const HTML2CANVAS_SRC = `${BASE}/invoice-generator/vendor/html2canvas.min.js`;
 const JSPDF_SRC = `${BASE}/invoice-generator/vendor/jspdf.umd.min.js`;
 
+// Document-type config (shared engine; invoice defaults when absent).
+const DOC = (typeof window !== 'undefined' && window.DOC_CONFIG) || {};
+const FILENAME_PREFIX = DOC.filenamePrefix || 'invoice';
+const EVENT_PREFIX = DOC.eventPrefix || 'invgen';
+
 let libsPromise = null;
 
 function loadScript(src) {
@@ -89,6 +94,11 @@ function prepareCloneForCapture(invoice, clonedDoc) {
   liveInputs.forEach((live, i) => {
     const cloned = cloneInputs[i];
     if (!cloned) return;
+
+    // File inputs (the logo picker) carry a "C:\fakepath\..." value the
+    // browser exposes for security. Never render that as text; the chosen
+    // logo is drawn separately via [data-logo-rendered]. Drop the clone.
+    if (live.type === 'file') { cloned.remove(); return; }
 
     const isTextarea = cloned.tagName === 'TEXTAREA';
     const value = live.value;
@@ -193,9 +203,9 @@ export async function downloadPdf(state) {
     pdf.text('Made with argorobots.com', pageWidthMm / 2, pageHeightMm - 5, { align: 'center' });
 
     const number = (state.invoiceNumber || '').toString().trim() || 'draft';
-    pdf.save(`invoice-${number}.pdf`);
+    pdf.save(`${FILENAME_PREFIX}-${number}.pdf`);
 
-    trackEvent('invgen_pdf_downloaded', state.template);
+    trackEvent(`${EVENT_PREFIX}_pdf_downloaded`, state.template);
   } finally {
     invoice.classList.remove('invgen-capturing');
   }

@@ -19,7 +19,7 @@ return [
   'hub_weight' => 80,
 
   'published' => '2026-05-30',
-  'updated'   => '2026-05-30',
+  'updated'   => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -38,6 +38,7 @@ HTML,
 <p>The invoice was due yesterday and the payment hasn't arrived. Your first move is to do nothing for a few hours. Most overdue invoices aren't a client problem, they're a process problem. The email may have gone to a junk folder. The approver may have been on vacation. The accounts payable run may happen on Fridays only, and yesterday was a Wednesday. None of those reasons reflect badly on you or the client, and none of them are worth a sharp message.</p>
 <p>Open your records and check the basics first. Did the invoice actually send? Did the email bounce? Did you send it to the right address? On larger clients with a finance team, did you copy the AP inbox as well as your point of contact? A meaningful share of "missing payments" turn out to be missing invoices that never reached the right inbox. Fixing that is a different conversation from chasing a late payer, and it deserves a friendly tone rather than a reminder.</p>
 <p>Tone matters from the very first contact. If the client is normally good and the invoice is one day late, you don't need to chase yet. Wait the rest of the week. If you have a payment portal, a small business owner, or a client who pays from their phone, they often pay inside 48 hours of the due date and a reminder on day 1 reads as anxious. Hold off, let the normal payment cycle run, and pick this back up later in the week if nothing arrives.</p>
+{{illustration:calendar-due}}
 <p>The mental shift here is the most important one in the whole guide: late doesn't mean unwilling. Treat the first few days as a small bookkeeping question, not a confrontation. The clients who appreciate the calm tone are the ones who keep hiring you. The ones who don't pay no matter what tone you use will reveal themselves later, and the calm record helps you when they do.</p>
 HTML,
     ],
@@ -79,6 +80,7 @@ HTML,
 <p>Three weeks past due and the situation has shifted. The reminders didn't work, the phone calls didn't work, and the relationship is now in awkward territory. This is the right moment to issue a fresh invoice rather than chasing the original one again. A new invoice with a new number gets logged as a new item in the client's accounts payable system, and that often moves things along when an older invoice has gone stale in the queue.</p>
 <p>Leave the original invoice exactly as it was. Don't edit it, don't change the date, don't delete it. The original is part of the paper trail and you may need it later for small claims or a collections handover. Create a new invoice with a brand new invoice number. In the description, reference the original: "Re-billing of invoice #1042 dated [date], plus late fee per agreed terms". That keeps both records consistent. For more on numbering, see <a href="/invoice-numbering-best-practices/">Invoice numbering best practices</a>.</p>
 <p>Add a late fee as a separate line item. The standard rate in most jurisdictions is 1.5% per month on the overdue balance, which works out to $27.75 on a $1,850 invoice for one month overdue. The fee should already be written into your standard terms, otherwise it's hard to apply now. For the math, the legal limits, and the wording to put on every invoice, see <a href="/late-fees-when-and-how-to-charge/">Late fees: when and how to charge</a>.</p>
+{{illustration:invoice-doc}}
 <p>Send the new invoice with a short note. Something like: "Hi [name], please find attached invoice #1058. This re-bills the balance on invoice #1042 from [date], which is now 30 days past due, plus the late fee per our agreed terms. Please let me know if there's anything blocking payment so we can sort it out." That message is firm without being hostile. You're telling the client that the clock is still running and that you're still willing to talk if there's a real problem on their side.</p>
 <p>If the client does pay at this stage, great. Mark both the original invoice and the new one as resolved in your records, and decide whether you want to keep working with them. A client who paid 35 days late once is fine. A client who needs a re-bill every time is telling you they aren't a good fit for your cash flow.</p>
 HTML,

@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-01',
 
-  'updated' => '2026-06-01',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 10,
 
@@ -58,6 +58,7 @@ HTML,
 <li><strong>Your invoicing and expenses are straightforward.</strong> You send invoices, track costs, and want clean records at tax time, without complex multi-entity or multi-currency needs.</li>
 <li><strong>You're price-sensitive and early.</strong> Every dollar not spent on software is a dollar in the business. Starting free and upgrading later, if you ever need to, costs you nothing.</li>
 </ul>
+{{illustration:coins}}
 <p>If that's you, free isn't second-best. It's the correct choice, and the sections below are about which free tool, not whether to pay.</p>
 HTML,
     ],
@@ -67,6 +68,19 @@ HTML,
       'anchor' => 'the-options',
       'html' => <<<'HTML'
 <p>These all have a genuinely free path for a small business. Order roughly follows how broad the appeal is, not preference. Free tiers change, so confirm the current limits before you commit.</p>
+<table>
+<thead>
+<tr><th>Tool</th><th>Type of free</th><th>Best for</th></tr>
+</thead>
+<tbody>
+<tr><td>Wave</td><td>Free tier, no time limit</td><td>Sole operators wanting free books in one place</td></tr>
+<tr><td>Zoho Books</td><td>Free tier (revenue threshold)</td><td>The smallest businesses, especially Zoho users</td></tr>
+<tr><td>Argo Books</td><td>Free tier, no time limit</td><td>Data on your own machine, inventory built in</td></tr>
+<tr><td>ZipBooks</td><td>Free starter tier</td><td>A small service business wanting the basics</td></tr>
+<tr><td>GnuCash</td><td>Open-source, free forever</td><td>Technical users wanting total control, zero cost</td></tr>
+<tr><td>A spreadsheet</td><td>Free</td><td>The very smallest operation, low volume</td></tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Wave.</strong> The best-known free accounting product. Core invoicing and accounting are free with no time limit and no invoice cap. You pay only when you take card payments, run payroll, or add the Pro tier. Best for sole operators and small service businesses that want free books in one place. The trade-offs: support on the free plan is thin, development has slowed, and some features have moved from free to the paid tier over time.</li>
 <li><strong>Zoho Books.</strong> A real free plan for the smallest businesses (typically below a revenue threshold), with full double-entry accounting and strong automation, especially if you already use other Zoho products. The trade-offs: the free plan has eligibility limits you can outgrow, and the wider Zoho suite has a learning curve.</li>
@@ -105,6 +119,7 @@ HTML,
 <li><strong>You want automation</strong> like recurring billing, automatic payment reminders, or bank feeds that the free tier doesn't include.</li>
 <li><strong>Your tax situation got complex</strong>, with multi-currency, multiple entities, or reporting a free tool can't produce.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>If one or two of those describe you, it's worth comparing paid options, and a good place to start is the guide on the <a href="/best-quickbooks-alternatives/">best QuickBooks alternatives</a>, which covers the paid tools in depth. If none of them describe you, stay free and put the money to work elsewhere. The honest summary: most small businesses can run on free accounting software for a long time, and the ones who should pay know exactly why. Don't let a sales page talk you past the free tier that's serving you fine.</p>
 HTML,
     ],
@@ -124,7 +139,7 @@ HTML,
     ],
     [
       'q' => 'Can I run a real business on free accounting software?',
-      'a' => 'Yes, many do for years. The limit is not the size of the business so much as its shape. A sole operator or small team that sends invoices, tracks expenses, and does not run payroll can run on a free tier indefinitely. Free stops being enough when you need built-in payroll, hit the plan caps, want automation like recurring billing and reminders, or your tax situation turns complex with multiple currencies or entities. If you need those, you are choosing between paid tools. If you do not, a free tier genuinely runs the business and the saving is real money.',
+      'a' => 'Yes, many do for years. The limit is not the size of the business so much as its shape. A sole operator or small team that sends invoices, tracks expenses, and does not run payroll can run on a free tier indefinitely. Free stops being enough when you need built-in payroll, hit the plan caps, want automation like recurring billing and reminders, or your tax situation turns complex with multiple currencies or entities. If you need those, you are choosing between paid tools. If you don\'t, a free tier genuinely runs the business and the saving is real money.',
     ],
     [
       'q' => 'What is the difference between free and open-source accounting software?',
@@ -136,7 +151,7 @@ HTML,
     ],
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you do not need.',
+      'a' => 'Partly, and you should read it that way. It\'s on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you don\'t need.',
     ],
   ],
 

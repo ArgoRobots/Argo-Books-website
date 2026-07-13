@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/2fa.php';
 require_once __DIR__ . '/../trusted_devices.php';
@@ -77,7 +77,7 @@ include __DIR__ . '/../admin_header.php';
         </div>
 
         <div class="table-container">
-            <table class="table-auto-size">
+            <table class="table-auto-size" data-paginate="25">
                 <thead>
                     <tr>
                         <th>Device</th>

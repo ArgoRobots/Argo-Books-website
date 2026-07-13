@@ -54,6 +54,8 @@ function getPayPalAccessToken() {
         CURLOPT_USERPWD => "$clientId:$clientSecret",
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -125,6 +127,8 @@ function verifyPayPalWebhookSignature($headers, $body, $webhookId) {
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -185,6 +189,8 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -230,6 +236,8 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     curl_exec($ch);
@@ -277,9 +285,10 @@ function refundPayPalSale($saleId, $amount, $currency, $description = 'Cycle swi
         'description' => $description,
     ]);
 
-    // PayPal-Request-Id: deterministic per (sale, day) so an accidental
-    // retry inside a 24h window reuses the key and PayPal dedups.
-    $requestId = hash('sha256', 'refund_' . $saleId . '_' . date('Y-m-d'));
+    // PayPal-Request-Id: deterministic per sale (no date component) so any
+    // retry — even days later — reuses the key and PayPal dedups the refund
+    // indefinitely, preventing an accidental double refund.
+    $requestId = hash('sha256', 'refund_' . $saleId);
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -340,6 +349,94 @@ function getMostRecentPayPalSale($subscriptionId) {
     $stmt->execute([$subscriptionId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ?: null;
+}
+
+/**
+ * Fetch the price PayPal will actually bill for a subscription, so callers can
+ * sanity-check it against the amount we computed/recorded. PayPal bills the
+ * plan's baked-in price (set when the plan was created), which can silently
+ * drift from our env-driven pricing if the plans aren't regenerated after a
+ * price change.
+ *
+ * Prefers the real last-payment amount when PayPal has recorded one; otherwise
+ * falls back to the subscription's plan fixed price. Returns null when it can't
+ * be determined (network error, no payment yet, no plan price) so the caller
+ * can skip the check rather than raise a false alarm.
+ *
+ * @param string $subscriptionId The PayPal subscription ID (e.g. I-XXXX...)
+ * @return float|null Amount in the plan's currency, or null if undeterminable
+ */
+function getPayPalSubscriptionBilledAmount($subscriptionId) {
+    if (!isValidPayPalResourceId($subscriptionId)) {
+        return null;
+    }
+
+    $accessToken = getPayPalAccessToken();
+    if (!$accessToken) {
+        return null;
+    }
+
+    $baseUrl = getPayPalApiBaseUrl();
+    $headers = [
+        'Content-Type: application/json',
+        "Authorization: Bearer $accessToken",
+    ];
+
+    // GET the subscription
+    $ch = curl_init("$baseUrl/v1/billing/subscriptions/$subscriptionId");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) {
+        error_log("getPayPalSubscriptionBilledAmount: subscription GET failed. HTTP $httpCode");
+        return null;
+    }
+    $sub = json_decode($response, true);
+
+    // Most accurate: the amount PayPal actually charged on the last payment.
+    $last = $sub['billing_info']['last_payment']['amount']['value'] ?? null;
+    if ($last !== null && is_numeric($last)) {
+        return (float) $last;
+    }
+
+    // Fall back to the plan's fixed price (always defined, no timing dependency).
+    $planId = $sub['plan_id'] ?? null;
+    if (!$planId || !isValidPayPalResourceId($planId)) {
+        return null;
+    }
+
+    $ch = curl_init("$baseUrl/v1/billing/plans/$planId");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) {
+        error_log("getPayPalSubscriptionBilledAmount: plan GET failed. HTTP $httpCode");
+        return null;
+    }
+    $plan = json_decode($response, true);
+
+    foreach (($plan['billing_cycles'] ?? []) as $cycle) {
+        $value = $cycle['pricing_scheme']['fixed_price']['value'] ?? null;
+        if ($value !== null && is_numeric($value)) {
+            return (float) $value;
+        }
+    }
+
+    return null;
 }
 
 /**

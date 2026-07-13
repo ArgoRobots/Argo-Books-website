@@ -1,8 +1,8 @@
 .wrapper {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   padding: 100px 20px 40px;
 }
 
@@ -15,6 +15,12 @@
   padding: 30px;
 }
 
+.wrapper .prefs-back-link {
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 20px;
+}
+
 .prefs-header {
   margin-bottom: 30px;
   text-align: center;
@@ -22,7 +28,7 @@
 
 .prefs-header h1 {
   font-size: 24px;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .prefs-header .subtitle {
@@ -44,7 +50,7 @@
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--gray-border);
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .checkbox {
@@ -112,7 +118,7 @@
 
 .form-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 30px;
 }
 

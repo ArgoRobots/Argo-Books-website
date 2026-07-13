@@ -131,6 +131,19 @@ CREATE TABLE IF NOT EXISTS community_votes (
     CHECK (vote_type IN (-1, 1))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- In-app notifications (e.g. @mentions in posts/comments). Written by
+-- community/mentions/mentions.php when a user is mentioned.
+CREATE TABLE IF NOT EXISTS user_notifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    link VARCHAR(255),
+    is_read BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Create comment votes table
 CREATE TABLE IF NOT EXISTS comment_votes (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -306,6 +319,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     email VARCHAR(100) DEFAULT NULL,
     billing_cycle ENUM('monthly', 'yearly') NOT NULL DEFAULT 'monthly',
     amount DECIMAL(10,2) NOT NULL,
+    signup_base_price DECIMAL(10,2) DEFAULT NULL COMMENT 'Base price (pre-processing-fee) locked at signup/cycle-switch. Renewals charge this so raising the env price never re-prices existing customers. NULL falls back to the current env price.',
     currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
@@ -350,7 +364,11 @@ CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at),
     INDEX idx_payment_type (payment_type),
-    INDEX idx_env_status_created (environment, status, created_at)
+    INDEX idx_env_status_created (environment, status, created_at),
+    -- Prevents a concurrent duplicate gateway/webhook delivery from recording
+    -- the same transaction twice (and double-extending end_date). NULLs allowed
+    -- (failed/credit rows use NULL), and MySQL permits multiple NULLs.
+    UNIQUE KEY uq_transaction_id (transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Keys table (free/promo keys)
@@ -837,6 +855,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --   'tips_onboarding'    - how-to / getting-started nudges
 --   'promotions'         - discount codes / upsells
 --   'community_digest'   - replies / activity digest
+--   'newsletter'         - opt-in list for no-account subscribers (marketing_subscribers)
 --   'all_marketing'      - blanket suppression of all marketing contexts
 CREATE TABLE IF NOT EXISTS email_suppressions (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -858,6 +877,69 @@ CREATE TABLE IF NOT EXISTS email_marketing_log (
     related_id INT DEFAULT NULL COMMENT 'license_keys.id for review emails, etc.',
     INDEX idx_email_context (email, context),
     INDEX idx_sent_at (sent_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Inbound, opt-in marketing subscribers WITHOUT a community account (e.g. people
+-- who tick the "email me tips & updates" box on the free Profit Analyzer). Double
+-- opt-in: a row starts 'pending' and only becomes 'confirmed' after the visitor
+-- clicks the confirm link. Broadcasts go to 'confirmed' rows only. Community-user
+-- marketing still lives in community_users.email_pref_* (this table is for people
+-- with no account). The send-time gate (should_send_marketing_email) treats the
+-- 'newsletter' context as: confirmed row here AND not in email_suppressions.
+CREATE TABLE IF NOT EXISTS marketing_subscribers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    context VARCHAR(50) NOT NULL DEFAULT 'newsletter',
+    status ENUM('pending','confirmed','unsubscribed') NOT NULL DEFAULT 'pending',
+    source VARCHAR(50) NOT NULL DEFAULT 'profit_analyzer',
+    confirm_token VARCHAR(64) DEFAULT NULL,
+    unsubscribe_token VARCHAR(64) DEFAULT NULL,
+    ip VARCHAR(45) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at DATETIME DEFAULT NULL,
+    unsubscribed_at DATETIME DEFAULT NULL,
+    UNIQUE KEY unique_email_context (email, context),
+    INDEX idx_confirm_token (confirm_token),
+    INDEX idx_unsubscribe_token (unsubscribe_token),
+    INDEX idx_status_context (status, context)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin-composed one-off broadcasts (the "email my list" tool). One row per send.
+-- audience names which list this went to: 'newsletter' (marketing_subscribers) or a
+-- community context like 'product_updates' / 'promotions' / 'tips_onboarding'
+-- (community_users.email_pref_*). Recipients are snapshotted into
+-- marketing_broadcast_recipients at queue time; a cron drains them in batches.
+CREATE TABLE IF NOT EXISTS marketing_broadcasts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    subject VARCHAR(500) NOT NULL,
+    html_body MEDIUMTEXT NOT NULL,
+    audience VARCHAR(50) NOT NULL,
+    status ENUM('queued','sending','sent','canceled') NOT NULL DEFAULT 'queued',
+    total_recipients INT NOT NULL DEFAULT 0,
+    sent_count INT NOT NULL DEFAULT 0,
+    failed_count INT NOT NULL DEFAULT 0,
+    skipped_count INT NOT NULL DEFAULT 0,
+    created_by VARCHAR(100) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    started_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    INDEX idx_broadcast_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-recipient rows for a broadcast. Snapshotted at queue time so the audience is
+-- frozen even if the underlying lists change mid-send. The cron picks 'pending'
+-- rows, re-checks the send-time gate (so a since-unsubscribed person is skipped),
+-- sends, then marks the row. UNIQUE(broadcast_id,email) makes re-queues idempotent.
+CREATE TABLE IF NOT EXISTS marketing_broadcast_recipients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    broadcast_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    status ENUM('pending','sent','failed','skipped') NOT NULL DEFAULT 'pending',
+    error VARCHAR(255) DEFAULT NULL,
+    sent_at DATETIME DEFAULT NULL,
+    UNIQUE KEY unique_broadcast_email (broadcast_id, email),
+    INDEX idx_recipient_pending (broadcast_id, status),
+    FOREIGN KEY (broadcast_id) REFERENCES marketing_broadcasts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log for outreach leads
@@ -1004,6 +1086,62 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     INDEX idx_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Candidate roundup/listicle articles for the Editorial outreach channel. One
+-- row per article URL (identity is the article, not the outlet), tracking
+-- fitness + dedup so discovery re-runs skip already-imported articles. Mirrors
+-- outreach_shopify_candidates.
+CREATE TABLE IF NOT EXISTS outreach_editorial_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    outlet_name VARCHAR(150) DEFAULT NULL,
+    author_name VARCHAR(120) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dedup/audit table for the Creators / affiliate-partner discovery channel
+-- (YouTubers, newsletter writers, niche bloggers, and LinkedIn profiles found by
+-- cron/lib/creator_discovery.php). Mirrors outreach_editorial_candidates: one row
+-- per canonical creator URL, status tracks imported/rejected so repeat runs skip
+-- already-handled candidates. platform records youtube/newsletter/blog/linkedin.
+CREATE TABLE IF NOT EXISTS outreach_creator_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    platform VARCHAR(20) DEFAULT NULL,
+    creator_name VARCHAR(150) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Key/value state for the outreach pipeline: master kill-switch
+-- (outreach_enabled), auto-send mode, follow-up sequence config, and other
+-- runtime flags. Read/written via getState/setState in cron/outreach_pipeline.php
+-- and the admin Settings tab (admin/outreach/tabs/settings.php).
+CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    state_key VARCHAR(100) NOT NULL UNIQUE,
+    state_value TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 14-day cache of SerpAPI organic-results responses. The Shopify discovery
 -- cron rotates through ~12 dork queries on a daily schedule, and Google's
 -- site:myshopify.com results for these queries change slowly. Caching cuts
@@ -1104,14 +1242,14 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     comment_count INT DEFAULT 0,
     posted_at DATETIME DEFAULT NULL,
     discovered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    discovery_source ENUM('watchlist','keyword','both') NOT NULL DEFAULT 'watchlist',
+    discovery_source ENUM('watchlist','keyword','both','manual') NOT NULL DEFAULT 'watchlist',
     matched_keywords JSON DEFAULT NULL,
     rules_score INT DEFAULT 0,
     ai_relevance TINYINT DEFAULT NULL COMMENT '0-10 or NULL if not checked',
     ai_relevance_reason VARCHAR(500) DEFAULT NULL,
     draft_body TEXT DEFAULT NULL,
     draft_generated_at DATETIME DEFAULT NULL,
-    status ENUM('new','drafted','drafted_pending','replied','skipped','not_fit','expired') NOT NULL DEFAULT 'new',
+    status ENUM('new','drafted','drafted_pending','replied','skipped','expired') NOT NULL DEFAULT 'new',
     status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied; counts toward post-limit',
     reply_permalink VARCHAR(500) DEFAULT NULL,
@@ -1173,7 +1311,8 @@ CREATE TABLE IF NOT EXISTS reddit_settings (
     daily_post_limit TINYINT NOT NULL DEFAULT 3,
     weekly_post_limit TINYINT NOT NULL DEFAULT 12,
     auto_disable_removal_rate TINYINT NOT NULL DEFAULT 60,
-    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3
+    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3,
+    manual_run_requested_at DATETIME DEFAULT NULL COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI (host disables exec/proc_open).'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed the singleton row and a starter watchlist + keyword pool. Idempotent
@@ -1198,7 +1337,42 @@ INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
     ('sweatystartup', 'service-business owners'),
     ('microsaas', 'indie SaaS founders: invoicing + subscription accounting'),
     ('graphic_design', 'designers with invoicing pain'),
-    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking');
+    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking'),
+    -- Expanded watchlist: more small-business owner / freelancer / service-biz
+    -- communities. Low-yield or high-removal subs auto-disable over time.
+    ('EntrepreneurRideAlong', 'early founders sharing the journey'),
+    ('startups', 'startup founders'),
+    ('smallbiz', 'small-business owners'),
+    ('selfemployed', 'self-employed / sole proprietors'),
+    ('Upwork', 'freelancers: client invoicing pain'),
+    ('Fiverr', 'freelancers / gig sellers'),
+    ('freelanceWriters', 'freelance writers: invoicing'),
+    ('WorkOnline', 'online earners / side income'),
+    ('digitalnomad', 'location-independent freelancers'),
+    ('SaaS', 'indie SaaS founders: subscription accounting'),
+    ('QuickBooks', 'QuickBooks users: strong switch-intent'),
+    ('Accounting', 'software-rec questions surface here, tune carefully'),
+    ('tax', 'US tax + software questions'),
+    ('cantax', 'Canadian tax: strong local fit'),
+    ('Contractor', 'contractors: invoicing + job costing'),
+    ('HVAC', 'HVAC business owners, tune carefully'),
+    ('lawncare', 'lawn-care operators'),
+    ('landscaping', 'landscaping businesses'),
+    ('pressurewashing', 'new service-biz owners'),
+    ('cleaningbusiness', 'cleaning-business owners'),
+    ('photography', 'photographers: client invoicing'),
+    ('WeddingPhotography', 'wedding pros: deposits + invoicing'),
+    ('videography', 'videographers: project invoicing'),
+    ('personaltraining', 'solo trainers: client billing'),
+    ('RealEstate', 'agents: expense tracking'),
+    ('realtors', 'realtors: expense + commission tracking'),
+    ('dropship', 'dropshippers: fees + bookkeeping'),
+    ('FulfillmentByAmazon', 'FBA sellers: fees + inventory'),
+    ('Etsy', 'broader Etsy community'),
+    ('Handmade', 'makers selling handmade'),
+    ('foodtrucks', 'food-truck owners'),
+    ('restaurateur', 'restaurant owners'),
+    ('nonprofit', 'nonprofit bookkeeping needs');
 
 INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('bookkeeping software', 'broad intent'),
@@ -1233,4 +1407,143 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('vendor tracking software', 'supplier mgmt'),
     -- General SMB / self-employed
     ('self-employed accounting', 'self-employed broad intent'),
-    ('sole proprietor taxes', 'sole proprietor pain');
+    ('sole proprietor taxes', 'sole proprietor pain'),
+    -- Expanded keyword pool: switch-intent, price pain, and broad SMB intent
+    ('xero alternative', 'switch-intent from Xero'),
+    ('free accounting software', 'price-sensitive new businesses'),
+    ('best accounting software small business', 'broad SMB intent'),
+    ('quickbooks too expensive', 'price pain / switch-intent'),
+    ('quickbooks self employed', 'switch-intent from QBSE'),
+    ('mileage tracking app', 'expense tracking for self-employed'),
+    ('contractor invoicing app', 'trades invoicing'),
+    ('profit and loss small business', 'bookkeeping reporting need');
+
+
+-- ============================================================
+-- Affiliate program
+-- ============================================================
+
+-- Affiliates: an existing community_users member who owns a referral source_code
+-- and earns commission on subscriptions attributed to it. The referral_links row
+-- for source_code is created on approval, so the link is dead until approved.
+CREATE TABLE IF NOT EXISTS affiliates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    source_code VARCHAR(50) NOT NULL UNIQUE COMMENT 'The referral_links.source_code this affiliate owns (e.g. aff-username)',
+    status ENUM('pending', 'approved', 'rejected', 'suspended') NOT NULL DEFAULT 'pending',
+    commission_rate DECIMAL(5,4) NOT NULL DEFAULT 0.5000 COMMENT '0.5000 = 50%. Per-affiliate so terms can be overridden later.',
+    commission_window_months INT NOT NULL DEFAULT 12 COMMENT 'Months from each subscription start_date during which payments earn commission',
+    payout_method VARCHAR(20) NOT NULL DEFAULT 'paypal',
+    payout_email VARCHAR(255) DEFAULT NULL COMMENT 'PayPal (or other) email for external payout',
+    application_reason TEXT DEFAULT NULL COMMENT 'Why they want to join / audience info',
+    promo_url VARCHAR(500) DEFAULT NULL COMMENT 'Where they will promote (channel/site)',
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME DEFAULT NULL,
+    reviewed_by VARCHAR(50) DEFAULT NULL COMMENT 'admin username that approved or rejected',
+    review_notes TEXT DEFAULT NULL,
+    environment ENUM('production', 'sandbox') NOT NULL DEFAULT 'production' COMMENT 'APP_ENV at insert time; reads filter by current env so sandbox test data does not pollute prod totals.',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_user_env (user_id, environment),
+    INDEX idx_status (status),
+    INDEX idx_source_code (source_code),
+    FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Affiliate payouts: manual ledger of money actually paid out to an affiliate.
+-- Commission earned is computed on the fly from premium_subscription_payments;
+-- owed = earned - SUM(affiliate_payouts.amount).
+CREATE TABLE IF NOT EXISTS affiliate_payouts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    affiliate_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
+    paid_at DATE NOT NULL COMMENT 'Date the payout was actually sent externally',
+    method VARCHAR(20) NOT NULL DEFAULT 'paypal',
+    reference VARCHAR(255) DEFAULT NULL COMMENT 'External txn id / PayPal reference',
+    notes TEXT DEFAULT NULL,
+    recorded_by VARCHAR(50) DEFAULT NULL COMMENT 'admin username who recorded it',
+    environment ENUM('production', 'sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_affiliate (affiliate_id),
+    INDEX idx_paid_at (paid_at),
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-call timing of desktop AI operations (receipt scan, bank categorize, supplier
+-- suggestion, spreadsheet analysis/processing via /api/ai/completions.php, and bank
+-- PDF extraction via /api/bank/extract.php). elapsed_ms is the SERVER-measured Gemini
+-- wall time, isolated from the user's network. The desktop app fetches aggregated
+-- p50/p90 priors from /api/ai/timing-priors.php to drive accurate, smooth progress
+-- bars. No user/device identity is stored (not needed for duration priors). Also
+-- created lazily by api/ai/_timing.php so a fresh server works without a migration.
+CREATE TABLE IF NOT EXISTS ai_call_timings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    operation VARCHAR(40) NOT NULL COMMENT 'receipt_scan, bank_categorize, supplier_category, spreadsheet_analysis, spreadsheet_process, bank_pdf_extract, completion',
+    model VARCHAR(50) NOT NULL,
+    size_feature INT DEFAULT NULL COMMENT 'Op-specific size hint: image bytes, line count, column count, pdf bytes',
+    page_count INT DEFAULT NULL COMMENT 'PDFs only',
+    input_bytes INT DEFAULT NULL,
+    mime VARCHAR(30) DEFAULT NULL,
+    prompt_tokens INT DEFAULT NULL,
+    output_tokens INT DEFAULT NULL,
+    max_output_tokens INT DEFAULT NULL,
+    finish_reason VARCHAR(20) DEFAULT NULL COMMENT 'Non-STOP rows are excluded from priors',
+    elapsed_ms INT NOT NULL COMMENT 'Server-measured Gemini generate wall time',
+    poll_count INT DEFAULT NULL COMMENT 'PDF Files-API polls until ACTIVE',
+    success TINYINT(1) NOT NULL DEFAULT 1,
+    app_platform VARCHAR(20) DEFAULT NULL,
+    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_op_model_created (operation, model, created_at),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===== Mobile sync (phone pairing + E2E-encrypted snapshot/queue) =====
+
+-- Short-lived pairing tokens shown in the desktop QR, redeemed once by the phone.
+CREATE TABLE IF NOT EXISTS mobile_sync_pairings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    pairing_token VARCHAR(64) NOT NULL UNIQUE COMMENT 'bin2hex(random_bytes(16))',
+    owner_identity_hash VARCHAR(64) NOT NULL COMMENT 'sha256 license key hash (premium) or device id hash (free)',
+    company_uid VARCHAR(64) NOT NULL COMMENT 'opaque per-company id generated by the desktop',
+    company_label VARCHAR(255) NOT NULL DEFAULT '',
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Paired phones. One row per phone per company.
+CREATE TABLE IF NOT EXISTS mobile_sync_devices (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    device_token_hash VARCHAR(64) NOT NULL UNIQUE COMMENT 'sha256 of the long-lived device token',
+    owner_identity_hash VARCHAR(64) NOT NULL,
+    company_uid VARCHAR(64) NOT NULL,
+    device_label VARCHAR(255) NOT NULL DEFAULT '',
+    last_seen_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_company_uid (company_uid),
+    INDEX idx_owner_identity_hash (owner_identity_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- One current encrypted read-model snapshot per company. Ciphertext is opaque to the server.
+CREATE TABLE IF NOT EXISTS mobile_sync_snapshots (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_uid VARCHAR(64) NOT NULL,
+    owner_identity_hash VARCHAR(64) NOT NULL,
+    ciphertext LONGTEXT NOT NULL COMMENT 'opaque base64 blob, encrypted on the desktop',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_owner_company (owner_identity_hash, company_uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Pending phone-scanned transactions waiting for the desktop to ingest. Ciphertext is opaque.
+CREATE TABLE IF NOT EXISTS mobile_sync_queue (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_uid VARCHAR(64) NOT NULL,
+    owner_identity_hash VARCHAR(64) NOT NULL,
+    from_device_id INT NOT NULL,
+    ciphertext LONGTEXT NOT NULL COMMENT 'opaque base64 blob (scanned transaction + image), encrypted on the phone',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_company_uid (company_uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

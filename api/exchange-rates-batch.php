@@ -33,7 +33,9 @@ if ($deviceId) {
     $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
 }
 $rateLimitKey = 'rates_' . $rateLimitId;
-if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
+// Generous limit: a normal import is a single batch request, so 1000 per 15 minutes is far beyond
+// any legitimate use while still guarding the OpenExchangeRates quota against a runaway client.
+if (is_rate_limited($rateLimitId, 1000, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);
@@ -82,14 +84,6 @@ require_once __DIR__ . '/../db_connect.php';
 if (!$pdo) {
     send_error_response(500, 'Database connection failed.', 'DB_ERROR');
 }
-
-// Ensure table exists
-$pdo->exec("CREATE TABLE IF NOT EXISTS exchange_rates (
-    rate_date DATE NOT NULL,
-    rates JSON NOT NULL,
-    fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (rate_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
 // Fetch all cached rates from MySQL in one query
 $placeholders = implode(',', array_fill(0, count($validDates), '?'));

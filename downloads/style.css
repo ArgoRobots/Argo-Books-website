@@ -332,17 +332,27 @@ body {
     padding: 2px 6px;
     border-radius: 6px;
     font-size: 0.85em;
-    word-break: break-all;
+    /* anywhere lets the long filename wrap inside the modal; clone makes the
+       padding/background apply per wrapped line so the last char isn't clipped. */
+    overflow-wrap: anywhere;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 
 /* SmartScreen Guide */
+/* Break the walkthrough out wider than the 1200px .container so the steps
+   (and their screenshots) render larger. Centered via the margin/transform pair. */
+.download-guides {
+    width: 100%;
+}
+
 .smartscreen-guide {
     background: var(--white);
     border-radius: 20px;
-    padding: 48px;
+    padding: 32px;
     box-shadow: 0 4px 20px var(--shadow);
     border: 1px solid var(--gray-border);
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     opacity: 0;
     transform: translateY(-8px);
     transition: opacity 0.35s ease, transform 0.35s ease;
@@ -359,7 +369,7 @@ body {
 
 .smartscreen-guide-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
 }
 
 .smartscreen-status {
@@ -399,9 +409,12 @@ body {
 .smartscreen-steps {
     list-style: none;
     padding: 0;
-    margin: 0;
+    /* Center the row of steps and cap its width to the step count, so a single
+       step stays small while the card itself spans the full section width. */
+    margin: 0 auto;
+    max-width: calc(var(--step-count, 3) * 340px);
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--step-count, 3), 1fr);
     gap: 28px;
 }
 
@@ -431,7 +444,9 @@ body {
     font-size: 0.95rem;
     color: var(--gray-800);
     line-height: 1.45;
-    min-height: 2.9em;
+    /* Reserve room for the longest title (3 lines) so every image starts at the
+       same height and the images line up along their tops. */
+    min-height: 4.4em;
     max-width: 280px;
 }
 

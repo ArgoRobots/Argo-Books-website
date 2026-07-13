@@ -1,24 +1,17 @@
 <?php
 /**
- * Reddit discovery cron.
+ * reddit_monitor.php
  *
- * Runs daily at 8am (and manually via admin "Run discovery now").
+ * Reddit discovery pipeline: pulls the last 24h from each watchlist subreddit and
+ * runs keyword searches, dedups by reddit_id, scores threads (rules-based then AI
+ * relevance), pre-generates drafts for strong matches, auto-expires stale threads
+ * older than 3 days, and updates reddit_settings diagnostics. Full detail in
+ * read-me/Cron jobs.md.
  *
- * Pipeline:
- *   1. Pull last 24h from each enabled watchlist subreddit
- *   2. Run global Reddit search for each enabled keyword (t=day)
- *   3. Dedup by reddit_id (a thread hitting both sources gets discovery_source=both)
- *   4. Score each new thread (rules-based 0-100)
- *   5. Threads scoring < rules_score_floor → status='skipped'
- *   6. For passing threads: fetch top comments, run AI relevance check
- *   7. Threads with ai_relevance < ai_relevance_floor → status='skipped'
- *   8. Threads with ai_relevance ≥ 8 → pre-generate draft, status='drafted'
- *   9. Threads with ai_relevance 6-7 → status='drafted_pending' (on-demand draft)
- *  10. Auto-expire `new`, `drafted`, and `drafted_pending` threads older than 3 days
- *      (including `new` catches AI-failure retries that never got reprocessed)
- *  11. Update reddit_settings diagnostics
+ * Schedule: daily at 8:00 AM.
+ *   0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_monitor.php
  *
- * Manual flags:
+ * Flags:
  *   --dry-run    Log what would happen without writing drafts or status changes
  *   --verbose    Print each step's progress to stdout
  */
@@ -43,6 +36,7 @@ if (!defined('REDDIT_MONITOR_INLINE')) {
 }
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/reddit_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file ───
 
@@ -79,6 +73,12 @@ reddit_progress_reset([
     'started_at' => $startedAt,
 ]);
 
+// Only track scheduled CLI cron runs. A manual "Run discovery now" from admin
+// runs inline in a PHP-FPM worker the host hard-kills at ~30s
+// (request_terminate_timeout, which set_time_limit can't override), so tracking
+// it would post a misleading ERROR to the cron dashboard for the real cron.
+$runId = defined('REDDIT_MONITOR_INLINE') ? 0 : cron_run_start($pdo, 'reddit_monitor');
+
 try {
     // Ensure singleton row + read floors
     $pdo->exec("INSERT IGNORE INTO reddit_settings (id) VALUES (1)");
@@ -90,13 +90,19 @@ try {
     // pre-migration schema (no `enabled` column yet) is treated as enabled
     // rather than crashing.
     try {
+        // A manual run (admin "Run discovery now", dispatched via REDDIT_FORCE_RUN,
+        // or the legacy inline path) is an explicit override and runs even when
+        // the master enable toggle is off.
+        $manualRun = defined('REDDIT_MONITOR_INLINE') || defined('REDDIT_FORCE_RUN');
         $enabledRow = $pdo->query("SELECT enabled FROM reddit_settings WHERE id = 1")->fetch();
-        if (!defined('REDDIT_MONITOR_INLINE') && $enabledRow && (int) $enabledRow['enabled'] === 0) {
+        if (!$manualRun && $enabledRow && (int) $enabledRow['enabled'] === 0) {
             reddit_log('Reddit discovery is DISABLED via admin Settings (reddit_settings.enabled = 0). Exiting without running.');
             reddit_progress_write([
                 'message' => 'Reddit discovery is disabled in Settings. Re-enable to run.',
                 'completed' => true,
             ]);
+            cron_metric_set('status', 'disabled');
+            cron_run_finish($pdo, $runId, 'ok');
             echo "Reddit discovery disabled in admin Settings. Exiting.\n";
             exit(0);
         }
@@ -193,7 +199,7 @@ try {
         reddit_progress_write(['message' => "AI scoring thread $processed/$totalToProcess (r/{$t['subreddit']})…"]);
 
         // AI relevance (passes $pdo so it can include the founder's recent
-        // not_fit / replied labels as few-shot examples in the prompt).
+        // accepted threads as few-shot examples in the prompt).
         $rel = reddit_ai_relevance($t, $comments, $pdo);
         $aiScore = $rel['score'];
         $aiReason = $rel['reason'];
@@ -287,6 +293,9 @@ try {
         'found' => $threadsFound,
         'drafted' => $threadsDrafted,
     ]);
+    cron_metric_set('threads_found', $threadsFound);
+    cron_metric_set('drafts_generated', $threadsDrafted);
+    cron_run_finish($pdo, $runId, 'ok');
     echo "Reddit monitor complete: $threadsFound threads found, $threadsDrafted pre-drafted.\n";
 } catch (Throwable $e) {
     $lastError = $e->getMessage();
@@ -300,6 +309,9 @@ try {
         $upd = $pdo->prepare("UPDATE reddit_settings SET last_run_at = ?, last_run_error = ? WHERE id = 1");
         $upd->execute([$startedAt, $lastError]);
     }
+    cron_metric_set('threads_found', $threadsFound);
+    cron_metric_set('drafts_generated', $threadsDrafted);
+    cron_run_finish($pdo, $runId, 'error', $lastError);
     echo "Reddit monitor FAILED: $lastError\n";
     exit(1);
 } finally {

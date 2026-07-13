@@ -1,15 +1,12 @@
 <?php
 /**
- * Account Purge Cron Job
+ * account_purge.php
  *
  * Permanently deletes user accounts whose 30-day deletion grace period has expired.
  * Users schedule deletion from their profile; logging back in cancels the request.
  *
- * RECOMMENDED SCHEDULE: Daily at 4:00 AM
- *   0 4 * * * /usr/bin/php /path/to/account_purge.php
- *
- * Manual execution:
- *   php account_purge.php
+ * Schedule: daily at 4:00 AM.
+ *   0 4 * * * /usr/bin/php /home/argorobots/public_html/cron/account_purge.php
  */
 
 set_time_limit(120);

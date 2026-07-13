@@ -9,7 +9,7 @@ declare(strict_types=1);
  * the actual refund status and reconcile.
  *
  * Schedule: every 5 minutes.
- *   *\/5 * * * * php /var/www/argo-books-website/cron/refund_stale_processing_reconcile.php
+ *   *\/5 * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_stale_processing_reconcile.php
  */
 
 // Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).

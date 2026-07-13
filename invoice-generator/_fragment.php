@@ -15,9 +15,14 @@
 //   That value goes into the ?source= query param, which track_referral.php
 //   reads on the destination (argorobots.com/) to attribute the visit.
 //   Falls back to 'invgen-tool' when callers forget to set it.
-$invgen_ref = $invgen_ref ?? 'invgen-tool';
-require_once __DIR__ . '/_base.php';
-$ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-generator&amp;utm_medium=tool&amp;utm_campaign=phase1';
+require_once __DIR__ . '/../shared/_base.php';
+require_once __DIR__ . '/doc-config.php';
+// Document-type config drives copy, accessibility labels, conversion-CTA
+// attribution, and which invoice-only fields render. Defaults to 'invoice'
+// so niche pages (which embed this fragment without a $doc_type) are unchanged.
+$dc = invgen_doc_config($doc_type ?? 'invoice');
+$invgen_ref = $invgen_ref ?? $dc['default_ref'];
+$ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=' . htmlspecialchars($dc['utm_source']) . '&amp;utm_medium=tool&amp;utm_campaign=phase1';
 // The site-header (logo bar) is rendered once for every tool page by layout.php,
 // so this fragment no longer emits its own.
 ?>
@@ -25,21 +30,21 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
 
   <?php if (!empty($show_tool_hero)): ?>
   <section class="site-hero">
-    <h1 class="site-hero-title">Free Invoice Generator</h1>
-    <p class="site-hero-tagline">Create professional invoices with one click. No signup required. Download as PDF or Word.</p>
+    <h1 class="site-hero-title"><?= htmlspecialchars($dc['hero_title']) ?></h1>
+    <p class="site-hero-tagline"><?= htmlspecialchars($dc['hero_tagline']) ?></p>
   </section>
   <?php endif; ?>
 
   <aside class="page-banner" role="complementary">
-    <span class="page-banner-text">Want to handle payments, refunds, and track everything?</span>
-    <a class="page-banner-link" data-pitch-placement="banner" href="<?= INVGEN_BASE ?>/features/invoicing/<?= $ref_qs ?>&amp;placement=banner">Try Argo Books <span aria-hidden="true">&rarr;</span></a>
+    <span class="page-banner-text"><?= htmlspecialchars($dc['banner_text']) ?></span>
+    <a class="page-banner-link" data-pitch-placement="banner" href="<?= INVGEN_BASE ?><?= htmlspecialchars($dc['cta_href']) ?><?= $ref_qs ?>&amp;placement=banner">Try Argo Books <span aria-hidden="true">&rarr;</span></a>
   </aside>
 
-  <header class="toolbar" role="toolbar" aria-label="Invoice tools">
+  <header class="toolbar" role="toolbar" aria-label="<?= htmlspecialchars($dc['toolbar_aria']) ?>">
     <div class="toolbar-controls">
       <label class="toolbar-field">
         <span class="toolbar-label">Template</span>
-        <select data-field="template" aria-label="Invoice template">
+        <select data-field="template" aria-label="<?= htmlspecialchars($dc['template_aria']) ?>">
           <option value="classic">Classic</option>
           <option value="modern">Modern</option>
           <option value="formal">Formal</option>
@@ -98,7 +103,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
     </div>
   </header>
 
-  <main class="invoice" aria-label="Invoice editor">
+  <main class="invoice" aria-label="<?= htmlspecialchars($dc['editor_aria']) ?>">
 
     <!-- Watercolor wave decoration: visible only for [data-template="ribbon"].
          Three overlapping wave paths, each filled with a vertical gradient at
@@ -147,7 +152,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
         <input type="text" class="editable-text editable-document-title" data-label="documentTitle" aria-label="Document title">
         <label class="invoice-number-field">
           <span class="invoice-number-prefix">#</span>
-          <input type="text" data-field="invoiceNumber" placeholder="1" aria-label="Invoice number">
+          <input type="text" data-field="invoiceNumber" placeholder="1" aria-label="<?= htmlspecialchars($dc['number_aria']) ?>">
         </label>
       </div>
     </section>
@@ -162,7 +167,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
         <div class="meta-bill-ship">
           <div class="meta-block meta-billto">
             <input type="text" class="editable-text editable-label" data-label="billTo" aria-label="Bill To label">
-            <textarea id="field-billTo" data-field="billTo" rows="3" placeholder="Client name&#10;Address&#10;City, State ZIP"></textarea>
+            <textarea id="field-billTo" data-field="billTo" rows="3" placeholder="<?= $dc['recipient_placeholder'] ?>"></textarea>
           </div>
 
           <div class="meta-block meta-shipto-col">
@@ -183,10 +188,12 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <input type="text" class="editable-text editable-label" data-label="date" aria-label="Date label">
           <input type="date" id="field-date" data-field="date">
         </div>
+        <?php if ($dc['show_payment_terms']): ?>
         <div class="meta-field-row">
           <input type="text" class="editable-text editable-label" data-label="paymentTerms" aria-label="Payment Terms label">
           <input type="text" id="field-paymentTerms" data-field="paymentTerms" placeholder="Net 30">
         </div>
+        <?php endif; ?>
         <div class="meta-field-row">
           <input type="text" class="editable-text editable-label" data-label="dueDate" aria-label="Due Date label">
           <input type="date" id="field-dueDate" data-field="dueDate">
@@ -251,7 +258,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
         </div>
       </div>
 
-      <div class="invoice-totals" role="group" aria-label="Invoice totals">
+      <div class="invoice-totals" role="group" aria-label="<?= htmlspecialchars($dc['totals_aria']) ?>">
         <div class="totals-row totals-subtotal">
           <input type="text" class="editable-text editable-totals-label" data-label="subtotal" aria-label="Subtotal label">
           <output data-field="subtotal" class="totals-value">$0.00</output>
@@ -298,6 +305,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <output data-field="total" class="totals-value">$0.00</output>
         </div>
 
+        <?php if ($dc['show_payment_fields']): ?>
         <div class="totals-row totals-paid">
           <input type="text" class="editable-text editable-totals-label" data-label="amountPaid" aria-label="Amount Paid label">
           <span class="totals-input-group">
@@ -311,16 +319,38 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <input type="text" class="editable-text editable-totals-label" data-label="balanceDue" aria-label="Balance Due label">
           <output data-field="balance-due" class="totals-value">$0.00</output>
         </div>
+        <?php endif; ?>
       </div>
     </section>
+
+    <?php if (!empty($dc['show_signature'])): ?>
+    <section class="invoice-signature">
+      <div id="signature-block" class="signature-block" hidden>
+        <input type="text" class="editable-text editable-label signature-heading" data-label="signatureLabel" aria-label="Signature section label">
+        <div class="signature-row">
+          <div class="signature-field">
+            <span class="signature-line" aria-hidden="true"></span>
+            <input type="text" class="editable-text editable-label signature-caption" data-label="signatureName" aria-label="Signature line label">
+          </div>
+          <div class="signature-field signature-field-date">
+            <span class="signature-line" aria-hidden="true"></span>
+            <input type="text" class="editable-text editable-label signature-caption" data-label="signatureDate" aria-label="Signature date label">
+          </div>
+        </div>
+      </div>
+      <div class="signature-toggle-row">
+        <button type="button" class="btn btn-add" data-action="toggle-signature" aria-controls="signature-block">+ Signature</button>
+      </div>
+    </section>
+    <?php endif; ?>
 
   </main>
 
   <dialog id="invgen-post-download" class="invgen-modal" aria-labelledby="invgen-modal-title">
-    <h2 id="invgen-modal-title">Your invoice is downloading</h2>
+    <h2 id="invgen-modal-title"><?= htmlspecialchars($dc['modal_heading']) ?></h2>
     <p>If you want to handle payments, refunds, and track everything, use Argo Books.</p>
     <div class="invgen-modal-actions">
-      <a href="https://argorobots.com/pricing/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=tool&amp;utm_campaign=phase1&amp;placement=modal" data-pitch-placement="modal" class="btn btn-primary">Get Argo Books</a>
+      <a href="https://argorobots.com/pricing/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=<?= htmlspecialchars($dc['utm_source']) ?>&amp;utm_medium=tool&amp;utm_campaign=phase1&amp;placement=modal" data-pitch-placement="modal" class="btn btn-primary">Get Argo Books</a>
       <button type="button" class="btn btn-secondary" data-action="close-modal">Close</button>
     </div>
   </dialog>

@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-01',
 
-  'updated' => '2026-06-01',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 8,
 
@@ -28,7 +28,7 @@ return [
 
   'intro_html' => <<<'HTML'
 <p>You don't need to pay for software to send a professional invoice. A free tool plus the right details gets you a clean PDF that looks every bit as professional as one from a paid app, and it gets you paid just as fast. The trap is doing it sloppily: a missing due date, no payment instructions, or a vague description, any one of which gives a slow-paying client an excuse to sit on it.</p>
-<p>This guide walks through sending an invoice for free, properly, from the details you pull together before you start to <a href="/how-to-follow-up-on-unpaid-invoices/">following up</a> if the money is late. It works whether you're a freelancer sending your first invoice or a small business that just wants to stop paying for software you barely use.</p>
+<p>This guide walks through sending an invoice for free, properly, from the details you pull together before you start <a href="/how-to-follow-up-on-unpaid-invoices/">following up</a> if the money is late. It works whether you're a freelancer sending your first invoice or a small business that just wants to stop paying for software you barely use.</p>
 HTML,
 
   'sections' => [
@@ -39,7 +39,7 @@ HTML,
       'step_name' => 'Gather your details',
       'step_text' => 'Collect your business name and contact details, the client name and billing email, the next invoice number, the work and amounts, your payment terms, and how you want to be paid.',
       'html' => <<<'HTML'
-<p>Two minutes of gathering now saves you redoing the invoice later. Before you open any tool, have these ready:</p>
+<p>Two minutes of gathering details now saves you redoing the invoice later. Before you open any tool, have these ready:</p>
 <ul>
 <li><strong>Your details.</strong> Business name (or your own name if you're not registered), an address, an email, and a phone number. If you're registered for tax, your tax number too.</li>
 <li><strong>The client's details.</strong> Their business name, the contact person, and the email the invoice should go to. For larger clients, that's often an accounts-payable address, not your day-to-day contact.</li>
@@ -57,8 +57,8 @@ HTML,
       'html' => <<<'HTML'
 <p>There are three honest free routes. The right one depends on whether you value speed, control, or saved history.</p>
 <ul>
-<li><strong>A free invoice generator.</strong> The fastest path. You fill in a form in your browser and download a clean PDF, no signup and no watermark on the good ones. Best for one-off invoices and for people who don't need their invoices stored for them. The trade-off: a pure generator doesn't keep a history, so you save the downloaded PDFs yourself.</li>
-<li><strong>A template.</strong> A Word, Excel, or Google Docs invoice template gives you full control over the layout, and you keep the files in your own folders. Best if you want to brand it heavily or you already live in a spreadsheet. The trade-off: more manual, and it's easy to make a maths or formatting mistake if the template isn't built carefully.</li>
+<li><strong>A free invoice generator.</strong> The fastest path. You fill in a form in your browser and download a clean PDF, no signup and no watermark on the good ones. Best for one-off invoices and for people who don't need their invoices stored. The trade-off: a pure generator doesn't keep a history, so you save the downloaded PDFs yourself.</li>
+<li><strong>A template.</strong> A Word, Excel, or Google Docs invoice template gives you full control over the layout, and you keep the files in your own folders. Best if you want to brand it heavily or you already live in a spreadsheet. The trade-off: more manual, and it's easy to make a calculation or formatting mistake if the template isn't built carefully.</li>
 <li><strong>Free-tier invoicing software.</strong> Tools like Wave and Zoho Invoice have genuinely free tiers that save your invoices, track which are paid, and sometimes add a pay-online button. Best if you send invoices regularly and want a record kept for you. The trade-off: you create an account, and free tiers have limits you can outgrow. Argo Books fits here too, with one difference: it's a desktop app you download, so there's no account to create, and its free tier covers up to {argo_free_invoice_limit} invoices a month.</li>
 </ul>
 <p>For most people sending the occasional invoice, a free generator is the quickest way to a professional result. If you're billing the same clients every month, free-tier software that remembers them will save you time. Either way, none of these lock you in, because an invoice is just a PDF at the end of the day.</p>
@@ -71,7 +71,7 @@ HTML,
       'step_name' => 'Fill in the invoice',
       'step_text' => 'Add your details and the client details, the invoice number and dates, a line for each item with quantity and rate, and let the tool total the subtotal, tax, and amount due.',
       'html' => <<<'HTML'
-<p>Whatever tool you picked, the invoice needs the same parts. Fill them in carefully, because a clear invoice gets paid faster than a vague one:</p>
+<p>Whatever tool you picked, the invoice needs the same parts. Fill them in carefully, because a clear invoice gets paid faster:</p>
 <ul>
 <li><strong>The word "Invoice" and the number.</strong> So it's unmistakably a bill and easy to reference later.</li>
 <li><strong>Your details and the client's details.</strong> Both clearly labelled, so there's no question who is billing whom.</li>
@@ -79,7 +79,8 @@ HTML,
 <li><strong>A line for each item.</strong> Description, quantity, rate, and the line total. Be specific: "Website homepage redesign, 6 hours" beats "design work". Specific descriptions head off "what was this for?" emails that delay payment.</li>
 <li><strong>Subtotal, tax, and total due.</strong> If you charge tax, show it as its own line so the client can see the breakdown. The total due should be big and obvious.</li>
 </ul>
-<p>If you used a generator or software, the totals and tax are calculated for you, which removes the most common source of invoice errors. If you used a template, double-check the maths before you send.</p>
+{{illustration:invoice-doc}}
+<p>If you used a generator or software, the totals and tax are calculated for you, which removes the most common source of invoice errors. If you used a template, double-check the calculations before you send.</p>
 HTML,
     ],
 
@@ -95,7 +96,7 @@ HTML,
 <li><strong>A payment link, if you want card payments.</strong> If you'd rather offer a "Pay now" button, a free-tier tool or a payment processor can generate a link. Card payments cost a processing fee, but they often get you paid days sooner, which is usually worth it.</li>
 <li><strong>The due date and accepted methods, stated plainly.</strong> "Payable by e-transfer to name@email.com by June 15" leaves nothing to guess.</li>
 </ul>
-<p>The rule is simple: the easier you make it to pay, the faster the money arrives. Every extra step between the client reading the invoice and being able to pay it is a day or two of delay.</p>
+<p>The rule is simple: the easier you make it to pay, the faster the money arrives. Every extra step between the client reading the invoice and being able to pay it is a delay.</p>
 HTML,
     ],
 
@@ -108,7 +109,7 @@ HTML,
 <p>How you send it matters almost as much as the invoice itself. A few things that get invoices paid rather than buried:</p>
 <ul>
 <li><strong>Attach a PDF, don't paste it in the email body.</strong> A PDF is what an accounts team needs to file and pay. Pasted text gets lost.</li>
-<li><strong>Write a clear subject line.</strong> "Invoice #1042 from [Your Business], due June 15" tells the reader everything before they open it, and makes the email findable later.</li>
+<li><strong>Write a clear subject line.</strong> "Invoice #1042 from [Your Business], due June 15" tells the reader everything before they open it and makes the email findable later.</li>
 <li><strong>Keep the message short and polite.</strong> Thank them, note what it's for, state the total and due date, and point to the payment details. Three or four sentences.</li>
 <li><strong>Send it to the right person.</strong> For a small client, that's your contact. For a larger one, ask early who handles invoices, because sending it to the wrong inbox is a common cause of "we never got it" delays.</li>
 <li><strong>Copy yourself.</strong> CC or BCC your own email so you have a timestamped record that it went out.</li>
@@ -123,10 +124,10 @@ HTML,
       'step_name' => 'Track it and follow up',
       'step_text' => 'Note the due date, mark the invoice paid when the money arrives, and send one polite reminder if it goes past due. Keep the PDF as your record.',
       'html' => <<<'HTML'
-<p>Sending the invoice isn't the last step, getting paid is. A light bit of tracking turns "I think they paid that one" into a clear picture:</p>
+<p>Sending the invoice isn't the last step, getting paid is. A bit of tracking turns "I think they paid that one" into a clear picture:</p>
 <ul>
 <li><strong>Note the due date somewhere you'll see it.</strong> A calendar reminder, a spreadsheet column, or the status field in free-tier software. The point is to know when something has gone past due without having to remember.</li>
-<li><strong>Mark it paid when the money lands.</strong> Check it off so you're not chasing an invoice that's already settled, which is an awkward email to send.</li>
+<li><strong>Mark it paid when the money lands.</strong> Check it off so you're not chasing an invoice that's already settled, which can lead to an awkward situation.</li>
 <li><strong>Send one polite reminder if it's late.</strong> A short, friendly note a few days after the due date unsticks most late payments. People forget; they're rarely refusing. You don't have to be apologetic about it, it's owed.</li>
 <li><strong>Keep the PDF.</strong> File the sent invoice in a folder by client or by year. It's your record at tax time and your proof if a client ever queries what they paid for.</li>
 </ul>
@@ -139,8 +140,8 @@ HTML,
       'anchor' => 'is-free-enough',
       'html' => <<<'HTML'
 <p>For a lot of people, free isn't a starter option, it's the permanent answer. If you send a handful of invoices a month to a short list of clients, take payment by bank or e-transfer, and only see your accountant once a year, a free generator or template will carry you for years with no downside.</p>
-<p>Paid invoicing software earns its monthly fee in specific situations: billing the same clients on a recurring schedule, wanting card payments built into the invoice, sending a high volume where manual entry eats real time, or needing expense tracking and reports that flow through to tax time. If two or more of those describe you, paid software probably pays for itself. If none do, stay free and put the money somewhere it matters more.</p>
-<p>For a fuller breakdown of where that line sits, see the guide on <a href="/free-vs-paid-invoicing-tools/">free versus paid invoicing tools</a>. But the short version: sending a professional invoice and getting paid is free, and always has been. Looking professional is a clean PDF with the right details, sent on time, with clear payment instructions. None of that costs anything.</p>
+<p>Paid invoicing software earns its monthly fee in specific situations: billing the same clients on a recurring schedule, wanting card payments built into the invoice, sending a high volume where manual entry costs real time, or needing expense tracking and reports that flow through to tax time. If two or more of those describe you, paid software will probably pay for itself. If none do, stay free and put the money somewhere it matters more.</p>
+<p>For a fuller breakdown of where that line sits, see the guide on <a href="/free-vs-paid-invoicing-tools/">free versus paid invoicing tools</a>. But the short version: sending a professional invoice and getting paid is free, and always has been, but looking professional is a clean PDF with the right details, sent on time, with clear payment instructions. None of that costs anything.</p>
 HTML,
     ],
 
@@ -170,7 +171,7 @@ HTML,
     ],
     [
       'q' => 'Is this article just trying to sell me Argo Books?',
-      'a' => 'The free invoice generator mentioned here is made by Argo Books, and this is the Argo Books site, so read it knowing that. But the generator genuinely needs no signup and adds no watermark, and every step in this guide works just as well with a template or a competitor\'s free tool. The advice does not depend on using our tool. If you follow the steps with a Word template and an e-transfer, you have sent a professional invoice for free, and that is a complete answer. We would rather you do that than pay for something you do not need.',
+      'a' => 'The free invoice generator mentioned here is made by Argo Books, and this is the Argo Books site, so read it knowing that. But the generator genuinely needs no signup and adds no watermark, and every step in this guide works just as well with a template or a competitor\'s free tool. The advice does not depend on using our tool. If you follow the steps with a Word template and an e-transfer, you have sent a professional invoice for free, and that is a complete answer. We would rather you do that than pay for something you don\'t need.',
     ],
   ],
 

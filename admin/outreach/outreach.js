@@ -129,8 +129,14 @@ async function api(action, options = {}) {
     return await res.json();
 }
 
-function notify(message) {
-    alert(message);
+function notify(message, type) {
+    // Non-blocking toast instead of a native alert box. notifications.js (loaded
+    // by admin_header.php) watches for .success-message/.error-message nodes and
+    // removes them when the fadeInOut animation ends.
+    const el = document.createElement('div');
+    el.className = type === 'error' ? 'error-message' : 'success-message';
+    el.textContent = message;
+    document.body.appendChild(el);
 }
 
 // ─── Stats ───
@@ -146,7 +152,6 @@ async function loadStats() {
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
             document.getElementById('statClicked').textContent = s.clicked || 0;
-            document.getElementById('statFollowupsPending').textContent = s.followups_pending || 0;
 
             // Show/hide pipeline running banner
             const banner = document.getElementById('pipelineBanner');
@@ -240,6 +245,16 @@ async function loadLeads() {
     }
 }
 
+// Refresh whichever leads tables are currently populated. The lead detail modal
+// (and quick-draft) can be opened from the Email, Editorial, or Creator tab, so
+// after a status change we refresh all of them; the editorial/creator tables only
+// reload if they've been opened (their paginator exists), keeping this cheap.
+function refreshLeadViews() {
+    loadLeads();
+    if (typeof editorialLeadsPaginator !== 'undefined' && editorialLeadsPaginator) loadEditorialLeads();
+    if (typeof creatorLeadsPaginator !== 'undefined' && creatorLeadsPaginator) loadCreatorLeads();
+}
+
 // ─── Bulk Select ───
 function toggleLeadCheckboxes(master) {
     document.querySelectorAll('.lead-check').forEach(cb => cb.checked = master.checked);
@@ -286,31 +301,43 @@ let bulkDraftCancelled = false;
 
 function cancelBulkDrafts() {
     bulkDraftCancelled = true;
-    const btn = document.getElementById('btnCancelDraft');
-    if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+    // Disable whichever cancel button is currently visible (email or editorial).
+    ['btnCancelDraft', 'edBtnCancelDraft'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && btn.offsetParent !== null) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+    });
 }
 
-async function bulkGenerateDrafts() {
-    const ids = getSelectedLeadIds();
+/**
+ * Shared bulk-draft engine used by both the Email and Editorial leads tables.
+ * The two tables use distinct checkbox classes/IDs and distinct progress/button
+ * element IDs, so the caller passes those in; everything else is id-based and
+ * identical. Concurrency of 3, per-row live updates, cancellable.
+ */
+async function runBulkDrafts(opts) {
+    const {
+        ids, checkClass, checkIdPrefix,
+        progressId, progressTextId, cancelBtnId, draftBtnId, onDone,
+    } = opts;
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
     bulkDraftCancelled = false;
     const total = ids.length;
     let success = 0, fail = 0;
-    const progressEl = document.getElementById('bulkDraftProgress');
-    const progressText = document.getElementById('bulkDraftProgressText');
-    const cancelBtn = document.getElementById('btnCancelDraft');
-    progressEl.style.display = 'flex';
+    const progressEl = document.getElementById(progressId);
+    const progressText = document.getElementById(progressTextId);
+    const cancelBtn = document.getElementById(cancelBtnId);
+    if (progressEl) progressEl.style.display = 'flex';
     if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Cancel'; }
 
     // Disable the draft button during processing
-    const draftBtn = document.getElementById('btnDraftSelected');
+    const draftBtn = document.getElementById(draftBtnId);
     if (draftBtn) draftBtn.disabled = true;
 
     function updateProgress() {
         const done = success + fail;
-        progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
+        if (progressText) progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
     }
     updateProgress();
 
@@ -319,7 +346,7 @@ async function bulkGenerateDrafts() {
     async function processDraft(id) {
         if (bulkDraftCancelled) return;
 
-        const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
+        const row = document.querySelector(`#${checkIdPrefix}${id}`)?.closest('tr');
         const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
         if (draftCellBtn) {
             draftCellBtn.disabled = true;
@@ -341,7 +368,7 @@ async function bulkGenerateDrafts() {
                         badge.className = 'badge badge-status-draft_generated';
                         badge.textContent = 'Draft Generated';
                     }
-                    const cb = row.querySelector('.lead-check');
+                    const cb = row.querySelector(checkClass);
                     if (cb) cb.dataset.hasDraft = '1';
                 }
             } else {
@@ -367,13 +394,23 @@ async function bulkGenerateDrafts() {
     const doneMsg = cancelled
         ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
         : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
-    progressText.textContent = doneMsg;
-    setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+    if (progressText) progressText.textContent = doneMsg;
+    if (progressEl) setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
 
     if (draftBtn) draftBtn.disabled = false;
     notify(doneMsg, success ? 'success' : 'error');
     loadStats();
-    updateBulkBar();
+    if (onDone) onDone();
+}
+
+function bulkGenerateDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedLeadIds(),
+        checkClass: '.lead-check', checkIdPrefix: 'lead-check-',
+        progressId: 'bulkDraftProgress', progressTextId: 'bulkDraftProgressText',
+        cancelBtnId: 'btnCancelDraft', draftBtnId: 'btnDraftSelected',
+        onDone: updateBulkBar,
+    });
 }
 
 async function bulkDeleteLeads() {
@@ -401,8 +438,8 @@ async function bulkDeleteLeads() {
 // ─── Bulk Send Email ───
 let bulkSendLeads = [];
 
-async function openBulkSendModal() {
-    const ids = getSelectedLeadIds();
+async function openBulkSendModal(idsArg) {
+    const ids = (Array.isArray(idsArg) && idsArg.length) ? idsArg : getSelectedLeadIds();
     if (!ids.length) { notify('No leads selected', 'error'); return; }
 
     const statusEl = document.getElementById('bulkSendStatus');
@@ -521,6 +558,10 @@ async function executeBulkSend() {
     if (success > 0) {
         loadLeads();
         loadStats();
+        // Refresh the editorial/creator leads tables too if they were ever
+        // populated, so a bulk send launched from those tabs reflects the new status.
+        if (editorialLeadsPaginator) loadEditorialLeads();
+        if (creatorLeadsPaginator) loadCreatorLeads();
     }
 }
 
@@ -543,20 +584,14 @@ async function openLeadDetail(id) {
         document.getElementById('detailBusinessName').value = lead.business_name || '';
         document.getElementById('detailContactName').value = lead.contact_name || '';
         document.getElementById('detailEmail').value = lead.email || '';
-        document.getElementById('detailPhone').value = lead.phone || '';
         document.getElementById('detailWebsite').value = lead.website || '';
-        document.getElementById('detailAddress').value = lead.address || '';
         document.getElementById('detailCategory').value = lead.category || '';
-        document.getElementById('detailCity').value = lead.city || '';
         document.getElementById('detailSource').value = lead.source || 'manual';
         document.getElementById('detailStatus').value = lead.status || 'new';
-        document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
         document.getElementById('detailCompanySize').value = lead.company_size || '';
-        document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
         document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
         document.getElementById('detailNotes').value = lead.notes || '';
-        document.getElementById('detailFeedback').value = lead.feedback_summary || '';
 
         // Meta info
         // Meta info removed from UI
@@ -583,10 +618,22 @@ function updateDraftStatus(lead) {
     const bar = document.getElementById('draftStatusBar');
     const sendBtn = document.getElementById('btnSend');
     const genBtn = document.getElementById('btnGenerate');
+    const saveBtn = document.getElementById('btnSaveDraft');
 
     let statusHtml = '';
     const isSent = ['contacted','replied','interested','not_interested','onboarded'].includes(lead.status);
     const isDisqualified = lead.status === 'disqualified';
+
+    // Editing the draft only makes sense before it's sent or disqualified.
+    const locked = isDisqualified || (isSent && lead.sent_at);
+    if (saveBtn) saveBtn.style.display = locked ? 'none' : '';
+
+    // Lock the subject/body fields too, not just hide the Save button, so a sent
+    // draft can't be typed into (which previously looked editable but never saved).
+    const subjectEl = document.getElementById('draftSubject');
+    const bodyEl = document.getElementById('draftBody');
+    if (subjectEl) subjectEl.readOnly = locked;
+    if (bodyEl) bodyEl.readOnly = locked;
 
     if (isDisqualified) {
         const reasonTag = lead.disqualified_reason ? ` (${escapeHtml(lead.disqualified_reason)})` : '';
@@ -668,18 +715,12 @@ async function saveLeadDetails() {
         business_name: document.getElementById('detailBusinessName').value,
         contact_name: document.getElementById('detailContactName').value,
         email: document.getElementById('detailEmail').value,
-        phone: document.getElementById('detailPhone').value,
         website: document.getElementById('detailWebsite').value,
-        address: document.getElementById('detailAddress').value,
         category: document.getElementById('detailCategory').value,
-        city: document.getElementById('detailCity').value,
         status: document.getElementById('detailStatus').value,
-        response_status: document.getElementById('detailResponseStatus').value,
         company_size: document.getElementById('detailCompanySize').value,
-        offer_sent: document.getElementById('detailOfferSent').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,
-        feedback_summary: document.getElementById('detailFeedback').value,
     };
 
     // Also save draft fields if modified
@@ -690,7 +731,7 @@ async function saveLeadDetails() {
         const result = await api('update_lead', { method: 'POST', body: data });
         if (result.success) {
             closeModal('leadDetailModal');
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         } else {
             notify(result.message, 'error');
@@ -707,7 +748,7 @@ async function deleteCurrentLead() {
         notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             closeModal('leadDetailModal');
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         }
     } catch (e) {
@@ -717,38 +758,24 @@ async function deleteCurrentLead() {
 
 // ─── Add Lead ───
 function showAddLeadModal() {
-    document.getElementById('addBusinessName').value = '';
-    document.getElementById('addContactName').value = '';
-    document.getElementById('addEmail').value = '';
-    document.getElementById('addPhone').value = '';
     document.getElementById('addWebsite').value = '';
-    document.getElementById('addAddress').value = '';
-    document.getElementById('addCategory').value = '';
-    document.getElementById('addCity').value = '';
-    document.getElementById('addNotes').value = '';
     showModal('addLeadModal');
 }
 
 async function createLead() {
-    const name = document.getElementById('addBusinessName').value.trim();
-    if (!name) { notify('Business name is required', 'error'); return; }
+    const website = document.getElementById('addWebsite').value.trim();
+    if (!website) { notify('Website is required', 'error'); return; }
 
-    const data = {
-        business_name: name,
-        contact_name: document.getElementById('addContactName').value.trim(),
-        email: document.getElementById('addEmail').value.trim(),
-        phone: document.getElementById('addPhone').value.trim(),
-        website: document.getElementById('addWebsite').value.trim(),
-        address: document.getElementById('addAddress').value.trim(),
-        category: document.getElementById('addCategory').value.trim(),
-        city: document.getElementById('addCity').value.trim(),
-        notes: document.getElementById('addNotes').value.trim(),
-    };
+    // Enrichment fetches the site + makes an AI call, so it takes a few seconds.
+    const btn = document.getElementById('btnAddLead');
+    const originalText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Fetching…'; }
 
     try {
-        const result = await api('create_lead', { method: 'POST', body: data });
+        const result = await api('create_lead_from_website', { method: 'POST', body: { website } });
         if (result.success) {
             closeModal('addLeadModal');
+            notify(result.message || 'Lead added', 'success');
             loadLeads();
             loadStats();
         } else {
@@ -756,6 +783,8 @@ async function createLead() {
         }
     } catch (e) {
         notify(e.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
     }
 }
 
@@ -977,7 +1006,7 @@ async function quickGenerateDraft(id, btn) {
     try {
         const result = await api('generate_draft', { method: 'POST', body: { id } });
         if (result.success) {
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         } else {
             notify(result.message, 'error');
@@ -990,6 +1019,38 @@ async function quickGenerateDraft(id, btn) {
 }
 
 // ─── Email Workflow ───
+// Persist the current subject/body from the Draft tab. Used on its own via the
+// Save Draft button, and by sendEmail() so a send always uses exactly what's
+// shown (the send endpoint reads the draft straight from the DB).
+async function saveDraft() {
+    if (!currentLeadId) return;
+    const subject = document.getElementById('draftSubject').value;
+    const body = document.getElementById('draftBody').value;
+    const btn = document.getElementById('btnSaveDraft');
+    const original = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+        const result = await api('update_lead', {
+            method: 'POST',
+            body: { id: currentLeadId, draft_subject: subject, draft_body: body }
+        });
+        if (result.success) {
+            notify('Draft saved', 'success');
+            // A draft typed from scratch (Send was disabled) should now be sendable.
+            const sendBtn = document.getElementById('btnSend');
+            const hasEmail = (document.getElementById('detailEmail').value || '').trim() !== '';
+            if (sendBtn && (subject.trim() || body.trim()) && hasEmail) sendBtn.disabled = false;
+            refreshLeadViews();
+        } else {
+            notify(result.message, 'error');
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = original; }
+    }
+}
+
 async function sendEmail() {
     if (!currentLeadId) return;
     if (!confirm('Send this email now?')) return;
@@ -999,12 +1060,22 @@ async function sendEmail() {
     btn.textContent = 'Sending...';
 
     try {
+        // Persist any edits first so we send exactly what's shown in the textareas.
+        await api('update_lead', {
+            method: 'POST',
+            body: {
+                id: currentLeadId,
+                draft_subject: document.getElementById('draftSubject').value,
+                draft_body: document.getElementById('draftBody').value
+            }
+        });
+
         const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
         btn.textContent = 'Send Email';
 
         if (result.success) {
             openLeadDetail(currentLeadId);
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         } else {
             notify(result.message, 'error');
@@ -1613,6 +1684,757 @@ async function importAllShopifyFits() {
 // Load Shopify status on page load so the usage display is populated
 document.addEventListener('DOMContentLoaded', loadShopifyStatus);
 
+// ─── Editorial / Roundup Discovery ───
+
+let editorialResults = [];
+let editorialLastSummary = null;
+
+async function loadEditorialStatus() {
+    try {
+        const data = await api('editorial_get_status');
+        if (data.success) {
+            const usage = document.getElementById('editorialSerpUsage');
+            if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+            const hunter = document.getElementById('editorialHunterState');
+            if (hunter) hunter.textContent = data.has_hunter ? 'connected' : 'not set (scrapes contact pages instead)';
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function runEditorialDiscovery() {
+    const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('editorialLimit').value, 10) || 8));
+    const btn = document.getElementById('editorialRunBtn');
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    try {
+        const data = await api('editorial_run_discovery', { method: 'POST', body: { limit } });
+        if (!data.success) {
+            notify(data.message || 'Editorial discovery failed');
+            return;
+        }
+        editorialResults = data.results || [];
+        editorialLastSummary = {
+            rejected_count: data.rejected_count || 0,
+            reject_reasons: data.reject_reasons || {},
+            already_imported_count: data.already_imported_count || 0,
+            already_rejected_count: data.already_rejected_count || 0,
+            total_evaluated: data.total_evaluated || 0,
+            requested_limit: data.requested_limit || limit,
+            quota_exhausted: !!data.quota_exhausted,
+            queries_run: (data.queries_run || []).length,
+        };
+        const usage = document.getElementById('editorialSerpUsage');
+        if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+        document.getElementById('editorialResults').style.display = 'block';
+        renderEditorialResults();
+        if (editorialLastSummary.quota_exhausted) {
+            notify(`SerpAPI daily quota hit before finding ${editorialLastSummary.requested_limit}. Got ${editorialResults.length} fit${editorialResults.length === 1 ? '' : 's'}. Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.`);
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run';
+    }
+}
+
+function renderEditorialResults() {
+    const body = document.getElementById('editorialResultsBody');
+    const countEl = document.getElementById('editorialResultsCount');
+    const importAllBtn = document.getElementById('editorialImportAllBtn');
+    const safe = (s) => escapeHtml(String(s ?? ''));
+
+    let summary = `${editorialResults.length} fit`;
+    if (editorialLastSummary) {
+        if (editorialLastSummary.already_imported_count > 0) {
+            summary += ` · ${editorialLastSummary.already_imported_count} already imported (hidden)`;
+        }
+        if (editorialLastSummary.already_rejected_count > 0) {
+            summary += ` · ${editorialLastSummary.already_rejected_count} previously skipped (hidden)`;
+        }
+        if (editorialLastSummary.rejected_count > 0) {
+            const reasons = editorialLastSummary.reject_reasons || {};
+            const reasonStr = Object.entries(reasons)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([k, n]) => `${n}× ${k}`)
+                .join(', ');
+            summary += ` · ${editorialLastSummary.rejected_count} skipped`;
+            if (reasonStr) summary += ` (${reasonStr})`;
+        }
+    }
+    countEl.textContent = summary;
+
+    if (importAllBtn) {
+        importAllBtn.disabled = editorialResults.length === 0;
+        importAllBtn.textContent = editorialResults.length > 0 ? `Import ${editorialResults.length} Fit${editorialResults.length !== 1 ? 's' : ''}` : 'Import All Fits';
+    }
+
+    if (editorialResults.length === 0) {
+        const n = (editorialLastSummary && editorialLastSummary.total_evaluated) || 0;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#888;">No new roundups to pitch (evaluated ${n}). They were not roundups, already list Argo, or had no findable contact.</td></tr>`;
+        return;
+    }
+
+    body.innerHTML = editorialResults.map((r, idx) => {
+        const outlet = `<div><strong>${safe(r.outlet_name) || safe(r.canonical_url)}</strong></div>`;
+        const emailSrc = r.email_source ? ` <span style="color:#888; font-size:11px;">(${safe(r.email_source)})</span>` : '';
+        return '<tr>' +
+            `<td>${outlet}</td>` +
+            `<td>${safe(r.author_name) || '—'}</td>` +
+            `<td>${safe(r.email) || '—'}${emailSrc}</td>` +
+            `<td style="max-width:220px; font-size:12px;">${safe(r.listed_tools) || '—'}</td>` +
+            `<td><a href="${safe(r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
+            `<td><button class="btn btn-small btn-blue" onclick="importEditorialRow(${idx}, this)">Import</button></td>` +
+        '</tr>';
+    }).join('');
+}
+
+async function importEditorialRow(idx, btn) {
+    const row = editorialResults[idx];
+    if (!row) return;
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    try {
+        const data = await api('editorial_import', { method: 'POST', body: {
+            canonical_url: row.canonical_url,
+            outlet_name: row.outlet_name,
+            author_name: row.author_name,
+            email: row.email,
+            business_summary: row.business_summary
+        } });
+        if (data.success) {
+            editorialResults = editorialResults.filter(r => r.canonical_url !== row.canonical_url);
+            if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + 1;
+            renderEditorialResults();
+            loadStats();
+            loadEditorialLeads();
+        } else {
+            notify(data.message || 'Import failed');
+            btn.disabled = false;
+            btn.textContent = 'Import';
+        }
+    } catch (e) {
+        notify(e.message);
+        btn.disabled = false;
+        btn.textContent = 'Import';
+    }
+}
+
+async function importAllEditorialFits() {
+    if (editorialResults.length === 0) return;
+    if (!confirm(`Import ${editorialResults.length} article${editorialResults.length === 1 ? '' : 's'} as new editorial leads?`)) return;
+    const toImport = editorialResults.map(r => ({
+        canonical_url: r.canonical_url,
+        outlet_name: r.outlet_name,
+        author_name: r.author_name,
+        email: r.email,
+        business_summary: r.business_summary
+    }));
+    const btn = document.getElementById('editorialImportAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    const succeeded = new Set();
+    let failed = 0;
+    for (const item of toImport) {
+        try {
+            const data = await api('editorial_import', { method: 'POST', body: item });
+            if (data.success) succeeded.add(item.canonical_url);
+            else failed++;
+        } catch (e) {
+            failed++;
+        }
+    }
+    editorialResults = editorialResults.filter(r => !succeeded.has(r.canonical_url));
+    if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + succeeded.size;
+    renderEditorialResults();
+    loadStats();
+    loadEditorialLeads();
+    notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+}
+
+// Add one specific article URL directly (bypasses SerpAPI discovery). Reads the
+// page, scrapes an email, researches the listed tools, and imports it as a lead.
+async function addEditorialUrl() {
+    const input = document.getElementById('editorialUrl');
+    const url = (input.value || '').trim();
+    if (!url) { notify('Enter an article URL'); return; }
+    const btn = document.getElementById('editorialAddBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    try {
+        const data = await api('editorial_add_url', { method: 'POST', body: { url } });
+        if (data.success) {
+            input.value = '';
+            const emailMsg = data.has_email ? `email ${data.email}` : 'no email found — add it on the lead';
+            notify(`Added ${data.outlet || 'article'} (${emailMsg})`, 'success');
+            loadEditorialLeads();
+            loadStats();
+        } else {
+            notify(data.message || 'Could not add that URL');
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadEditorialStatus);
+
+// Editorial leads list (own tab, scoped to source=editorial_auto). Reuses the
+// shared esc/formatStatus/formatDateTime helpers and the id-driven lead modal
+// (openLeadDetail) and draft flow (quickGenerateDraft), so nothing else needs
+// duplicating. Uses its own paginator + table class to avoid colliding with the
+// Email leads table.
+let editorialLeadsPaginator = null;
+
+// ─── Editorial Leads: bulk select (distinct class/IDs from the Email tab so the
+// two tables' selections never collide, since both live in the DOM at once) ───
+function toggleEditorialLeadCheckboxes(master) {
+    document.querySelectorAll('.ed-lead-check').forEach(cb => cb.checked = master.checked);
+    updateEditorialBulkBar();
+}
+
+function updateEditorialBulkBar() {
+    const checked = document.querySelectorAll('.ed-lead-check:checked');
+    const bar = document.getElementById('edBulkActionsBar');
+    const count = document.getElementById('edSelectedCount');
+    const selectAll = document.getElementById('edLeadsSelectAll');
+    const allBoxes = document.querySelectorAll('.ed-lead-check');
+
+    if (bar) bar.style.display = checked.length ? 'flex' : 'none';
+    if (count) count.textContent = checked.length;
+
+    if (selectAll && allBoxes.length) {
+        if (checked.length === 0) { selectAll.checked = false; selectAll.indeterminate = false; }
+        else if (checked.length === allBoxes.length) { selectAll.checked = true; selectAll.indeterminate = false; }
+        else { selectAll.checked = false; selectAll.indeterminate = true; }
+    }
+
+    const draftBtn = document.getElementById('edBtnDraftSelected');
+    if (draftBtn) {
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
+    }
+}
+
+function getSelectedEditorialLeadIds() {
+    return Array.from(document.querySelectorAll('.ed-lead-check:checked')).map(cb => parseInt(cb.value));
+}
+
+function bulkGenerateEditorialDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedEditorialLeadIds(),
+        checkClass: '.ed-lead-check', checkIdPrefix: 'ed-lead-check-',
+        progressId: 'edBulkDraftProgress', progressTextId: 'edBulkDraftProgressText',
+        cancelBtnId: 'edBtnCancelDraft', draftBtnId: 'edBtnDraftSelected',
+        onDone: updateEditorialBulkBar,
+    });
+}
+
+function openEditorialBulkSend() {
+    openBulkSendModal(getSelectedEditorialLeadIds());
+}
+
+async function bulkDeleteEditorialLeads() {
+    const ids = getSelectedEditorialLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
+
+    let success = 0, fail = 0, lastError = '';
+    for (const id of ids) {
+        try {
+            const result = await api('delete_lead', { method: 'POST', body: { id } });
+            if (result.success) success++; else { fail++; lastError = result.message || 'Unknown error'; }
+        } catch (err) { fail++; lastError = err.message; }
+    }
+    if (fail > 0) notify(`Deleted: ${success}, Failed: ${fail}. Last error: ${lastError}`, 'error');
+    else notify(`Successfully deleted ${success} lead(s)`, 'success');
+    loadEditorialLeads();
+    loadStats();
+}
+
+function debounceLoadEditorialLeads() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadEditorialLeads, 300);
+}
+
+async function loadEditorialLeads() {
+    const tbody = document.getElementById('editorialLeadsTableBody');
+    if (!tbody) return;
+
+    const params = { source: 'editorial_auto' };
+    const searchEl = document.getElementById('edFilterSearch');
+    const statusEl = document.getElementById('edFilterStatus');
+    const responseEl = document.getElementById('edFilterResponse');
+    const sortEl = document.getElementById('edFilterSort');
+    if (searchEl && searchEl.value.trim()) params.search = searchEl.value.trim();
+    if (statusEl && statusEl.value) params.status = statusEl.value;
+    if (responseEl && responseEl.value) params.response_status = responseEl.value;
+    params.sort = (sortEl && sortEl.value) ? sortEl.value : 'date_added_desc';
+
+    try {
+        const data = await api('get_leads', { params });
+        if (!data.success || !data.leads.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No editorial leads found.</td></tr>';
+            if (editorialLeadsPaginator) editorialLeadsPaginator.reset();
+            const selectAll = document.getElementById('edLeadsSelectAll');
+            if (selectAll) selectAll.checked = false;
+            updateEditorialBulkBar();
+            return;
+        }
+        tbody.innerHTML = data.leads.map(lead => `
+            <tr class="lead-row">
+                <td class="checkbox-column" onclick="event.stopPropagation()">
+                    <div class="checkbox"><input type="checkbox" class="ed-lead-check" value="${lead.id}" id="ed-lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateEditorialBulkBar()"><label for="ed-lead-check-${lead.id}"></label></div>
+                </td>
+                <td>
+                    <strong>${esc(lead.business_name)}</strong>
+                    ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
+                </td>
+                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+                <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+                <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
+                <td onclick="event.stopPropagation()">
+                    <div class="actions-cell">
+                        <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                        ${!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        const selectAll = document.getElementById('edLeadsSelectAll');
+        if (selectAll) selectAll.checked = false;
+        updateEditorialBulkBar();
+
+        const table = document.querySelector('.editorial-leads-table');
+        if (table) {
+            if (!editorialLeadsPaginator) editorialLeadsPaginator = new TablePaginator(table, { perPage: 25 });
+            else editorialLeadsPaginator.reset();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
+}
+
+// Load the editorial leads list when its section-tab is opened, and on initial
+// load if that tab is already active.
+document.querySelectorAll('.section-tab[data-tab="editorial-leads"]').forEach(btn =>
+    btn.addEventListener('click', () => setTimeout(loadEditorialLeads, 0)));
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.querySelector('#editorial-leads.tab-content.active')) loadEditorialLeads();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Creators / affiliate-partner outreach channel
+// Mirrors the editorial channel (discovery + leads with filters/bulk), scoped to
+// source=creator_auto, reusing the shared runBulkDrafts()/openBulkSendModal() and
+// the id-driven lead modal. Distinct classes/IDs (.cr-lead-check, cr*) so its
+// selection never collides with the other leads tables in the DOM.
+// ═══════════════════════════════════════════════════════════════════════════
+
+let creatorResults = [];
+let creatorLastSummary = null;
+let creatorLeadsPaginator = null;
+
+async function loadCreatorStatus() {
+    try {
+        const data = await api('creator_get_status');
+        if (data.success) {
+            const usage = document.getElementById('creatorSerpUsage');
+            if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+            const hunter = document.getElementById('creatorHunterState');
+            if (hunter) hunter.textContent = data.has_hunter ? 'connected' : 'not set (scrapes linked sites instead)';
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function runCreatorDiscovery() {
+    const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('creatorLimit').value, 10) || 8));
+    const btn = document.getElementById('creatorRunBtn');
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    try {
+        const data = await api('creator_run_discovery', { method: 'POST', body: { limit } });
+        if (!data.success) {
+            notify(data.message || 'Creator discovery failed');
+            return;
+        }
+        creatorResults = data.results || [];
+        creatorLastSummary = {
+            rejected_count: data.rejected_count || 0,
+            reject_reasons: data.reject_reasons || {},
+            already_imported_count: data.already_imported_count || 0,
+            already_rejected_count: data.already_rejected_count || 0,
+            total_evaluated: data.total_evaluated || 0,
+            requested_limit: data.requested_limit || limit,
+            quota_exhausted: !!data.quota_exhausted,
+            stop_reason: data.stop_reason || '',
+        };
+        const usage = document.getElementById('creatorSerpUsage');
+        if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+        document.getElementById('creatorResults').style.display = 'block';
+        renderCreatorResults();
+        if (creatorLastSummary.quota_exhausted) {
+            notify(`SerpAPI daily quota hit before finding ${creatorLastSummary.requested_limit}. Got ${creatorResults.length} fit${creatorResults.length === 1 ? '' : 's'}. Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.`);
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run';
+    }
+}
+
+function renderCreatorResults() {
+    const body = document.getElementById('creatorResultsBody');
+    const countEl = document.getElementById('creatorResultsCount');
+    const importAllBtn = document.getElementById('creatorImportAllBtn');
+    const safe = (s) => escapeHtml(String(s ?? ''));
+
+    let summary = `${creatorResults.length} fit`;
+    if (creatorLastSummary) {
+        if (creatorLastSummary.already_imported_count > 0) summary += ` · ${creatorLastSummary.already_imported_count} already imported (hidden)`;
+        if (creatorLastSummary.already_rejected_count > 0) summary += ` · ${creatorLastSummary.already_rejected_count} previously skipped (hidden)`;
+        if (creatorLastSummary.rejected_count > 0) {
+            const reasons = creatorLastSummary.reject_reasons || {};
+            const reasonStr = Object.entries(reasons).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => `${n}× ${k}`).join(', ');
+            summary += ` · ${creatorLastSummary.rejected_count} skipped`;
+            if (reasonStr) summary += ` (${reasonStr})`;
+        }
+    }
+    countEl.textContent = summary;
+
+    if (importAllBtn) {
+        importAllBtn.disabled = creatorResults.length === 0;
+        importAllBtn.textContent = creatorResults.length > 0 ? `Import ${creatorResults.length} Fit${creatorResults.length !== 1 ? 's' : ''}` : 'Import All Fits';
+    }
+
+    if (creatorResults.length === 0) {
+        const n = (creatorLastSummary && creatorLastSummary.total_evaluated) || 0;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#888;">No new creators to recruit (evaluated ${n}). They were not a fit for the audience, or already imported.</td></tr>`;
+        return;
+    }
+
+    body.innerHTML = creatorResults.map((r, idx) => {
+        const name = `<div><strong>${safe(r.creator_name) || safe(r.canonical_url)}</strong></div>`;
+        const emailSrc = r.email_source ? ` <span style="color:#888; font-size:11px;">(${safe(r.email_source)})</span>` : '';
+        const emailCell = r.email ? (safe(r.email) + emailSrc) : '<span style="color:#c00; font-size:12px;">manual</span>';
+        return '<tr>' +
+            `<td>${name}</td>` +
+            `<td><span class="badge">${safe(r.platform) || '—'}</span></td>` +
+            `<td style="max-width:200px; font-size:12px;">${safe(r.audience) || '—'}</td>` +
+            `<td>${emailCell}</td>` +
+            `<td><a href="${safe(r.profile_url || r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
+            `<td><button class="btn btn-small btn-blue" onclick="importCreatorRow(${idx}, this)">Import</button></td>` +
+        '</tr>';
+    }).join('');
+}
+
+async function importCreatorRow(idx, btn) {
+    const row = creatorResults[idx];
+    if (!row) return;
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    try {
+        const data = await api('creator_import', { method: 'POST', body: {
+            canonical_url: row.canonical_url,
+            profile_url: row.profile_url,
+            platform: row.platform,
+            creator_name: row.creator_name,
+            email: row.email,
+            business_summary: row.business_summary
+        } });
+        if (data.success) {
+            creatorResults = creatorResults.filter(r => r.canonical_url !== row.canonical_url);
+            if (creatorLastSummary) creatorLastSummary.already_imported_count = (creatorLastSummary.already_imported_count || 0) + 1;
+            renderCreatorResults();
+            loadStats();
+            loadCreatorLeads();
+        } else {
+            notify(data.message || 'Import failed');
+            btn.disabled = false;
+            btn.textContent = 'Import';
+        }
+    } catch (e) {
+        notify(e.message);
+        btn.disabled = false;
+        btn.textContent = 'Import';
+    }
+}
+
+async function importAllCreatorFits() {
+    if (creatorResults.length === 0) return;
+    if (!confirm(`Import ${creatorResults.length} creator${creatorResults.length === 1 ? '' : 's'} as new partner leads?`)) return;
+    const toImport = creatorResults.map(r => ({
+        canonical_url: r.canonical_url,
+        profile_url: r.profile_url,
+        platform: r.platform,
+        creator_name: r.creator_name,
+        email: r.email,
+        business_summary: r.business_summary
+    }));
+    const btn = document.getElementById('creatorImportAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    const succeeded = new Set();
+    let failed = 0;
+    for (const item of toImport) {
+        try {
+            const data = await api('creator_import', { method: 'POST', body: item });
+            if (data.success) succeeded.add(item.canonical_url);
+            else failed++;
+        } catch (e) {
+            failed++;
+        }
+    }
+    creatorResults = creatorResults.filter(r => !succeeded.has(r.canonical_url));
+    if (creatorLastSummary) creatorLastSummary.already_imported_count = (creatorLastSummary.already_imported_count || 0) + succeeded.size;
+    renderCreatorResults();
+    loadStats();
+    loadCreatorLeads();
+    notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+}
+
+// Add one specific creator URL directly (YouTube channel, newsletter, blog, or a
+// LinkedIn profile which imports as a manual, email-less lead).
+async function addCreatorUrl() {
+    const input = document.getElementById('creatorUrl');
+    const url = (input.value || '').trim();
+    if (!url) { notify('Enter a creator URL'); return; }
+    const btn = document.getElementById('creatorAddBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    try {
+        const data = await api('creator_add_url', { method: 'POST', body: { url } });
+        if (data.success) {
+            input.value = '';
+            const emailMsg = data.has_email ? `email ${data.email}` : 'no email found — add it on the lead or use assisted email';
+            notify(`Added ${data.name || 'creator'} (${data.platform || ''}, ${emailMsg})`, 'success');
+            loadCreatorLeads();
+            loadStats();
+        } else {
+            notify(data.message || 'Could not add that URL');
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add';
+    }
+}
+
+// ─── Creator Leads: bulk select (distinct .cr-lead-check class / cr* IDs) ───
+function toggleCreatorLeadCheckboxes(master) {
+    document.querySelectorAll('.cr-lead-check').forEach(cb => cb.checked = master.checked);
+    updateCreatorBulkBar();
+}
+
+function updateCreatorBulkBar() {
+    const checked = document.querySelectorAll('.cr-lead-check:checked');
+    const bar = document.getElementById('crBulkActionsBar');
+    const count = document.getElementById('crSelectedCount');
+    const selectAll = document.getElementById('crLeadsSelectAll');
+    const allBoxes = document.querySelectorAll('.cr-lead-check');
+
+    if (bar) bar.style.display = checked.length ? 'flex' : 'none';
+    if (count) count.textContent = checked.length;
+
+    if (selectAll && allBoxes.length) {
+        if (checked.length === 0) { selectAll.checked = false; selectAll.indeterminate = false; }
+        else if (checked.length === allBoxes.length) { selectAll.checked = true; selectAll.indeterminate = false; }
+        else { selectAll.checked = false; selectAll.indeterminate = true; }
+    }
+
+    const draftBtn = document.getElementById('crBtnDraftSelected');
+    if (draftBtn) {
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
+    }
+}
+
+function getSelectedCreatorLeadIds() {
+    return Array.from(document.querySelectorAll('.cr-lead-check:checked')).map(cb => parseInt(cb.value));
+}
+
+function bulkGenerateCreatorDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedCreatorLeadIds(),
+        checkClass: '.cr-lead-check', checkIdPrefix: 'cr-lead-check-',
+        progressId: 'crBulkDraftProgress', progressTextId: 'crBulkDraftProgressText',
+        cancelBtnId: 'crBtnCancelDraft', draftBtnId: 'crBtnDraftSelected',
+        onDone: updateCreatorBulkBar,
+    });
+}
+
+function openCreatorBulkSend() {
+    openBulkSendModal(getSelectedCreatorLeadIds());
+}
+
+async function bulkDeleteCreatorLeads() {
+    const ids = getSelectedCreatorLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
+
+    let success = 0, fail = 0, lastError = '';
+    for (const id of ids) {
+        try {
+            const result = await api('delete_lead', { method: 'POST', body: { id } });
+            if (result.success) success++; else { fail++; lastError = result.message || 'Unknown error'; }
+        } catch (err) { fail++; lastError = err.message; }
+    }
+    if (fail > 0) notify(`Deleted: ${success}, Failed: ${fail}. Last error: ${lastError}`, 'error');
+    else notify(`Successfully deleted ${success} lead(s)`, 'success');
+    loadCreatorLeads();
+    loadStats();
+}
+
+// Grab a creator's email when none was auto-found: open the page where the email
+// lives (the channel About page for YouTube) in a new tab, then paste it back
+// onto the lead. Beats a command-line tool for a handful of leads.
+// Holds the button + lead being resolved while the paste-email modal is open.
+// We use an in-page modal rather than a native prompt() because getCreatorEmail
+// opens the channel in a foreground tab, and browsers suppress prompt()/alert()
+// dialogs fired from the now-backgrounded admin tab (the box never appeared).
+let creatorEmailBtn = null;
+let creatorEmailLeadId = null;
+
+function getCreatorEmail(btn) {
+    const leadId = parseInt(btn.dataset.leadId, 10);
+    let target = btn.dataset.website || '';
+    if (/youtube\.com/i.test(target)) {
+        target = target.replace(/\/+$/, '');
+        if (!/\/about$/i.test(target)) target += '/about';
+    }
+    if (target) window.open(target, '_blank', 'noopener');
+
+    creatorEmailBtn = btn;
+    creatorEmailLeadId = leadId;
+    const input = document.getElementById('creatorEmailInput');
+    if (input) input.value = '';
+    showModal('creatorEmailModal');
+    if (input) setTimeout(() => input.focus(), 50);
+}
+
+async function saveCreatorEmail() {
+    const input = document.getElementById('creatorEmailInput');
+    const email = (input ? input.value : '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        notify('That does not look like an email address', 'error');
+        return;
+    }
+    const btn = creatorEmailBtn;
+    const leadId = creatorEmailLeadId;
+    closeModal('creatorEmailModal');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+    }
+    try {
+        const res = await api('creator_set_email', { method: 'POST', body: { lead_id: leadId, email } });
+        if (res.success && res.updated > 0) {
+            notify('Email saved', 'success');
+            loadCreatorLeads();
+        } else {
+            notify(res.message || 'Could not save the email', 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Get email';
+            }
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Get email';
+        }
+    }
+}
+
+function debounceLoadCreatorLeads() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadCreatorLeads, 300);
+}
+
+async function loadCreatorLeads() {
+    const tbody = document.getElementById('creatorLeadsTableBody');
+    if (!tbody) return;
+
+    const params = { source: 'creator_auto' };
+    const searchEl = document.getElementById('crFilterSearch');
+    const statusEl = document.getElementById('crFilterStatus');
+    const responseEl = document.getElementById('crFilterResponse');
+    const sortEl = document.getElementById('crFilterSort');
+    if (searchEl && searchEl.value.trim()) params.search = searchEl.value.trim();
+    if (statusEl && statusEl.value) params.status = statusEl.value;
+    if (responseEl && responseEl.value) params.response_status = responseEl.value;
+    params.sort = (sortEl && sortEl.value) ? sortEl.value : 'date_added_desc';
+
+    try {
+        const data = await api('get_leads', { params });
+        if (!data.success || !data.leads.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No partner leads found.</td></tr>';
+            if (creatorLeadsPaginator) creatorLeadsPaginator.reset();
+            const selectAll = document.getElementById('crLeadsSelectAll');
+            if (selectAll) selectAll.checked = false;
+            updateCreatorBulkBar();
+            return;
+        }
+        tbody.innerHTML = data.leads.map(lead => {
+            const platform = (lead.category || '').replace(/^creator:/, '') || '—';
+            return `
+            <tr class="lead-row">
+                <td class="checkbox-column" onclick="event.stopPropagation()">
+                    <div class="checkbox"><input type="checkbox" class="cr-lead-check" value="${lead.id}" id="cr-lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateCreatorBulkBar()"><label for="cr-lead-check-${lead.id}"></label></div>
+                </td>
+                <td>
+                    <strong>${esc(lead.business_name)}</strong>
+                    ${lead.website ? '<br><a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : ''}
+                </td>
+                <td><span class="badge">${esc(platform)}</span></td>
+                <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+                <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+                <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
+                <td onclick="event.stopPropagation()">
+                    <div class="actions-cell">
+                        <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                        ${!lead.email
+                            ? `<button class="btn btn-small btn-blue" data-lead-id="${lead.id}" data-website="${escapeHtml(lead.website || '')}" onclick="getCreatorEmail(this)" title="Open the channel and paste the email">Get email</button>`
+                            : (!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status)
+                                ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>`
+                                : '')}
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+
+        const selectAll = document.getElementById('crLeadsSelectAll');
+        if (selectAll) selectAll.checked = false;
+        updateCreatorBulkBar();
+
+        const table = document.querySelector('.creator-leads-table');
+        if (table) {
+            if (!creatorLeadsPaginator) creatorLeadsPaginator = new TablePaginator(table, { perPage: 25 });
+            else creatorLeadsPaginator.reset();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
+}
+
+document.querySelectorAll('.section-tab[data-tab="creator-leads"]').forEach(btn =>
+    btn.addEventListener('click', () => setTimeout(loadCreatorLeads, 0)));
+document.addEventListener('DOMContentLoaded', function () {
+    loadCreatorStatus();
+    if (document.querySelector('#creator-leads.tab-content.active')) loadCreatorLeads();
+});
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Reddit outreach
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1652,11 +2474,17 @@ function switchChannel(channel) {
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('channel', channel);
-        if (channel === 'email' && url.searchParams.get('tab') && url.searchParams.get('tab').startsWith('reddit-')) {
+        if (channel === 'email' && /^(reddit|editorial|creator)-/.test(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'leads');
         }
         if (channel === 'reddit' && !['reddit-threads', 'reddit-settings'].includes(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'reddit-threads');
+        }
+        if (channel === 'editorial') {
+            url.searchParams.set('tab', 'editorial-discovery');
+        }
+        if (channel === 'creator') {
+            url.searchParams.set('tab', 'creator-discovery');
         }
         history.replaceState({}, '', url.toString());
     } catch (e) { /* ignore */ }
@@ -1675,6 +2503,12 @@ function switchChannel(channel) {
         loadRedditThreads();
         loadRedditStats();
         startRedditProgressPolling();
+    }
+    if (channel === 'editorial') {
+        loadEditorialStatus();
+    }
+    if (channel === 'creator') {
+        loadCreatorStatus();
     }
 }
 
@@ -1755,7 +2589,6 @@ function redditStatusBadge(s) {
         drafted_pending: ['badge-yellow', 'Drafted-pending'],
         replied: ['badge-blue', 'Replied'],
         skipped: ['badge-gray', 'Skipped'],
-        not_fit: ['badge-gray', 'Not fit'],
         expired: ['badge-gray', 'Expired'],
         new: ['badge-yellow', 'New'],
     };
@@ -1817,12 +2650,6 @@ function setText(id, value) {
 
 let redditProgressPollTimer = null;
 let redditDiscoveryWasRunning = false;
-
-async function loadRedditPipelineStatus() {
-    // Kept for backwards compat. Delegates to the progress poller which has
-    // strictly more info.
-    return loadRedditPipelineProgress();
-}
 
 async function loadRedditPipelineProgress() {
     const data = await api('reddit_pipeline_progress');
@@ -1891,6 +2718,42 @@ async function runRedditDiscoveryNow() {
         return;
     }
     startRedditProgressPolling();
+}
+
+// ─── Manually add a thread ───
+
+function showAddRedditThreadModal() {
+    document.getElementById('addRedditUrl').value = '';
+    document.getElementById('addRedditSubreddit').value = '';
+    document.getElementById('addRedditTitle').value = '';
+    document.getElementById('addRedditBody').value = '';
+    showModal('addRedditThreadModal');
+}
+
+async function addRedditThread() {
+    const url = document.getElementById('addRedditUrl').value.trim();
+    if (!url) { notify('Reddit post URL is required', 'error'); return; }
+
+    const data = {
+        url,
+        subreddit: document.getElementById('addRedditSubreddit').value.trim(),
+        title: document.getElementById('addRedditTitle').value.trim(),
+        body: document.getElementById('addRedditBody').value.trim(),
+    };
+
+    try {
+        const result = await api('reddit_add_thread', { method: 'POST', body: data });
+        if (result.success) {
+            closeModal('addRedditThreadModal');
+            notify('Thread added to the queue', 'success');
+            loadRedditThreads();
+            loadRedditStats();
+        } else {
+            notify(result.message, 'error');
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
 }
 
 // ─── Thread detail modal ───
@@ -2005,16 +2868,6 @@ function copyRedditDraft(btn) {
         document.body.removeChild(ta);
         copied();
     });
-}
-
-async function markRedditNotFit() {
-    if (!redditCurrentThread) return;
-    if (!confirm('Mark this thread as not a fit? It will be hidden from the actionable queue.')) return;
-    const data = await api('reddit_mark_not_fit', { method: 'POST', body: { id: redditCurrentThread.id } });
-    if (!data || !data.success) { notify('Failed'); return; }
-    closeModal('redditThreadModal');
-    loadRedditThreads();
-    loadRedditStats();
 }
 
 async function markRedditSkipped() {

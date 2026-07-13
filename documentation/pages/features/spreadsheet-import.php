@@ -1,5 +1,7 @@
 <?php
+require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
+$pricing = get_pricing_config();
 $pageTitle = 'AI Spreadsheet Import';
 $pageDescription = 'Import data from any Excel or CSV spreadsheet into Argo Books. AI automatically detects your data types and maps columns, with no reformatting needed.';
 $currentPage = 'spreadsheet-import';
@@ -14,7 +16,7 @@ include __DIR__ . '/../../docs-header.php';
             <h2>How AI Import Works</h2>
             <p>The AI importer analyzes your spreadsheet and figures out the rest. Here's what happens when you import a file:</p>
             <ol class="steps-list">
-                <li>Click <strong>File &gt; Import...</strong>, select "Excel or CSV", then choose your file</li>
+                <li>Click <strong>File &gt; Import &gt; Spreadsheet</strong>, then choose your file</li>
                 <li>AI analyzes each sheet, detects the data type (customers, products, expenses, etc.), and maps your columns to Argo Books fields</li>
                 <li>Review the mapping. You'll see confidence scores for each match, and can adjust anything that doesn't look right</li>
                 <li>Click <strong>Import</strong> to bring everything in</li>
@@ -81,7 +83,7 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <h2>Usage Limits</h2>
-            <p>Every user gets 100 AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import.</p>
+            <p>Free accounts get <?= (int) $pricing['ai_import_monthly_limit'] ?> AI-powered imports per month and Premium gets <?= (int) $pricing['premium_ai_import_monthly_limit'] ?>. Each file you import (regardless of the number of sheets) counts as one import.</p>
 
             <div class="page-navigation">
                 <a href="receipt-scanning.php" class="nav-button prev">

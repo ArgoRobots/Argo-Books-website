@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-01',
 
-  'updated' => '2026-06-01',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -67,6 +67,7 @@ HTML,
 <li><strong>A photo and a folder.</strong> The free, no-tool version. Snap the receipt with your phone into a labelled folder. It keeps the image as proof, but you still type the numbers in later, so it only works at low volume.</li>
 <li><strong>A receipt-scanning app.</strong> The real upgrade. You photograph the receipt and the app reads the supplier, date, total, and tax, then files it as an expense with the image attached, no typing. For a business doing more than a handful of receipts a week, this is the difference between expense tracking taking minutes a month and taking an evening. The guide on the <a href="/best-free-ai-receipt-scanner/">best free AI receipt scanners</a> covers the options.</li>
 </ul>
+{{illustration:receipt-scan}}
 <p>The principle is the same whichever you use: capture at the point of sale, not at month-end. A receipt scanned in the car takes two seconds. The same receipt reconstructed from memory in April takes ten minutes and is probably wrong. Capture-as-you-go is the single biggest reason a system works or fails.</p>
 HTML,
     ],
@@ -105,6 +106,7 @@ HTML,
       'html' => <<<'HTML'
 <p>If you've done the four habits, tax time isn't a project, it's a button. Your expenses are captured, categorized, checked against the bank, and the receipts are attached. The report your accountant needs, total expenses broken down by category, already exists.</p>
 <p>This is where dropping the spreadsheet pays off most. With a spreadsheet, the year-end report is more typing and a final round of error-hunting. With a system that's been current all year, the categories are already totalled, and you, or your accountant, just read them off. Accountants bill by the hour, so handing over clean, categorized totals with receipts available is the cheapest way to do tax time, often by hundreds of dollars.</p>
+{{illustration:coins}}
 <p>The receipts matter here too. Tax authorities in most countries want the original kept, and a scan stored alongside the record means that if you're ever asked to back up a claim, the proof is already filed, not faded to nothing in a drawer. Captured-as-you-go, your records and your proof are the same thing.</p>
 HTML,
     ],
@@ -133,7 +135,7 @@ HTML,
     ],
     [
       'q' => 'What expense categories should a small business track?',
-      'a' => 'Start with a handful that match how you actually spend: materials and supplies, vehicle and travel, tools and equipment, software and subscriptions, insurance and professional fees, and meals separately because their tax treatment often differs. You do not need an accountant\'s full chart of accounts to begin. The goal is that every expense lands in a bucket that means something at tax time. If you carry stock, keep inventory purchases out of general expenses, since they affect cost of goods sold rather than being a plain deductible cost. Your accountant can refine the categories later, but these cover most small businesses well enough to start today.',
+      'a' => 'Start with a handful that match how you actually spend: materials and supplies, vehicle and travel, tools and equipment, software and subscriptions, insurance and professional fees, and meals separately because their tax treatment often differs. You don\'t need an accountant\'s full chart of accounts to begin. The goal is that every expense lands in a bucket that means something at tax time. If you carry stock, keep inventory purchases out of general expenses, since they affect cost of goods sold rather than being a plain deductible cost. Your accountant can refine the categories later, but these cover most small businesses well enough to start today.',
     ],
     [
       'q' => 'How do I track cash expenses with no card record?',
@@ -145,7 +147,7 @@ HTML,
     ],
     [
       'q' => 'Is this article just trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and yes this is the Argo Books site, so read it with that in mind. But the system in this guide does not depend on our tool. Separating your accounts, capturing receipts as they happen, categorizing them, and checking against the bank monthly are habits that work with a phone and a free app, a competitor\'s software, or even the spreadsheet we are talking you out of. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you claim every deduction you are owed than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and yes this is the Argo Books site, so read it with that in mind. But the system in this guide does not depend on our tool. Separating your accounts, capturing receipts as they happen, categorizing them, and checking against the bank monthly are habits that work with a phone and a free app, a competitor\'s software, or even the spreadsheet we are talking you out of. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you claim every deduction you are owed than buy software you don\'t need.',
     ],
   ],
 

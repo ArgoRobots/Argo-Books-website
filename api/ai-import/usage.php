@@ -1,8 +1,10 @@
 <?php
 /**
- * AI Spreadsheet Import Usage Tracking API
- * Tracks and enforces monthly import limits for all users.
- * Every user gets 100 AI-powered imports per month.
+ * AI Import Usage Tracking API
+ * Tracks and enforces monthly import limits per user, per import type.
+ * Spreadsheet imports and bank statement imports have separate monthly counters
+ * and separate limits (see config/pricing.php). Pass `type` = "spreadsheet" (default)
+ * or "bank".
  */
 
 header('Content-Type: application/json');
@@ -26,9 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($input['license_key']) || empty($input['license_key'])) {
+// Accept either license_key (premium) or device_id (free)
+$license_key = trim($input['license_key'] ?? '');
+$device_id = trim($input['device_id'] ?? '');
+
+if (empty($license_key) && empty($device_id)) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'License key is required']);
+    echo json_encode(['success' => false, 'error' => 'Either license_key or device_id is required']);
     exit();
 }
 
@@ -38,54 +44,86 @@ if (!isset($input['action']) || !in_array($input['action'], ['check', 'increment
     exit();
 }
 
-$license_key = trim($input['license_key']);
 $action = $input['action'];
+
+// Import type. Bank and spreadsheet imports track separate monthly counters.
+$type = $input['type'] ?? 'spreadsheet';
+if (!in_array($type, ['spreadsheet', 'bank'], true)) {
+    $type = 'spreadsheet';
+}
 
 // Load database connection and pricing config
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../config/pricing.php';
 
 /**
- * Determine tier and validate license key
+ * Determine tier and validate identity.
  * AI import is available to all users (free and premium) with 100 imports/month.
+ * Premium users authenticate with a license key; free users authenticate with a device ID.
  * @param PDO $pdo
  * @param string $license_key
- * @return array|null Returns ['tier' => string, 'limit' => N] for valid keys,
- *                    or null if invalid
+ * @param string $device_id
+ * @return array|null Returns ['tier' => string, 'limit' => N, 'identifier' => string]
+ *                    for valid identities, or null if invalid
  */
-function validateAndGetTier($pdo, $license_key) {
+function validateAndGetTier($pdo, $license_key, $device_id) {
     $config = get_pricing_config();
     $limit = $config['ai_import_monthly_limit'];
 
-    // Check if it's a Premium key (starts with PREM-)
-    if (strpos($license_key, 'PREM-') === 0) {
-        // Check premium_subscription_keys table (unredeemed promo keys)
-        $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
-        $stmt->execute([$license_key]);
-        if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => $limit];
+    if (!empty($license_key)) {
+        // Check if it's a Premium key (starts with PREM-)
+        if (strpos($license_key, 'PREM-') === 0) {
+            // Require the key to be redeemed AND linked to an active, unexpired
+            // subscription before granting premium tier (mirrors receipt/invoice
+            // usage). An unredeemed promo code must not count as premium.
+            $stmt = $pdo->prepare("
+                SELECT subscription_id, redeemed_at
+                FROM premium_subscription_keys
+                WHERE subscription_key = ?
+            ");
+            $stmt->execute([$license_key]);
+            $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($premiumKey && $premiumKey['redeemed_at'] !== null) {
+                $stmt = $pdo->prepare("
+                    SELECT id FROM premium_subscriptions
+                    WHERE subscription_id = ?
+                    AND status IN ('active', 'cancelled')
+                    AND end_date > NOW()
+                ");
+                $stmt->execute([$premiumKey['subscription_id']]);
+                if ($stmt->fetch()) {
+                    return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
+                }
+            }
+
+            // Fallback: subscription_id may have been used directly as the license key
+            $stmt = $pdo->prepare("
+                SELECT id FROM premium_subscriptions
+                WHERE subscription_id = ?
+                AND status IN ('active', 'cancelled')
+                AND end_date > NOW()
+            ");
+            $stmt->execute([$license_key]);
+            if ($stmt->fetch()) {
+                return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
+            }
+
+            return null;
         }
 
-        // Check premium_subscriptions table for active subscriptions
-        $stmt = $pdo->prepare("
-            SELECT id FROM premium_subscriptions
-            WHERE subscription_id = ?
-            AND status IN ('active', 'cancelled')
-            AND end_date > NOW()
-        ");
+        // Check if it's a valid free license key
+        $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => $limit];
+            return ['tier' => 'free', 'limit' => $limit, 'identifier' => $license_key];
         }
-
-        return null;
     }
 
-    // Check if it's a valid free license key
-    $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
-    $stmt->execute([$license_key]);
-    if ($stmt->fetch()) {
-        return ['tier' => 'free', 'limit' => $limit];
+    if (!empty($device_id)) {
+        // Free tier via device ID
+        $identifier = 'device_' . hash('sha256', $device_id);
+        return ['tier' => 'free', 'limit' => $limit, 'identifier' => $identifier];
     }
 
     return null;
@@ -158,8 +196,8 @@ function buildResponse($import_count, $monthly_limit, $tier, $can_import = null)
 }
 
 try {
-    // Validate license key and get tier
-    $tierInfo = validateAndGetTier($pdo, $license_key);
+    // Validate identity and get tier
+    $tierInfo = validateAndGetTier($pdo, $license_key, $device_id);
 
     if (!$tierInfo) {
         http_response_code(401);
@@ -168,13 +206,25 @@ try {
     }
 
     $tier = $tierInfo['tier'];
-    $monthly_limit = $tierInfo['limit'];
+    $identifier = $tierInfo['identifier'];
+
+    // Resolve the limit by tier + import type. Bank imports use a separate, prefixed
+    // identifier so they get their own monthly counter row, distinct from spreadsheet imports.
+    $config = get_pricing_config();
+    if ($type === 'bank') {
+        $identifier = 'bank:' . $identifier;
+        $monthly_limit = $tier === 'premium'
+            ? $config['premium_bank_import_monthly_limit']
+            : $config['bank_import_monthly_limit'];
+    } else {
+        $monthly_limit = $tier === 'premium'
+            ? $config['premium_ai_import_monthly_limit']
+            : $config['ai_import_monthly_limit'];
+    }
 
     // Get or create usage record
-    $usage = getOrCreateUsageRecord($pdo, $license_key, $monthly_limit);
+    $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $import_count = $usage['scan_count'];
-    // Use the limit from the tier info (in case it changed)
-    $monthly_limit = $tierInfo['limit'];
 
     if ($action === 'check') {
         // Just return current status
@@ -201,7 +251,7 @@ try {
             SET scan_count = scan_count + 1
             WHERE license_key = ? AND usage_month = ? AND scan_count < ?
         ");
-        $stmt->execute([$license_key, $usage_month, $monthly_limit]);
+        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
 
         if ($stmt->rowCount() === 0) {
             $response = buildResponse($import_count, $monthly_limit, $tier, false);

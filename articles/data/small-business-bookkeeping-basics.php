@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 10,
 
@@ -64,6 +64,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Before any tool or technique, do this: open a separate bank account, and ideally a separate card for the business. Run all business income and costs through it, and keep personal spending on personal accounts.</p>
 <p>This is the single highest-value thing a new business owner can do for their books, and it costs nothing. When business and personal money share one account, every tax season becomes a forensic exercise of sorting hundreds of transactions into business and personal. Mixed accounts also hide whether the business is actually profitable, because the rent and the grocery bills sit in the same list. With a separate account, the business statement is your business record. You're no longer sorting; you're just categorizing.</p>
+{{illustration:coins}}
 <p>You don't need a fancy business account with fees. A second basic account in the business name is enough. Get this in place first, and half the difficulty of bookkeeping disappears before you've learned a single term.</p>
 HTML,
     ],
@@ -89,6 +90,7 @@ HTML,
 <li><strong>Look at who owes you.</strong> Check which invoices are unpaid and follow up on anything overdue. This is how you actually get paid, and it's part of the books.</li>
 <li><strong>Set tax money aside.</strong> Move a percentage of what you earned into a separate account so the tax bill isn't a shock. Your accountant can suggest a sensible percentage.</li>
 </ol>
+{{illustration:checklist}}
 <p>Done monthly, the year-end is just handing your accountant tidy totals. Skipped all year, it's a two-week scramble and a bigger accounting bill. The habit is the whole game.</p>
 HTML,
     ],
@@ -122,15 +124,15 @@ HTML,
     ],
     [
       'q' => 'Should I use cash basis or accrual basis bookkeeping?',
-      'a' => 'Most small businesses start on cash basis, where you record income when the money lands and expenses when you pay them. It is simpler and tracks the cash you can actually see. Accrual basis records income when you invoice and costs when you are billed, which gives a truer picture of profit but is more work, and it is sometimes required once a business passes a certain size or in certain industries. The right answer depends on your country and your situation, so it is a good early question for an accountant. If you are small and just starting, cash basis is almost always the sensible, correct place to begin.',
+      'a' => 'Most small businesses start on cash basis, where you record income when the money lands and expenses when you pay them. It\'s simpler and tracks the cash you can actually see. Accrual basis records income when you invoice and costs when you are billed, which gives a truer picture of profit but is more work, and it is sometimes required once a business passes a certain size or in certain industries. The right answer depends on your country and your situation, so it is a good early question for an accountant. If you are small and just starting, cash basis is almost always the sensible, correct place to begin.',
     ],
     [
       'q' => 'How often should I do my bookkeeping?',
-      'a' => 'Capture continuously and review monthly. Income and expense receipts need to be recorded as they happen, because a receipt you do not capture now is usually lost, and a payment you do not log is easy to forget. Then once a month, sit down for under an hour to check your records against the bank, see which invoices are unpaid, and set tax money aside. That rhythm, constant capture plus a monthly check, keeps the books current with very little effort. The alternative, leaving it all for year-end, turns a small ongoing habit into a stressful two-week project and usually means lost receipts and missed deductions.',
+      'a' => 'Capture continuously and review monthly. Income and expense receipts need to be recorded as they happen, because a receipt you don\'t capture now is usually lost, and a payment you don\'t log is easy to forget. Then once a month, sit down for under an hour to check your records against the bank, see which invoices are unpaid, and set tax money aside. That rhythm, constant capture plus a monthly check, keeps the books current with very little effort. The alternative, leaving it all for year-end, turns a small ongoing habit into a stressful two-week project and usually means lost receipts and missed deductions.',
     ],
     [
       'q' => 'Is this article tax advice?',
-      'a' => 'No. It is a plain-language introduction to bookkeeping to help a new business owner get started and ask an accountant the right questions. The specific rules, including which accounting basis you can use, what records you must keep, and what you can claim, vary by country and by your circumstances, and only someone who knows your situation and your local law can advise you. Use this to set up good habits; use a qualified accountant for decisions about your tax. This guide is on the Argo Books site, which sells bookkeeping software, so read the single product mention with that in mind.',
+      'a' => 'No. It\'s a plain-language introduction to bookkeeping to help a new business owner get started and ask an accountant the right questions. The specific rules, including which accounting basis you can use, what records you must keep, and what you can claim, vary by country and by your circumstances, and only someone who knows your situation and your local law can advise you. Use this to set up good habits; use a qualified accountant for decisions about your tax. This guide is on the Argo Books site, which sells bookkeeping software, so read the single product mention with that in mind.',
     ],
   ],
 

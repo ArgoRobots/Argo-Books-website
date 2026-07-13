@@ -15,7 +15,7 @@
 }
 
 .profile-header h1 {
-  color: var(--blue-900);
+  color: var(--black);
   font-size: 28px;
   display: flex;
   align-items: center;
@@ -154,7 +154,7 @@
   margin-top: 20px;
   font-size: 18px;
   font-weight: 600;
-  color: var(--blue-900);
+  color: var(--black);
   letter-spacing: 1px;
   display: flex;
   align-items: center;
@@ -209,7 +209,7 @@
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .stat-label {
@@ -277,7 +277,7 @@
 .impact-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .impact-label {
@@ -423,7 +423,7 @@
   align-items: center;
   justify-content: center;
   min-width: 60px;
-  color: var(--blue-900);
+  color: var(--black);
   padding: 8px;
   background-color: var(--gray-bg-light);
   border-radius: 4px;

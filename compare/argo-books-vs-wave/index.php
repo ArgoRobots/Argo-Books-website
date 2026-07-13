@@ -38,10 +38,10 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
     <meta name="twitter:title" content="Argo Books vs Wave: Offline-Capable Finance & Inventory Management">
     <meta name="twitter:description"
         content="Compare Argo Books and Wave side by side. See why small businesses are choosing Argo Books for offline-capable finance and inventory management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -73,7 +73,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro)."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro)."
                     }
                 },
                 {
@@ -401,7 +401,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro).</p>
                         </div>
                     </div>

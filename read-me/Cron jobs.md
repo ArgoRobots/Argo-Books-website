@@ -301,3 +301,118 @@ Idempotent: each row tracks its own check count and last-checked timestamp; the 
 ### Logs
 
 A lock file (`/cron/logs/reddit_status_check.lock`) prevents overlapping runs.
+
+---
+
+## 11. Marketing Broadcast Sender
+
+**Script:** `cron/marketing_broadcast.php`
+**Schedule:** Every 5 minutes
+
+```bash
+*/5 * * * * /usr/bin/php /home/argorobots/public_html/cron/marketing_broadcast.php
+```
+
+### What It Does
+
+Drains queued broadcasts composed in the admin **Marketing** page (`marketing_broadcasts` / `marketing_broadcast_recipients`). Each run:
+
+1. Picks broadcasts in `queued` or `sending` status, oldest first, and marks them `sending`.
+2. Sends up to 100 emails per run total (the per-run cap keeps each run under Resend's rate limit and the time budget). A broadcast larger than the cap finishes over multiple runs.
+3. Re-checks every recipient against the send-time gate (`should_send_marketing_email`), so anyone who unsubscribed between queue time and send time is marked `skipped`, not emailed.
+4. Appends the one-click unsubscribe footer (subscriber token for the `newsletter` audience, community-user token for community contexts).
+5. Marks the broadcast `sent` once no `pending` recipients remain.
+
+Audience is one of: `newsletter` (no-account opt-in subscribers in `marketing_subscribers`) or a community context (`product_updates`, `tips_onboarding`, `promotions`) that maps to a `community_users.email_pref_*` column.
+
+### Manual Execution
+
+```bash
+php /home/argorobots/public_html/cron/marketing_broadcast.php
+```
+
+### Logs
+
+A lock file (`/cron/logs/marketing_broadcast.lock`) prevents overlapping runs.
+
+---
+
+## 12. IndexNow Submit
+
+**Script:** `cron/indexnow_submit.php`
+**Schedule:** Daily at 5:00 AM
+
+```bash
+0 5 * * * /usr/bin/php /home/argorobots/public_html/cron/indexnow_submit.php
+```
+
+### What It Does
+
+Pings IndexNow with the pages whose source files changed since the last successful run, so freshly deployed or edited pages get recrawled quickly without manual submission. IndexNow notifies Bing, Yandex, DuckDuckGo, Seznam, and Naver in one call.
+
+1. Builds the full URL list from `sitemap_build_urls()` in `sitemap_urls.php` (the same source the XML sitemap uses, so new pages are picked up automatically).
+2. Selects URLs whose source file modification time is newer than the stored watermark (`/cron/logs/indexnow_last_submit`). On the server, file mtime reflects the last deploy that touched the file.
+3. POSTs them to `https://api.indexnow.org/indexnow` via the helper in `indexnow.php`.
+4. Advances the watermark only on full success, so a transient failure retries the same URLs next run.
+
+The first run has no watermark, so it submits every URL once as a bootstrap. Run with `--baseline` first if you would rather start clean and only announce future changes.
+
+Google does NOT participate in IndexNow, so this cron does nothing for Google. Keep using Search Console for Google.
+
+### Setup (one time)
+
+1. The ownership key file `77469e7877e34a30ab5fab27e275650e.txt` lives at the site root and deploys with the rest of the repo. Confirm it is reachable at `https://argorobots.com/77469e7877e34a30ab5fab27e275650e.txt` after the first deploy.
+2. Add the crontab line above on the server.
+
+The key can be rotated by generating a new one in Bing Webmaster Tools, replacing the root `.txt` file, and setting `INDEXNOW_KEY` in `.env`.
+
+### CLI Flags
+
+```bash
+php indexnow_submit.php             # Submit URLs changed since last run
+php indexnow_submit.php --all       # Force-submit every URL
+php indexnow_submit.php --baseline  # Record the watermark without submitting
+php indexnow_submit.php --dry-run   # Log what would be submitted; send nothing
+```
+
+### Logs
+
+`/cron/logs/indexnow_submit_YYYY-MM-DD.log`
+
+A lock file (`/cron/logs/indexnow_submit.lock`) prevents overlapping runs.
+
+---
+
+## 13. Reddit Run Dispatcher
+
+**Script:** `cron/reddit_run_dispatcher.php`
+**Schedule:** Every 2 minutes
+
+```bash
+*/2 * * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_run_dispatcher.php
+```
+
+### What It Does
+
+Bridges the admin **"Run discovery now"** button to a real CLI run of `reddit_monitor.php`.
+
+The production host disables `exec` / `shell_exec` / `proc_open`, so the admin button cannot spawn a background process, and running discovery inline in the web request is killed by PHP-FPM's `request_terminate_timeout` (~30s) long before it finishes. So the button only records a request (`reddit_settings.manual_run_requested_at = NOW()`); this cron polls for that flag and runs discovery via CLI, which has no time limit.
+
+1. Reads `reddit_settings.manual_run_requested_at`. If unset, exits immediately (one cheap SELECT).
+2. Claims the request by clearing the flag, so a second tick can't double-fire it.
+3. Ignores requests older than 15 minutes (a stale click can't trigger a surprise run later).
+4. Runs `reddit_monitor.php` via CLI with `REDDIT_FORCE_RUN` defined, which makes discovery run even when the master enable toggle is off (a manual request is an explicit override).
+
+This cron does not write to `cron_runs`; `reddit_monitor` records its own run when fired. Discovery starts within ~2 minutes of clicking the button; progress shows in the Reddit threads tab as usual.
+
+### Setup (one time)
+
+Add the column the button writes to (run in HeidiSQL):
+
+```sql
+ALTER TABLE reddit_settings
+  ADD COLUMN manual_run_requested_at DATETIME DEFAULT NULL
+  COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI.';
+```
+
+Then add the crontab line above on the server.

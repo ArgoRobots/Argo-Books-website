@@ -418,8 +418,11 @@ if ($user) {
     $error_message = '';
 
     if ($is_own_profile && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Handle profile picture upload
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Validate CSRF before the avatar upload (the only POST this page handles).
+        $posted_csrf = (string)($_POST['csrf_token'] ?? '');
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $posted_csrf)) {
+            $error_message = 'Security check failed. Please refresh the page and try again.';
+        } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
             $avatar_result = upload_avatar($_SESSION['user_id'], $_FILES['avatar']);
             if ($avatar_result) {
                 $user['avatar'] = $avatar_result;
@@ -440,6 +443,7 @@ if ($user) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,follow">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo $user_not_found ? 'User Not Found' : htmlspecialchars($user['username']) . "'s Profile"; ?> - Argo Community</title>
 
@@ -521,6 +525,7 @@ if ($user) {
                 <div class="profile-sidebar">
                     <div class="profile-card">
                         <form method="post" enctype="multipart/form-data" id="avatar-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                             <div class="profile-avatar <?php echo $is_own_profile ? 'editable' : ''; ?>" id="profile-avatar">
                                 <?php if (!empty($user['avatar'])): ?>
                                     <img src="../<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo htmlspecialchars($user['username']); ?>'s avatar" id="avatar-preview">
@@ -597,6 +602,10 @@ if ($user) {
                                 <a href="email_preferences.php" class="btn btn-blue">
                                     <?= svg_icon('mail', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Email Preferences
+                                </a>
+                                <a href="../affiliate/" class="btn btn-blue">
+                                    <?= svg_icon('dollar', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                                    Affiliate Program
                                 </a>
                                 <a href="logout.php" class="btn btn-gray">Log Out</a>
                             <?php endif; ?>
@@ -1151,6 +1160,13 @@ if ($user) {
 
                             // Move the input to the form
                             form.appendChild(this);
+
+                            // Include the CSRF token so the server accepts the upload
+                            const csrfInput = document.createElement('input');
+                            csrfInput.type = 'hidden';
+                            csrfInput.name = 'csrf_token';
+                            csrfInput.value = <?php echo json_encode($_SESSION['csrf_token']); ?>;
+                            form.appendChild(csrfInput);
 
                             // Add to document and submit
                             document.body.appendChild(form);

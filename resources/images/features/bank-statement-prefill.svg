@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bspBg" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="bspShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="500" rx="24" fill="url(#bspBg)"/>
+  <g opacity="0.03" stroke="#7c3aed" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+  <circle cx="540" cy="70" r="45" fill="#7c3aed" opacity="0.04"/>
+  <circle cx="60" cy="430" r="35" fill="#16a34a" opacity="0.04"/>
+
+  <g filter="url(#bspShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Header -->
+  <circle cx="66" cy="56" r="18" fill="#f5f3ff"/>
+  <path d="M63 48 L60 57 L65 57 L62 66 L70 54 L65 54 L67 48 Z" fill="#7c3aed"/>
+  <text x="92" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#1e293b">Smart pre-fill</text>
+  <text x="92" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">Each line is filled in for you before you review</text>
+
+  <!-- Raw bank line -->
+  <rect x="48" y="90" width="504" height="58" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
+  <text x="64" y="111" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.5" fill="#a78bfa">BANK LINE</text>
+  <text x="64" y="133" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1e293b">SQ *BLUE BOTTLE COFFEE</text>
+  <text x="540" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="700" fill="#dc2626" text-anchor="end">&#8722;$18.40</text>
+  <text x="540" y="133" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#94a3b8" text-anchor="end">Jul 2, 2026</text>
+
+  <!-- Connector -->
+  <line x1="300" y1="148" x2="300" y2="172" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="3 3"/>
+  <path d="M295 168 L300 174 L305 168" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Field 1: Type -->
+  <rect x="48" y="180" width="504" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="64" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.5" fill="#94a3b8">TYPE</text>
+  <text x="64" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1e293b">Expense</text>
+  <rect x="424" y="196" width="112" height="24" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="440" cy="208" r="3.5" fill="#94a3b8"/>
+  <text x="452" y="208" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#64748b" dominant-baseline="central">From amount</text>
+
+  <!-- Field 2: Product & Category -->
+  <rect x="48" y="244" width="504" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="64" y="266" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.5" fill="#94a3b8">PRODUCT &amp; CATEGORY</text>
+  <text x="64" y="286" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1e293b">Coffee &#183; Meals &amp; Entertainment</text>
+  <rect x="424" y="260" width="112" height="24" rx="12" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+  <path d="M438 266 L433 273 L436.5 273 L434.5 278 L441 271 L437.5 271 L439 266 Z" fill="#7c3aed"/>
+  <text x="450" y="272" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#7c3aed" dominant-baseline="central">AI suggestion</text>
+
+  <!-- Field 3: Supplier -->
+  <rect x="48" y="308" width="504" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="64" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.5" fill="#94a3b8">SUPPLIER</text>
+  <text x="64" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1e293b">Blue Bottle Coffee</text>
+  <rect x="426" y="324" width="110" height="24" rx="12" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <polyline points="438,336 441,339 446,333" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="452" y="336" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#16a34a" dominant-baseline="central">Learned rule</text>
+
+  <!-- Footer banner -->
+  <rect x="48" y="384" width="504" height="44" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <circle cx="74" cy="406" r="11" fill="#16a34a"/>
+  <polyline points="69,406 73,410 79,402" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="94" y="406" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#166534" dominant-baseline="central">Rule saved. Next statement fills Blue Bottle in automatically.</text>
+
+  <text x="300" y="452" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">You review and confirm before anything is saved to your books.</text>
+</svg>

@@ -31,7 +31,9 @@ if ($deviceId) {
     $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
 }
 $rateLimitKey = 'rates_' . $rateLimitId;
-if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
+// Shares the 'rates_' bucket with the batch endpoint; kept generous so the per-date fallback never
+// trips it during a legitimate import (the app no longer fans out on a rate-limit).
+if (is_rate_limited($rateLimitId, 1000, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);
@@ -63,14 +65,6 @@ $lookupDate = $isLatest ? date('Y-m-d') : $date;
 // Check MySQL cache
 require_once __DIR__ . '/../db_connect.php';
 if ($pdo) {
-    // Ensure table exists
-    $pdo->exec("CREATE TABLE IF NOT EXISTS exchange_rates (
-        rate_date DATE NOT NULL,
-        rates JSON NOT NULL,
-        fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (rate_date)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
     $stmt = $pdo->prepare("SELECT rates, fetched_at FROM exchange_rates WHERE rate_date = ?");
     $stmt->execute([$lookupDate]);
     $cached = $stmt->fetch(PDO::FETCH_ASSOC);

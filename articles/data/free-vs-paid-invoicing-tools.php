@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-30',
 
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -41,6 +41,7 @@ HTML,
 <p>Free invoicing tools are good enough for most sole traders, side hustlers, and very small businesses. If you send under five invoices a month, bill one or two clients, don't take card payments through the invoice, and only see your accountant once a year, you're spending money for no reason if you pay for invoicing software.</p>
 <p>Paid tools earn their cost in specific places. The big ones: <a href="/recurring-invoices-when-to-use-them/">recurring billing on a fixed schedule</a>, integrated card and bank payments, expense and revenue tracking that flows through to tax-time reports, multiple users on the same set of books, and a client portal that lets customers pay and download past invoices on their own. None of those are gimmicks. They each save hours a month for the right business, and at $15 to $40 a month a paid tool only has to save you two hours to pay for itself.</p>
 <p>The trick is matching your real workload to the right side of that line, not the side a sales page wants you on. Most of the people we talk to who are paying for software they don't need are doing it because somebody talked them out of a free tool that was working fine. And most of the people we talk to who are buried in admin are running a real five-employee business on a spreadsheet and a free generator, because they got the message that paid software is only for big companies. Both of those are wrong.</p>
+{{illustration:compare-scale}}
 <p>The rest of this article is the test for which side you're on, and the names of the tools worth looking at on each side.</p>
 HTML,
     ],
@@ -75,6 +76,7 @@ HTML,
 <li><strong>Stripe invoices.</strong> If you already take card payments through Stripe, you can send a Stripe-hosted invoice with no extra signup. The client pays by clicking a link. The trade-off: Stripe charges the standard card fee (around 2.9% plus 30 cents in the US) plus a 0.4% per-paid-invoice fee on the starter Invoicing plan, and the invoice layout is fixed.</li>
 </ul>
 <p>All four are honest options. The right pick depends on whether you need invoice history saved for you (Zoho), card payments built in (Stripe or Zoho), or just a fast PDF with no signup (the generator on this site, or invoice-generator.com). Try one or two for a month and see which one you like the best. None of them will lock you in, because invoices are just PDFs at the end of the day.</p>
+{{illustration:invoice-doc}}
 HTML,
     ],
 
@@ -104,10 +106,10 @@ HTML,
 <ul>
 <li><strong>QuickBooks Online (Intuit).</strong> The default. Most accountants in the US, Canada, the UK, and Australia know it inside out, which makes hand-off at tax time straightforward. Strong on bank feeds, expense tracking, and reports, with a deep app marketplace. The trade-off: pricing creeps up, the interface is dense, and it's time-consuming to use. Plans start around ${quickbooks_easystart} CAD a month for the entry tier, and they gatekeep important features behind more expensive tiers, pressuring people to climb up to ${quickbooks_plus}+ a month for Plus.</li>
 <li><strong>FreshBooks.</strong> Built for service businesses and freelancers, with an easier learning curve than QuickBooks. Strong on time tracking, project profitability, and a clean client portal. The trade-off: lower-tier plans cap the number of billable clients, and you can hit the cap quickly if you have a long list of clients. Plans start around ${freshbooks_lite} CAD a month for Lite (5-client cap), with Plus closer to ${freshbooks_plus} CAD.</li>
-<li><strong>Wave.</strong> The big freemium player. The core invoicing and accounting product is  free, with no invoice cap and no time limit. But you pay when you take card payments (a per-transaction fee), use the payroll product, or pay for the new Pro tier with extras like automatic reminders. The trade-off: free support is limited, the product is less actively developed than it used to be, and the Pro tier (around ${wave_pro} CAD a month) unlocks features that used to be free, which has annoyed some long-time users.</li>
+<li><strong>Wave.</strong> The big freemium player. The core invoicing and accounting product is free, with no invoice cap and no time limit. But you pay when you take card payments (a per-transaction fee), use the payroll product, or pay for the new Pro tier with extras like automatic reminders. The trade-off: free support is limited, the product is less actively developed than it used to be, and the Pro tier (around ${wave_pro} CAD a month) unlocks features that used to be free, which has annoyed some long-time users.</li>
 <li><strong>Xero.</strong> Strong in the UK, Australia, and New Zealand, growing in North America. Clean interface, strong on multi-currency invoicing and bank feeds, popular with bookkeepers. The trade-off: in lower-tier plans, the number of invoices per month is capped (the Starter plan in many regions caps you at around 20 invoices a month), which can be a surprise if you scale up mid-year.</li>
 <li><strong>Zoho Invoice / Zoho Books.</strong> Zoho Invoice is the free tier (mentioned above). Zoho Books is the paid step up, with full accounting, expense tracking, and recurring invoices. Strong if you already use other Zoho products like CRM. The trade-off: the interface has a learning curve, and the broader Zoho suite can feel like it wants to absorb your whole business.</li>
-<li><strong>Argo Books.</strong> Newer than the others, freemium with a generous free tier (25 invoices a month, basic bookkeeping, no time limit) and a Premium tier at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher invoice volumes, receipt scanning, and more advanced features. Built on a desktop app (Windows, Linux, and macOS) so your data lives on your machine rather than only in the cloud. Trade-off: smaller accountant ecosystem and fewer integrations than the older players, and the desktop-first model takes some getting used to if you're coming from a browser-only tool.</li>
+<li><strong>Argo Books.</strong> Newer than the others, freemium with a generous free tier ({argo_free_invoice_limit} invoices a month, basic bookkeeping, no time limit) and a Premium tier at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher invoice volumes, receipt scanning, and more advanced features. Built on a desktop app (Windows, Linux, and macOS) so your data lives on your machine rather than only in the cloud. Trade-off: smaller accountant ecosystem and fewer integrations than the older players, and the desktop-first model takes some getting used to if you're coming from a browser-only tool.</li>
 </ul>
 <p>For most small businesses the realistic shortlist is two or three of these, not all six. If your accountant uses QuickBooks, that's a heavy nudge toward QuickBooks. If you're a service business with a manageable client list, FreshBooks is a clean fit. If you want a real free tier you can grow on, Wave and Argo Books are worth a look (both are freemium, with no time limit on the free side). If you're based outside the US, Xero is often the easier pick than QuickBooks. Pick one, try it for a month, and switch if it's wrong.</p>
 HTML,

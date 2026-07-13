@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/admin_session.php';
 
 // Unset all session variables
 $_SESSION = array();

@@ -1,5 +1,8 @@
 <?php
+require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
+require_once __DIR__ . '/../../../resources/components/feature-video.php';
+$pricing = get_pricing_config();
 $pageTitle = 'Invoicing & Payments';
 $pageDescription = 'Create professional invoices, track payments, and accept online payments with Argo Books invoicing and payment features.';
 $currentPage = 'invoicing';
@@ -13,10 +16,10 @@ include __DIR__ . '/../../docs-header.php';
             integrated payment processing. Argo Books makes invoicing simple and efficient.</p>
 
             <div class="info-box">
-                <p><strong>Note:</strong> The free version includes up to 25 invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
+                <p><strong>Note:</strong> The free version includes up to <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
             </div>
 
-            <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <?php docs_video_embed('cTQaejF6Gh0', 'Argo Books Invoicing'); ?>
 
             <h2>Setting Up Payment Integration</h2>
             <p>This is a one-time setup and should be your first step: it's what enables customers to pay your invoices online. Argo Books supports <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>, covering credit/debit cards, Apple Pay, Google Pay, PayPal balance, and more.</p>
@@ -103,9 +106,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Expense/Revenue Tracking</span>
                 </a>
-                <a href="bank-matching.php" class="nav-button next">
+                <a href="bank-statement-import.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Bank Matching &rarr;</span>
+                    <span class="nav-title">Bank Statement Import &rarr;</span>
                 </a>
             </div>
         </div>

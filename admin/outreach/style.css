@@ -1,36 +1,6 @@
-/* ─── Stats Row ─── */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.stat-card {
-    background: var(--white);
-    padding: 14px 18px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-default);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 100px;
-    text-align: center;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: var(--gray-500);
-    text-transform: uppercase;
-    font-weight: 500;
-}
-
-.stat-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gray-800);
-}
-
+/* ─── Stat value color modifiers ───
+   Stat cards/grid come from admin/common-style.css; only the semantic value
+   colors are page-specific. */
 .stat-new { color: var(--blue-500); }
 .stat-pending { color: var(--amber-500); }
 .stat-contacted { color: var(--purple-500); }
@@ -67,7 +37,7 @@
 }
 
 .panel-toggle {
-    color: var(--gray-400);
+    color: var(--admin-text);
     font-size: 12px;
 }
 
@@ -108,7 +78,7 @@
 .form-group label {
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .form-group input,
@@ -120,7 +90,7 @@
     font-size: 14px;
     font-family: inherit;
     background: var(--white);
-    color: var(--gray-800);
+    color: var(--admin-text);
 }
 
 .form-group input:focus,
@@ -167,19 +137,19 @@
     gap: 10px;
     padding: 8px 20px;
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--admin-text);
     background: var(--blue-50);
     border-bottom: 1px solid var(--gray-border);
 }
 
 [data-theme="dark"] .bulk-draft-progress {
     background: var(--navy-1e3a5f);
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .bulk-draft-progress .btn-small {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
     border-color: var(--gray-600);
 }
 
@@ -239,7 +209,7 @@
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
-    color: var(--gray-500);
+    color: var(--admin-text);
     border-bottom: 2px solid var(--gray-border);
     white-space: nowrap;
 }
@@ -272,24 +242,24 @@
 .empty-state {
     text-align: center;
     padding: 30px;
-    color: var(--gray-400);
+    color: var(--admin-text);
 }
 
 .empty-state-text {
     text-align: center;
-    color: var(--gray-400);
+    color: var(--admin-text);
     padding: 20px;
 }
 
 .text-muted {
-    color: var(--gray-400);
+    color: var(--admin-text);
 }
 
 /* ─── Badges ─── */
 .badge {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
@@ -314,48 +284,6 @@
 .badge-size-large { background: var(--purple-100); color: var(--purple-700); }
 
 
-/* ─── Filters ─── */
-.filters-container {
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--gray-border);
-}
-
-.filters-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.filter-group:first-child {
-    flex: 1;
-    max-width: 350px;
-}
-
-.filter-group label {
-    font-size: 12px;
-    color: var(--gray-500);
-    font-weight: 500;
-}
-
-.filter-group select,
-.filter-group input {
-    padding: 6px 10px;
-    border: 1px solid var(--gray-input-border);
-    border-radius: 6px;
-    font-size: 13px;
-    min-width: 130px;
-    background: var(--white);
-    color: var(--gray-800);
-}
-
 /* ─── Modals ─── */
 .modal {
     position: fixed;
@@ -370,7 +298,7 @@
 
 .modal-content {
     background: var(--white);
-    border-radius: 10px;
+    border-radius: 8px;
     width: 100%;
     height: auto;
     max-height: 85vh;
@@ -401,13 +329,13 @@
     border: none;
     font-size: 22px;
     cursor: pointer;
-    color: var(--gray-400);
+    color: var(--admin-text);
     padding: 0 4px;
     line-height: 1;
 }
 
 .modal-close:hover {
-    color: var(--gray-800);
+    color: var(--admin-text);
 }
 
 .modal-body {
@@ -436,7 +364,7 @@
     border: none;
     font-size: 14px;
     font-weight: 500;
-    color: var(--gray-500);
+    color: var(--admin-text);
     cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
@@ -444,7 +372,7 @@
 }
 
 .tab:hover {
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .tab.active {
@@ -565,12 +493,12 @@
 }
 
 .activity-details {
-    color: var(--gray-500);
+    color: var(--admin-text);
     font-size: 12px;
 }
 
 .activity-time {
-    color: var(--gray-400);
+    color: var(--admin-text);
     font-size: 11px;
 }
 
@@ -600,19 +528,6 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-    .stats-row {
-        gap: 8px;
-    }
-
-    .stat-card {
-        min-width: 70px;
-        padding: 10px 12px;
-    }
-
-    .stat-value {
-        font-size: 18px;
-    }
-
     .form-row {
         flex-direction: column;
     }
@@ -623,19 +538,6 @@
 
     .detail-grid {
         grid-template-columns: 1fr;
-    }
-
-    .filters-row {
-        flex-direction: column;
-    }
-
-    .filter-group {
-        width: 100%;
-    }
-
-    .filter-group select,
-    .filter-group input {
-        width: 100%;
     }
 
     .panel-actions {
@@ -651,7 +553,7 @@
 .bulk-send-status {
     padding: 12px 20px;
     font-size: 0.9rem;
-    color: var(--gray-600);
+    color: var(--admin-text);
     border-bottom: 1px solid var(--gray-border);
 }
 
@@ -682,7 +584,7 @@
 
 .bulk-send-item-email {
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: var(--admin-text);
 }
 
 .bulk-send-item-subject {
@@ -693,7 +595,7 @@
 
 .bulk-send-item-body {
     font-size: 0.85rem;
-    color: var(--gray-600);
+    color: var(--admin-text);
     white-space: pre-line;
     line-height: 1.5;
     max-height: 120px;
@@ -722,22 +624,17 @@
 }
 
 /* ─── Dark Theme ─── */
-[data-theme="dark"] .stat-card,
 [data-theme="dark"] .panel {
     background: var(--gray-800);
-    box-shadow: 0 1px 3px var(--overlay-light);
+    box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .panel-header {
     border-bottom-color: var(--gray-700);
 }
 
-[data-theme="dark"] .stat-value {
-    color: var(--gray-200);
-}
-
 [data-theme="dark"] .data-table th {
-    color: var(--gray-400);
+    color: var(--white);
     border-bottom-color: var(--gray-700);
 }
 
@@ -748,18 +645,15 @@
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
-[data-theme="dark"] .form-group textarea,
-[data-theme="dark"] .filter-group select,
-[data-theme="dark"] .filter-group input {
+[data-theme="dark"] .form-group textarea {
     background: var(--gray-900);
     border-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
     color-scheme: dark;
 }
 
-[data-theme="dark"] .form-group label,
-[data-theme="dark"] .filter-group label {
-    color: var(--gray-400);
+[data-theme="dark"] .form-group label {
+    color: var(--white);
 }
 
 [data-theme="dark"] .modal-content {
@@ -771,15 +665,15 @@
 }
 
 [data-theme="dark"] .modal-header h3 {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .modal-close {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .modal-close:hover {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .modal-footer {
@@ -787,7 +681,7 @@
 }
 
 [data-theme="dark"] .bulk-send-status {
-    color: var(--gray-400);
+    color: var(--white);
     border-bottom-color: var(--gray-700);
 }
 
@@ -796,11 +690,11 @@
 }
 
 [data-theme="dark"] .bulk-send-item-email {
-    color: var(--gray-500);
+    color: var(--white);
 }
 
 [data-theme="dark"] .bulk-send-item-body {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .bulk-send-list::-webkit-scrollbar,
@@ -829,11 +723,11 @@
 }
 
 [data-theme="dark"] .tab {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .tab:hover {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .draft-status-bar {
@@ -864,12 +758,8 @@
     border-bottom-color: var(--gray-700);
 }
 
-[data-theme="dark"] .filters-container {
-    border-bottom-color: var(--gray-700);
-}
-
 [data-theme="dark"] .gray-border {
-    color: var(--gray-500);
+    color: var(--white);
 }
 
 [data-theme="dark"] .leads-table-wrapper::-webkit-scrollbar,
@@ -919,14 +809,14 @@
 
 .hint {
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--admin-text);
     margin: 12px 0;
 }
 
 .hint code {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     padding: 1px 5px;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 12px;
 }
 
@@ -945,7 +835,7 @@
     align-items: center;
     margin-bottom: 8px;
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .variant-row-header label {
@@ -958,13 +848,13 @@
 /* Neutral (no-color-modifier) button used inside the A/B create form. */
 .btn-neutral {
     background: var(--white);
-    color: var(--gray-700);
+    color: var(--admin-text);
     border: 1px solid var(--gray-border);
 }
 
 .btn-neutral:hover {
-    background: var(--gray-100, #f3f4f6);
-    color: var(--gray-800);
+    background: var(--gray-100, var(--gray-bg-light));
+    color: var(--admin-text);
 }
 
 .variant-remove {
@@ -976,17 +866,17 @@
 }
 
 .variant-remove:hover {
-    color: #dc2626;
-    border-color: #dc2626;
+    color: var(--red-600);
+    border-color: var(--red-600);
     background: var(--white);
 }
 
 .variant-content-cell {
     max-width: 360px;
     word-break: break-word;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 /* Status pills (test status) */
@@ -1002,22 +892,22 @@
 }
 
 .status-draft {
-    background: var(--gray-100, #f3f4f6);
-    color: var(--gray-700);
+    background: var(--gray-100, var(--gray-bg-light));
+    color: var(--admin-text);
 }
 
 .status-active {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--green-100);
+    color: var(--green-800);
 }
 
 .status-paused {
-    background: #fef3c7;
+    background: var(--amber-100);
     color: #854d0e;
 }
 
 .status-completed {
-    background: #ede9fe;
+    background: var(--violet-100);
     color: #6b21a8;
 }
 
@@ -1032,18 +922,18 @@
 }
 
 .conf-insufficient {
-    background: var(--gray-100, #f3f4f6);
-    color: var(--gray-500, #6b7280);
+    background: var(--gray-100, var(--gray-bg-light));
+    color: var(--admin-text);
 }
 
 .conf-trending {
-    background: #fef3c7;
+    background: var(--amber-100);
     color: #854d0e;
 }
 
 .conf-significant {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--green-100);
+    color: var(--green-800);
 }
 
 .conf-leader-row {
@@ -1052,8 +942,8 @@
 
 .directive-pill {
     display: inline-block;
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--indigo-100);
+    color: var(--indigo-800);
     font-size: 11px;
     font-weight: 600;
     padding: 1px 6px;
@@ -1064,7 +954,7 @@
 
 .chart-card {
     background: var(--white);
-    border: 1px solid var(--gray-border);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 16px 20px;
     margin-top: 16px;
@@ -1074,7 +964,7 @@
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .chart-wrap {
@@ -1099,14 +989,14 @@
 .meta-label {
     font-size: 11px;
     text-transform: uppercase;
-    color: var(--gray-500);
+    color: var(--admin-text);
     font-weight: 600;
     letter-spacing: 0.04em;
 }
 
 .meta-value {
     font-size: 14px;
-    color: var(--gray-800);
+    color: var(--admin-text);
     font-weight: 500;
     margin-top: 2px;
     word-break: break-word;
@@ -1136,7 +1026,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .segmented-option:hover {
@@ -1146,7 +1036,7 @@
 .segmented-option.active {
     border-color: var(--primary-blue);
     background: rgba(59, 130, 246, 0.08);
-    color: var(--gray-800);
+    color: var(--admin-text);
 }
 
 .segmented-title {
@@ -1156,17 +1046,17 @@
 
 .segmented-desc {
     font-size: 12px;
-    color: var(--gray-500);
+    color: var(--admin-text);
     line-height: 1.4;
 }
 
 /* Log tail in Settings tab */
 .log-tail {
-    background: var(--gray-900, #0f172a);
-    color: #e2e8f0;
+    background: var(--gray-900, var(--gray-900));
+    color: var(--white);
     padding: 12px 14px;
     border-radius: 6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     line-height: 1.5;
     max-height: 400px;
@@ -1180,16 +1070,16 @@
 [data-theme="dark"] .variant-row {
     background: var(--gray-900);
     border-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .variant-row-header {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .variant-content-cell,
 [data-theme="dark"] .hint code {
-    color: var(--gray-300);
+    color: var(--white);
     background: var(--gray-900);
 }
 
@@ -1198,11 +1088,11 @@
 }
 
 [data-theme="dark"] .meta-label {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .meta-value {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .chart-card {
@@ -1211,17 +1101,17 @@
 }
 
 [data-theme="dark"] .chart-card h3 {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .status-draft {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .conf-insufficient {
     background: var(--gray-700);
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .directive-pill {
@@ -1232,7 +1122,7 @@
 [data-theme="dark"] .segmented-option {
     background: var(--gray-800);
     border-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .segmented-option:hover {
@@ -1242,31 +1132,31 @@
 [data-theme="dark"] .segmented-option.active {
     background: rgba(59, 130, 246, 0.18);
     border-color: var(--primary-blue);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .segmented-desc {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .hint {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .btn-neutral {
     background: var(--gray-800);
-    color: var(--gray-200);
+    color: var(--white);
     border-color: var(--gray-700);
 }
 
 [data-theme="dark"] .btn-neutral:hover {
     background: var(--gray-700);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .variant-remove:hover {
-    color: #f87171;
-    border-color: #f87171;
+    color: var(--red-400);
+    border-color: var(--red-400);
     background: var(--gray-800);
 }
 
@@ -1287,14 +1177,14 @@
     padding: 10px 20px;
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--admin-text);
     cursor: pointer;
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.15s, border-color 0.15s;
 }
 
-.channel-tab:hover { color: var(--gray-700); }
+.channel-tab:hover { color: var(--admin-text); }
 
 .channel-tab.active {
     color: var(--blue-700);
@@ -1305,8 +1195,8 @@
 .channel-pane.active { display: block; }
 
 [data-theme="dark"] .channel-tabs { border-bottom-color: var(--gray-700); }
-[data-theme="dark"] .channel-tab { color: var(--gray-400); }
-[data-theme="dark"] .channel-tab:hover { color: var(--gray-200); }
+[data-theme="dark"] .channel-tab { color: var(--white); }
+[data-theme="dark"] .channel-tab:hover { color: var(--white); }
 [data-theme="dark"] .channel-tab.active { color: var(--blue-400, #60a5fa); border-bottom-color: var(--blue-400, #60a5fa); }
 
 /* ─── Generic color badges (used by Reddit + future channels) ─────────── */
@@ -1315,13 +1205,13 @@
 .badge-red { background: var(--red-100); color: var(--red-700); }
 .badge-yellow { background: var(--amber-100); color: var(--amber-700); }
 .badge-blue { background: var(--blue-100); color: var(--blue-700); }
-.badge-gray { background: var(--gray-100); color: var(--gray-700); }
+.badge-gray { background: var(--gray-100); color: var(--admin-text); }
 
-[data-theme="dark"] .badge-green { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .badge-red { background: rgba(239,68,68,0.18); color: #fca5a5; }
-[data-theme="dark"] .badge-yellow { background: rgba(245,158,11,0.18); color: #fcd34d; }
+[data-theme="dark"] .badge-green { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .badge-red { background: rgba(239,68,68,0.18); color: var(--red-300); }
+[data-theme="dark"] .badge-yellow { background: rgba(245,158,11,0.18); color: var(--amber-300); }
 [data-theme="dark"] .badge-blue { background: rgba(59,130,246,0.18); color: #93c5fd; }
-[data-theme="dark"] .badge-gray { background: var(--gray-700); color: var(--gray-200); }
+[data-theme="dark"] .badge-gray { background: var(--gray-700); color: var(--white); }
 
 /* ─── Reddit progress banner ──────────────────────────────────────────── */
 
@@ -1330,7 +1220,7 @@
     align-items: center;
     gap: 12px;
     background: var(--blue-50, #eff6ff);
-    color: var(--gray-800);
+    color: var(--admin-text);
     border: 1px solid var(--blue-200, #bfdbfe);
     border-left: 4px solid var(--primary-blue, #3b82f6);
     border-radius: 6px;
@@ -1345,7 +1235,7 @@
 }
 
 .reddit-progress-banner .reddit-progress-counts {
-    color: var(--gray-500);
+    color: var(--admin-text);
     font-size: 12px;
     white-space: nowrap;
 }
@@ -1353,35 +1243,35 @@
 .reddit-progress-banner.banner-success {
     background: var(--green-100);
     color: var(--green-700);
-    border-color: #86efac;
-    border-left-color: #16a34a;
+    border-color: var(--green-300);
+    border-left-color: var(--green-600);
 }
 
 .reddit-progress-banner.banner-error {
     background: var(--red-100);
     color: var(--red-700);
-    border-color: #fca5a5;
-    border-left-color: #dc2626;
+    border-color: var(--red-300);
+    border-left-color: var(--red-600);
 }
 
 [data-theme="dark"] .reddit-progress-banner {
-    background: var(--navy-1e3a5f, #1e3a5f);
-    color: var(--gray-100);
+    background: var(--navy-1e3a5f, var(--navy-1e3a5f));
+    color: var(--white);
     border-color: var(--gray-700);
 }
 
 [data-theme="dark"] .reddit-progress-banner .reddit-progress-counts {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reddit-progress-banner.banner-success {
     background: rgba(34,197,94,0.15);
-    color: #86efac;
+    color: var(--green-300);
 }
 
 [data-theme="dark"] .reddit-progress-banner.banner-error {
     background: rgba(239,68,68,0.15);
-    color: #fca5a5;
+    color: var(--red-300);
 }
 
 /* ─── Reddit dark-mode text legibility ───────────────────────────────────
@@ -1396,29 +1286,29 @@
 [data-theme="dark"] #redditThreadModal .form-help,
 [data-theme="dark"] #redditMarkRepliedModal .text-muted,
 [data-theme="dark"] #redditMarkRepliedModal .form-help {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .safety-meter-label,
-[data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .stat-label {
-    color: var(--gray-300);
+[data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .stat-card h3 {
+    color: var(--white);
 }
 
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .stat-value,
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .safety-meter-value {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .reddit-thread-section h4 {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] #redditThreadModal .reddit-thread-section h4 {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .reddit-diagnostics {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 /* ─── Reddit safety meter ─────────────────────────────────────────────── */
@@ -1444,7 +1334,7 @@
 
 .safety-meter-label {
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--admin-text);
     margin-bottom: 4px;
 }
 
@@ -1455,7 +1345,7 @@
 }
 
 .safety-meter-divider {
-    color: var(--gray-400);
+    color: var(--admin-text);
     margin: 0 4px;
 }
 
@@ -1472,9 +1362,9 @@
     transition: width 0.3s, background-color 0.2s;
 }
 
-.safety-meter-fill.safety-green { background: #16a34a; }
+.safety-meter-fill.safety-green { background: var(--green-600); }
 .safety-meter-fill.safety-yellow { background: #eab308; }
-.safety-meter-fill.safety-red { background: #dc2626; }
+.safety-meter-fill.safety-red { background: var(--red-600); }
 
 .safety-meter-help {
     position: relative;
@@ -1491,7 +1381,7 @@
     height: 22px;
     border-radius: 999px;
     background: var(--gray-200);
-    color: var(--gray-700);
+    color: var(--admin-text);
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
@@ -1512,7 +1402,7 @@
     max-width: 320px;
     padding: 10px 12px;
     background: #1f2937;
-    color: #f9fafb;
+    color: var(--white);
     border-radius: 6px;
     font-size: 12px;
     font-weight: 400;
@@ -1547,11 +1437,11 @@
 
 [data-theme="dark"] .reddit-safety-meter { background: var(--gray-800); border-color: var(--gray-700); }
 [data-theme="dark"] .safety-meter-bar { background: var(--gray-700); }
-[data-theme="dark"] .safety-meter-help-icon { background: var(--gray-700); color: var(--gray-200); }
+[data-theme="dark"] .safety-meter-help-icon { background: var(--gray-700); color: var(--white); }
 [data-theme="dark"] .safety-meter-help:hover .safety-meter-help-icon,
 [data-theme="dark"] .safety-meter-help:focus-visible .safety-meter-help-icon { background: var(--primary-blue); color: #fff; }
-[data-theme="dark"] .safety-meter-help-tooltip { background: #0f172a; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
-[data-theme="dark"] .safety-meter-help-tooltip::after { border-top-color: #0f172a; }
+[data-theme="dark"] .safety-meter-help-tooltip { background: var(--gray-900); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
+[data-theme="dark"] .safety-meter-help-tooltip::after { border-top-color: var(--gray-900); }
 
 /* ─── Reddit threads table ────────────────────────────────────────────── */
 
@@ -1564,7 +1454,7 @@
 }
 
 .reddit-table tr { cursor: pointer; }
-.reddit-table tr:hover { background: var(--gray-50, #f9fafb); }
+.reddit-table tr:hover { background: var(--gray-50, var(--whiteBackground)); }
 
 .reddit-title-cell {
     max-width: 480px;
@@ -1575,20 +1465,20 @@
 .reddit-ai-score {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
 }
 
 .reddit-ai-high { background: var(--green-100); color: var(--green-700); }
 .reddit-ai-mid { background: var(--amber-100); color: var(--amber-700); }
-.reddit-ai-low { background: var(--gray-100); color: var(--gray-600); }
+.reddit-ai-low { background: var(--gray-100); color: var(--admin-text); }
 
 [data-theme="dark"] .reddit-table-wrapper { background: var(--gray-800); border-color: var(--gray-700); }
 [data-theme="dark"] .reddit-table tr:hover { background: var(--gray-700); }
-[data-theme="dark"] .reddit-ai-high { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .reddit-ai-mid { background: rgba(245,158,11,0.18); color: #fcd34d; }
-[data-theme="dark"] .reddit-ai-low { background: var(--gray-700); color: var(--gray-300); }
+[data-theme="dark"] .reddit-ai-high { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .reddit-ai-mid { background: rgba(245,158,11,0.18); color: var(--amber-300); }
+[data-theme="dark"] .reddit-ai-low { background: var(--gray-700); color: var(--white); }
 
 /* ─── Reddit thread detail modal ──────────────────────────────────────── */
 
@@ -1608,10 +1498,10 @@
 .reddit-thread-meta a:hover { text-decoration: underline; }
 
 .reddit-thread-section { margin-bottom: 16px; }
-.reddit-thread-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--gray-600); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.reddit-thread-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--admin-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
 
 .reddit-thread-body {
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
     border: 1px solid var(--gray-200);
     border-radius: 6px;
     padding: 10px 12px;
@@ -1644,7 +1534,7 @@
 .reddit-regenerate-feedback {
     margin-top: 12px;
     padding: 12px;
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
     border: 1px solid var(--gray-200);
     border-radius: 6px;
 }
@@ -1654,7 +1544,7 @@
     margin-bottom: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--admin-text);
 }
 
 .reddit-regenerate-feedback textarea {
@@ -1676,18 +1566,18 @@
 }
 
 [data-theme="dark"] .reddit-regenerate-feedback {
-    background: var(--gray-900, #111827);
+    background: var(--gray-900, var(--neutral-111827));
     border-color: var(--gray-700);
 }
 
 [data-theme="dark"] .reddit-regenerate-feedback label {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reddit-regenerate-feedback textarea {
     background: var(--gray-800);
     border-color: var(--gray-700);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reddit-thread-meta { border-bottom-color: var(--gray-700); }
@@ -1695,8 +1585,8 @@
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] a:not(.btn):not(.channel-tab):not(.section-tab),
 [data-theme="dark"] #redditThreadModal a:not(.btn),
 [data-theme="dark"] #redditMarkRepliedModal a:not(.btn) { color: var(--blue-400); }
-[data-theme="dark"] .reddit-thread-body { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--gray-200); }
-[data-theme="dark"] #redditDraftBody { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--gray-200); }
+[data-theme="dark"] .reddit-thread-body { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] #redditDraftBody { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
 
 .checkbox-label {
     display: flex;
@@ -1721,7 +1611,7 @@
 .reddit-settings-panel .panel-header {
     padding: 12px 16px;
     border-bottom: 1px solid var(--gray-200);
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
 }
 
 .reddit-settings-panel .panel-header h2 {
@@ -1765,7 +1655,7 @@
 .form-help {
     margin: 4px 0 0;
     font-size: 12px;
-    color: var(--gray-500);
+    color: var(--admin-text);
 }
 
 .reddit-diagnostics {
@@ -1787,9 +1677,9 @@
 }
 
 [data-theme="dark"] .reddit-settings-panel { background: var(--gray-800); border-color: var(--gray-700); }
-[data-theme="dark"] .reddit-settings-panel .panel-header { background: var(--gray-900, #111827); border-bottom-color: var(--gray-700); }
-[data-theme="dark"] .reddit-add-form input[type="text"] { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--gray-100); }
-[data-theme="dark"] .reddit-diagnostics-error { background: rgba(239,68,68,0.15); color: #fca5a5; }
+[data-theme="dark"] .reddit-settings-panel .panel-header { background: var(--gray-900, var(--neutral-111827)); border-bottom-color: var(--gray-700); }
+[data-theme="dark"] .reddit-add-form input[type="text"] { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] .reddit-diagnostics-error { background: rgba(239,68,68,0.15); color: var(--red-300); }
 
 /* ─── Flash messages (for reddit-settings POST-back) ──────────────────── */
 
@@ -1803,14 +1693,14 @@
 .flash-success {
     background: var(--green-100);
     color: var(--green-700);
-    border-left: 4px solid #16a34a;
+    border-left: 4px solid var(--green-600);
 }
 
 .flash-error {
     background: var(--red-100);
     color: var(--red-700);
-    border-left: 4px solid #dc2626;
+    border-left: 4px solid var(--red-600);
 }
 
-[data-theme="dark"] .flash-success { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .flash-error { background: rgba(239,68,68,0.18); color: #fca5a5; }
+[data-theme="dark"] .flash-success { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .flash-error { background: rgba(239,68,68,0.18); color: var(--red-300); }

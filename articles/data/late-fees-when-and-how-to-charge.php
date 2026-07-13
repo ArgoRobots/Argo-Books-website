@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-30',
 
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 8,
 
@@ -60,6 +60,7 @@ HTML,
 <li><strong>Simple monthly.</strong> The fee is calculated once per month on the original overdue balance. A $1,000 invoice at 1.5% simple gives $15 the first month, $15 the second month, $15 the third month. Three months overdue: $45 in fees.</li>
 <li><strong>Compounding.</strong> The fee is calculated each month on the new balance, including previous late fees. A $1,000 invoice at 1.5% compounded gives $15.00 the first month, $15.23 the second month, $15.45 the third month. Three months overdue: $45.68 in fees.</li>
 </ul>
+{{illustration:coins}}
 <p>For most small-business work, simple monthly is the right call. It's easier to explain, easier to calculate, and easier to defend if the client argues. Compounding makes a noticeable difference only on large balances that have been overdue for many months, and at that point the late fee is no longer the main issue. Whatever you pick, write it down in the contract or invoice terms in plain language. "1.5% simple interest per month on overdue balances" is clearer than a paragraph of formulas.</p>
 HTML,
     ],
@@ -76,6 +77,7 @@ HTML,
 <li>"Invoices unpaid 10 days after the due date are subject to a 1.5% monthly late fee."</li>
 <li>"Overdue invoices accrue a flat $25 late fee, plus 1.5% per month on balances over $500."</li>
 </ul>
+{{illustration:calendar-due}}
 <p>Pick one rule, write it on every invoice, and apply it the same way to every client. Inconsistent fees, where you charge one client and waive it for another with no clear reason, are where disputes start. If you want the option to waive in a particular case, that's fine: the rule is the default, and waiving is a deliberate choice you make for a specific reason. More on when to waive below.</p>
 HTML,
     ],
@@ -139,9 +141,9 @@ HTML,
 <p>A real possibility: you send the late-fee invoice, the client pays the original balance, and the late-fee invoice sits unpaid. The client may not say anything. They may send an email saying they don't believe the fee applies. Either way, the fee is now its own outstanding invoice, and you have to decide what to do.</p>
 <p>Three options, in order of how much energy they cost you:</p>
 <ul>
-<li><strong>Drop it.</strong> If the relationship is worth more than the fee, write it off. Send a short note: "Thanks for settling invoice 2026-0042. I am writing off the late fee on this one. Please make sure invoice 2026-0058 is paid on time so we do not run into the same situation again." You keep the client, the lesson is on record, and you're out the cost of the fee, which on most invoices is a small number.</li>
+<li><strong>Drop it.</strong> If the relationship is worth more than the fee, write it off. Send a short note: "Thanks for settling invoice 2026-0042. I am writing off the late fee on this one. Please make sure invoice 2026-0058 is paid on time so we don't run into the same situation again." You keep the client, the lesson is on record, and you're out the cost of the fee, which on most invoices is a small number.</li>
 <li><strong>Pursue it through follow-up.</strong> Treat the late-fee invoice the same way you would treat any other overdue invoice. Send reminders, follow up, escalate to phone calls if needed. Most clients who initially balk at the fee will pay it after one or two firm reminders if the clause is clearly on the original invoice. See <a href="/how-to-follow-up-on-unpaid-invoices/">how to follow up on unpaid invoices</a> for the full sequence.</li>
-<li><strong>Take it to small claims court.</strong> An option for unpaid invoices that genuinely matter to your business. The threshold for small claims varies by jurisdictio. Small claims is set up so you don't need a lawyer, filing fees are modest, and judges are used to invoice disputes. For a late fee of $15 or $50, it isn't worth your time. For an unpaid balance of $5,000 plus three months of late fees, it can be.</li>
+<li><strong>Take it to small claims court.</strong> An option for unpaid invoices that genuinely matter to your business. The threshold for small claims varies by jurisdiction. Small claims is set up so you don't need a lawyer, filing fees are modest, and judges are used to invoice disputes. For a late fee of $15 or $50, it isn't worth your time. For an unpaid balance of $5,000 plus three months of late fees, it can be.</li>
 </ul>
 <p>Set expectations honestly. Most disputes over small late fees don't end up in court. They end with the client paying, the small-business owner writing it off, or both sides agreeing to a partial settlement. The point of the fee is to get the original invoice paid on time, and on that score it works most of the time even if the fee itself doesn't always get collected. For deeper guidance on the worst-case path, see <a href="/what-to-do-when-a-client-does-not-pay/">what to do when a client does not pay</a>.</p>
 HTML,
@@ -173,7 +175,7 @@ HTML,
     ],
     [
       'q' => 'Do I charge late fees on overdue late fees?',
-      'a' => 'Most small-business owners do not, and the math does not really justify it on small balances. If your late-fee clause uses simple monthly interest, the fee is calculated once per month on the original overdue invoice amount, and the previous fees do not get re-charged. Compounding, where each month the fee is calculated on the new total including previous fees, is allowed in some jurisdictions but adds very little money and makes the calculation harder to explain. Pick simple monthly unless you have a specific reason not to, and keep the clause easy to read.',
+      'a' => 'Most small-business owners don\'t, and the math does not really justify it on small balances. If your late-fee clause uses simple monthly interest, the fee is calculated once per month on the original overdue invoice amount, and the previous fees don\'t get re-charged. Compounding, where each month the fee is calculated on the new total including previous fees, is allowed in some jurisdictions but adds very little money and makes the calculation harder to explain. Pick simple monthly unless you have a specific reason not to, and keep the clause easy to read.',
     ],
   ],
 

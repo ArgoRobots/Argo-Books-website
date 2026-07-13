@@ -1,66 +1,7 @@
-.filters-container {
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.filters-row {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-group label {
-  font-size: 14px;
-  color: var(--gray-700);
-}
-
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.status-badges {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-
-.status-badge {
-  background: var(--white);
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px var(--shadow-default);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.status-badge-label {
-  font-size: 13px;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.status-badge-count {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--gray-800);
-  text-align: center;
-}
-
-.status-badge.pending .status-badge-count {
+/* Summary cards use the shared .stats-grid / .stat-card component
+   (admin/common-style.css). Only the amber accent on the actionable
+   Pending count is page-specific. */
+.stat-card.pending .value {
   color: var(--amber-500);
 }
 
@@ -101,7 +42,7 @@
 
 .report-id {
   font-size: 11px;
-  color: var(--gray-400);
+  color: var(--admin-text);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -110,7 +51,7 @@
 .report-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--admin-text);
   margin: 2px 0 0 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -129,13 +70,13 @@
   display: flex;
   gap: 8px;
   font-size: 12px;
-  color: var(--gray-500);
+  color: var(--admin-text);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .meta-separator {
-  color: var(--gray-input-border);
+  color: var(--admin-text);
   font-weight: 300;
 }
 
@@ -146,7 +87,7 @@
   margin: 10px 0 8px 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--gray-600);
+  color: var(--admin-text);
   max-height: 80px;
   overflow: hidden;
   position: relative;
@@ -165,7 +106,7 @@
 
 .report-details {
   font-size: 13px;
-  color: var(--gray-500);
+  color: var(--admin-text);
   margin: 8px 0;
   padding: 8px 12px;
   background: var(--amber-50);
@@ -176,7 +117,7 @@
 .violation-badge {
   display: inline-block;
   padding: 3px 8px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   background: var(--amber-100);
@@ -187,7 +128,7 @@
 .status-badge-inline {
   display: inline-block;
   padding: 3px 8px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
 }
@@ -206,14 +147,14 @@
 
 .status-badge-inline.dismissed {
   background: var(--gray-100);
-  color: var(--gray-700);
+  color: var(--admin-text);
   border: 1px solid var(--gray-border);
 }
 
 .content-type-badge {
   display: inline-block;
   padding: 3px 8px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   background: var(--blue-100);
@@ -308,7 +249,7 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: var(--gray-500);
+  color: var(--admin-text);
 }
 
 .empty-state svg {
@@ -358,14 +299,14 @@
   border: none;
   font-size: 28px;
   cursor: pointer;
-  color: var(--gray-500);
+  color: var(--admin-text);
   padding: 0;
   width: 32px;
   height: 32px;
 }
 
 .modal-close:hover {
-  color: var(--gray-800);
+  color: var(--admin-text);
 }
 
 .modal-body {
@@ -377,7 +318,7 @@
 }
 
 .modal-body .form-group label {
-  color: var(--gray-700);
+  color: var(--admin-text);
 }
 
 .modal-body .form-group textarea,

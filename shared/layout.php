@@ -1,8 +1,9 @@
 <?php
-// invoice-generator/layout.php
-// Minimal tool-isolated layout. Used by tool pages only.
-// Do NOT include the main site's header, footer, or main.js.
-// One-way funnel: tool pages link out to argorobots.com, never the reverse.
+// shared/layout.php
+// Minimal self-contained page shell shared across the standalone tools
+// (invoice-generator, profit-analyzer, etc.), the guides/articles, and the
+// niche pages. Does NOT include the main site's header, footer, or main.js;
+// these pages link out to argorobots.com rather than pulling its chrome in.
 
 require_once __DIR__ . '/_base.php';
 
@@ -16,6 +17,9 @@ $og_image = $og_image ?? 'https://argorobots.com/resources/images/og-default.png
 $body_content = $body_content ?? '';
 $extra_head = $extra_head ?? '';
 $extra_scripts = $extra_scripts ?? '';
+// Optional back-link to the /tools/ hub, shown top-left of the header. Opt-in:
+// set by the tool pages only, so guides / articles / niche pages are unaffected.
+$tools_back = $tools_back ?? null; // ['href' => ..., 'label' => ...]
 
 // Sitewide Organization + WebSite schema. Baked in for E-E-A-T.
 // Update logo path and sameAs URLs to match the project's real assets / social profiles.
@@ -93,8 +97,22 @@ $site_schema = [
     <a class="site-brand" href="<?= INVGEN_BASE ?>/" aria-label="Argo Books home">
       <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
     </a>
+    <?php if (!empty($header_nav)): ?>
+    <nav class="site-header-nav" aria-label="Section navigation">
+      <?php foreach ($header_nav as $nav_item): ?>
+      <a href="<?= INVGEN_BASE ?>/<?= ltrim(htmlspecialchars($nav_item['href']), '/') ?>"><?= htmlspecialchars($nav_item['label']) ?></a>
+      <?php endforeach; ?>
+    </nav>
+    <?php endif; ?>
   </div>
 </header>
+<?php if ($tools_back): ?>
+<nav class="tool-breadcrumb" aria-label="Breadcrumb">
+  <a class="site-back" href="<?= htmlspecialchars($tools_back['href']) ?>">
+    <span class="site-back-arrow" aria-hidden="true">&larr;</span> <?= htmlspecialchars($tools_back['label']) ?>
+  </a>
+</nav>
+<?php endif; ?>
 <?= $body_content ?>
 <?= $extra_scripts ?>
 </body>

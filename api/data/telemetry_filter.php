@@ -13,9 +13,9 @@ const TELEMETRY_PLATFORMS = ['Windows', 'macOS', 'Linux', 'Other'];
 
 const TELEMETRY_SESSION_ACTIONS = ['SessionStart', 'SessionEnd'];
 
-const TELEMETRY_EXPORT_TYPES = ['Excel', 'GoogleSheets', 'Pdf', 'Csv', 'Backup', 'Receipts', 'ChartImage'];
+const TELEMETRY_EXPORT_TYPES = ['Excel', 'GoogleSheets', 'Pdf', 'Csv', 'Backup'];
 
-const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'GoogleSheets', 'ReceiptScanProxy', 'MicrosoftTranslator'];
+const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'GoogleSheets', 'ReceiptScanProxy'];
 
 const TELEMETRY_ERROR_CATEGORIES = [
     'Unknown', 'Network', 'FileSystem', 'Parsing', 'Validation', 'UI', 'Api',
@@ -23,15 +23,13 @@ const TELEMETRY_ERROR_CATEGORIES = [
 ];
 
 const TELEMETRY_FEATURE_NAMES = [
-    'ChartViewed', 'ChartTypeChanged',
-    'ReportGenerated', 'ReportPrinted',
-    'ReceiptScanned', 'ReceiptManualEntry',
-    'DataImported', 'DataExported', 'BackupCreated', 'BackupRestored',
+    'ReportGenerated',
+    'ReceiptScanned',
+    'DataImported', 'BackupCreated', 'BackupRestored',
     'InvoiceCreated', 'ExpenseCreated', 'RevenueCreated', 'PaymentRecorded',
     'ProductCreated', 'StockAdjusted', 'PurchaseOrderCreated',
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
-    'AiSearchUsed', 'AiSuggestionAccepted',
     'ThemeChanged', 'LanguageChanged'
 ];
 

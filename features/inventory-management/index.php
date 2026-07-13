@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Inventory+Management&subtitle=Real-time+stock+tracking%2C+purchase+orders%2C+low-stock+alerts%2C+and+multi-location+support.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Inventory Management | Argo Books">
     <meta name="twitter:description"
         content="Manage your inventory with real-time stock tracking, low-stock alerts, purchase orders, and multi-location support. Argo Books makes inventory simple for small businesses.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Inventory+Management&subtitle=Real-time+stock+tracking%2C+purchase+orders%2C+low-stock+alerts%2C+and+multi-location+support.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -554,6 +554,28 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     </div>
                     <h3>Rental Management</h3>
                     <p>Rental items are tracked in your inventory. See which units are available, which are being rented, and when they're due back, all in one place.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../inventory-tracking-for-small-businesses/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Inventory tracking for small businesses</h3>
+                    <p>The basics of tracking stock and reorder points.</p>
+                </a>
+                <a href="../../bookkeeping-for-online-sellers/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Bookkeeping for online sellers</h3>
+                    <p>Track fees, inventory, and cost of goods across channels.</p>
                 </a>
             </div>
         </div>

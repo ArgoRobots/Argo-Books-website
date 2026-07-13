@@ -30,10 +30,10 @@ $isDocsLanding = true;
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<?php echo htmlspecialchars($pageTitle); ?> - Argo Books">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($pageDescription); ?>">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
@@ -204,6 +204,13 @@ $isDocsLanding = true;
                     </div>
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
+                </a>
+                <a href="pages/features/bank-statement-import.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('document-download', 20) ?>
+                    </div>
+                    <h3>Bank Statement Import</h3>
+                    <p>Turn a bank statement into categorized transactions</p>
                 </a>
                 <a href="pages/features/bank-matching.php" class="doc-card">
                     <div class="card-icon">

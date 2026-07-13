@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -29,7 +29,7 @@ $rangeInterval = $rangeMap[$range]['interval'];
 $cronConfig = [
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
-        'frequency' => 'every hour',
+        'frequency' => 'daily',
         'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, schedules follow-ups, and runs A/B tests on the wording. This is the main engine that finds and contacts new leads.',
         'metrics'   => [
             'leads_discovered'          => 'Leads discovered',
@@ -40,7 +40,7 @@ $cronConfig = [
             'ab_tests_promoted'         => 'A/B tests promoted',
             'shopify_rejected'          => 'Shopify stores rejected',
         ],
-        'expected_interval_hours' => 2,
+        'expected_interval_hours' => 48,
     ],
     'subscription_renewal' => [
         'label'     => 'Subscription Renewal',
@@ -110,6 +110,47 @@ $cronConfig = [
         ],
         'expected_interval_hours' => 36,
     ],
+    'marketing_broadcast' => [
+        'label'     => 'Marketing Broadcast Sender',
+        'frequency' => 'every 5 minutes',
+        'description' => "Delivers the email broadcasts you queue from the Marketing page. Each run sends a capped batch (up to 100) so a big list goes out over several runs without tripping rate limits, and it skips anyone who unsubscribed after the broadcast was queued.",
+        'metrics'   => [
+            'emails_sent'           => 'Emails sent',
+            'emails_failed'         => 'Emails failed',
+            'broadcasts_completed'  => 'Broadcasts completed',
+        ],
+        'expected_interval_hours' => 1,
+    ],
+    'reddit_monitor' => [
+        'label'     => 'Reddit Discovery',
+        'frequency' => 'daily',
+        'description' => "Pulls fresh Reddit threads from the watchlist subreddits and keyword searches, scores them for relevance with AI, and pre-writes a reply draft for the strongest matches. It never posts anything: drafts are reviewed and posted by hand.",
+        'metrics'   => [
+            'threads_found'    => 'Threads found',
+            'drafts_generated' => 'Drafts generated',
+        ],
+        'expected_interval_hours' => 36,
+    ],
+    'reddit_status_check' => [
+        'label'     => 'Reddit Status Check',
+        'frequency' => 'every 2 hours',
+        'description' => "Re-checks Reddit comments we've replied to, on a staggered schedule, to see if they're still live, removed, or shadowbanned. Tracks upvotes and replies, and auto-drops any subreddit with a high removal rate from the watchlist.",
+        'metrics'   => [
+            'replies_checked' => 'Replies checked',
+            'replies_removed' => 'Replies removed',
+        ],
+        'expected_interval_hours' => 4,
+    ],
+    'indexnow_submit' => [
+        'label'     => 'IndexNow Submit',
+        'frequency' => 'daily',
+        'description' => "Tells Bing, Yandex, DuckDuckGo and other IndexNow search engines about pages that changed since the last run, so they get recrawled quickly without manual submission. Does not affect Google, which doesn't use IndexNow.",
+        'metrics'   => [
+            'changed_urls' => 'Pages changed',
+            'submitted_ok' => 'Pages submitted',
+        ],
+        'expected_interval_hours' => 48,
+    ],
 ];
 
 // ─── Aggregate runs in the time range ───────────────────────────────────────
@@ -159,7 +200,15 @@ function relative_time_ago($datetime) {
 function cron_status_pill($latest, $expectedIntervalHours) {
     if (!$latest) return ['class' => 'status-stale', 'label' => 'No runs'];
     if ($latest['status'] === 'error') return ['class' => 'status-error', 'label' => 'Error'];
-    if ($latest['status'] === 'running') return ['class' => 'status-running', 'label' => 'Running'];
+    if ($latest['status'] === 'running') {
+        // A row stuck in 'running' well past when the run should have finished is
+        // an orphan (process died before recording a result), not a live run.
+        $runHours = (time() - strtotime($latest['started_at'])) / 3600;
+        if ($runHours > max($expectedIntervalHours, 1)) {
+            return ['class' => 'status-error', 'label' => 'Stalled'];
+        }
+        return ['class' => 'status-running', 'label' => 'Running'];
+    }
     $ageHours = (time() - strtotime($latest['started_at'])) / 3600;
     if ($ageHours > $expectedIntervalHours * 2) return ['class' => 'status-stale', 'label' => 'Stale'];
     return ['class' => 'status-ok', 'label' => 'OK'];
@@ -185,13 +234,16 @@ include __DIR__ . '/../admin_header.php';
 
 <link rel="stylesheet" href="style.css">
 
-<div class="range-row">
-    <div class="range-selector">
-        <?php foreach ($rangeMap as $key => $r): ?>
-            <a href="?range=<?= $key ?>" class="range-btn <?= $range === $key ? 'active' : '' ?>">
-                <?= htmlspecialchars($r['label']) ?>
-            </a>
-        <?php endforeach; ?>
+<div class="control-bar">
+    <div class="control-group">
+        <span class="control-label">Period:</span>
+        <div class="control-pills">
+            <?php foreach ($rangeMap as $key => $r): ?>
+                <a href="?range=<?= $key ?>" class="control-pill <?= $range === $key ? 'active' : '' ?>">
+                    <?= htmlspecialchars($r['label']) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
@@ -281,7 +333,7 @@ include __DIR__ . '/../admin_header.php';
         window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
         sessionStorage.removeItem('scrollPosition');
     }
-    document.querySelectorAll('.range-btn').forEach(link => {
+    document.querySelectorAll('a[href^="?range="]').forEach(link => {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });

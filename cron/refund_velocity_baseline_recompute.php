@@ -9,8 +9,8 @@ declare(strict_types=1);
  * 25% / 50% multipliers) from each company's own history rather than fixed
  * dollar amounts that would either choke big shops or let small ones drain.
  *
- * Schedule: nightly at 02:00.
- *   0 2 * * * php /var/www/argo-books-website/cron/refund_velocity_baseline_recompute.php
+ * Schedule: nightly at 2:00 AM.
+ *   0 2 * * * /usr/bin/php /home/argorobots/public_html/cron/refund_velocity_baseline_recompute.php
  */
 
 // Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).

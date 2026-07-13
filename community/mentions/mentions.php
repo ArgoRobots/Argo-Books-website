@@ -88,24 +88,6 @@ function create_mention_notifications($mentions, $post_id, $comment_id = 0, $aut
 
     global $pdo;
 
-    // Check if notifications table exists, if not, create it
-    $result = $pdo->query("SHOW TABLES LIKE 'user_notifications'");
-    if ($result->fetch() === false) {
-        // Create notifications table
-        $sql = "CREATE TABLE IF NOT EXISTS user_notifications (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT NOT NULL,
-            type VARCHAR(50) NOT NULL,
-            message TEXT NOT NULL,
-            link VARCHAR(255),
-            is_read BOOLEAN DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
-
-        $pdo->query($sql);
-    }
-
     // Insert notifications for each mentioned user
     $insert_stmt = $pdo->prepare("
         INSERT INTO user_notifications (user_id, type, message, link, is_read)

@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-31',
 
-  'updated' => '2026-05-31',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -44,6 +44,7 @@ HTML,
 <li><strong>Extraction.</strong> Reading the image and pulling out fields. At minimum that's supplier, date, and total. Stronger tools also grab the tax amount, the payment method, and each line item. This is the part the "AI" label refers to, and it's where accuracy is won or lost.</li>
 <li><strong>Storage and export.</strong> What happens to the result. A scan is only useful if it lands somewhere you can search later and hand to an accountant. The weakest tools give you a photo in a folder. The strong ones give you a categorized, searchable expense record with the original image attached.</li>
 </ul>
+{{illustration:receipt-scan}}
 <p>When you compare tools, check all three. A free app that captures and extracts beautifully but won't let you export the data is a dead end at tax time. One that stores everything neatly but misreads half the totals just moves the typing from the receipt to the correction screen.</p>
 HTML,
     ],
@@ -55,7 +56,7 @@ HTML,
 <p>"Free receipt scanner" covers three different things, and the difference matters before you commit your receipts to one.</p>
 <ul>
 <li><strong>Free tier, capped by scans.</strong> The most common. You get a set number of scans a month at no cost, and you need to pay for higher usage limits. This is fine if your volume is low or you just want to test the accuracy.</li>
-<li><strong>Free tier, full feature, paid for extras.</strong> The scanning is genuinely free and unlimited, and the company makes money elsewhere (payments, payroll, a higher tier). Best value if the scanning quality is good, although, they tend not to be.</li>
+<li><strong>Free tier, full feature, paid for extras.</strong> The scanning is genuinely free and unlimited, and the company makes money elsewhere (payments, payroll, a higher tier). Best value if the scanning quality is good, although it often isn't.</li>
 <li><strong>Free trial.</strong> Not really free. You get full access for 14 or 30 days, then it stops. Useful for a one-time tax-season catch-up, not for ongoing use.</li>
 </ul>
 <p>Read which one you're signing up for before you scan a month of receipts into it. Pick a tool you're willing to stay on before you load it up.</p>
@@ -77,11 +78,22 @@ HTML,
       'anchor' => 'best-free',
       'html' => <<<'HTML'
 <p>These all have a genuinely free path to scanning receipts. Order roughly follows how generous the free side is, not preference. Check the current limits yourself before committing, because free tiers change.</p>
+<table>
+<thead>
+<tr><th>Tool</th><th>Free scanning</th><th>Best for</th></tr>
+</thead>
+<tbody>
+<tr><td>Wave</td><td>No hard monthly scan cap</td><td>Free scanning and free books in one place</td></tr>
+<tr><td>Zoho Expense</td><td>Capped auto-scans per month</td><td>Individuals already in the Zoho world</td></tr>
+<tr><td>Expensify</td><td>Around 25 SmartScans a month</td><td>Light expense tracking, slick capture</td></tr>
+<tr><td>Argo Books</td><td>{argo_free_receipt_scan_limit} scans a month</td><td>Accurate scans, data on your own machine</td></tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Wave.</strong> Wave's receipt scanning is part of its free accounting product, with no hard monthly scan cap, and the extracted expense flows straight into free bookkeeping. Strong value if you want free scanning and free books in one place. The trade-offs: extraction accuracy is decent rather than excellent, support on the free plan is thin, and some features have shifted to the paid Pro tier over time.</li>
 <li><strong>Zoho Expense.</strong> The free plan is aimed at individuals and includes automatic receipt scanning, though the free tier limits how many auto-scans you get each month before you're entering them by hand. Clean mobile app, good if you already live in the Zoho world. The trade-off: you'll feel the free-tier scan cap quickly if you travel, and the wider Zoho suite has a learning curve.</li>
 <li><strong>Expensify.</strong> The free plan includes a set number of SmartScans a month (around 25), which is plenty for light expense tracking. Well-known, slick capture. The trade-offs: it's expense-report software at heart, so it's more than you need if you just want receipts filed, and going over the free scan count pushes you to a paid seat.</li>
-<li><strong>Argo Books.</strong> The free tier includes a 10  AI receipt scans a month, with the supplier, date, total, tax, and line items extracted and filed as a searchable expense with the image attached. It's one of the more accurate receipt scanners out there. Premium, at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year, raises that to 500 scans a month for heavier users. Built as a desktop app (Windows, Linux, and macOS) so the receipts live on your own machine. The trade-offs: the free scan count is low if you're high-volume, and it doesn't have a mobile app yet.</li>
+<li><strong>Argo Books.</strong> The free tier includes {argo_free_receipt_scan_limit} AI receipt scans a month, with the supplier, date, total, tax, and line items extracted and filed as a searchable expense with the image attached. It's one of the more accurate receipt scanners out there. Premium, at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year, raises that to {argo_receipt_scan_limit} scans a month for heavier users. Built as a desktop app (Windows, Linux, and macOS) so the receipts live on your own machine. The trade-offs: the free scan count is low if you're high-volume, and it doesn't have a mobile app yet.</li>
 </ul>
 <p>QuickBooks and FreshBooks also capture receipts well, but receipt capture sits inside their paid plans rather than a free tier, so they're not on this list. If you already pay for one of them, use the scanner you're already paying for before adding another tool.</p>
 HTML,
@@ -113,6 +125,7 @@ HTML,
 <li><strong>Do a five-minute month-end check.</strong> Once a month, scan anything you missed and skim the list for blanks or odd totals. Catching a misread in May is a glance; catching it next April is an archaeology project.</li>
 <li><strong>Keep the originals until you've filed.</strong> Even with images stored, hold the paper receipts for the current tax year in one envelope. Once the return is filed and accepted, the digital copies are your record and the paper can go.</li>
 </ol>
+{{illustration:checklist}}
 <p>None of this depends on which tool you pick. A free scanner used every week beats a paid one used in a panic the night before the deadline.</p>
 HTML,
     ],

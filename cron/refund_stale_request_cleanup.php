@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Without this, abandoned codes pile up and clutter audit logs.
  *
  * Schedule: hourly.
- *   0 * * * * php /var/www/argo-books-website/cron/refund_stale_request_cleanup.php
+ *   0 * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_stale_request_cleanup.php
  */
 
 // Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).

@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-31',
 
-  'updated' => '2026-05-31',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -92,6 +92,7 @@ HTML,
 <li><strong>Pay traceably and keep the record.</strong> Pay by transfer, cheque, or card rather than untracked cash where you can, and keep an invoice or record for every subcontractor payment. Cash payments with no paperwork are both a lost deduction for you and a problem if anyone ever asks.</li>
 <li><strong>Collect their details up front.</strong> Most countries require you to report what you paid each subcontractor over the year, which means you need their business name, tax number, and address before you pay them, not chased down the following spring. Get the details with the first invoice and the year-end reporting is a quick export instead of a round of awkward calls.</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>The exact forms and thresholds vary by country, so check your local rules or ask your accountant what you owe and when. But the habit is universal: a clean record of who you paid, how much, and their details, kept as you go.</p>
 HTML,
     ],
@@ -107,6 +108,7 @@ HTML,
 <li><strong>Set tax money aside as you get paid.</strong> Contractor income arrives in lumps and the tax on it is owed later. Moving a percentage of each payment into a separate tax-savings account as it lands means the bill isn't a shock. Your accountant can tell you a sensible percentage for your situation.</li>
 <li><strong>Hand your accountant clean totals.</strong> Income, costs by category, mileage, and subcontractor payments, with the receipts available if asked. Accountants bill by the hour, so the cleaner your numbers, the smaller the bill.</li>
 </ol>
+{{illustration:checklist}}
 <p>None of this is complicated. It's a handful of habits done consistently. The contractors who dread tax season are almost always the ones who left it all for the end. The ones who spend five minutes a week keeping it current barely notice it.</p>
 HTML,
     ],
@@ -134,7 +136,7 @@ HTML,
     ],
     [
       'q' => 'What is the most common bookkeeping mistake contractors make?',
-      'a' => 'Mixing business and personal money in one account. It is the root of most year-end pain: it hides whether the business is profitable, turns tax prep into sorting hundreds of transactions by hand, and makes any tax-authority question harder to answer. The fix costs nothing but a second bank account and the discipline to keep business money in it. The second most common mistake is letting receipts pile up untagged, so the job-costing and the deductions both fall apart. Both mistakes are about habits, not knowledge, which is good news, because habits are fixable starting today.',
+      'a' => 'Mixing business and personal money in one account. It\'s the root of most year-end pain: it hides whether the business is profitable, turns tax prep into sorting hundreds of transactions by hand, and makes any tax-authority question harder to answer. The fix costs nothing but a second bank account and the discipline to keep business money in it. The second most common mistake is letting receipts pile up untagged, so the job-costing and the deductions both fall apart. Both mistakes are about habits, not knowledge, which is good news, because habits are fixable starting today.',
     ],
   ],
 

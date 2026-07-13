@@ -28,7 +28,7 @@
 // _base.php defines INVGEN_BASE and the shared invgen_render_404() helper
 // that niche_render_404() at the bottom of this file delegates to. Must be
 // required BEFORE the 404 fallbacks fire below.
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
 
@@ -180,7 +180,7 @@ if (function_exists('current_environment')) {
 // hrefs. On Laragon the prefix is '/argo-books-website', on production
 // it is empty. Required again later for script paths (require_once
 // makes the second call a no-op).
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 ob_start();
 ?>
@@ -340,7 +340,7 @@ if (!empty($data['generator_defaults'])) {
     . json_encode($data['generator_defaults'], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)
     . ';</script>';
 }
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 $extra_scripts .= '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
 
 // Collapsible FAQ click handler. One open at a time, matching the main
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 HTML;
 
-include __DIR__ . '/../invoice-generator/layout.php';
+include __DIR__ . '/../shared/layout.php';
 
 // -----------------------------------------------------------------------------
 

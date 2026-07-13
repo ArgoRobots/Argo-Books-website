@@ -1,25 +1,22 @@
 <?php
 /**
- * Fully Automated Outreach Pipeline Cron
+ * outreach_pipeline.php
  *
- * Runs the complete outreach pipeline automatically:
- *   1. Pick the next target city from the expansion list
- *   2. Discover businesses via Google Places
- *   3. Import them (skip duplicates)
- *   4. Generate AI email drafts for leads without one
- *   5. Auto-approve drafts
- *   6. Send approved emails (up to daily limit)
+ * Runs the complete outreach pipeline automatically: picks the next target city
+ * from the expansion list, discovers businesses via Google Places, imports them
+ * (skipping duplicates), generates AI email drafts for leads without one,
+ * auto-approves drafts, and sends approved emails up to the daily limit. Full
+ * detail in read-me/Cron jobs.md.
  *
- * RECOMMENDED SCHEDULE: Daily at 8:00 AM (before the send window)
- *   0 8 * * * /usr/bin/php /path/to/outreach_pipeline.php
+ * Schedule: daily at 8:00 AM.
+ *   0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/outreach_pipeline.php
  *
- * Manual execution:
- *   php outreach_pipeline.php
- *   php outreach_pipeline.php --discover-only   # Only run discovery + import (Google Places + Shopify)
- *   php outreach_pipeline.php --shopify-only    # Only run Shopify discovery
- *   php outreach_pipeline.php --draft-only      # Only run draft generation
- *   php outreach_pipeline.php --send-only       # Only run send (same as outreach_email.php)
- *   php outreach_pipeline.php --dry-run         # Log what would happen without doing it
+ * Flags:
+ *   --discover-only   Only run discovery + import (Google Places + Shopify)
+ *   --shopify-only    Only run Shopify discovery
+ *   --draft-only      Only run draft generation
+ *   --send-only       Only run send (same as outreach_email.php)
+ *   --dry-run         Log what would happen without doing it
  */
 
 set_time_limit(600); // 10 minutes max for full pipeline
@@ -149,18 +146,6 @@ function logPipeline($message, $type = 'INFO')
 
 // log_activity() is provided by cron/lib/outreach_helpers.php
 
-// ─── Ensure outreach_pipeline_state table exists ───
-
-function ensureStateTable($pdo)
-{
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        state_key VARCHAR(100) NOT NULL UNIQUE,
-        state_value TEXT,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
 function getState($pdo, $key, $default = null)
 {
     $stmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = ?");
@@ -187,14 +172,16 @@ global $pdo;
 $cronRunId = $dryRun ? 0 : cron_run_start($pdo, 'outreach_pipeline');
 
 try {
-    ensureStateTable($pdo);
-
     // ─── Master kill-switch: admin can disable the entire outreach system
     // from the Settings tab. When off, the server cron still fires but does
     // nothing until re-enabled.
     $outreachEnabled = getState($pdo, 'outreach_enabled', '1');
     if ($outreachEnabled !== '1') {
         logPipeline('Outreach is DISABLED via admin Settings (outreach_enabled != "1"). Pipeline exiting without running any steps.');
+        // Finish cleanly: this is a normal no-op, not a crash. Without this the
+        // run row would stay 'running' and the admin Crons pill would read
+        // "Running" forever while outreach is toggled off.
+        cron_run_finish($pdo, $cronRunId, 'ok');
         return;
     }
 
@@ -260,7 +247,10 @@ try {
     logPipeline('=== Outreach Pipeline Complete ===');
     cron_run_finish($pdo, $cronRunId, 'ok');
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    // Throwable, not Exception: also catch PHP Errors (TypeError, OOM-adjacent
+    // fatals) so a non-Exception failure still records 'error' instead of
+    // leaving the run row orphaned as 'running'.
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
     cron_run_finish($pdo, $cronRunId, 'error', $e->getMessage());
     exit(1);
@@ -548,12 +538,29 @@ function stepDiscoverShopify($pdo, $dryRun)
 
         // Pick next dork and advance cursor immediately so failures don't get re-tried next dork
         $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
-        $query = $dorkPool[$cursor % $totalDorks];
+        $idx = $cursor % $totalDorks;
+        $query = $dorkPool[$idx];
         setState($pdo, 'shopify_dork_cursor', (string) ($cursor + 1));
         $dorksTriedThisRun++;
         $queriesUsed[] = $query;
 
-        logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor): '$query'");
+        // Per-dork page offset (shared with the admin Run button via the
+        // shopify_dork_pages state) so each pass pulls a DEEPER result page
+        // instead of re-reading page 1 and re-seeing already-imported stores.
+        // Capped by SHOPIFY_MAX_PAGE_DEPTH; a tapped-out dork is skipped (the
+        // $dorksTriedThisRun guard still terminates the loop).
+        $shopifyPages = json_decode(getState($pdo, 'shopify_dork_pages', '{}'), true);
+        if (!is_array($shopifyPages)) {
+            $shopifyPages = [];
+        }
+        $maxStart = (max(1, (int) ($_ENV['SHOPIFY_MAX_PAGE_DEPTH'] ?? 3)) - 1) * 100;
+        $start = (int) ($shopifyPages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            logPipeline("Dork '$query' past page-depth cap (start=$start). Skipping this pass.");
+            continue;
+        }
+
+        logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor, page=" . (intdiv($start, 100) + 1) . "): '$query'");
 
         // SerpAPI call via 14-day response cache. Append global exclusions
         // so we don't pay for results that openly advertise being decades
@@ -561,7 +568,7 @@ function stepDiscoverShopify($pdo, $dryRun)
         // num=10 on SerpAPI, 10x the candidates per credit. Cache hits
         // do NOT consume daily SerpAPI quota.
         $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
-        $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo);
+        $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo, $start);
         $results = $queryResult['results'];
         if ($queryResult['from_cache']) {
             logPipeline("'$query' served from SerpAPI cache (no credit spent).");
@@ -569,6 +576,9 @@ function stepDiscoverShopify($pdo, $dryRun)
             $serpapiCallsToday++;
             setState($pdo, 'serpapi_calls_today', (string) $serpapiCallsToday);
         }
+        // Advance this dork's page offset so the next pass goes deeper.
+        $shopifyPages[(string) $idx] = $start + 100;
+        setState($pdo, 'shopify_dork_pages', json_encode($shopifyPages));
 
         if (empty($results)) {
             logPipeline("SerpAPI returned no results for '$query'. Moving to next dork.");

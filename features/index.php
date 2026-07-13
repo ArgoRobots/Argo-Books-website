@@ -25,7 +25,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta name="twitter:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta name="twitter:description"
         content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -180,6 +180,26 @@ require_once __DIR__ . '/../track_referral.php';
                     </div>
                     <h3>Spreadsheet Import</h3>
                     <p>Import data from any spreadsheet format. Our AI automatically maps columns, detects data types, and imports everything cleanly, with no manual mapping required.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
+
+                <!-- Bank Statement Import -->
+                <a href="bank-statement-import/" class="feature-card animate-on-scroll">
+                    <div class="feature-card-icon purple">
+                        <?= svg_icon('bank', 24) ?>
+                    </div>
+                    <h3>Bank Statement Import</h3>
+                    <p>Drop in a CSV, Excel, or PDF bank statement and every line comes back as a categorized expense or revenue. Match against your books too, all without connecting your bank.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
+
+                <!-- Report Builder -->
+                <a href="report-builder/" class="feature-card animate-on-scroll">
+                    <div class="feature-card-icon cyan">
+                        <?= svg_icon('report', 24) ?>
+                    </div>
+                    <h3>Report Builder</h3>
+                    <p>Build Income Statements, Balance Sheets, tax summaries, and more from your own data. Design each report your way and export a clean, branded PDF. Free to use.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
             </div>

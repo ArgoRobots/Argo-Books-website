@@ -9,6 +9,7 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../portal/portal-helper.php';      // authenticate_device_request / authenticate_license_request
 require_once __DIR__ . '/../../track_referral_event.php';   // lookup_country_for_ip()
+require_once __DIR__ . '/../../founder_exclusion.php';       // is_excluded_auth_id() — founder's own installs
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
@@ -162,6 +163,20 @@ try {
 
     $tier = $auth['tier'];
     $authId = $auth['authId'];
+
+    // Drop crash reports from the founder's own installs (EXCLUDED_AUTH_IDS)
+    // before any work, so their testing never lands in the crash dashboards.
+    // Return a normal success so the client stops retrying the report.
+    if (is_excluded_auth_id($authId)) {
+        echo json_encode([
+            'status' => 'success',
+            'file' => 'excluded',
+            'received' => 0,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ]);
+        exit;
+    }
+
     $maxSize = $tier === 'premium' ? CRASH_MAX_SIZE_PREMIUM : CRASH_MAX_SIZE_FREE;
     $maxPerHour = $tier === 'premium' ? CRASH_MAX_PER_HOUR_PREMIUM : CRASH_MAX_PER_HOUR_FREE;
     $ipMaxPerHour = $tier === 'free' ? CRASH_MAX_PER_HOUR_FREE_PER_IP : null;

@@ -37,6 +37,7 @@
       <li><a href="<?= $base ?>compare/argo-books-vs-odoo/">Argo Books vs Odoo</a></li>
       <li><a href="<?= $base ?>compare/argo-books-vs-xero/">Argo Books vs Xero</a></li>
       <li><a href="<?= $base ?>compare/argo-books-vs-zipbooks/">Argo Books vs ZipBooks</a></li>
+      <li><a href="<?= $base ?>best-quickbooks-alternatives/">Best QuickBooks Alternatives</a></li>
     </ul>
   </div>
   <div class="footer-section">
@@ -54,6 +55,8 @@
       <li><a href="<?= $base ?>about-us/">About Us</a></li>
       <li><a href="<?= $base ?>contact-us/">Contact Us</a></li>
       <li><a href="<?= $base ?>guides/">Guides</a></li>
+      <li><a href="<?= $base ?>tools/">Tools</a></li>
+      <li><a href="<?= $base ?>affiliates/">Affiliate Program</a></li>
       <li><a href="<?= $base ?>review/">Leave a Review</a></li>
     </ul>
   </div>

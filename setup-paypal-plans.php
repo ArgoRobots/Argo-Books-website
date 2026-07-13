@@ -26,8 +26,15 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $pricing = get_pricing_config();
-$monthlyPrice = $pricing['premium_monthly_price'];
-$yearlyPrice = $pricing['premium_yearly_price'];
+$monthlyBase = $pricing['premium_monthly_price'];
+$yearlyBase  = $pricing['premium_yearly_price'];
+
+// PayPal bills the plan's fixed_price with no fee added, but the card flow
+// (Stripe/Square) charges base + processing fee, and every receipt prints
+// base + fee. To keep all payment methods and the receipt consistent, bake the
+// processing fee into the PayPal plan price so PayPal charges the same total.
+$monthlyPrice = $monthlyBase + calculate_processing_fee($monthlyBase);
+$yearlyPrice  = $yearlyBase + calculate_processing_fee($yearlyBase);
 
 echo "=== PayPal Subscription Plans Setup ===\n\n";
 
@@ -94,11 +101,11 @@ echo "SUCCESS! Add these to your .env file:\n";
 echo "===========================================\n\n";
 
 if ($isProduction) {
-    echo "PAYPAL_LIVE_MONTHLY_PLAN_ID=$monthlyPlanId\n";
-    echo "PAYPAL_LIVE_YEARLY_PLAN_ID=$yearlyPlanId\n";
+    echo "PAYPAL_LIVE_MONTHLY_PLAN_ID=\"$monthlyPlanId\"\n";
+    echo "PAYPAL_LIVE_YEARLY_PLAN_ID=\"$yearlyPlanId\"\n";
 } else {
-    echo "PAYPAL_SANDBOX_MONTHLY_PLAN_ID=$monthlyPlanId\n";
-    echo "PAYPAL_SANDBOX_YEARLY_PLAN_ID=$yearlyPlanId\n";
+    echo "PAYPAL_SANDBOX_MONTHLY_PLAN_ID=\"$monthlyPlanId\"\n";
+    echo "PAYPAL_SANDBOX_YEARLY_PLAN_ID=\"$yearlyPlanId\"\n";
 }
 
 

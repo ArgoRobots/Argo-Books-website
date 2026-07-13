@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 
 // Check if user is logged in
@@ -436,9 +436,14 @@ include __DIR__ . '/../admin_header.php';
 
     <!-- Environment Toggle -->
     <?php $current_tab = $_GET['tab'] ?? ''; $tab_param = !empty($current_tab) ? '&tab=' . urlencode($current_tab) : ''; ?>
-    <div class="env-toggle-bar">
-        <a href="?view_env=production<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-production <?php echo $view_env === 'production' ? 'active' : ''; ?>">Production</a>
-        <a href="?view_env=sandbox<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-sandbox <?php echo $view_env === 'sandbox' ? 'active' : ''; ?>">Sandbox</a>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Environment:</span>
+            <div class="control-pills">
+                <a href="?view_env=production<?php echo $tab_param; ?>" class="control-pill env-toggle-production <?php echo $view_env === 'production' ? 'active' : ''; ?>">Production</a>
+                <a href="?view_env=sandbox<?php echo $tab_param; ?>" class="control-pill env-toggle-sandbox <?php echo $view_env === 'sandbox' ? 'active' : ''; ?>">Sandbox</a>
+            </div>
+        </div>
     </div>
 
     <!-- Tab Navigation -->
@@ -526,7 +531,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Recent Payments</h2>
             </div>
             <?php if (empty($recent_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No payments recorded yet</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No payments recorded yet</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table>
@@ -563,22 +568,22 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <div id="transactions" class="tab-content">
         <!-- Filters -->
-        <div class="filters-bar">
+        <div class="control-bar">
             <form method="GET" class="filters-form" id="tx-filters-form">
                 <input type="hidden" name="tab" value="transactions">
-                <div class="filter-group">
-                    <input type="text" name="tx_search" placeholder="Search customer, reference, company..." value="<?php echo htmlspecialchars($tx_search); ?>">
+                <div class="control-group">
+                    <input type="text" class="control-input" name="tx_search" placeholder="Search customer, reference, company..." value="<?php echo htmlspecialchars($tx_search); ?>">
                 </div>
-                <div class="filter-group">
-                    <select name="tx_method" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_method" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Methods</option>
                         <option value="stripe" <?php echo $tx_method === 'stripe' ? 'selected' : ''; ?>>Stripe</option>
                         <option value="paypal" <?php echo $tx_method === 'paypal' ? 'selected' : ''; ?>>PayPal</option>
                         <option value="square" <?php echo $tx_method === 'square' ? 'selected' : ''; ?>>Square</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <select name="tx_status" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_status" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Statuses</option>
                         <option value="completed" <?php echo $tx_status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                         <option value="pending" <?php echo $tx_status === 'pending' ? 'selected' : ''; ?>>Pending</option>
@@ -587,8 +592,8 @@ include __DIR__ . '/../admin_header.php';
                     </select>
                 </div>
                 <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
-                <div class="filter-group">
-                    <select name="tx_company" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_company" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Companies</option>
                         <?php foreach ($company_options as $co): ?>
                             <option value="<?php echo $co['id']; ?>" <?php echo $tx_company == $co['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($co['company_name']); ?></option>
@@ -608,7 +613,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($transactions); ?> results</span>
             </div>
             <?php if (empty($transactions)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No transactions found</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No transactions found</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -664,7 +669,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($companies); ?> companies</span>
             </div>
             <?php if (empty($companies)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No companies registered yet</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No companies registered yet</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table>
@@ -800,7 +805,7 @@ include __DIR__ . '/../admin_header.php';
                                                             if (!empty($company['locked'])) {
                                                                 echo '<strong style="color:#dc2626;">Locked</strong>';
                                                                 if (!empty($company['locked_at'])) echo ' on ' . date('M j', strtotime($company['locked_at']));
-                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:#6b7280;">' . htmlspecialchars($company['lock_reason']) . '</small>';
+                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:var(--admin-text);">' . htmlspecialchars($company['lock_reason']) . '</small>';
                                                             } else {
                                                                 echo 'Active';
                                                             }
@@ -848,7 +853,7 @@ include __DIR__ . '/../admin_header.php';
                                                             <td><?php echo date('M j, Y g:i A', strtotime($ec['created_at'])); ?></td>
                                                             <td>
                                                                 <?php echo htmlspecialchars($ec['old_email']); ?>
-                                                                <span style="color:#6b7280;"> → </span>
+                                                                <span style="color:var(--admin-text);"> → </span>
                                                                 <?php echo htmlspecialchars($ec['new_email']); ?>
                                                             </td>
                                                             <td>
@@ -890,15 +895,15 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <div id="invoices" class="tab-content">
         <!-- Filters -->
-        <div class="filters-bar">
+        <div class="control-bar">
             <form method="GET" class="filters-form" id="inv-filters-form">
                 <input type="hidden" name="tab" value="invoices">
                 <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
-                <div class="filter-group">
-                    <input type="text" name="inv_search" placeholder="Search customer, invoice ID, company..." value="<?php echo htmlspecialchars($inv_search); ?>">
+                <div class="control-group">
+                    <input type="text" class="control-input" name="inv_search" placeholder="Search customer, invoice ID, company..." value="<?php echo htmlspecialchars($inv_search); ?>">
                 </div>
-                <div class="filter-group">
-                    <select name="inv_status" onchange="document.getElementById('inv-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="inv_status" onchange="document.getElementById('inv-filters-form').submit()">
                         <option value="">All Statuses</option>
                         <option value="draft" <?php echo $inv_status === 'draft' ? 'selected' : ''; ?>>Draft</option>
                         <option value="sent" <?php echo $inv_status === 'sent' ? 'selected' : ''; ?>>Sent</option>
@@ -910,8 +915,8 @@ include __DIR__ . '/../admin_header.php';
                         <option value="cancelled" <?php echo $inv_status === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <select name="inv_company" onchange="document.getElementById('inv-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="inv_company" onchange="document.getElementById('inv-filters-form').submit()">
                         <option value="">All Companies</option>
                         <?php foreach ($company_options as $co): ?>
                             <option value="<?php echo $co['id']; ?>" <?php echo $inv_company == $co['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($co['company_name']); ?></option>
@@ -931,7 +936,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($invoices); ?> results</span>
             </div>
             <?php if (empty($invoices)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No invoices found</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No invoices found</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1074,10 +1079,10 @@ include __DIR__ . '/../admin_header.php';
         <div class="table-container">
             <div class="table-header">
                 <h2>Refund Requests</h2>
-                <span class="subtext" style="color:#6b7280;font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
+                <span class="subtext" style="color:var(--admin-text);font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
             </div>
             <?php if (empty($inflight_refunds)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 1.5rem;">No in-flight refund requests.</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 1.5rem;">No in-flight refund requests.</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1122,7 +1127,7 @@ include __DIR__ . '/../admin_header.php';
                                             </form>
                                         <?php endif; ?>
                                         <?php if ($r['state_reason']): ?>
-                                            <small style="color:#6b7280;display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
+                                            <small style="color:var(--admin-text);display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -1139,7 +1144,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Failed Payments</h2>
             </div>
             <?php if (empty($failed_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No failed payments</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No failed payments</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1176,7 +1181,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Refunded Payments</h2>
             </div>
             <?php if (empty($refunded_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No refunded payments</p>
+                <p style="text-align: center; color: var(--admin-text); padding: 2rem;">No refunded payments</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">

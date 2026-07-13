@@ -89,6 +89,10 @@ function consume_pairing_token(string $token): ?array
     if (!$row) {
         return null;
     }
-    $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE pairing_token = ?')->execute([$token]);
+    $del = $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE pairing_token = ? AND expires_at > NOW()');
+    $del->execute([$token]);
+    if ($del->rowCount() !== 1) {
+        return null;
+    }
     return $row;
 }

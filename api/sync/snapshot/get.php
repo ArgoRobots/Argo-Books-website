@@ -16,8 +16,8 @@ if (!$device) {
 }
 
 global $pdo;
-$stmt = $pdo->prepare('SELECT ciphertext, updated_at FROM mobile_sync_snapshots WHERE company_uid = ? LIMIT 1');
-$stmt->execute([$device['company_uid']]);
+$stmt = $pdo->prepare('SELECT ciphertext, updated_at FROM mobile_sync_snapshots WHERE owner_identity_hash = ? AND company_uid = ? LIMIT 1');
+$stmt->execute([$device['owner_identity_hash'], $device['company_uid']]);
 $row = $stmt->fetch();
 if (!$row) {
     send_error_response(404, 'No snapshot yet. Open Argo Books on your computer to sync.', 'NO_SNAPSHOT');

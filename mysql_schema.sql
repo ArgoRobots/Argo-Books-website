@@ -1529,11 +1529,12 @@ CREATE TABLE IF NOT EXISTS mobile_sync_devices (
 -- One current encrypted read-model snapshot per company. Ciphertext is opaque to the server.
 CREATE TABLE IF NOT EXISTS mobile_sync_snapshots (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    company_uid VARCHAR(64) NOT NULL UNIQUE,
+    company_uid VARCHAR(64) NOT NULL,
     owner_identity_hash VARCHAR(64) NOT NULL,
     ciphertext LONGTEXT NOT NULL COMMENT 'opaque base64 blob, encrypted on the desktop',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_owner_company (owner_identity_hash, company_uid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Pending phone-scanned transactions waiting for the desktop to ingest. Ciphertext is opaque.

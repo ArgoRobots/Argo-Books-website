@@ -21,10 +21,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 $companyUid = trim((string) ($data['company_uid'] ?? ''));
 $ids = $data['ids'] ?? [];
-if ($companyUid === '' || !is_array($ids) || $ids === []) {
-    send_error_response(400, 'company_uid and non-empty ids are required.', 'INVALID_INPUT');
+if ($companyUid === '' || strlen($companyUid) > 64 || !is_array($ids) || $ids === []) {
+    send_error_response(400, 'company_uid (max 64 chars) and non-empty ids are required.', 'INVALID_INPUT');
 }
 $ids = array_values(array_filter(array_map('intval', $ids), fn ($n) => $n > 0));
+$ids = array_slice($ids, 0, 500);
 if ($ids === []) {
     send_json_response(200, ['success' => true, 'deleted' => 0]);
 }

@@ -21,8 +21,8 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     send_error_response(400, 'Invalid JSON body.', 'INVALID_JSON');
 }
 $companyUid = trim((string) ($data['company_uid'] ?? ''));
-if ($companyUid === '') {
-    send_error_response(400, 'company_uid is required.', 'INVALID_COMPANY');
+if ($companyUid === '' || strlen($companyUid) > 64) {
+    send_error_response(400, 'company_uid (max 64 chars) is required.', 'INVALID_COMPANY');
 }
 
 global $pdo;

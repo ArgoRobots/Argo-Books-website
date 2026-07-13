@@ -29,7 +29,7 @@ global $pdo;
 $pdo->prepare(
     'INSERT INTO mobile_sync_snapshots (company_uid, owner_identity_hash, ciphertext)
      VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE ciphertext = VALUES(ciphertext), owner_identity_hash = VALUES(owner_identity_hash)'
+     ON DUPLICATE KEY UPDATE ciphertext = VALUES(ciphertext)'
 )->execute([$companyUid, $owner, $ciphertext]);
 
 send_json_response(200, ['success' => true]);

@@ -334,6 +334,11 @@ php_value upload_max_filesize 10M
     # Desktop app crash reports
     RewriteRule ^api/data/crash/?$ api/data/crash.php [L,QSA]
 
+    # Mobile sync API: /api/sync/{group}/{action} -> api/sync/{group}/{action}.php
+    # Covers pair/create, pair/redeem, snapshot/put, snapshot/get, queue/push,
+    # queue/pull, queue/ack, devices/list, devices/revoke.
+    RewriteRule ^api/sync/([a-z]+/[a-z]+)/?$ api/sync/$1.php [L,QSA]
+
     # --- Avalonia (cross-platform) download routes ---
 
     # Versioned: /download/avalonia/2.1.0/win

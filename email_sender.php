@@ -21,6 +21,72 @@ function sanitize_header_value(?string $value): ?string
     return preg_replace('/[\r\n\x00-\x1f]+/', ' ', $value);
 }
 
+/**
+ * Admin notification preferences (single global row).
+ *
+ * Every team-facing alert that a founder can toggle on/off consults this row:
+ * one destination email plus a set of boolean toggles. Managed from
+ * admin/settings/ (Notifications tab). The row is auto-seeded on first read so
+ * callers never have to worry about a missing config.
+ *
+ * @return array Associative row with notification_email + notify_* flags.
+ */
+function get_admin_notification_prefs()
+{
+    global $pdo;
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+
+    // Seed the default row once. Default destination mirrors the address the
+    // customer/cancellation alerts historically hardcoded, so behaviour is
+    // unchanged until an admin edits it.
+    $pdo->prepare(
+        "INSERT IGNORE INTO admin_notification_prefs (id, notification_email)
+         VALUES (1, 'contact@argorobots.com')"
+    )->execute();
+
+    $stmt = $pdo->query('SELECT * FROM admin_notification_prefs WHERE id = 1');
+    $cache = $stmt->fetch() ?: [
+        'notification_email'            => 'contact@argorobots.com',
+        'notify_new_posts'              => 1,
+        'notify_new_comments'           => 1,
+        'notify_new_reports'            => 1,
+        'notify_new_customer'           => 1,
+        'notify_subscription_cancelled' => 1,
+    ];
+    return $cache;
+}
+
+/**
+ * The address admin notifications should be sent to.
+ *
+ * @return string
+ */
+function admin_notification_email()
+{
+    $prefs = get_admin_notification_prefs();
+    $email = trim((string)($prefs['notification_email'] ?? ''));
+    return $email !== '' ? $email : 'contact@argorobots.com';
+}
+
+/**
+ * Whether a given admin notification toggle is enabled.
+ *
+ * @param string $key One of the notify_* column names.
+ * @return bool Defaults to true for unknown keys (fail-open: better to send a
+ *              stray alert than to silently swallow one).
+ */
+function admin_notification_enabled($key)
+{
+    $prefs = get_admin_notification_prefs();
+    if (!array_key_exists($key, $prefs)) {
+        return true;
+    }
+    return (int)$prefs[$key] === 1;
+}
+
 // Note: send_post_reply_email() and send_mention_email() defined below
 // call into helpers from email_marketing.php (should_send_marketing_email,
 // community_user_unsubscribe_url, mark_marketing_sent). Callers of those
@@ -258,22 +324,12 @@ function send_verification_email($email, $code, $username)
  */
 function send_notification_email($type, $data)
 {
-    global $pdo;
-
-    // Get all admins with the corresponding notification enabled
+    // Respect the admin's notification preferences (Settings > Notifications).
     $notification_column = ($type === 'new_post') ? 'notify_new_posts' : 'notify_new_comments';
-
-    $stmt = $pdo->prepare("SELECT u.username, ans.notification_email
-                         FROM admin_notification_settings ans
-                         JOIN community_users u ON ans.user_id = u.id
-                         WHERE u.role = 'admin' AND ans.$notification_column = 1");
-    $stmt->execute();
-    $recipients = $stmt->fetchAll();
-
-    // If no admins have notifications enabled, exit early
-    if (empty($recipients)) {
+    if (!admin_notification_enabled($notification_column)) {
         return true;
     }
+    $recipient_email = admin_notification_email();
 
     // Prepare email content
     $subject = '';
@@ -303,7 +359,7 @@ function send_notification_email($type, $data)
                     </div>
 
                     <p class="text-muted" style="font-size: 12px; margin-top: 20px;">This is an automated notification. You received this because you're an administrator of the Argo Community.
-                    You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
+                    You can adjust your notification settings <a href="$site_url/admin/settings/?tab=notifications">here</a>.</p>
             HTML;
     } elseif ($type === 'new_comment') {
         $subject = "[Argo Community] New Comment on: " . $data['post_title'];
@@ -326,28 +382,15 @@ function send_notification_email($type, $data)
                     </div>
 
                     <p class="text-muted" style="font-size: 12px; margin-top: 20px;">This is an automated notification. You received this because you're an administrator of the Argo Community.
-                    You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
+                    You can adjust your notification settings <a href="$site_url/admin/settings/?tab=notifications">here</a>.</p>
             HTML;
     } else {
         return false; // Unknown notification type
     }
 
-    // Send emails to all recipients via send_styled_email (uses SMTP when configured)
-    $success = true;
-    foreach ($recipients as $recipient) {
-        $safe_username = htmlspecialchars($recipient['username'], ENT_QUOTES, 'UTF-8');
-        $personal_body = str_replace(
-            "you're an administrator of the Argo Community.",
-            "you're an administrator ({$safe_username}) of the Argo Community.",
-            $body_template
-        );
-
-        if (!send_styled_email($recipient['notification_email'], $subject, $personal_body)) {
-            $success = false;
-        }
-    }
-
-    return $success;
+    // Send a single email to the configured admin notification address
+    // (uses SMTP when configured).
+    return send_styled_email($recipient_email, $subject, $body_template);
 }
 
 /**
@@ -855,6 +898,54 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
         HTML;
 
     return send_styled_email($email, 'Subscription Cancelled - Argo Premium', $body, 'purple');
+}
+
+/**
+ * Notify the team when a Premium subscription is cancelled. Mirrors the
+ * new-customer alert sent from process-subscription.php. Best-effort: callers
+ * must wrap this in try/catch so a failed notification never affects the
+ * customer-facing cancellation flow.
+ *
+ * @param string $email          Customer's email address
+ * @param string $subscriptionId Subscription (license) ID
+ * @param string $endDate        Date Premium access ends
+ * @param string $source         Where the cancellation came from (e.g. 'account settings', 'PayPal')
+ * @return bool Success status
+ */
+function send_premium_subscription_cancelled_admin_notification($email, $subscriptionId, $endDate, $source = '')
+{
+    // Respect the admin's notification preferences (Settings > Notifications).
+    if (!admin_notification_enabled('notify_subscription_cancelled')) {
+        return true;
+    }
+
+    $custEmail   = htmlspecialchars($email);
+    $subSafe     = htmlspecialchars($subscriptionId);
+    $accessUntil = htmlspecialchars(date('F j, Y', strtotime($endDate)));
+    $sourceSafe  = htmlspecialchars($source !== '' ? $source : 'unknown');
+    $envLabel    = htmlspecialchars(current_environment());
+
+    $body = <<<HTML
+        <h2>A Premium subscription was cancelled</h2>
+        <p>A customer just cancelled their Argo Premium subscription.</p>
+        <ul>
+            <li><strong>Customer:</strong> $custEmail</li>
+            <li><strong>Subscription ID:</strong> $subSafe</li>
+            <li><strong>Premium access ends:</strong> $accessUntil</li>
+            <li><strong>Cancelled via:</strong> $sourceSafe</li>
+            <li><strong>Environment:</strong> $envLabel</li>
+        </ul>
+        HTML;
+
+    return send_styled_email(
+        admin_notification_email(),
+        "[Argo Books] Premium subscription cancelled: $custEmail",
+        $body,
+        'purple',
+        null,
+        null,
+        $email
+    );
 }
 
 /**

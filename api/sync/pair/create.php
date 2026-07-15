@@ -1,9 +1,10 @@
 <?php
 /**
- * POST /api/sync/pair/create - desktop asks for a pairing token to embed in its QR.
+ * POST /api/sync/pair/create - desktop asks for a pairing token to embed in its QR,
+ * plus a short code the phone can type in manually.
  * Auth: desktop owner (license key or device id).
  * Body: { "company_uid": "...", "company_label": "..." }
- * Returns: { success, pairing_token, expires_in_seconds }
+ * Returns: { success, pairing_token, short_code, expires_in_seconds }
  */
 require_once __DIR__ . '/../sync-helper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -36,9 +37,10 @@ if (strlen($companyLabel) > 255) {
     $companyLabel = substr($companyLabel, 0, 255);
 }
 
-$token = create_pairing_token($owner, $companyUid, $companyLabel);
+$pairing = create_pairing_token($owner, $companyUid, $companyLabel);
 send_json_response(200, [
     'success' => true,
-    'pairing_token' => $token,
+    'pairing_token' => $pairing['token'],
+    'short_code' => $pairing['short_code'],
     'expires_in_seconds' => 600,
 ]);

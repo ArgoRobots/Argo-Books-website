@@ -234,6 +234,18 @@ function handleSubscriptionCancelled($resource) {
             error_log("Failed to send cancellation email: " . $e->getMessage());
         }
 
+        // Notify the team. Best-effort: never let it affect webhook handling.
+        try {
+            send_premium_subscription_cancelled_admin_notification(
+                $subscription['email'],
+                $subscription['subscription_id'],
+                $subscription['end_date'],
+                'PayPal'
+            );
+        } catch (Exception $e) {
+            error_log("Failed to send cancellation admin notification: " . $e->getMessage());
+        }
+
         try {
             $attr = find_visitor_for_subscription($subscription['subscription_id']);
             track_referral_event('premium_churned', [

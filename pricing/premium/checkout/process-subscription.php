@@ -937,7 +937,9 @@ try {
         // Notify the team that a new paying customer just signed up. Best-effort:
         // a failed notification must never affect the customer's checkout. Mirrors
         // the admin-alert pattern used by the PayPal price-drift guard below.
+        // Gated by the admin's notification preferences (Settings > Notifications).
         try {
+          if (admin_notification_enabled('notify_new_customer')) {
             $providerNames = ['paypal' => 'PayPal', 'stripe' => 'Stripe', 'square' => 'Square'];
             $custEmail  = htmlspecialchars($email);
             $planSafe   = htmlspecialchars(ucfirst($billing));
@@ -959,7 +961,7 @@ try {
                 </ul>
                 HTML;
             send_styled_email(
-                'contact@argorobots.com',
+                admin_notification_email(),
                 "[Argo Books] New paying customer: $custEmail",
                 $newCustomerBody,
                 'purple',
@@ -967,6 +969,7 @@ try {
                 null,
                 $email
             );
+          }
         } catch (Exception $e) {
             error_log("Failed to send new-customer admin notification: " . $e->getMessage());
         }

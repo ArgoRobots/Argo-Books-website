@@ -584,13 +584,6 @@ if ($user) {
 
                         <div class="profile-actions">
                             <?php if ($is_own_profile): ?>
-                                <?php if ($is_admin): ?>
-                                    <a href="admin_notification_settings.php" class="btn btn-blue">
-                                        <?= svg_icon('bell', 20) ?>
-                                        Notification Settings
-                                    </a>
-                                <?php endif; ?>
-
                                 <a href="subscription.php" class="btn btn-blue">
                                     <?= svg_icon('credit-card', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Manage Subscription

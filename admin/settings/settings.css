@@ -1,0 +1,318 @@
+/* Admin Settings page (Security + Notifications tabs). Colours come from the
+   shared CSS variables in custom-colors.css; dark mode is handled via the
+   [data-theme="dark"] overrides at the bottom. */
+
+.settings-page {
+    max-width: 760px;
+}
+
+/* ---- Cards ---- */
+.settings-card {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 14px;
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px -18px var(--shadow-default);
+}
+
+.settings-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.settings-card-head:last-child {
+    margin-bottom: 0;
+}
+
+.settings-card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.settings-card p {
+    color: var(--gray-800);
+    line-height: 1.55;
+    margin: 0 0 16px;
+}
+
+.settings-muted {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.settings-card p.settings-muted {
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+/* ---- Status pills ---- */
+.settings-status {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.settings-status-on {
+    color: var(--green-700);
+    background: var(--green-100);
+    border: 1px solid var(--green-300);
+}
+
+.settings-status-off {
+    color: var(--gray-700);
+    background: var(--gray-bg-light);
+    border: 1px solid var(--gray-border);
+}
+
+.settings-count {
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    background: var(--gray-bg-light);
+    border: 1px solid var(--gray-border);
+    border-radius: 999px;
+    padding: 4px 12px;
+}
+
+/* ---- 2FA setup ---- */
+.settings-steps {
+    margin: 0 0 20px;
+    padding-left: 20px;
+    color: var(--gray-800);
+    line-height: 1.7;
+}
+
+.qr-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+#qr-code-container {
+    width: 200px;
+    height: 200px;
+    flex-shrink: 0;
+    background: #fff;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-border);
+}
+
+.manual-entry {
+    flex: 1;
+    min-width: 220px;
+}
+
+.manual-entry h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    color: var(--gray-900);
+}
+
+.secret-key {
+    font-family: monospace;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    word-break: break-all;
+    background: var(--gray-bg-light);
+    border: 1px dashed var(--gray-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    color: var(--gray-900);
+}
+
+.verification-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.verification-heading {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.verification-input {
+    font-size: 1.6rem;
+    letter-spacing: 8px;
+    text-align: center;
+    width: 200px;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--gray-900);
+}
+
+/* ---- Notification toggle rows ---- */
+.notif-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-top: 1px solid var(--gray-border);
+}
+
+.notif-row:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
+
+.notif-label {
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 2px;
+}
+
+.notif-desc {
+    margin: 0;
+}
+
+/* ---- Toggle switch ---- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch .slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: var(--gray-400, #9ca3af);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+}
+
+.switch .slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.switch input:checked + .slider {
+    background: var(--primary-blue);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+.switch input:focus-visible + .slider {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* ---- Email field ---- */
+.settings-email-field label {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 6px;
+}
+
+.settings-email-field input {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--gray-900);
+    font-size: 0.95rem;
+}
+
+.settings-actions {
+    margin-top: 4px;
+}
+
+.settings-footnote {
+    margin-top: 16px;
+    text-align: center;
+}
+
+@media (max-width: 560px) {
+    .settings-card {
+        padding: 20px 18px;
+    }
+    .qr-container {
+        justify-content: center;
+    }
+}
+
+/* ================= Dark theme ================= */
+[data-theme="dark"] .settings-card {
+    background: var(--gray-800);
+    border-color: var(--black);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .settings-card h2,
+[data-theme="dark"] .manual-entry h3,
+[data-theme="dark"] .settings-card p,
+[data-theme="dark"] .notif-label,
+[data-theme="dark"] .verification-heading,
+[data-theme="dark"] .settings-email-field label,
+[data-theme="dark"] .secret-key {
+    color: var(--white);
+}
+
+[data-theme="dark"] .settings-muted {
+    color: var(--gray-400, #b3b3b3);
+}
+
+[data-theme="dark"] .notif-row {
+    border-top-color: var(--gray-700);
+}
+
+[data-theme="dark"] .secret-key,
+[data-theme="dark"] .settings-status-off,
+[data-theme="dark"] .settings-count {
+    background: var(--gray-700);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] .settings-email-field input,
+[data-theme="dark"] .verification-input {
+    background: var(--gray-700);
+    border-color: var(--black);
+    color: var(--white);
+}
+
+[data-theme="dark"] .settings-steps {
+    color: var(--white);
+}

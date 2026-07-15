@@ -84,6 +84,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
                 error_log("Failed to send cancellation email: " . $e->getMessage());
             }
 
+            // Notify the team. Best-effort: never let it affect the cancel flow.
+            try {
+                send_premium_subscription_cancelled_admin_notification(
+                    $subscription['email'],
+                    $subscription['subscription_id'],
+                    $subscription['end_date'],
+                    'account settings'
+                );
+            } catch (Exception $e) {
+                error_log("Failed to send cancellation admin notification: " . $e->getMessage());
+            }
+
             try {
                 $attr = find_visitor_for_subscription($subscription['subscription_id']);
                 track_referral_event('premium_churned', [

@@ -12,7 +12,8 @@ final class PairEndpointsTest extends DatabaseTestCase
     public function test_redeem_creates_device_row_bound_to_company(): void
     {
         // Desktop side: create a pairing token.
-        $token = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $pairing = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $token = $pairing['token'];
 
         // Phone side (what redeem.php does): consume the token, insert a device row.
         $binding = consume_pairing_token($token);

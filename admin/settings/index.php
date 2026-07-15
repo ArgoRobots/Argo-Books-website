@@ -209,9 +209,9 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <?php if ($is_enabled): ?>
-                <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
+                <form method="post" class="settings-center" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <button type="submit" name="disable_2fa" value="1" class="btn btn-red">Disable 2FA</button>
+                    <button type="submit" name="disable_2fa" value="1" class="settings-linkbtn">Disable 2FA</button>
                 </form>
             <?php elseif (isset($_GET['setup'])): ?>
                 <ol class="settings-steps">
@@ -250,7 +250,6 @@ include __DIR__ . '/../admin_header.php';
                         <h2>Trusted Devices</h2>
                         <p class="settings-muted">Browsers allowed to skip the 2FA code for 30 days.</p>
                     </div>
-                    <span class="settings-count"><?= (int)$trusted_count ?></span>
                 </div>
                 <p>
                     <?php if ($trusted_count === 0): ?>
@@ -259,7 +258,9 @@ include __DIR__ . '/../admin_header.php';
                         <?= (int)$trusted_count ?> device<?= $trusted_count === 1 ? '' : 's' ?> can currently skip the code.
                     <?php endif; ?>
                 </p>
-                <a href="trusted-devices.php" class="btn btn-blue">Manage trusted devices</a>
+                <div class="settings-center">
+                    <a href="trusted-devices.php" class="btn btn-secondary">Manage trusted devices</a>
+                </div>
             </div>
         <?php endif; ?>
     </div>
@@ -312,8 +313,8 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             <?php endforeach; ?>
 
-            <div class="settings-actions">
-                <button type="submit" class="btn btn-blue">Save Notifications</button>
+            <div class="settings-actions settings-center">
+                <button type="submit" class="btn btn-blue">Save settings</button>
             </div>
         </form>
 

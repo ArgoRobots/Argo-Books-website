@@ -3,7 +3,7 @@
    [data-theme="dark"] overrides at the bottom. */
 
 .settings-page {
-    max-width: 760px;
+    max-width: 640px;
 }
 
 /* ---- Cards ---- */
@@ -11,27 +11,29 @@
     background: var(--white);
     border: 1px solid var(--gray-border);
     border-radius: 14px;
-    padding: 24px 26px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px -18px var(--shadow-default);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
 }
 
 .settings-card-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 16px;
 }
 
-.settings-card-head:last-child {
-    margin-bottom: 0;
+/* Let the title/description block shrink so the pill stays on the same row. */
+.settings-card-head > div {
+    min-width: 0;
 }
 
 .settings-card h2 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--gray-900);
 }
 
@@ -41,51 +43,96 @@
     margin: 0 0 16px;
 }
 
+/* The button/link is the last child; don't leave a trailing gap under the text. */
+.settings-card > form:last-child,
+.settings-card > a:last-child,
+.settings-card > p:last-child {
+    margin-bottom: 0;
+}
+
 .settings-muted {
     color: var(--gray-600);
     font-size: 0.9rem;
 }
 
-.settings-card p.settings-muted {
-    margin-top: 4px;
-    margin-bottom: 0;
+.settings-card-head p.settings-muted {
+    margin: 4px 0 0;
 }
 
-/* ---- Status pills ---- */
+/* ---- Status pill (with a leading dot) ---- */
 .settings-status {
     flex-shrink: 0;
-    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
-    padding: 5px 12px;
+    letter-spacing: 0.5px;
+    padding: 5px 11px 5px 10px;
     border-radius: 999px;
     white-space: nowrap;
+}
+
+.settings-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 .settings-status-on {
     color: var(--green-700);
     background: var(--green-100);
-    border: 1px solid var(--green-300);
 }
 
 .settings-status-off {
-    color: var(--gray-700);
+    color: var(--gray-600);
     background: var(--gray-bg-light);
+}
+
+/* ---- Buttons + centered card actions ---- */
+/* The shared .btn is a fixed 180px with no side padding; release the width so
+   longer labels (e.g. "Manage trusted devices") size to their text. */
+.settings-page .btn {
+    width: auto;
+    padding: 11px 24px;
+    white-space: nowrap;
+}
+
+/* Card actions (Disable, Manage, Save) sit centered under the card text. */
+.settings-center {
+    text-align: center;
+}
+
+/* "Disable 2FA" reads as a quiet link, not a button. */
+.settings-linkbtn {
+    display: inline-block;
+    background: none;
+    border: none;
+    padding: 4px 2px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--red-600, #dc2626);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.settings-linkbtn:hover {
+    color: var(--red-700, #b91c1c);
+}
+
+.settings-page .btn-secondary {
+    background: var(--gray-bg-light);
+    color: var(--gray-800);
     border: 1px solid var(--gray-border);
 }
 
-.settings-count {
-    flex-shrink: 0;
-    min-width: 34px;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-    background: var(--gray-bg-light);
-    border: 1px solid var(--gray-border);
-    border-radius: 999px;
-    padding: 4px 12px;
+.settings-page .btn-secondary:hover {
+    background: var(--gray-100, #f3f4f6);
+    border-color: var(--gray-400, #9ca3af);
 }
 
 /* ---- 2FA setup ---- */
@@ -162,29 +209,35 @@
     color: var(--gray-900);
 }
 
-/* ---- Notification toggle rows ---- */
+/* ---- Notification toggle rows (compact) ---- */
 .notif-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding: 14px 0;
+    padding: 11px 0;
     border-top: 1px solid var(--gray-border);
 }
 
 .notif-row:first-of-type {
     border-top: none;
-    padding-top: 0;
+    padding-top: 2px;
+}
+
+.notif-row:last-of-type {
+    padding-bottom: 2px;
 }
 
 .notif-label {
     font-weight: 600;
     color: var(--gray-900);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .notif-desc {
     margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
 /* ---- Toggle switch ---- */
@@ -274,11 +327,13 @@
     }
 }
 
-/* ================= Dark theme ================= */
+/* ================= Dark theme =================
+   Subtle light-alpha borders (never pure black) so cards separate cleanly
+   from the page and each other. */
 [data-theme="dark"] .settings-card {
     background: var(--gray-800);
-    border-color: var(--black);
-    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="dark"] .settings-card h2,
@@ -296,21 +351,44 @@
 }
 
 [data-theme="dark"] .notif-row {
-    border-top-color: var(--gray-700);
+    border-top-color: rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="dark"] .secret-key,
-[data-theme="dark"] .settings-status-off,
-[data-theme="dark"] .settings-count {
-    background: var(--gray-700);
-    border-color: var(--black);
+[data-theme="dark"] .settings-status-off {
+    color: var(--gray-400, #b3b3b3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .settings-linkbtn {
+    color: var(--red-300, #fca5a5);
+}
+
+[data-theme="dark"] .settings-page .btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--white);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="dark"] .settings-page .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="dark"] .secret-key {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 [data-theme="dark"] .settings-email-field input,
-[data-theme="dark"] .verification-input {
-    background: var(--gray-700);
-    border-color: var(--black);
+[data-theme="dark"] .verification-input,
+[data-theme="dark"] #qr-code-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.14);
     color: var(--white);
+}
+
+[data-theme="dark"] #qr-code-container {
+    background: #fff;
 }
 
 [data-theme="dark"] .settings-steps {

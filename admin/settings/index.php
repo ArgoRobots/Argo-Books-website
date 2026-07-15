@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/2fa.php';
+require_once __DIR__ . '/../trusted_devices.php';
+require_once __DIR__ . '/../../email_sender.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -9,60 +11,117 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// CSRF token for the enable/disable 2FA forms below.
+// CSRF token shared by every form on this page.
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Set page variables for the header
-$page_title = "Two-Factor Authentication Setup";
-$page_description = "Configure two-factor authentication for enhanced account security";
+$page_title = 'Settings';
+$page_description = 'Security and notification preferences for the admin dashboard.';
 
 $username = $_SESSION['admin_username'];
 $error = '';
 $success = '';
+$notif_error = '';
+$notif_success = '';
 $is_enabled = is_2fa_enabled($username);
 $new_secret = '';
 $qr_code_data = '';
 
-// Check if 2FA is already enabled or we're setting it up
+// Which tab renders active. Query param wins for deep links; a form submission
+// re-activates the tab it came from so messages land next to their form.
+$valid_tabs = ['security', 'notifications'];
+$active_tab = 'security';
+if (isset($_GET['tab']) && in_array($_GET['tab'], $valid_tabs, true)) {
+    $active_tab = $_GET['tab'];
+}
+
+// Seed the notification prefs row (idempotent) so the UPDATE below always hits.
+get_admin_notification_prefs();
+
+// ---- 2FA setup flow (Security tab) ----
 if (!$is_enabled && isset($_GET['setup'])) {
-    // Only generate a new secret if one doesn't already exist in session
     if (!isset($_SESSION['temp_2fa_secret'])) {
         $new_secret = generate_2fa_secret();
         $_SESSION['temp_2fa_secret'] = $new_secret;
     } else {
-        // Use existing secret from session
         $new_secret = $_SESSION['temp_2fa_secret'];
     }
-
     $qr_code_data = get_qr_code_url($username, $new_secret, 'Argo Books Admin');
 }
 
-// Handle disabling of 2FA
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['disable_2fa'])) {
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)($_POST['csrf_token'] ?? ''))) {
-        $error = 'Security check failed. Please refresh the page and try again.';
-    } elseif (disable_2fa($username)) {
-        $success = 'Two-factor authentication has been disabled.';
-        $is_enabled = false;
-    } else {
-        $error = 'Failed to disable two-factor authentication.';
-    }
-}
+// ---- POST handling ----
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $posted_csrf = (string)($_POST['csrf_token'] ?? '');
+    $csrf_ok = hash_equals($_SESSION['csrf_token'] ?? '', $posted_csrf);
 
-// Handle activation of 2FA
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enable_2fa'])) {
-    $verification_code = $_POST['verification_code'] ?? '';
-    $secret = $_SESSION['temp_2fa_secret'] ?? '';
+    if (isset($_POST['save_notifications'])) {
+        // ---- Notifications tab ----
+        $active_tab = 'notifications';
+        $email = trim((string)($_POST['notification_email'] ?? ''));
+        $toggles = [
+            'notify_new_posts',
+            'notify_new_comments',
+            'notify_new_reports',
+            'notify_new_customer',
+            'notify_subscription_cancelled',
+        ];
+        $values = [];
+        foreach ($toggles as $t) {
+            $values[$t] = isset($_POST[$t]) ? 1 : 0;
+        }
 
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)($_POST['csrf_token'] ?? ''))) {
-        $error = 'Security check failed. Please refresh the page and try again.';
-    } elseif (empty($secret)) {
-        $error = 'Session expired or invalid. Please try again.';
-    } else {
-        // Check verification code
-        if (verify_2fa_code($secret, $verification_code)) {
+        if (!$csrf_ok) {
+            $notif_error = 'Security check failed. Please refresh the page and try again.';
+        } elseif ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $notif_error = 'Please enter a valid notification email address.';
+        } else {
+            try {
+                $stmt = $pdo->prepare(
+                    'UPDATE admin_notification_prefs
+                        SET notification_email = ?,
+                            notify_new_posts = ?,
+                            notify_new_comments = ?,
+                            notify_new_reports = ?,
+                            notify_new_customer = ?,
+                            notify_subscription_cancelled = ?
+                      WHERE id = 1'
+                );
+                $stmt->execute([
+                    $email,
+                    $values['notify_new_posts'],
+                    $values['notify_new_comments'],
+                    $values['notify_new_reports'],
+                    $values['notify_new_customer'],
+                    $values['notify_subscription_cancelled'],
+                ]);
+                $notif_success = 'Notification settings saved.';
+            } catch (PDOException $e) {
+                error_log('admin_notification_prefs update failed: ' . $e->getMessage());
+                $notif_error = 'Failed to save notification settings. Please try again.';
+            }
+        }
+    } elseif (isset($_POST['disable_2fa'])) {
+        // ---- 2FA disable (Security tab) ----
+        $active_tab = 'security';
+        if (!$csrf_ok) {
+            $error = 'Security check failed. Please refresh the page and try again.';
+        } elseif (disable_2fa($username)) {
+            $success = 'Two-factor authentication has been disabled.';
+            $is_enabled = false;
+        } else {
+            $error = 'Failed to disable two-factor authentication.';
+        }
+    } elseif (isset($_POST['enable_2fa'])) {
+        // ---- 2FA enable (Security tab) ----
+        $active_tab = 'security';
+        $verification_code = $_POST['verification_code'] ?? '';
+        $secret = $_SESSION['temp_2fa_secret'] ?? '';
+        if (!$csrf_ok) {
+            $error = 'Security check failed. Please refresh the page and try again.';
+        } elseif (empty($secret)) {
+            $error = 'Session expired or invalid. Please try again.';
+        } elseif (verify_2fa_code($secret, $verification_code)) {
             if (save_2fa_secret($username, $secret)) {
                 $success = 'Two-factor authentication successfully enabled!';
                 $is_enabled = true;
@@ -76,94 +135,208 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enable_2fa'])) {
     }
 }
 
+// Current notification prefs for rendering. Read straight from the DB so a save
+// in this same request is reflected. On a failed save, fall back to the posted
+// values so the admin doesn't lose their edits.
+$prefs = $pdo->query('SELECT * FROM admin_notification_prefs WHERE id = 1')->fetch();
+if (!$prefs) {
+    $prefs = [
+        'notification_email'            => 'contact@argorobots.com',
+        'notify_new_posts'              => 1,
+        'notify_new_comments'           => 1,
+        'notify_new_reports'            => 1,
+        'notify_new_customer'           => 1,
+        'notify_subscription_cancelled' => 1,
+    ];
+}
+if ($notif_error !== '') {
+    $prefs['notification_email'] = $_POST['notification_email'] ?? $prefs['notification_email'];
+    foreach (['notify_new_posts', 'notify_new_comments', 'notify_new_reports', 'notify_new_customer', 'notify_subscription_cancelled'] as $t) {
+        $prefs[$t] = isset($_POST[$t]) ? 1 : 0;
+    }
+}
+
+// Trusted-device count for the Security tab card.
+$user = get_user_by_username($username);
+$trusted_count = ($is_enabled && $user) ? count(list_trusted_devices((int)$user['id'])) : 0;
+
+// Notification toggle definitions, grouped for display.
+$notif_groups = [
+    'Community' => [
+        'notify_new_posts'    => ['New posts', 'When someone posts a bug report or feature request.'],
+        'notify_new_comments' => ['New comments', 'When someone comments on any community post.'],
+        'notify_new_reports'  => ['Content reports', 'When a user reports content for moderation.'],
+    ],
+    'Sales' => [
+        'notify_new_customer'           => ['New paying customer', 'When someone subscribes to Argo Premium.'],
+        'notify_subscription_cancelled' => ['Subscription cancelled', 'When someone cancels their Premium subscription.'],
+    ],
+];
+
 include __DIR__ . '/../admin_header.php';
 ?>
 
-<div class="container">
-    <?php if ($error): ?>
-        <div class="error-message">
-            <?php echo htmlspecialchars($error); ?>
-        </div>
-    <?php endif; ?>
+<link rel="stylesheet" href="settings.css">
 
-    <?php if ($success): ?>
-        <div class="success-message">
-            <?php echo htmlspecialchars($success); ?>
-        </div>
-    <?php endif; ?>
+<div class="container settings-page">
 
-    <div class="center">
-        <?php if ($is_enabled): ?>
-            <h2>Your account is currently protected with 2FA</h2>
+    <div class="section-tabs">
+        <button type="button" class="section-tab <?= $active_tab === 'security' ? 'active' : '' ?>" data-tab="tab-security">Security</button>
+        <button type="button" class="section-tab <?= $active_tab === 'notifications' ? 'active' : '' ?>" data-tab="tab-notifications">Notifications</button>
+    </div>
 
-            <p>
-                <a href="trusted-devices.php" class="link">Manage trusted devices</a>:
-                review the browsers that can skip the 2FA step for 30 days.
-            </p>
+    <!-- ===================== SECURITY ===================== -->
+    <div id="tab-security" class="tab-content <?= $active_tab === 'security' ? 'active' : '' ?>">
 
-            <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <div class="center">
-                    <button type="submit" name="disable_2fa" class="btn btn-red">Disable 2FA</button>
+        <?php if ($error): ?>
+            <div class="error-message"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="success-message"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
+
+        <div class="settings-card">
+            <div class="settings-card-head">
+                <div>
+                    <h2>Two-Factor Authentication</h2>
+                    <p class="settings-muted">An authenticator code is required on top of your password when signing in.</p>
                 </div>
-            </form>
-        <?php elseif (isset($_GET['setup'])): ?>
-            <ol class="steps">
-                <li>Download and install Google Authenticator app on your mobile device
-                    <ul>
-                        <li><a class="link" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Android - Google Play Store</a></li>
-                        <li><a class="link" href="https://apps.apple.com/us/app/google-authenticator/id388497605" target="_blank">iOS - App Store</a></li>
-                    </ul>
-                </li>
-                <li>Scan the QR code below with the app</li>
-                <li>Enter the 6-digit verification code from the app</li>
-            </ol>
+                <?php if ($is_enabled): ?>
+                    <span class="settings-status settings-status-on">Enabled</span>
+                <?php else: ?>
+                    <span class="settings-status settings-status-off">Off</span>
+                <?php endif; ?>
+            </div>
 
-            <div class="qr-container">
-                <div id="qr-code-container" style="margin: 0 auto; width: 200px; height: 200px;"></div>
+            <?php if ($is_enabled): ?>
+                <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <button type="submit" name="disable_2fa" value="1" class="btn btn-red">Disable 2FA</button>
+                </form>
+            <?php elseif (isset($_GET['setup'])): ?>
+                <ol class="settings-steps">
+                    <li>Install an authenticator app (Google Authenticator, Authy, etc.).</li>
+                    <li>Scan the QR code below, or enter the key manually.</li>
+                    <li>Enter the 6-digit code to confirm.</li>
+                </ol>
 
-                <div class="manual-entry">
-                    <h3>Manual Entry</h3>
-                    <p>If you can't scan the QR code, enter this key manually in your authenticator app:</p>
-                    <div class="secret-key"><?php echo htmlspecialchars($new_secret); ?></div>
-                    <p><small>In Google Authenticator: tap + button → Enter a setup key → Enter the key above and set "Argo Books Admin" as the account name</small></p>
+                <div class="qr-container">
+                    <div id="qr-code-container"></div>
+                    <div class="manual-entry">
+                        <h3>Manual entry</h3>
+                        <p>If you can't scan the code, enter this key in your app:</p>
+                        <div class="secret-key"><?= htmlspecialchars($new_secret) ?></div>
+                        <p class="settings-muted"><small>Set "Argo Books Admin" as the account name.</small></p>
+                    </div>
+                </div>
+
+                <form method="post" class="verification-form" id="verification-form">
+                    <label class="verification-heading" for="verification_code">Enter the 6-digit code from your app</label>
+                    <input type="number" id="verification_code" name="verification_code" class="verification-input" required autofocus placeholder="000000" min="0" max="999999">
+                    <button type="button" onclick="submitVerificationForm()" id="verify-button" class="btn btn-green">Verify and Enable</button>
+                    <input type="hidden" name="enable_2fa" value="1">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                </form>
+            <?php else: ?>
+                <p>Add an extra layer of security so a stolen password alone can't sign in.</p>
+                <a href="?setup=1" class="btn btn-blue">Set Up 2FA</a>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($is_enabled): ?>
+            <div class="settings-card">
+                <div class="settings-card-head">
+                    <div>
+                        <h2>Trusted Devices</h2>
+                        <p class="settings-muted">Browsers allowed to skip the 2FA code for 30 days.</p>
+                    </div>
+                    <span class="settings-count"><?= (int)$trusted_count ?></span>
+                </div>
+                <p>
+                    <?php if ($trusted_count === 0): ?>
+                        No trusted devices right now. Tick "Trust this device" at sign-in to add one.
+                    <?php else: ?>
+                        <?= (int)$trusted_count ?> device<?= $trusted_count === 1 ? '' : 's' ?> can currently skip the code.
+                    <?php endif; ?>
+                </p>
+                <a href="trusted-devices.php" class="btn btn-blue">Manage trusted devices</a>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- ===================== NOTIFICATIONS ===================== -->
+    <div id="tab-notifications" class="tab-content <?= $active_tab === 'notifications' ? 'active' : '' ?>">
+
+        <?php if ($notif_error): ?>
+            <div class="error-message"><?= htmlspecialchars($notif_error) ?></div>
+        <?php endif; ?>
+        <?php if ($notif_success): ?>
+            <div class="success-message"><?= htmlspecialchars($notif_success) ?></div>
+        <?php endif; ?>
+
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+            <input type="hidden" name="save_notifications" value="1">
+
+            <div class="settings-card">
+                <div class="settings-card-head">
+                    <div>
+                        <h2>Where alerts go</h2>
+                        <p class="settings-muted">All admin notifications below are sent to this address.</p>
+                    </div>
+                </div>
+                <div class="settings-email-field">
+                    <label for="notification_email">Notification email</label>
+                    <input type="email" id="notification_email" name="notification_email" required
+                           value="<?= htmlspecialchars($prefs['notification_email']) ?>">
                 </div>
             </div>
 
-            <form method="post" class="verification-form center" id="verification-form">
-                <div class="verification-heading">Enter the 6-digit code from your authenticator app</div>
+            <?php foreach ($notif_groups as $group_label => $rows): ?>
+                <div class="settings-card">
+                    <div class="settings-card-head">
+                        <div><h2><?= htmlspecialchars($group_label) ?></h2></div>
+                    </div>
+                    <?php foreach ($rows as $key => [$label, $desc]): ?>
+                        <div class="notif-row">
+                            <div class="notif-text">
+                                <div class="notif-label"><?= htmlspecialchars($label) ?></div>
+                                <div class="notif-desc settings-muted"><?= htmlspecialchars($desc) ?></div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="<?= htmlspecialchars($key) ?>" <?= (int)$prefs[$key] === 1 ? 'checked' : '' ?>>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
 
-                <input type="number" id="verification_code" name="verification_code" class="verification-input" required autofocus placeholder="000000" min="0" max="999999">
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-blue">Save Notifications</button>
+            </div>
+        </form>
 
-                <button type="button" onclick="submitVerificationForm()" id="verify-button" class="btn btn-green">Verify and Enable</button>
-                <input type="hidden" name="enable_2fa" value="1">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-            </form>
-        <?php else: ?>
-            <h2>Enhance Your Account Security</h2>
-            <p>Two-factor authentication adds an extra layer of security to your account. After enabling, you'll need both your password and a verification code from your mobile device to sign in.</p>
-
-            <a href="?setup=1" class="btn btn-blue">Set Up 2FA</a>
-        <?php endif; ?>
+        <p class="settings-muted settings-footnote">
+            Safety alerts (refund blocks, payment price mismatches) are always sent and can't be turned off here.
+        </p>
     </div>
 </div>
 
+<?php if (!empty($qr_code_data)): ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<?php endif; ?>
 <script>
     function submitVerificationForm() {
-        document.getElementById('verification-form').submit();
+        var f = document.getElementById('verification-form');
+        if (f) f.submit();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // QR Code generation
-        const qrContainer = document.getElementById('qr-code-container');
-        let otpAuthUrl = "";
+        var qrContainer = document.getElementById('qr-code-container');
+        var otpAuthUrl = <?= !empty($qr_code_data) ? json_encode($qr_code_data) : '""' ?>;
 
-        <?php if (!empty($qr_code_data)): ?>
-            otpAuthUrl = <?php echo json_encode($qr_code_data); ?>;
-        <?php endif; ?>
-
-        if (qrContainer && otpAuthUrl) {
+        if (qrContainer && otpAuthUrl && typeof QRCode !== 'undefined') {
             try {
                 new QRCode(qrContainer, {
                     text: otpAuthUrl,
@@ -178,28 +351,16 @@ include __DIR__ . '/../admin_header.php';
             }
         }
 
-        // Auto-submit when 6 digits are entered
-        const verificationInput = document.getElementById('verification_code');
+        var verificationInput = document.getElementById('verification_code');
         if (verificationInput) {
             verificationInput.addEventListener('input', function() {
-                // Force numeric only
                 this.value = this.value.replace(/[^0-9]/g, '');
-
-                // Auto-submit on 6 digits
                 if (this.value.length === 6) {
-                    // Add a small delay so user sees the 6th digit
-                    setTimeout(function() {
-                        submitVerificationForm();
-                    }, 300);
+                    setTimeout(submitVerificationForm, 300);
                 }
             });
-
-            // Prevent arrow keys
             verificationInput.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                }
-                // Also submit on Enter key when 6 digits entered
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') e.preventDefault();
                 if (e.key === 'Enter' && this.value.length === 6) {
                     e.preventDefault();
                     submitVerificationForm();
@@ -208,3 +369,9 @@ include __DIR__ . '/../admin_header.php';
         }
     });
 </script>
+
+        </main>
+    </div>
+</body>
+
+</html>

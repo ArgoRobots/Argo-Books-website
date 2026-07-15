@@ -124,17 +124,12 @@ try {
 
         error_log("Report created with ID: " . $report_id);
 
-        // Send notification to admins who have opted in
-        $stmt = $pdo->prepare('
-            SELECT ans.notification_email, cu.username as admin_username
-            FROM admin_notification_settings ans
-            JOIN community_users cu ON ans.user_id = cu.id
-            WHERE cu.role = "admin" AND ans.notify_new_reports = 1
-        ');
-        $stmt->execute();
-        $admins = $stmt->fetchAll();
+        // Notify the admin if content-report alerts are enabled
+        // (Settings > Notifications).
+        $report_alerts_enabled = admin_notification_enabled('notify_new_reports');
+        $admin_alert_email = admin_notification_email();
 
-        error_log("Found " . count($admins) . " admins with notifications enabled");
+        error_log("Content-report alerts enabled: " . ($report_alerts_enabled ? 'yes' : 'no'));
 
         // Get reporter username
         $stmt2 = $pdo->prepare('SELECT username FROM community_users WHERE id = ?');
@@ -162,17 +157,17 @@ try {
 
         error_log("Reported username: " . $reported_username);
 
-        foreach ($admins as $admin) {
-            error_log("Sending notification to: " . $admin['notification_email'] . " (admin: " . $admin['admin_username'] . ")");
+        if ($report_alerts_enabled) {
+            error_log("Sending report notification to: " . $admin_alert_email);
             $mail_result = send_new_report_notification(
-                $admin['notification_email'],
+                $admin_alert_email,
                 $report_id,
                 $content_type,
                 $violation_type,
                 $reporter_username,
                 $reported_username
             );
-            error_log("Mail result for " . $admin['notification_email'] . ": " . ($mail_result ? "success" : "failure"));
+            error_log("Mail result for " . $admin_alert_email . ": " . ($mail_result ? "success" : "failure"));
         }
 
         echo json_encode(['success' => true, 'message' => 'Report submitted successfully.']);

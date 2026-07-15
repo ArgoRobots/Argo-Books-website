@@ -1,0 +1,33 @@
+<?php
+/**
+ * POST /api/sync/devices/list - desktop lists paired phones for a company.
+ * Auth: desktop owner. Body: { "company_uid": "..." }
+ * Returns: { success, devices: [ { id, device_label, last_seen_at } ] }
+ */
+require_once __DIR__ . '/../sync-helper.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
+Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../')->safeLoad();
+
+set_portal_headers();
+require_method(['POST']);
+
+$owner = resolve_owner_identity();
+if (!$owner) {
+    send_error_response(401, 'Unauthorized.', 'UNAUTHORIZED');
+}
+$data = json_decode(file_get_contents('php://input'), true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    send_error_response(400, 'Invalid JSON body.', 'INVALID_JSON');
+}
+$companyUid = trim((string) ($data['company_uid'] ?? ''));
+if ($companyUid === '') {
+    send_error_response(400, 'company_uid is required.', 'INVALID_COMPANY');
+}
+
+global $pdo;
+$stmt = $pdo->prepare(
+    'SELECT id, device_label, last_seen_at FROM mobile_sync_devices
+     WHERE company_uid = ? AND owner_identity_hash = ? ORDER BY created_at ASC'
+);
+$stmt->execute([$companyUid, $owner]);
+send_json_response(200, ['success' => true, 'devices' => $stmt->fetchAll()]);

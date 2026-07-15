@@ -60,7 +60,7 @@ include __DIR__ . '/../admin_header.php';
     <?php endif; ?>
 
     <p>
-        <a href="index.php" class="link">&larr; Back to 2FA settings</a>
+        <a href="index.php?tab=security" class="link">&larr; Back to Settings</a>
     </p>
 
     <?php if (empty($devices)): ?>

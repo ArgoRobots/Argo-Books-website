@@ -97,7 +97,7 @@ $base_path = $in_subdir ? '../' : '';
                     ],
                     'System' => [
                         'crons'    => 'Crons',
-                        'settings' => '2FA',
+                        'settings' => 'Settings',
                     ],
                 ];
                 ?>

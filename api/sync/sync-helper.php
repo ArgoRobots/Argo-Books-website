@@ -253,3 +253,38 @@ function deliver_pairing_key(string $pairingToken, string $ownerHash, string $en
     $update->execute([$encryptedSyncKey, $pairingToken, $ownerHash]);
     return $update->rowCount() === 1;
 }
+
+/**
+ * Phone polls for the delivered sync key using the device token it received at claim time.
+ * Looked up by device_token_hash on the pairing row itself (not mobile_sync_devices), since
+ * the pairing, not the device, carries the ciphertext.
+ *
+ * Returns null if the token doesn't resolve to any pairing (caller surfaces one generic
+ * not-found, whether the token is unknown or already consumed). Returns ['pending' => true]
+ * while the desktop hasn't delivered the key yet. Once delivered, returns
+ * ['encrypted_sync_key' => ...] and deletes the pairing row so it can't be fetched twice;
+ * the mobile_sync_devices row is untouched and keeps working for snapshot/queue calls.
+ */
+function fetch_and_consume_pairing_key(string $deviceToken): ?array
+{
+    global $pdo;
+    if ($deviceToken === '') {
+        return null;
+    }
+    $tokenHash = hash('sha256', $deviceToken);
+    $stmt = $pdo->prepare(
+        'SELECT id, status, encrypted_sync_key FROM mobile_sync_pairings WHERE device_token_hash = ? LIMIT 1'
+    );
+    $stmt->execute([$tokenHash]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return null;
+    }
+
+    if ($row['status'] !== 'delivered') {
+        return ['pending' => true];
+    }
+
+    $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE id = ?')->execute([$row['id']]);
+    return ['encrypted_sync_key' => $row['encrypted_sync_key']];
+}

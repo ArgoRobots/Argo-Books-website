@@ -194,13 +194,34 @@ function claim_pairing_code(string $rawCode, string $phonePublicKey, string $dev
     $deviceToken = bin2hex(random_bytes(32));
     $deviceTokenHash = hash('sha256', $deviceToken);
 
-    $pdo->prepare(
-        'INSERT INTO mobile_sync_devices (device_token_hash, owner_identity_hash, company_uid, device_label, last_seen_at)
-         VALUES (?, ?, ?, ?, NOW())'
-    )->execute([$deviceTokenHash, $row['owner_identity_hash'], $row['company_uid'], $deviceLabel]);
+    // The device row and the pairing's device_token_hash must land together: a
+    // thrown exception here would otherwise strand a 'claimed' row with a NULL
+    // device_token_hash (unusable, but no longer claimable either). Only start
+    // (and commit/roll back) a transaction if the caller isn't already inside
+    // one, since MySQL doesn't nest transactions and PHPUnit's DatabaseTestCase
+    // wraps every test in its own outer transaction.
+    $ownTransaction = !$pdo->inTransaction();
+    if ($ownTransaction) {
+        $pdo->beginTransaction();
+    }
+    try {
+        $pdo->prepare(
+            'INSERT INTO mobile_sync_devices (device_token_hash, owner_identity_hash, company_uid, device_label, last_seen_at)
+             VALUES (?, ?, ?, ?, NOW())'
+        )->execute([$deviceTokenHash, $row['owner_identity_hash'], $row['company_uid'], $deviceLabel]);
 
-    $pdo->prepare('UPDATE mobile_sync_pairings SET device_token_hash = ? WHERE short_code = ?')
-        ->execute([$deviceTokenHash, $code]);
+        $pdo->prepare('UPDATE mobile_sync_pairings SET device_token_hash = ? WHERE short_code = ?')
+            ->execute([$deviceTokenHash, $code]);
+
+        if ($ownTransaction) {
+            $pdo->commit();
+        }
+    } catch (\Throwable $e) {
+        if ($ownTransaction) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
 
     return [
         'company_uid' => $row['company_uid'],
@@ -244,11 +265,11 @@ function get_pairing_status(string $pairingToken, string $ownerHash): ?array
 /**
  * Desktop delivers the RSA-encrypted sync key to a pairing it created, once
  * the phone has claimed it. Owner-scoped and status-gated in a single atomic
- * UPDATE: matches pairing_token AND owner_identity_hash AND status = 'claimed',
- * so rowCount() === 1 is the only signal callers need. A pairing that's still
- * pending, already delivered, or belongs to a different owner all collapse to
- * the same false, so callers surface one generic error without leaking which
- * case applied.
+ * UPDATE: matches pairing_token AND owner_identity_hash AND status = 'claimed'
+ * AND expires_at > NOW(), so rowCount() === 1 is the only signal callers need.
+ * A pairing that's still pending, already delivered, expired, or belongs to a
+ * different owner all collapse to the same false, so callers surface one
+ * generic error without leaking which case applied.
  */
 function deliver_pairing_key(string $pairingToken, string $ownerHash, string $encryptedSyncKey): bool
 {
@@ -256,7 +277,7 @@ function deliver_pairing_key(string $pairingToken, string $ownerHash, string $en
     $update = $pdo->prepare(
         "UPDATE mobile_sync_pairings
          SET encrypted_sync_key = ?, status = 'delivered'
-         WHERE pairing_token = ? AND owner_identity_hash = ? AND status = 'claimed'"
+         WHERE pairing_token = ? AND owner_identity_hash = ? AND status = 'claimed' AND expires_at > NOW()"
     );
     $update->execute([$encryptedSyncKey, $pairingToken, $ownerHash]);
     return $update->rowCount() === 1;
@@ -267,11 +288,13 @@ function deliver_pairing_key(string $pairingToken, string $ownerHash, string $en
  * Looked up by device_token_hash on the pairing row itself (not mobile_sync_devices), since
  * the pairing, not the device, carries the ciphertext.
  *
- * Returns null if the token doesn't resolve to any pairing (caller surfaces one generic
- * not-found, whether the token is unknown or already consumed). Returns ['pending' => true]
- * while the desktop hasn't delivered the key yet. Once delivered, returns
- * ['encrypted_sync_key' => ...] and deletes the pairing row so it can't be fetched twice;
- * the mobile_sync_devices row is untouched and keeps working for snapshot/queue calls.
+ * Returns null if the token doesn't resolve to any unexpired pairing (caller surfaces one
+ * generic not-found, whether the token is unknown, expired, or already consumed). Returns
+ * ['pending' => true] while the desktop hasn't delivered the key yet. Once delivered,
+ * deletes the pairing row with a `status = 'delivered'` guard and returns
+ * ['encrypted_sync_key' => ...] only when that guarded delete actually removed the row, so
+ * two concurrent polls can't both consume it; the mobile_sync_devices row is untouched and
+ * keeps working for snapshot/queue calls.
  */
 function fetch_and_consume_pairing_key(string $deviceToken): ?array
 {
@@ -281,7 +304,8 @@ function fetch_and_consume_pairing_key(string $deviceToken): ?array
     }
     $tokenHash = hash('sha256', $deviceToken);
     $stmt = $pdo->prepare(
-        'SELECT id, status, encrypted_sync_key FROM mobile_sync_pairings WHERE device_token_hash = ? LIMIT 1'
+        'SELECT id, status, encrypted_sync_key FROM mobile_sync_pairings
+         WHERE device_token_hash = ? AND expires_at > NOW() LIMIT 1'
     );
     $stmt->execute([$tokenHash]);
     $row = $stmt->fetch();
@@ -293,6 +317,12 @@ function fetch_and_consume_pairing_key(string $deviceToken): ?array
         return ['pending' => true];
     }
 
-    $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE id = ?')->execute([$row['id']]);
+    // Guarded delete: only the caller whose DELETE actually removes the row
+    // gets to return the ciphertext, so two concurrent polls can't both consume it.
+    $delete = $pdo->prepare("DELETE FROM mobile_sync_pairings WHERE id = ? AND status = 'delivered'");
+    $delete->execute([$row['id']]);
+    if ($delete->rowCount() !== 1) {
+        return null;
+    }
     return ['encrypted_sync_key' => $row['encrypted_sync_key']];
 }

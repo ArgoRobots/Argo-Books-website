@@ -14,10 +14,9 @@ set_portal_headers();
 require_method(['POST']);
 
 $ip = get_client_ip();
-if (is_rate_limited($ip, 10, 900, 'sync_claim')) {
+if (check_and_record_rate_limit($ip, 10, 900, 'sync_claim')) {
     send_error_response(429, 'Too many attempts. Try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, 'sync_claim', 900);
 
 $data = json_decode(file_get_contents('php://input'), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -34,7 +33,7 @@ $invalidCode = static function () {
     send_error_response(400, 'That code is not valid or has expired.', 'INVALID_CODE');
 };
 
-if ($code === '') {
+if ($code === '' || strlen($code) > 64) {
     $invalidCode();
 }
 if ($phonePublicKey === '' || strlen($phonePublicKey) > 2000 || !preg_match('/^[A-Za-z0-9+\/=]+$/', $phonePublicKey)) {

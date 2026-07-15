@@ -200,3 +200,35 @@ function claim_pairing_code(string $rawCode, string $phonePublicKey, string $dev
         'device_token' => $deviceToken,
     ];
 }
+
+/**
+ * Look up a pairing's status for the desktop that created it (owner-scoped:
+ * matches pairing_token AND owner_identity_hash, so one owner can never poll
+ * another owner's session). Returns null if no such pairing exists for this
+ * owner; a pairing that exists but belongs to someone else collapses to the
+ * same null, so callers surface one generic not-found.
+ *
+ * Always returns ['status' => ...]. Only adds 'phone_public_key' and
+ * 'device_label' once status has moved past 'pending' (i.e. 'claimed' or
+ * 'delivered'), so a still-pending session never exposes a null/empty key.
+ */
+function get_pairing_status(string $pairingToken, string $ownerHash): ?array
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'SELECT status, phone_public_key, device_label
+         FROM mobile_sync_pairings WHERE pairing_token = ? AND owner_identity_hash = ? LIMIT 1'
+    );
+    $stmt->execute([$pairingToken, $ownerHash]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return null;
+    }
+
+    $result = ['status' => $row['status']];
+    if ($row['status'] !== 'pending') {
+        $result['phone_public_key'] = $row['phone_public_key'];
+        $result['device_label'] = $row['device_label'];
+    }
+    return $result;
+}

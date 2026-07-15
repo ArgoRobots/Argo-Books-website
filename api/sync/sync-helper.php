@@ -130,3 +130,73 @@ function consume_pairing_token(string $token): ?array
     }
     return $row;
 }
+
+/**
+ * Normalize a phone-typed short code: uppercase, then strip anything outside
+ * the pairing alphabet (23456789ABCDEFGHJKMNPQRSTVWXYZ) so stray dashes,
+ * spaces, or a mistaken lowercase entry still match.
+ */
+function normalize_pairing_short_code(string $code): string
+{
+    return preg_replace('/[^23456789ABCDEFGHJKMNPQRSTVWXYZ]/', '', strtoupper($code)) ?? '';
+}
+
+/**
+ * Claim a pending pairing by its manually-typed short code: the phone uploads
+ * its public key and picks up a device token.
+ *
+ * Atomic against double-claims and TOCTOU races: the UPDATE's
+ * `status = 'pending' AND expires_at > NOW()` guard only ever matches one
+ * concurrent caller, so rowCount() === 1 is the single source of truth for
+ * "this call won the claim."
+ *
+ * Returns ['company_uid', 'company_label', 'device_token'] on success, or
+ * null if the code doesn't resolve to a pending, unexpired row. Unknown,
+ * expired, and already-claimed codes all collapse to the same null so
+ * callers can surface one generic error without leaking which codes exist.
+ */
+function claim_pairing_code(string $rawCode, string $phonePublicKey, string $deviceLabel): ?array
+{
+    global $pdo;
+    $code = normalize_pairing_short_code($rawCode);
+    if ($code === '') {
+        return null;
+    }
+
+    $update = $pdo->prepare(
+        "UPDATE mobile_sync_pairings
+         SET status = 'claimed', phone_public_key = ?, device_label = ?, claimed_at = NOW()
+         WHERE short_code = ? AND status = 'pending' AND expires_at > NOW()"
+    );
+    $update->execute([$phonePublicKey, $deviceLabel, $code]);
+    if ($update->rowCount() !== 1) {
+        return null;
+    }
+
+    $select = $pdo->prepare(
+        'SELECT owner_identity_hash, company_uid, company_label FROM mobile_sync_pairings WHERE short_code = ? LIMIT 1'
+    );
+    $select->execute([$code]);
+    $row = $select->fetch();
+    if (!$row) {
+        // Shouldn't happen: the UPDATE above just matched this exact row.
+        return null;
+    }
+
+    $deviceToken = bin2hex(random_bytes(32));
+    $deviceTokenHash = hash('sha256', $deviceToken);
+
+    $pdo->prepare(
+        'INSERT INTO mobile_sync_devices (device_token_hash, owner_identity_hash, company_uid, device_label, last_seen_at)
+         VALUES (?, ?, ?, ?, NOW())'
+    )->execute([$deviceTokenHash, $row['owner_identity_hash'], $row['company_uid'], $deviceLabel]);
+
+    $pdo->prepare('UPDATE mobile_sync_pairings SET device_token_hash = ? WHERE short_code = ?')
+        ->execute([$deviceTokenHash, $code]);
+
+    return [
+        'company_uid' => $row['company_uid'],
+        'company_label' => $row['company_label'],
+        'device_token' => $deviceToken,
+    ];
+}

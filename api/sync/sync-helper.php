@@ -232,3 +232,24 @@ function get_pairing_status(string $pairingToken, string $ownerHash): ?array
     }
     return $result;
 }
+
+/**
+ * Desktop delivers the RSA-encrypted sync key to a pairing it created, once
+ * the phone has claimed it. Owner-scoped and status-gated in a single atomic
+ * UPDATE: matches pairing_token AND owner_identity_hash AND status = 'claimed',
+ * so rowCount() === 1 is the only signal callers need. A pairing that's still
+ * pending, already delivered, or belongs to a different owner all collapse to
+ * the same false, so callers surface one generic error without leaking which
+ * case applied.
+ */
+function deliver_pairing_key(string $pairingToken, string $ownerHash, string $encryptedSyncKey): bool
+{
+    global $pdo;
+    $update = $pdo->prepare(
+        "UPDATE mobile_sync_pairings
+         SET encrypted_sync_key = ?, status = 'delivered'
+         WHERE pairing_token = ? AND owner_identity_hash = ? AND status = 'claimed'"
+    );
+    $update->execute([$encryptedSyncKey, $pairingToken, $ownerHash]);
+    return $update->rowCount() === 1;
+}

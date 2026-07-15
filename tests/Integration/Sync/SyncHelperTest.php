@@ -11,8 +11,10 @@ final class SyncHelperTest extends DatabaseTestCase
 {
     public function test_create_and_consume_pairing_token_round_trip(): void
     {
-        $token = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $pairing = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $token = $pairing['token'];
         $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $token);
+        $this->assertMatchesRegularExpression('/^[23456789ABCDEFGHJKMNPQRSTVWXYZ]{8}$/', $pairing['short_code']);
 
         $consumed = consume_pairing_token($token);
         $this->assertSame('owner-hash-1', $consumed['owner_identity_hash']);
@@ -22,7 +24,8 @@ final class SyncHelperTest extends DatabaseTestCase
 
     public function test_pairing_token_is_single_use(): void
     {
-        $token = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $pairing = create_pairing_token('owner-hash-1', 'company-uid-1', 'Acme Co');
+        $token = $pairing['token'];
         consume_pairing_token($token);
         $this->assertNull(consume_pairing_token($token));
     }

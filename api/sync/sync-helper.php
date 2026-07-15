@@ -58,20 +58,54 @@ function authenticate_sync_device(): ?array
 }
 
 /**
- * Create a single-use, 10-minute pairing token for (owner, company). Opportunistically
- * GCs expired tokens. Returns the token (bin2hex(random_bytes(16))).
+ * Generate an 8-char short code from an alphabet that excludes ambiguous
+ * characters (no 0 1 I L O U), for the phone to type in manually.
  */
-function create_pairing_token(string $ownerHash, string $companyUid, string $companyLabel): string
+function generate_pairing_short_code(): string
+{
+    $alphabet = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
+    $max = strlen($alphabet) - 1;
+    $code = '';
+    for ($i = 0; $i < 8; $i++) {
+        $code .= $alphabet[random_int(0, $max)];
+    }
+    return $code;
+}
+
+/**
+ * Create a single-use, 10-minute pairing token for (owner, company). Opportunistically
+ * GCs expired tokens. Also mints a unique short code for the manual-entry pairing flow.
+ * Returns ['token' => bin2hex(random_bytes(16)), 'short_code' => string].
+ */
+function create_pairing_token(string $ownerHash, string $companyUid, string $companyLabel): array
 {
     global $pdo;
     $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE expires_at < NOW()')->execute();
 
     $token = bin2hex(random_bytes(16));
-    $pdo->prepare(
-        'INSERT INTO mobile_sync_pairings (pairing_token, owner_identity_hash, company_uid, company_label, expires_at)
-         VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))'
-    )->execute([$token, $ownerHash, $companyUid, $companyLabel]);
-    return $token;
+    $insert = $pdo->prepare(
+        "INSERT INTO mobile_sync_pairings
+            (pairing_token, short_code, owner_identity_hash, company_uid, company_label, status, expires_at)
+         VALUES (?, ?, ?, ?, ?, 'pending', DATE_ADD(NOW(), INTERVAL 10 MINUTE))"
+    );
+
+    $attempts = 0;
+    while (true) {
+        $code = generate_pairing_short_code();
+        try {
+            $insert->execute([$token, $code, $ownerHash, $companyUid, $companyLabel]);
+            break;
+        } catch (\PDOException $e) {
+            $attempts++;
+            // MySQL duplicate-entry error code is 23000; retry with a fresh code
+            // a few times in case of a short_code collision, then give up.
+            if ($e->getCode() !== '23000' || $attempts >= 5) {
+                throw $e;
+            }
+        }
+    }
+
+    return ['token' => $token, 'short_code' => $code];
 }
 
 /**

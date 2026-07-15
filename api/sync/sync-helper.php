@@ -110,20 +110,28 @@ function create_pairing_token(string $ownerHash, string $companyUid, string $com
 
 /**
  * Validate + consume (single use) a pairing token. Returns the binding or null.
+ *
+ * Mutually exclusive with the short-code claim path: the DELETE's
+ * `status = 'pending'` guard means a pairing already claimed via
+ * claim_pairing_code() (status='claimed') can no longer be redeemed here, and
+ * rowCount() === 1 is the single source of truth for "this call won the
+ * redeem," mirroring claim_pairing_code()'s atomic UPDATE guard.
  */
 function consume_pairing_token(string $token): ?array
 {
     global $pdo;
     $stmt = $pdo->prepare(
-        'SELECT owner_identity_hash, company_uid, company_label
-         FROM mobile_sync_pairings WHERE pairing_token = ? AND expires_at > NOW() LIMIT 1'
+        "SELECT owner_identity_hash, company_uid, company_label
+         FROM mobile_sync_pairings WHERE pairing_token = ? AND status = 'pending' AND expires_at > NOW() LIMIT 1"
     );
     $stmt->execute([$token]);
     $row = $stmt->fetch();
     if (!$row) {
         return null;
     }
-    $del = $pdo->prepare('DELETE FROM mobile_sync_pairings WHERE pairing_token = ? AND expires_at > NOW()');
+    $del = $pdo->prepare(
+        "DELETE FROM mobile_sync_pairings WHERE pairing_token = ? AND status = 'pending' AND expires_at > NOW()"
+    );
     $del->execute([$token]);
     if ($del->rowCount() !== 1) {
         return null;

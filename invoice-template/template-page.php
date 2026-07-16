@@ -47,7 +47,7 @@ if (!is_array($data) || empty($data['h1']) || empty($data['format'])) {
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php';
     $safe_slug_for_event = preg_replace('/[^a-z0-9_-]/', '', $slug);
-    track_page_view('invgen_template_' . $safe_slug_for_event);
+    defer_client_page_view('invgen_template_' . $safe_slug_for_event);
 }
 
 // --- 4. Page metadata ---------------------------------------------------------

@@ -155,7 +155,7 @@ function funnel_classify_channel(?string $host, ?string $source_code): string
  */
 function funnel_landing_scope(?string $period_start, ?string $source_filter): array
 {
-    $where  = "event_type = 'landing' AND environment = ? AND visitor_id IS NOT NULL";
+    $where  = "event_type = 'landing' AND js_confirmed = 1 AND environment = ? AND visitor_id IS NOT NULL";
     $params = [current_environment()];
     if ($period_start !== null) {
         $where .= ' AND created_at >= ?';
@@ -245,7 +245,7 @@ function funnel_first_touch(array $visitor_ids): array
     $expr = FUNNEL_REF_HOST_SQL;
     $sql = "SELECT visitor_id, $expr AS host, keyword
               FROM referral_events
-             WHERE event_type = 'landing' AND environment = ?
+             WHERE event_type = 'landing' AND js_confirmed = 1 AND environment = ?
                AND visitor_id IN ($placeholders)
              ORDER BY created_at ASC, id ASC";
     $params = array_merge([current_environment()], $visitor_ids);
@@ -295,7 +295,7 @@ function funnel_stage_dimension(string $column, ?string $period_start, ?string $
 {
     global $pdo;
 
-    $where  = 'environment = ?';
+    $where  = 'environment = ? AND js_confirmed = 1';
     $params = [current_environment()];
     if ($period_start !== null) {
         $where .= ' AND created_at >= ?';

@@ -35,6 +35,9 @@ function is_likely_bot($user_agent)
         'GPTBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'anthropic-ai',
         'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended',
         'CCBot', 'Bytespider', 'Diffbot', 'Amazonbot', 'cohere-ai',
+        // SEO / marketing-data crawlers (self-identified, so name-matching works).
+        'DataForSeoBot', 'PetalBot', 'DataForSeo', 'BLEXBot', 'SeznamBot',
+        'serpstatbot', 'ZoominfoBot', 'Barkrowler', 'SiteAuditBot', 'AwarioBot',
         // Social / link-preview fetchers
         'facebookexternalhit', 'meta-externalagent', 'Twitterbot', 'LinkedInBot',
         'Slackbot', 'Discordbot', 'TelegramBot', 'WhatsApp',
@@ -280,6 +283,21 @@ function track_page_view($page)
     // clicks (the only Reddit traffic browsers expose a referrer for).
     track_reddit_referrer_if_present($page);
     return $result;
+}
+
+/**
+ * Register a page view to be recorded via a client-side JS beacon (emitted by
+ * shared/layout.php) instead of recording it here, server-side. Because the
+ * beacon only fires when the browser actually runs JavaScript, this excludes
+ * headless scrapers that load the HTML but never execute JS, which otherwise
+ * flood the stats with fake "views". The beacon posts back to
+ * api/invoice-generator/track.php, which calls track_page_view() for real.
+ */
+function defer_client_page_view(string $page): void
+{
+    if (preg_match('/^[a-z0-9_-]+$/', $page)) {
+        $GLOBALS['__client_page_view'] = $page;
+    }
 }
 
 /**

@@ -207,7 +207,9 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
 {
     global $pdo;
 
-    $where_clauses = ['environment = ?'];
+    // js_confirmed = 1 filters bots out of the page-view stages (landing,
+    // downloads_page); non-page-view stages are inserted already-confirmed.
+    $where_clauses = ['environment = ?', 'js_confirmed = 1'];
     $params = [current_environment()];
 
     if ($period_start !== null) {
@@ -307,7 +309,7 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
                                   THEN subscription_id END) AS paying,
               COUNT(DISTINCT CASE WHEN event_type='premium_churned' THEN subscription_id END) AS churned
             FROM referral_events re
-            WHERE re.environment = ? $event_period_clause
+            WHERE re.environment = ? AND re.js_confirmed = 1 $event_period_clause
             GROUP BY source_code
         ) ev ON ev.source_code = rl.source_code
         LEFT JOIN (

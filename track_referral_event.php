@@ -221,13 +221,19 @@ function track_referral_event(string $event_type, array $opts = []): bool
         $event_data_json = json_encode($opts['event_data'], JSON_UNESCAPED_SLASHES);
     }
 
+    // Page-view events (fired server-side on every page load) start unconfirmed
+    // and are promoted to confirmed by a client-side JS beacon, so headless bots
+    // that never run JS are excluded from the funnel. Real action / webhook
+    // events aren't page views, so they're confirmed on insert.
+    $js_confirmed = in_array($event_type, ['landing', 'downloads_page'], true) ? 0 : 1;
+
     try {
         $stmt = $pdo->prepare(
             'INSERT INTO referral_events
                 (visitor_id, source_code, event_type, event_data,
                  subscription_id, user_id, page_url, ip_address,
-                 user_agent, country_code, region, city, keyword, environment)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                 user_agent, country_code, region, city, keyword, js_confirmed, environment)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         return $stmt->execute([
             $visitor_id,
@@ -243,6 +249,7 @@ function track_referral_event(string $event_type, array $opts = []): bool
             $geo['region'],
             $geo['city'],
             $keyword,
+            $js_confirmed,
             current_environment(),
         ]);
     } catch (PDOException $e) {

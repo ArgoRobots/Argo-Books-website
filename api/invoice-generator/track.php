@@ -23,6 +23,27 @@ $body = json_decode(file_get_contents('php://input'), true);
 $event_type = is_array($body) ? (string)($body['event_type'] ?? '') : '';
 $event_data = is_array($body) ? ($body['event_data'] ?? '') : '';
 
+// JS-confirmed page view (fired by the beacon in shared/layout.php). Recorded
+// as a normal page_view so the existing dashboards keep working, but gated
+// behind real JS execution so headless scrapers that never run JS are excluded.
+if ($event_type === 'page_view') {
+    if (!preg_match('/^(invgen|estgen|pogen)_[a-z0-9_-]+$/', (string)$event_data)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'bad page id']);
+        exit;
+    }
+    // The beacon forwards document.referrer so track_page_view()'s reddit-referrer
+    // detection still sees the original referrer (this POST's own Referer header
+    // is the same-origin tool page, not the inbound source).
+    $ref = is_array($body) ? (string)($body['referrer'] ?? '') : '';
+    if ($ref !== '') {
+        $_SERVER['HTTP_REFERER'] = $ref;
+    }
+    track_page_view($event_data);
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 // Allowlist of event types the tool is allowed to emit. Keep this list in
 // sync with invoice-generator/scripts/tracker.js + its callers.
 //

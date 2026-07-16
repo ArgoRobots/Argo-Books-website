@@ -115,5 +115,38 @@ $site_schema = [
 <?php endif; ?>
 <?= $body_content ?>
 <?= $extra_scripts ?>
+<?php if (!empty($GLOBALS['__client_page_view'])): ?>
+<script>
+// Records this page view only when a real browser runs JS, filtering out the
+// headless scrapers that inflate the tool stats. Posts back to track.php, which
+// applies the usual admin/bot/dedup filtering server-side.
+(function () {
+  try {
+    var p = <?= json_encode($GLOBALS['__client_page_view'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    var url = (window.INVGEN_BASE || '') + '/api/invoice-generator/track.php';
+    var payload = JSON.stringify({ event_type: 'page_view', event_data: p, referrer: document.referrer || '' });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+    } else {
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function () {});
+    }
+  } catch (e) { /* never break the page over analytics */ }
+})();
+</script>
+<?php endif; ?>
+<script>
+// Confirms this page view as a real browser for the referral funnel (see
+// api/referral/confirm.php); bots that never run JS stay unconfirmed.
+(function () {
+  try {
+    var url = (window.INVGEN_BASE || '') + '/api/referral/confirm.php';
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob(['{}'], { type: 'application/json' }));
+    } else {
+      fetch(url, { method: 'POST', body: '{}', keepalive: true, credentials: 'same-origin' }).catch(function () {});
+    }
+  } catch (e) { /* analytics must never break the page */ }
+})();
+</script>
 </body>
 </html>

@@ -53,7 +53,7 @@ if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../track_referral.php';
     require_once __DIR__ . '/../statistics.php';
     $safe_slug_for_event = preg_replace('/[^a-z0-9_-]/', '', $slug);
-    track_page_view('invgen_article_' . $safe_slug_for_event);
+    defer_client_page_view('invgen_article_' . $safe_slug_for_event);
 }
 
 // Cap at 50: referral source_code columns are VARCHAR(50). Long slugs are

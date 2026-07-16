@@ -83,8 +83,8 @@ $base_path = $in_subdir ? '../' : '';
                         'marketing-funnel' => 'Funnel',
                         'referral-links'   => 'Referrals',
                         'affiliates'       => 'Affiliates',
-                        'email-customers'  => 'Email customers',
                         'outreach'         => 'Outreach',
+                        'email-customers'  => 'Email customers',
                     ],
                     'Analytics' => [
                         'app-stats'     => 'App Stats',

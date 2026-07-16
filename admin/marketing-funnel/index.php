@@ -25,12 +25,13 @@ function funnel_flag_emoji(?string $code): string
  * count (plus revenue) on the right. Rows beyond $limit collapse into "Other".
  *
  * @param list<array{key:string,label:string,visits:int,revenue:float}> $rows
- * @param array{revenue?:bool,flag?:bool,limit?:int,empty?:string} $opts
+ * @param array{revenue?:bool,flag?:bool,icon?:bool,limit?:int,empty?:string} $opts
  */
 function funnel_render_bar_list(array $rows, array $opts = []): string
 {
     $show_revenue = $opts['revenue'] ?? true;
     $with_flag    = $opts['flag']    ?? false;
+    $with_icon    = $opts['icon']    ?? false;
     $limit        = $opts['limit']   ?? 9;
     $empty_msg    = $opts['empty']   ?? 'No data for this period yet.';
 
@@ -52,6 +53,11 @@ function funnel_render_bar_list(array $rows, array $opts = []): string
     $max_v = max(1, max(array_map(fn($r) => (int)$r['visits'], $shown)));
     $max_r = max(array_map(fn($r) => (float)$r['revenue'], $shown));
 
+    // Muted globe icon (data URI, CSP-safe) for referrer/campaign rows.
+    $globe = 'data:image/svg+xml;utf8,' . rawurlencode(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#9098a3' stroke-width='1.6'>"
+        . "<circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18'/></svg>");
+
     $html = '<ul class="bd-list">';
     foreach ($shown as $r) {
         $v   = (int)$r['visits'];
@@ -67,22 +73,36 @@ function funnel_render_bar_list(array $rows, array $opts = []): string
             $tip .= ' · $' . number_format($rev, 2) . ' revenue';
         }
 
+        $icon = '';
+        if ($with_flag) {
+            $icon = '<span class="bd-flag">' . ($flag !== '' ? $flag : '&#127987;&#65039;') . '</span>';
+        } elseif ($with_icon && $r['key'] !== '__other__') {
+            $icon = '<img class="bd-icon" src="' . htmlspecialchars($globe) . '" alt="">';
+        }
+
         $html .= '<li class="bd-row" data-tip="' . htmlspecialchars($tip) . '">';
         $html .= '<span class="bd-bar bd-bar-visits" style="width:' . $vw . '%"></span>';
         if ($show_revenue) {
             $html .= '<span class="bd-bar bd-bar-revenue" style="width:' . $rw . '%"></span>';
         }
-        $html .= '<span class="bd-label">'
-            . ($flag !== '' ? '<span class="bd-flag">' . $flag . '</span>' : '')
-            . htmlspecialchars($r['label']) . '</span>';
-        $html .= '<span class="bd-value">' . number_format($v);
-        if ($show_revenue && $rev > 0) {
-            $html .= '<em class="bd-rev">$' . number_format($rev, 0) . '</em>';
-        }
-        $html .= '</span></li>';
+        $html .= $icon;
+        $html .= '<span class="bd-label">' . htmlspecialchars($r['label']) . '</span>';
+        $html .= '<span class="bd-value">' . funnel_kfmt($v) . '</span></li>';
     }
     $html .= '</ul>';
     return $html;
+}
+
+/**
+ * Compact visitor-count formatting: 1900 -> "1.9k", 782 -> "782".
+ */
+function funnel_kfmt(int $n): string
+{
+    if (abs($n) >= 1000) {
+        $k = $n / 1000;
+        return (fmod($k, 1.0) === 0.0 ? number_format($k, 0) : number_format($k, 1)) . 'k';
+    }
+    return number_format($n);
 }
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -727,7 +747,7 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/jsvectormap.min.css">
+<link rel="stylesheet" href="vendor/jsvectormap.min.css">
 
 <div class="container">
     <?php if (isset($_SESSION['success_message'])): ?>
@@ -963,9 +983,9 @@ include __DIR__ . '/../admin_header.php';
     <?php
         // Server-rendered breakdown lists (dual blue/orange bars). The Channel
         // donut and the world map are drawn client-side from the JSON below.
-        $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 8]);
-        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 8, 'empty' => 'No tracked campaigns in this period yet.']);
-        $bd_keyword  = funnel_render_bar_list($analytics['keywords'],  ['revenue' => true,  'limit' => 8, 'empty' => 'No keywords captured yet. Collecting from ?utm_term going forward.']);
+        $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 9, 'icon' => true]);
+        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 9, 'icon' => true, 'empty' => 'No tracked campaigns in this period yet.']);
+        $bd_keyword  = funnel_render_bar_list($analytics['keywords'],  ['revenue' => true,  'limit' => 9, 'empty' => 'No keywords captured yet. Collecting from ?utm_term going forward.']);
         $bd_country  = funnel_render_bar_list($analytics['countries'], ['revenue' => true,  'limit' => 9, 'flag' => true]);
         $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
         $bd_city     = funnel_render_bar_list($analytics['cities'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No city data yet. Collecting going forward.']);
@@ -985,7 +1005,13 @@ include __DIR__ . '/../admin_header.php';
             <div class="bd-panel active" data-bd-panel="channel">
                 <?php if ($channel_total_visits > 0): ?>
                     <div class="donut-wrap">
-                        <div class="donut-canvas"><canvas id="channelDonut"></canvas></div>
+                        <div class="donut-canvas">
+                            <canvas id="channelDonut"></canvas>
+                            <div class="donut-center">
+                                <span class="dc-num"><?php echo funnel_kfmt($channel_total_visits); ?></span>
+                                <span class="dc-lbl">visitors</span>
+                            </div>
+                        </div>
                         <ul class="donut-legend" id="channelLegend"></ul>
                     </div>
                 <?php else: ?>
@@ -1534,9 +1560,10 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
-<!-- World map for the geography card (choropleth by visits) -->
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/jsvectormap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/maps/world.min.js"></script>
+<!-- World map for the geography card (choropleth by visits). Self-hosted so it
+     loads under the admin CSP, which only allows scripts from 'self' + cdnjs. -->
+<script src="vendor/jsvectormap.min.js"></script>
+<script src="vendor/world.min.js"></script>
 
 <script>
     const csrfToken = <?php echo json_encode($_SESSION['csrf_token']); ?>;
@@ -1842,7 +1869,7 @@ include __DIR__ . '/../admin_header.php';
             const maxCount = Math.max(1, ...FUNNEL.map(s => s.count));
             const halfMax = cy - pad;
             const xs = FUNNEL.map((s, i) => n === 1 ? W / 2 : (i / (n - 1)) * W);
-            const hs = FUNNEL.map(s => Math.max(4, (s.count / maxCount) * halfMax));
+            const hs = FUNNEL.map(s => Math.max(6, Math.sqrt(s.count / maxCount) * halfMax));
 
             const edge = sign => {
                 let d = `M ${xs[0].toFixed(1)} ${(cy + sign * hs[0]).toFixed(1)}`;
@@ -1942,16 +1969,17 @@ include __DIR__ . '/../admin_header.php';
             const canvas = document.getElementById('channelDonut');
             if (!canvas || typeof Chart === 'undefined' || !CHANNELS.length) return;
             const palette = {
-                'Direct': '#64748b', 'Organic search': '#3f63e8', 'Organic social': '#8b5cf6',
-                'AI': '#10b981', 'Referral': '#f59e0b', 'Newsletter': '#ec4899'
+                'Referral': '#3f63e8', 'Direct': '#8aa0e8', 'Organic search': '#2740b5',
+                'Organic social': '#6f8fe6', 'Newsletter': '#c2cffb', 'AI': '#9db4f5'
             };
-            const colors = CHANNELS.map(c => palette[c.label] || '#94a3b8');
+            const colors = CHANNELS.map(c => palette[c.label] || '#8aa0e8');
             const total = CHANNELS.reduce((a, c) => a + c.visits, 0);
+            const donutBorder = isDark() ? '#1e232b' : '#ffffff';
             new Chart(canvas, {
                 type: 'doughnut',
-                data: { labels: CHANNELS.map(c => c.label), datasets: [{ data: CHANNELS.map(c => c.visits), backgroundColor: colors, borderWidth: 0 }] },
+                data: { labels: CHANNELS.map(c => c.label), datasets: [{ data: CHANNELS.map(c => c.visits), backgroundColor: colors, borderWidth: 2, borderColor: donutBorder }] },
                 options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '62%',
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
                     plugins: {
                         legend: { display: false },
                         tooltip: { callbacks: { label: ctx => {
@@ -1982,9 +2010,14 @@ include __DIR__ . '/../admin_header.php';
                 if (el) el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
                 return;
             }
-            const visitsByCode = {};
-            Object.keys(MAP_VALUES).forEach(k => { visitsByCode[k] = MAP_VALUES[k].visits; });
             const dark = isDark();
+            // jsvectormap's built-in colour scale mis-interpolates, so we shade
+            // the country <path>s ourselves: a medium->light blue by visit share.
+            const codes = Object.keys(MAP_VALUES);
+            const maxV = Math.max(1, ...codes.map(c => MAP_VALUES[c].visits));
+            const lo = dark ? [77, 122, 201] : [120, 158, 230], hi = dark ? [169, 211, 247] : [37, 64, 181];
+            const hx = n => ('0' + Math.max(0, Math.min(255, Math.round(n))).toString(16)).slice(-2);
+            const shade = v => { const t = Math.sqrt(v / maxV); return '#' + hx(lo[0] + (hi[0] - lo[0]) * t) + hx(lo[1] + (hi[1] - lo[1]) * t) + hx(lo[2] + (hi[2] - lo[2]) * t); };
             try {
                 window.__argoMap = new jsVectorMap({
                     selector: '#worldMap',
@@ -1993,15 +2026,8 @@ include __DIR__ . '/../admin_header.php';
                     zoomOnScroll: false,
                     backgroundColor: 'transparent',
                     regionStyle: {
-                        initial: { fill: dark ? '#243044' : '#e5ecf6', stroke: dark ? '#0f172a' : '#ffffff', strokeWidth: 0.4 },
-                        hover: { fill: '#233a93' }
+                        initial: { fill: dark ? '#2a2f38' : '#e6ebf3', stroke: dark ? '#13161c' : '#ffffff', strokeWidth: 0.4 }
                     },
-                    series: { regions: [{
-                        attribute: 'fill',
-                        scale: ['#c2cffb', '#233a93'],
-                        normalizeFunction: 'polynomial',
-                        values: visitsByCode
-                    }] },
                     onRegionTooltipShow(event, tooltip, code) {
                         const d = MAP_VALUES[code];
                         let html = '<b>' + (tooltip.text() || code) + '</b>';
@@ -2014,6 +2040,13 @@ include __DIR__ . '/../admin_header.php';
                         tooltip.text(html, true);
                     }
                 });
+                // Paths draw just after construction; retry until present.
+                let tries = 0;
+                (function paint() {
+                    let n = 0;
+                    codes.forEach(code => { const p = el.querySelector('path[data-code="' + code + '"]'); if (p) { p.setAttribute('fill', shade(MAP_VALUES[code].visits)); n++; } });
+                    if (n === 0 && tries++ < 60) requestAnimationFrame(paint);
+                })();
             } catch (err) {
                 el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
             }

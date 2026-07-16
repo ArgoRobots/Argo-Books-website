@@ -32,6 +32,58 @@ const FUNNEL_REF_HOST_SQL =
 /** Label used for visitors/customers with no usable referer. */
 const FUNNEL_DIRECT_LABEL = 'Direct / None';
 
+/** Category label per key, matching admin/referral-links "By category". */
+const FUNNEL_CATEGORY_LABELS = [
+    'paid'      => 'Paid ads',
+    'website'   => 'My website (guides & articles)',
+    'invgen'    => 'Invoice generator',
+    'outreach'  => 'Outreach',
+    'social'    => 'Social media',
+    'youtube'   => 'YouTube',
+    'ai'        => 'AI assistants',
+    'directory' => 'Directories',
+    'other'     => 'Other',
+];
+
+/**
+ * Roll a source_code up into a referral category from its naming-prefix, the
+ * same convention admin/referral-links uses. Returns null for untracked
+ * (direct/organic) traffic that has no source_code.
+ */
+function funnel_category_key(?string $source_code): ?string
+{
+    if ($source_code === null || $source_code === '') {
+        return null;
+    }
+    $code = strtolower($source_code);
+    if (strncmp($code, 'google-ads-', 11) === 0 || strncmp($code, 'ads-', 4) === 0
+        || strncmp($code, 'paid-', 5) === 0 || strncmp($code, 'bing-ads-', 9) === 0) {
+        return 'paid';
+    }
+    if (strncmp($code, 'guide-', 6) === 0 || $code === 'guides-hub') {
+        return 'website';
+    }
+    if (strncmp($code, 'invgen-', 7) === 0) {
+        return 'invgen';
+    }
+    if (strncmp($code, 'outreach-', 9) === 0) {
+        return 'outreach';
+    }
+    if (strncmp($code, 'social-', 7) === 0) {
+        return 'social';
+    }
+    if (strncmp($code, 'youtube-', 8) === 0) {
+        return 'youtube';
+    }
+    if (strncmp($code, 'ai-', 3) === 0) {
+        return 'ai';
+    }
+    if (strncmp($code, 'dir-', 4) === 0) {
+        return 'directory';
+    }
+    return 'other';
+}
+
 /**
  * True when $host equals one of $domains or is a subdomain of it.
  */
@@ -322,7 +374,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         }
         return $m;
     };
-    $source_visits_map  = $mapize($source_visits,  FUNNEL_DIRECT_LABEL);
     $keyword_visits_map = $mapize($keyword_visits, '(no keyword)');
     $country_visits_map = $mapize($country_visits, 'Unknown');
     $region_visits_map  = $mapize($region_visits,  'Unknown');
@@ -333,15 +384,18 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
     $visitor_ids = array_map(fn($r) => $r['visitor_id'], $paying);
     $first_touch = funnel_first_touch($visitor_ids);
 
-    $rev_by_ref = $rev_by_channel = $rev_by_source = [];
+    $rev_by_ref = $rev_by_channel = $rev_by_category = [];
     $rev_by_country = $rev_by_keyword = [];
     $total_revenue = 0.0;
     foreach ($paying as $p) {
         $amt = (float)$p['amount'];
         $total_revenue += $amt;
 
-        $src = ($p['source_code'] === null || $p['source_code'] === '') ? FUNNEL_DIRECT_LABEL : $p['source_code'];
-        $rev_by_source[$src] = ($rev_by_source[$src] ?? 0) + $amt;
+        // Category rollup: only tracked sources contribute (direct excluded).
+        $cat = funnel_category_key($p['source_code']);
+        if ($cat !== null) {
+            $rev_by_category[$cat] = ($rev_by_category[$cat] ?? 0) + $amt;
+        }
 
         $cc = ($p['country_code'] === null || $p['country_code'] === '') ? 'Unknown' : $p['country_code'];
         $rev_by_country[$cc] = ($rev_by_country[$cc] ?? 0) + $amt;
@@ -358,15 +412,19 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         $rev_by_keyword[$kw] = ($rev_by_keyword[$kw] ?? 0) + $amt;
     }
 
-    // ---- Labelers ----
-    $name_by_source = [];
-    foreach ($referral_links as $rl) {
-        $name_by_source[$rl['source_code']] = $rl['name'];
+    // ---- Category rollup (matches referral-links "By category") ----
+    // Bucket tracked-source visits by category; direct/untracked is excluded.
+    $category_visits = [];
+    foreach ($source_visits as $r) {
+        $cat = funnel_category_key($r['k']);
+        if ($cat !== null) {
+            $category_visits[$cat] = ($category_visits[$cat] ?? 0) + (int)$r['visitors'];
+        }
     }
-    $source_labeler = fn(string $k) => $k === FUNNEL_DIRECT_LABEL
-        ? $k
-        : ($name_by_source[$k] ?? $k);
+
+    // ---- Labelers ----
     $identity = fn(string $k) => $k;
+    $category_labeler = fn(string $k) => FUNNEL_CATEGORY_LABELS[$k] ?? ucfirst($k);
     // Country keys stay ISO-2 codes (flag + map need them); only the label
     // becomes the readable country name.
     $country_labeler = fn(string $k) => $k === 'Unknown' ? 'Unknown' : (country_name($k) ?: $k);
@@ -374,7 +432,7 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
     // ---- Merge into sorted breakdown lists ----
     $channels  = funnel_merge_breakdown($channel_visits,     $rev_by_channel, $identity);
     $referrers = funnel_merge_breakdown($ref_visits_map,     $rev_by_ref,     $identity);
-    $campaigns = funnel_merge_breakdown($source_visits_map,  $rev_by_source,  $source_labeler);
+    $campaigns = funnel_merge_breakdown($category_visits,    $rev_by_category, $category_labeler);
     $keywords  = funnel_merge_breakdown($keyword_visits_map, $rev_by_keyword, $identity);
     $countries = funnel_merge_breakdown($country_visits_map, $rev_by_country, $country_labeler);
     $regions   = funnel_merge_breakdown($region_visits_map,  [],              $identity);

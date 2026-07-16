@@ -984,7 +984,7 @@ include __DIR__ . '/../admin_header.php';
         // Server-rendered breakdown lists (dual blue/orange bars). The Channel
         // donut and the world map are drawn client-side from the JSON below.
         $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 9, 'icon' => true]);
-        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 9, 'icon' => true, 'empty' => 'No tracked campaigns in this period yet.']);
+        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 9, 'icon' => true, 'empty' => 'No tracked source categories in this period yet.']);
         $bd_keyword  = funnel_render_bar_list($analytics['keywords'],  ['revenue' => true,  'limit' => 9, 'empty' => 'No keywords captured yet. Collecting from ?utm_term going forward.']);
         $bd_country  = funnel_render_bar_list($analytics['countries'], ['revenue' => true,  'limit' => 9, 'flag' => true]);
         $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
@@ -998,7 +998,7 @@ include __DIR__ . '/../admin_header.php';
             <div class="bd-tabs" role="tablist">
                 <button class="bd-tab active" data-bd="channel">Channel</button>
                 <button class="bd-tab" data-bd="referrer">Referrer</button>
-                <button class="bd-tab" data-bd="campaign">Campaign</button>
+                <button class="bd-tab" data-bd="campaign">Category</button>
                 <button class="bd-tab" data-bd="keyword">Keyword</button>
             </div>
 
@@ -1866,61 +1866,67 @@ include __DIR__ . '/../admin_header.php';
             if (!host || !FUNNEL.length) return;
             const W = 1000, H = 300, cy = H / 2, pad = 18;
             const n = FUNNEL.length;
+            const colW = W / n;
             const maxCount = Math.max(1, ...FUNNEL.map(s => s.count));
             const halfMax = cy - pad;
-            const xs = FUNNEL.map((s, i) => n === 1 ? W / 2 : (i / (n - 1)) * W);
+            // Section centres (labels + waist points sit here); the shape flows
+            // flat from the left edge, through each centre, off the right edge.
+            const cxs = FUNNEL.map((s, i) => (i + 0.5) * colW);
             const hs = FUNNEL.map(s => Math.max(6, Math.sqrt(s.count / maxCount) * halfMax));
+            const px = [0, ...cxs, W];
+            const ph = [hs[0], ...hs, hs[n - 1]];
+
+            // Per-section blue ramp, dark blue -> light blue (matches Funnel.png).
+            const c0 = [44, 70, 140], c1 = [176, 209, 246];
+            const hx2 = v => ('0' + Math.max(0, Math.min(255, Math.round(v))).toString(16)).slice(-2);
+            const sectionColor = i => {
+                const t = n === 1 ? 0 : i / (n - 1);
+                return '#' + hx2(c0[0] + (c1[0] - c0[0]) * t) + hx2(c0[1] + (c1[1] - c0[1]) * t) + hx2(c0[2] + (c1[2] - c0[2]) * t);
+            };
 
             const edge = sign => {
-                let d = `M ${xs[0].toFixed(1)} ${(cy + sign * hs[0]).toFixed(1)}`;
-                for (let i = 0; i < n - 1; i++) {
-                    const x0 = xs[i], x1 = xs[i + 1];
-                    const y0 = cy + sign * hs[i], y1 = cy + sign * hs[i + 1];
-                    const dx = (x1 - x0) / 2;
+                let d = `M ${px[0].toFixed(1)} ${(cy + sign * ph[0]).toFixed(1)}`;
+                for (let i = 0; i < px.length - 1; i++) {
+                    const x0 = px[i], x1 = px[i + 1], y0 = cy + sign * ph[i], y1 = cy + sign * ph[i + 1], dx = (x1 - x0) / 2;
                     d += ` C ${(x0 + dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 - dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
                 }
                 return d;
             };
-            let bottom = `L ${xs[n - 1].toFixed(1)} ${(cy + hs[n - 1]).toFixed(1)}`;
-            for (let i = n - 1; i > 0; i--) {
-                const x0 = xs[i], x1 = xs[i - 1];
-                const y0 = cy + hs[i], y1 = cy + hs[i - 1];
-                const dx = (x0 - x1) / 2;
+            let bottom = `L ${px[px.length - 1].toFixed(1)} ${(cy + ph[ph.length - 1]).toFixed(1)}`;
+            for (let i = px.length - 1; i > 0; i--) {
+                const x0 = px[i], x1 = px[i - 1], y0 = cy + ph[i], y1 = cy + ph[i - 1], dx = (x0 - x1) / 2;
                 bottom += ` C ${(x0 - dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 + dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
             }
             const pathD = edge(-1) + ' ' + bottom + ' Z';
 
-            let guides = '', segs = '';
+            // Each section: the full shape clipped to its column, own colour.
+            let defs = '<defs>', sections = '', dividers = '', segs = '';
             for (let i = 0; i < n; i++) {
-                if (i > 0) guides += `<line x1="${xs[i].toFixed(1)}" y1="0" x2="${xs[i].toFixed(1)}" y2="${H}" class="funnel-guide"/>`;
-                const left  = i === 0 ? 0 : (xs[i] + xs[i - 1]) / 2;
-                const right = i === n - 1 ? W : (xs[i] + xs[i + 1]) / 2;
-                segs += `<rect class="funnel-seg" data-i="${i}" x="${left.toFixed(1)}" y="0" width="${(right - left).toFixed(1)}" height="${H}"></rect>`;
+                defs += `<clipPath id="fseg${i}"><rect x="${(i * colW).toFixed(1)}" y="0" width="${colW.toFixed(1)}" height="${H}"/></clipPath>`;
+                sections += `<path d="${pathD}" fill="${sectionColor(i)}" clip-path="url(#fseg${i})"/>`;
+                if (i > 0) dividers += `<line x1="${(i * colW).toFixed(1)}" y1="0" x2="${(i * colW).toFixed(1)}" y2="${H}" class="funnel-divider" vector-effect="non-scaling-stroke"/>`;
+                segs += `<rect class="funnel-seg" data-i="${i}" x="${(i * colW).toFixed(1)}" y="0" width="${colW.toFixed(1)}" height="${H}"></rect>`;
             }
+            defs += '</defs>';
 
             const svg =
                 `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="funnel-svg">` +
-                `<defs><linearGradient id="funnelGrad" x1="0" y1="0" x2="0" y2="1">` +
-                `<stop offset="0%" stop-color="var(--funnel-grad-top)"/>` +
-                `<stop offset="100%" stop-color="var(--funnel-grad-bottom)"/></linearGradient></defs>` +
-                guides +
-                `<path d="${pathD}" fill="url(#funnelGrad)" class="funnel-shape"/>` +
+                defs + dividers +
+                `<g class="funnel-body">${sections}<path d="${pathD}" fill="none" class="funnel-border" vector-effect="non-scaling-stroke"/></g>` +
                 segs + `</svg>`;
 
             let pills = '<div class="funnel-pills">';
             for (let i = 0; i < n - 1; i++) {
-                const midX = ((xs[i] + xs[i + 1]) / 2) / W * 100;
+                const midX = ((i + 1) * colW) / W * 100;
                 pills += `<span class="funnel-pill" style="left:${midX}%">-${FUNNEL[i + 1].lost}% <span class="arw">&rarr;</span></span>`;
             }
             pills += '</div>';
 
+            // Labels centred under each section.
             let labels = '<div class="funnel-labels">';
             FUNNEL.forEach((s, i) => {
-                let pos;
-                if (i === 0) pos = 'left:0;text-align:left';
-                else if (i === n - 1) pos = 'left:100%;transform:translateX(-100%);text-align:right';
-                else pos = `left:${(xs[i] / W * 100).toFixed(2)}%;transform:translateX(-50%)`;
-                labels += `<div class="funnel-lbl" style="${pos}"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}</span></div>`;
+                const left = ((i + 0.5) * colW) / W * 100;
+                labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}</span></div>`;
             });
             labels += '</div>';
 
@@ -2011,13 +2017,15 @@ include __DIR__ . '/../admin_header.php';
                 return;
             }
             const dark = isDark();
-            // jsvectormap's built-in colour scale mis-interpolates, so we shade
-            // the country <path>s ourselves: a medium->light blue by visit share.
+            // Use jsvectormap's top-level `visualizeData` (a linear colour scale)
+            // rather than the ordinal `series.scale`, and sqrt-spread the counts
+            // so low-traffic countries still read as blue. visualizeData updates
+            // each region's stored style, so hovering keeps the country's colour.
             const codes = Object.keys(MAP_VALUES);
             const maxV = Math.max(1, ...codes.map(c => MAP_VALUES[c].visits));
-            const lo = dark ? [77, 122, 201] : [120, 158, 230], hi = dark ? [169, 211, 247] : [37, 64, 181];
-            const hx = n => ('0' + Math.max(0, Math.min(255, Math.round(n))).toString(16)).slice(-2);
-            const shade = v => { const t = Math.sqrt(v / maxV); return '#' + hx(lo[0] + (hi[0] - lo[0]) * t) + hx(lo[1] + (hi[1] - lo[1]) * t) + hx(lo[2] + (hi[2] - lo[2]) * t); };
+            const vals = {};
+            codes.forEach(k => { vals[k] = Math.round(Math.sqrt(MAP_VALUES[k].visits / maxV) * 1000); });
+            const scale = dark ? ['#4d7ac9', '#a9d3f7'] : ['#9db4f5', '#2740b5'];
             try {
                 window.__argoMap = new jsVectorMap({
                     selector: '#worldMap',
@@ -2026,8 +2034,10 @@ include __DIR__ . '/../admin_header.php';
                     zoomOnScroll: false,
                     backgroundColor: 'transparent',
                     regionStyle: {
-                        initial: { fill: dark ? '#2a2f38' : '#e6ebf3', stroke: dark ? '#13161c' : '#ffffff', strokeWidth: 0.4 }
+                        initial: { fill: dark ? '#2a2f38' : '#e6ebf3', stroke: dark ? '#13161c' : '#ffffff', strokeWidth: 0.4 },
+                        hover: { fillOpacity: 0.78 }
                     },
+                    visualizeData: { scale: scale, values: vals },
                     onRegionTooltipShow(event, tooltip, code) {
                         const d = MAP_VALUES[code];
                         let html = '<b>' + (tooltip.text() || code) + '</b>';
@@ -2040,13 +2050,6 @@ include __DIR__ . '/../admin_header.php';
                         tooltip.text(html, true);
                     }
                 });
-                // Paths draw just after construction; retry until present.
-                let tries = 0;
-                (function paint() {
-                    let n = 0;
-                    codes.forEach(code => { const p = el.querySelector('path[data-code="' + code + '"]'); if (p) { p.setAttribute('fill', shade(MAP_VALUES[code].visits)); n++; } });
-                    if (n === 0 && tries++ < 60) requestAnimationFrame(paint);
-                })();
             } catch (err) {
                 el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
             }

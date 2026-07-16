@@ -101,7 +101,7 @@ function ensure_auto_referral_link($source_code, $name)
         $insert->execute([
             $source_code,
             $name,
-            'Auto-detected from referrer',
+            'Auto-detected',
             'https://argorobots.com/'
         ]);
     } catch (PDOException $e) {
@@ -206,14 +206,23 @@ if ($resolved_source === null && !empty($_SERVER['HTTP_REFERER'])) {
 }
 
 if ($resolved_source !== null) {
-    // Auto-register guides-hub and per-article (guide-*) sources so they show
-    // up in the referral admin without manual setup, the same way UTM and
-    // referrer sources self-register. Ad and sponsor sources are still added
-    // by hand so their names and targets stay curated.
+    // Auto-register guides-hub, per-article (guide-*) and invoice-generator
+    // (invgen-*) sources so they show up in the referral admin without manual
+    // setup, the same way UTM and referrer sources self-register. Ad and sponsor
+    // sources are still added by hand so their names and targets stay curated.
+    // Outreach (outreach-*) is intentionally NOT auto-registered: its codes
+    // encode lead id + A/B variant for the outreach dashboard, and there can be
+    // thousands, so it stays in its own admin rather than the referral list.
     if ($resolved_source === 'guides-hub' || strncmp($resolved_source, 'guide-', 6) === 0) {
         $auto_name = $resolved_source === 'guides-hub'
             ? 'Guides hub'
             : 'Guide: ' . ucwords(str_replace('-', ' ', substr($resolved_source, 6)));
+        ensure_auto_referral_link($resolved_source, $auto_name);
+    } elseif (strncmp($resolved_source, 'invgen-', 7) === 0) {
+        $slug = substr($resolved_source, 7);
+        $auto_name = $slug === 'tool'
+            ? 'Invoice generator (tool)'
+            : 'Invoice generator: ' . ucwords(str_replace('-', ' ', $slug));
         ensure_auto_referral_link($resolved_source, $auto_name);
     }
 

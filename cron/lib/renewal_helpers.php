@@ -38,6 +38,47 @@ function calculateNewEndDate($currentEndDate, $billing) {
 }
 
 /**
+ * Reconcile the checkout placeholder for a PayPal subscription's initial
+ * capture.
+ *
+ * At checkout, process-subscription.php records the first PayPal payment
+ * immediately, using the PayPal subscription id as the placeholder
+ * transaction_id because the real sale id doesn't exist until PayPal actually
+ * captures the money. When PayPal later reports that first sale via the
+ * PAYMENT.SALE.COMPLETED webhook, its real id should REPLACE the placeholder
+ * rather than create a second, phantom "renewal" row.
+ *
+ * Returns true if a placeholder row existed for this subscription (and now
+ * carries $realTxnId), false if there was nothing to reconcile — in which case
+ * the caller should treat the sale as a genuine new payment.
+ */
+function reconcile_paypal_initial_capture(PDO $pdo, string $subscriptionId, string $paypalSubscriptionId, string $realTxnId): bool
+{
+    $find = $pdo->prepare(
+        "SELECT id FROM premium_subscription_payments
+         WHERE subscription_id = ? AND transaction_id = ? AND payment_type = 'initial'
+         LIMIT 1"
+    );
+    $find->execute([$subscriptionId, $paypalSubscriptionId]);
+    $rowId = $find->fetchColumn();
+
+    if ($rowId === false) {
+        return false;
+    }
+
+    // The `transaction_id <> ?` guard makes a re-run a harmless no-op once the
+    // real id is already attached.
+    $upd = $pdo->prepare(
+        "UPDATE premium_subscription_payments
+         SET transaction_id = ?
+         WHERE id = ? AND transaction_id <> ?"
+    );
+    $upd->execute([$realTxnId, $rowId, $realTxnId]);
+
+    return true;
+}
+
+/**
  * Decide how much to charge for a renewal given the customer's credit balance.
  *
  * Returns:

@@ -422,6 +422,34 @@ function handlePaymentCompleted($resource) {
         return;
     }
 
+    // Cycle-length helpers, computed once and reused by both the initial-capture
+    // reconcile below and the cycle-switch guard further down.
+    $cycleSecs = ($subscription['billing_cycle'] === 'yearly')
+        ? 365 * 86400
+        : 30 * 86400;
+    $secsUntilEnd = strtotime($subscription['end_date']) - time();
+
+    // Idempotent initial-capture handling.
+    // Checkout (process-subscription.php) records the first PayPal payment
+    // immediately, using the PayPal subscription id as a placeholder
+    // transaction_id, because the real sale id isn't known until PayPal
+    // actually captures the money and fires THIS webhook. So the very first
+    // PAYMENT.SALE.COMPLETED for a subscription is that same initial charge,
+    // NOT a renewal. Without this guard it fails the duplicate check above
+    // (the id differs), gets booked as a renewal, and both double-counts the
+    // payment and pushes end_date out a second time. Detect it (still within
+    // the first billing cycle, and no cycle switch has happened) and attach
+    // the real sale id to the placeholder row instead of inserting anything.
+    // The initial premium_paid funnel event and receipt were already sent by
+    // checkout, so there is nothing else to do here.
+    $withinFirstCycle = $secsUntilEnd > (0.7 * $cycleSecs);
+    if ($withinFirstCycle && empty($subscription['last_cycle_change_at'])
+        && reconcile_paypal_initial_capture($pdo, $subscription['subscription_id'], $billingAgreementId, $transactionId)
+    ) {
+        logPayPalWebhookEvent('PAYMENT.SALE.COMPLETED', $resource, 'initial_capture_reconciled');
+        return;
+    }
+
     // Determine if this is a renewal (subscription already has payments)
     $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE subscription_id = ?");
     $stmt->execute([$subscription['subscription_id']]);

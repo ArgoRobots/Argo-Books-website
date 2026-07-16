@@ -61,46 +61,66 @@ function get_or_set_visitor_id(): string
 }
 
 /**
- * Look up the country code for an IP, reusing prior lookups when possible.
- * Checks referral_visits and referral_events first so we don't burn ipinfo.io
- * quota for an IP we've already resolved.
+ * Look up country + region + city for an IP, reusing prior lookups when
+ * possible so we don't burn ipinfo.io quota for an IP we've already resolved.
+ *
+ * Returns ['country' => ?string, 'region' => ?string, 'city' => ?string].
+ * Any field may be null when it can't be resolved.
+ *
+ * Cache order: a prior referral_events row for this IP that already has a
+ * city (full geo), then a country-only row from referral_events /
+ * referral_visits, then a single ipinfo.io/json call.
  */
-function lookup_country_for_ip(?string $ip): ?string
+function lookup_geo_for_ip(?string $ip): array
 {
+    $empty = ['country' => null, 'region' => null, 'city' => null];
     if (empty($ip)) {
-        return null;
+        return $empty;
     }
     global $pdo;
     if (!$pdo) {
-        return null;
+        return $empty;
     }
 
     try {
-        $stmt = $pdo->prepare('SELECT country_code FROM referral_visits
-                               WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
+        // Prefer a prior row that already resolved the full geo for this IP.
+        $stmt = $pdo->prepare('SELECT country_code, region, city FROM referral_events
+                               WHERE ip_address = ? AND city IS NOT NULL AND city != ""
                                LIMIT 1');
         $stmt->execute([$ip]);
         $row = $stmt->fetch();
         if ($row !== false) {
-            return $row['country_code'];
+            return [
+                'country' => $row['country_code'] ?: null,
+                'region'  => $row['region'] ?: null,
+                'city'    => $row['city'] ?: null,
+            ];
         }
 
+        // Fall back to a country-only cache hit (older rows, or referral_visits).
         $stmt = $pdo->prepare('SELECT country_code FROM referral_events
                                WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
                                LIMIT 1');
         $stmt->execute([$ip]);
-        $row = $stmt->fetch();
-        if ($row !== false) {
-            return $row['country_code'];
+        $cached_country = $stmt->fetchColumn();
+        if ($cached_country === false) {
+            $stmt = $pdo->prepare('SELECT country_code FROM referral_visits
+                                   WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
+                                   LIMIT 1');
+            $stmt->execute([$ip]);
+            $cached_country = $stmt->fetchColumn();
         }
+        // A country-only cache hit still means we've never resolved region/city
+        // for this IP, so fall through to a live lookup to backfill them.
     } catch (PDOException $e) {
-        return null;
+        return $empty;
     }
 
     if (!function_exists('curl_init')) {
-        return null;
+        return ['country' => $cached_country ?: null, 'region' => null, 'city' => null];
     }
-    $ch = curl_init("https://ipinfo.io/{$ip}/country");
+
+    $ch = curl_init("https://ipinfo.io/{$ip}/json");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
     curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
@@ -109,9 +129,25 @@ function lookup_country_for_ip(?string $ip): ?string
     curl_close($ch);
 
     if ($http_code === 200 && !empty($response)) {
-        return trim($response);
+        $data = json_decode($response, true);
+        if (is_array($data)) {
+            return [
+                'country' => !empty($data['country']) ? substr(trim($data['country']), 0, 2) : ($cached_country ?: null),
+                'region'  => !empty($data['region']) ? substr(trim($data['region']), 0, 100) : null,
+                'city'    => !empty($data['city']) ? substr(trim($data['city']), 0, 100) : null,
+            ];
+        }
     }
-    return null;
+    return ['country' => $cached_country ?: null, 'region' => null, 'city' => null];
+}
+
+/**
+ * Backwards-compatible country-only lookup. Kept for callers that only need
+ * the country code (api/data/upload.php, api/data/crash.php).
+ */
+function lookup_country_for_ip(?string $ip): ?string
+{
+    return lookup_geo_for_ip($ip)['country'];
 }
 
 /**
@@ -171,7 +207,14 @@ function track_referral_event(string $event_type, array $opts = []): bool
     $ip_address  = $_SERVER['REMOTE_ADDR'] ?? null;
     $page_url    = $opts['page_url'] ?? ($_SERVER['REQUEST_URI'] ?? null);
 
-    $country_code = lookup_country_for_ip($ip_address);
+    $geo = lookup_geo_for_ip($ip_address);
+
+    // Campaign/search keyword: caller override, else ?utm_term on this request.
+    $keyword = $opts['keyword'] ?? null;
+    if ($keyword === null && !empty($_GET['utm_term'])) {
+        $keyword = trim((string)$_GET['utm_term']);
+    }
+    $keyword = ($keyword !== null && $keyword !== '') ? substr($keyword, 0, 150) : null;
 
     $event_data_json = null;
     if (!empty($opts['event_data']) && is_array($opts['event_data'])) {
@@ -183,8 +226,8 @@ function track_referral_event(string $event_type, array $opts = []): bool
             'INSERT INTO referral_events
                 (visitor_id, source_code, event_type, event_data,
                  subscription_id, user_id, page_url, ip_address,
-                 user_agent, country_code, environment)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                 user_agent, country_code, region, city, keyword, environment)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         return $stmt->execute([
             $visitor_id,
@@ -196,7 +239,10 @@ function track_referral_event(string $event_type, array $opts = []): bool
             $page_url,
             $ip_address,
             substr($user_agent, 0, 255),
-            $country_code,
+            $geo['country'],
+            $geo['region'],
+            $geo['city'],
+            $keyword,
             current_environment(),
         ]);
     } catch (PDOException $e) {

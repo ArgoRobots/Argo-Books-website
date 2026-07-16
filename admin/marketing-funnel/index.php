@@ -1,6 +1,89 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../country_names.php';
+require_once __DIR__ . '/analytics.php';
+
+/**
+ * ISO 3166-1 alpha-2 code -> flag emoji (regional indicator symbols).
+ * Returns an empty string for non-two-letter / unknown codes.
+ */
+function funnel_flag_emoji(?string $code): string
+{
+    $code = strtoupper((string)$code);
+    if (!preg_match('/^[A-Z]{2}$/', $code)) {
+        return '';
+    }
+    $a = 0x1F1E6 + (ord($code[0]) - ord('A'));
+    $b = 0x1F1E6 + (ord($code[1]) - ord('A'));
+    return mb_convert_encoding('&#' . $a . ';&#' . $b . ';', 'UTF-8', 'HTML-ENTITIES');
+}
+
+/**
+ * Render a Plausible-style breakdown list: each row is tinted by a blue visits
+ * bar with an orange revenue underline, the label on the left and the visit
+ * count (plus revenue) on the right. Rows beyond $limit collapse into "Other".
+ *
+ * @param list<array{key:string,label:string,visits:int,revenue:float}> $rows
+ * @param array{revenue?:bool,flag?:bool,limit?:int,empty?:string} $opts
+ */
+function funnel_render_bar_list(array $rows, array $opts = []): string
+{
+    $show_revenue = $opts['revenue'] ?? true;
+    $with_flag    = $opts['flag']    ?? false;
+    $limit        = $opts['limit']   ?? 9;
+    $empty_msg    = $opts['empty']   ?? 'No data for this period yet.';
+
+    if (empty($rows)) {
+        return '<div class="bd-empty">' . htmlspecialchars($empty_msg) . '</div>';
+    }
+
+    $shown = array_slice($rows, 0, $limit);
+    $rest  = array_slice($rows, $limit);
+    if (!empty($rest)) {
+        $shown[] = [
+            'key'     => '__other__',
+            'label'   => 'Other',
+            'visits'  => array_sum(array_map(fn($r) => (int)$r['visits'], $rest)),
+            'revenue' => array_sum(array_map(fn($r) => (float)$r['revenue'], $rest)),
+        ];
+    }
+
+    $max_v = max(1, max(array_map(fn($r) => (int)$r['visits'], $shown)));
+    $max_r = max(array_map(fn($r) => (float)$r['revenue'], $shown));
+
+    $html = '<ul class="bd-list">';
+    foreach ($shown as $r) {
+        $v   = (int)$r['visits'];
+        $rev = (float)$r['revenue'];
+        $vw  = round(($v / $max_v) * 100, 2);
+        $rw  = ($max_r > 0) ? round(($rev / $max_r) * 100, 2) : 0;
+
+        $flag = ($with_flag && $r['key'] !== '__other__' && $r['key'] !== 'Unknown')
+            ? funnel_flag_emoji($r['key']) : '';
+
+        $tip = $r['label'] . ' — ' . number_format($v) . ' visit' . ($v === 1 ? '' : 's');
+        if ($show_revenue) {
+            $tip .= ' · $' . number_format($rev, 2) . ' revenue';
+        }
+
+        $html .= '<li class="bd-row" data-tip="' . htmlspecialchars($tip) . '">';
+        $html .= '<span class="bd-bar bd-bar-visits" style="width:' . $vw . '%"></span>';
+        if ($show_revenue) {
+            $html .= '<span class="bd-bar bd-bar-revenue" style="width:' . $rw . '%"></span>';
+        }
+        $html .= '<span class="bd-label">'
+            . ($flag !== '' ? '<span class="bd-flag">' . $flag . '</span>' : '')
+            . htmlspecialchars($r['label']) . '</span>';
+        $html .= '<span class="bd-value">' . number_format($v);
+        if ($show_revenue && $rev > 0) {
+            $html .= '<em class="bd-rev">$' . number_format($rev, 0) . '</em>';
+        }
+        $html .= '</span></li>';
+    }
+    $html .= '</ul>';
+    return $html;
+}
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
@@ -644,6 +727,7 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/jsvectormap.min.css">
 
 <div class="container">
     <?php if (isset($_SESSION['success_message'])): ?>
@@ -671,37 +755,10 @@ include __DIR__ . '/../admin_header.php';
         // always reflects "users we couldn't attribute by token".
         $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 
-        // Where paying customers came from: one slice per attributed source, plus
-        // a "Direct / untracked" slice for payers we couldn't tie to a campaign.
-        $payer_source_rows   = get_paying_customers_by_source($funnel_period_start_dt, current_environment());
-        $payer_source_total  = array_sum(array_map(fn($r) => (int)$r['payers'], $payer_source_rows));
-        $payer_source_labels = array_map(fn($r) => $r['label'], $payer_source_rows);
-        $payer_source_counts = array_map(fn($r) => (int)$r['payers'], $payer_source_rows);
-
-        // Landing-page breakdown: only meaningful for "All traffic" since a
-        // specific tracked source usually points at a single destination page.
-        $landing_breakdown = [];
-        $landing_chart_labels = [];
-        $landing_chart_counts = [];
-        if ($funnel_source_filter === '') {
-            $rows = get_landing_page_breakdown($funnel_period_start_dt, current_environment());
-            $top = array_slice($rows, 0, 14);
-            $rest = array_slice($rows, 14);
-            $other_total = array_sum(array_map(fn($r) => (int)$r['visitors'], $rest));
-            foreach ($top as $r) {
-                $landing_breakdown[] = [
-                    'label'    => friendly_landing_label($r['clean_path']),
-                    'visitors' => (int)$r['visitors'],
-                ];
-            }
-            if ($other_total > 0) {
-                $landing_breakdown[] = ['label' => 'Other', 'visitors' => $other_total];
-            }
-            foreach ($landing_breakdown as $r) {
-                $landing_chart_labels[] = $r['label'];
-                $landing_chart_counts[] = $r['visitors'];
-            }
-        }
+        // Plausible-style breakdowns for the channel donut, the referrer /
+        // campaign / keyword bar lists, and the map / country / region / city
+        // lists. Each row carries visits + attributed revenue.
+        $analytics = build_funnel_analytics($funnel_period_start_dt, $funnel_source_filter ?: null, $referral_links);
 
         $total_spend = 0.0;
         $total_revenue = 0.0;
@@ -745,6 +802,28 @@ include __DIR__ . '/../admin_header.php';
             ['key' => 'premium_paid',    'label' => 'Premium paid'],
         ];
 
+        // Per-stage top sources / countries for the funnel hover tooltip.
+        $stage_countries = $analytics['stage_countries'];
+        $stage_sources   = $analytics['stage_sources'];
+        $name_by_source_code = [];
+        foreach ($referral_links as $rl) {
+            $name_by_source_code[$rl['source_code']] = $rl['name'];
+        }
+        $fmt_stage_rows = function (array $bucket, bool $is_country) use ($name_by_source_code): array {
+            $out = [];
+            foreach (($bucket['rows'] ?? []) as $r) {
+                if ($is_country) {
+                    $label = ($r['k'] === null || $r['k'] === '') ? 'Unknown' : (country_name($r['k']) ?: $r['k']);
+                    $flag  = ($r['k'] === null || $r['k'] === '') ? '' : funnel_flag_emoji($r['k']);
+                } else {
+                    $label = ($r['k'] === null || $r['k'] === '') ? FUNNEL_DIRECT_LABEL : ($name_by_source_code[$r['k']] ?? $r['k']);
+                    $flag  = '';
+                }
+                $out[] = ['label' => $label, 'flag' => $flag, 'pct' => $r['pct']];
+            }
+            return $out;
+        };
+
         $top_count = max(1, $funnel_counts[$stage_defs[0]['key']]);
         $funnel_stages = [];
         $prev_count = null;
@@ -756,6 +835,10 @@ include __DIR__ . '/../admin_header.php';
             $funnel_stages[] = [
                 'key' => $sd['key'], 'label' => $sd['label'], 'count' => $c,
                 'pct_of_top' => $pct_of_top, 'retained' => $retained, 'lost' => $lost,
+                'dropoff'    => ($prev_count !== null) ? ($prev_count - $c) : null,
+                'step_value' => $c > 0 ? round($total_revenue / $c, 2) : 0,
+                'top_countries' => $fmt_stage_rows($stage_countries[$sd['key']] ?? [], true),
+                'top_sources'   => $fmt_stage_rows($stage_sources[$sd['key']] ?? [], false),
             ];
             $prev_count = $c;
         }
@@ -768,6 +851,7 @@ include __DIR__ . '/../admin_header.php';
                 $biggest_drop_index = $i;
             }
         }
+        $overall_conversion = $funnel_stages[count($funnel_stages) - 1]['pct_of_top'] ?? 0;
     ?>
     <div class="control-bar">
         <div class="control-group">
@@ -846,91 +930,121 @@ include __DIR__ . '/../admin_header.php';
         </div>
     </div>
 
-    <div class="funnel-container">
-        <h2>
-            Conversion Funnel
-            <?php if ($funnel_source_filter !== ''): ?>
-                <span class="source-tag"><?php echo htmlspecialchars($funnel_source_filter); ?></span>
-            <?php else: ?>
-                <span class="source-tag">all traffic, including visitors with no referral link</span>
-            <?php endif; ?>
-        </h2>
-
-        <div class="funnel funnel-bars">
-            <?php foreach ($funnel_stages as $i => $stage): ?>
-                <div class="funnel-row" data-stage="<?php echo htmlspecialchars($stage['key']); ?>">
-                    <div class="funnel-label"><?php echo htmlspecialchars($stage['label']); ?></div>
-                    <div class="funnel-bar-wrap">
-                        <div class="funnel-bar funnel-bar-<?php echo htmlspecialchars($stage['key']); ?>"
-                             style="--target-pct: <?php echo $stage['pct_of_top']; ?>%"></div>
-                    </div>
-                    <div class="funnel-count"><?php echo number_format($stage['count']); ?></div>
-                </div>
-                <?php if ($i + 1 < count($funnel_stages) && $funnel_stages[$i+1]['retained'] !== null):
-                    $next = $funnel_stages[$i+1];
-                    $is_biggest = ($biggest_drop_index === $i + 1);
-                ?>
-                    <div class="funnel-dropoff <?php echo $is_biggest ? 'biggest' : ''; ?>">
-                        <span class="kept"><?php echo $next['retained']; ?>% retained</span>
-                        <span class="sep">·</span>
-                        <span class="lost"><?php echo $next['lost']; ?>% left</span>
-                        <?php if ($is_biggest): ?>
-                            <span class="sep">·</span>
-                            <span class="kept">biggest drop-off</span>
-                        <?php endif; ?>
-                    </div>
+    <?php
+        // Date-range label for the funnel header, e.g. "Jun 15 → Jul 15".
+        $range_start_label = $funnel_period_start_dt !== null
+            ? date('M j', strtotime($funnel_period_start_dt))
+            : 'All time';
+        $range_end_label = date('M j');
+        $range_label = $funnel_period_start_dt !== null
+            ? ($range_start_label . ' → ' . $range_end_label)
+            : 'All time';
+    ?>
+    <div class="funnel-card">
+        <div class="funnel-card-head">
+            <h2>
+                Conversion Funnel
+                <?php if ($funnel_source_filter !== ''): ?>
+                    <span class="source-tag"><?php echo htmlspecialchars($funnel_source_filter); ?></span>
+                <?php else: ?>
+                    <span class="source-tag">all traffic</span>
                 <?php endif; ?>
-            <?php endforeach; ?>
+            </h2>
+            <div class="funnel-conv">
+                <span class="funnel-conv-rate"><?php echo $overall_conversion; ?>% conversion rate</span>
+                <span class="funnel-conv-range"><?php echo htmlspecialchars($range_label); ?></span>
+            </div>
+        </div>
+        <div class="funnel-stream" id="funnelStream"
+             data-biggest="<?php echo $biggest_drop_index === null ? -1 : (int)$biggest_drop_index; ?>"></div>
+        <div class="funnel-tip" id="funnelTip" role="tooltip" aria-hidden="true"></div>
+    </div>
+
+    <?php
+        // Server-rendered breakdown lists (dual blue/orange bars). The Channel
+        // donut and the world map are drawn client-side from the JSON below.
+        $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 8]);
+        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 8, 'empty' => 'No tracked campaigns in this period yet.']);
+        $bd_keyword  = funnel_render_bar_list($analytics['keywords'],  ['revenue' => true,  'limit' => 8, 'empty' => 'No keywords captured yet. Collecting from ?utm_term going forward.']);
+        $bd_country  = funnel_render_bar_list($analytics['countries'], ['revenue' => true,  'limit' => 9, 'flag' => true]);
+        $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
+        $bd_city     = funnel_render_bar_list($analytics['cities'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No city data yet. Collecting going forward.']);
+
+        $channel_total_visits = array_sum(array_map(fn($r) => (int)$r['visits'], $analytics['channels']));
+    ?>
+    <div class="analytics-row">
+        <!-- Traffic sources: channel / referrer / campaign / keyword -->
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="channel">Channel</button>
+                <button class="bd-tab" data-bd="referrer">Referrer</button>
+                <button class="bd-tab" data-bd="campaign">Campaign</button>
+                <button class="bd-tab" data-bd="keyword">Keyword</button>
+            </div>
+
+            <div class="bd-panel active" data-bd-panel="channel">
+                <?php if ($channel_total_visits > 0): ?>
+                    <div class="donut-wrap">
+                        <div class="donut-canvas"><canvas id="channelDonut"></canvas></div>
+                        <ul class="donut-legend" id="channelLegend"></ul>
+                    </div>
+                <?php else: ?>
+                    <div class="bd-empty">No traffic in this period yet.</div>
+                <?php endif; ?>
+            </div>
+
+            <div class="bd-panel" data-bd-panel="referrer">
+                <?php echo $bd_ref; ?>
+                <?php if (count($analytics['referrers']) > 0): ?>
+                    <button type="button" class="bd-details-btn" id="referrerDetailsBtn">See all details</button>
+                <?php endif; ?>
+            </div>
+
+            <div class="bd-panel" data-bd-panel="campaign"><?php echo $bd_campaign; ?></div>
+            <div class="bd-panel" data-bd-panel="keyword"><?php echo $bd_keyword; ?></div>
         </div>
 
-        <?php if ($payer_source_total > 0): ?>
-            <div class="landing-breakdown">
-                <h3>Where paying customers came from</h3>
-                <p class="muted-note">
-                    Each paying customer attributed to the source captured at signup. "Direct / untracked"
-                    means we couldn't tie them to a campaign (organic, or a returning visitor).
-                </p>
-                <div class="landing-breakdown-body">
-                    <div class="landing-breakdown-chart">
-                        <canvas id="payerSourcesChart"></canvas>
-                    </div>
-                    <ul class="landing-breakdown-list">
-                        <?php foreach ($payer_source_rows as $i => $row):
-                            $pct = $payer_source_total > 0 ? round(((int)$row['payers'] / $payer_source_total) * 100, 1) : 0;
-                        ?>
-                            <li>
-                                <span class="swatch" data-payer-swatch-idx="<?php echo $i; ?>"></span>
-                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
-                                <span class="pct"><?php echo (int)$row['payers']; ?> &middot; <?php echo $pct; ?>%</span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
+        <!-- Geography: map / country / region / city -->
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="map">Map</button>
+                <button class="bd-tab" data-bd="country">Country</button>
+                <button class="bd-tab" data-bd="region">Region</button>
+                <button class="bd-tab" data-bd="city">City</button>
             </div>
-        <?php endif; ?>
 
-        <?php if (!empty($landing_breakdown)): ?>
-            <div class="landing-breakdown">
-                <h3>Where landings come from</h3>
-                <div class="landing-breakdown-body">
-                    <div class="landing-breakdown-chart">
-                        <canvas id="landingPagesChart"></canvas>
-                    </div>
-                    <ul class="landing-breakdown-list landing-breakdown-list--two-col">
-                        <?php $total_landings = array_sum($landing_chart_counts); ?>
-                        <?php foreach ($landing_breakdown as $i => $row):
-                            $pct = $total_landings > 0 ? round(($row['visitors'] / $total_landings) * 100, 1) : 0;
-                        ?>
-                            <li>
-                                <span class="swatch" data-swatch-idx="<?php echo $i; ?>"></span>
-                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
-                                <span class="pct"><?php echo $pct; ?>%</span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+            <div class="bd-panel active" data-bd-panel="map">
+                <div class="world-map" id="worldMap"></div>
+                <div class="map-legend">
+                    <span class="map-legend-label">Fewer</span>
+                    <span class="map-legend-gradient"></span>
+                    <span class="map-legend-label">More visits</span>
                 </div>
             </div>
-        <?php endif; ?>
+            <div class="bd-panel" data-bd-panel="country"><?php echo $bd_country; ?></div>
+            <div class="bd-panel" data-bd-panel="region"><?php echo $bd_region; ?></div>
+            <div class="bd-panel" data-bd-panel="city"><?php echo $bd_city; ?></div>
+        </div>
+    </div>
+
+    <!-- Full referrer list (opened from the Referrer tab's "See all details") -->
+    <div id="referrerDetailsModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeReferrerDetails()">&times;</span>
+            <h2>Referrer</h2>
+            <input type="text" class="bd-details-search" id="referrerDetailsSearch"
+                   placeholder="Search&hellip;" autocomplete="off" spellcheck="false">
+            <div class="bd-details-list" id="referrerDetailsList">
+                <?php foreach ($analytics['referrers'] as $r): ?>
+                    <div class="bd-details-row" data-name="<?php echo htmlspecialchars(strtolower($r['label'])); ?>">
+                        <span class="bd-details-name"><?php echo htmlspecialchars($r['label']); ?></span>
+                        <span class="bd-details-visits"><?php echo number_format((int)$r['visits']); ?></span>
+                        <span class="bd-details-revenue">$<?php echo number_format((float)$r['revenue'], 0); ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
 
         <?php
             $survey_by_answer = $survey_breakdown['by_answer'];
@@ -1005,72 +1119,6 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             </div>
         <?php endif; ?>
-    </div>
-
-    <div class="table-container">
-        <div class="table-header-actions">
-            <h2>Compare all sources</h2>
-        </div>
-        <div class="table-responsive">
-            <table class="compare-table" data-paginate="25">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Landings</th>
-                        <th>Pages</th>
-                        <th>Clicks</th>
-                        <th>Signups</th>
-                        <th>Paying</th>
-                        <th>Spend</th>
-                        <th>Revenue</th>
-                        <th>CAC</th>
-                        <th>LTV</th>
-                        <th>LTV:CAC</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($per_source as $r):
-                        $rspend = (float)$r['spend'];
-                        $rrev   = (float)$r['revenue'];
-                        $rpaying = (int)$r['paying'];
-                        $rcac = $rpaying > 0 ? $rspend / $rpaying : null;
-                        $rltv = $rpaying > 0 ? $rrev / $rpaying : null;
-                        $rratio = ($rcac !== null && $rcac > 0 && $rltv !== null) ? $rltv / $rcac : null;
-                        $rclass = 'organic';
-                        if ($rspend > 0) {
-                            if ($rratio === null) $rclass = 'losing';
-                            elseif ($rratio < 1.0) $rclass = 'losing';
-                            elseif ($rratio < 3.0) $rclass = 'marginal';
-                            else $rclass = 'profitable';
-                        }
-                        $row_href = 'index.php?' . http_build_query([
-                            'tab' => 'funnel', 'funnel_period' => $funnel_period_key, 'source' => $r['source_code']
-                        ]);
-                    ?>
-                        <tr onclick="window.location.href='<?php echo htmlspecialchars($row_href); ?>'">
-                            <td><code><?php echo htmlspecialchars($r['source_code']); ?></code></td>
-                            <td><?php echo number_format((int)$r['landings']); ?></td>
-                            <td><?php echo number_format((int)$r['dl_pages']); ?></td>
-                            <td><?php echo number_format((int)$r['dl_clicks']); ?></td>
-                            <td><?php echo number_format((int)$r['signups']); ?></td>
-                            <td><?php echo number_format($rpaying); ?></td>
-                            <td>$<?php echo number_format($rspend, 2); ?></td>
-                            <td>$<?php echo number_format($rrev, 2); ?></td>
-                            <td><?php echo $rcac !== null ? '$' . number_format($rcac, 2) : '—'; ?></td>
-                            <td><?php echo $rltv !== null ? '$' . number_format($rltv, 2) : '—'; ?></td>
-                            <td class="ratio-cell <?php echo $rclass; ?>">
-                                <?php
-                                    if ($rspend == 0 && $rpaying > 0) echo '∞';
-                                    elseif ($rratio !== null) echo number_format($rratio, 2) . '×';
-                                    else echo '—';
-                                ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
     </div><!-- /#funnel -->
 
     <div id="spend" class="tab-content <?php echo $current_tab === 'spend' ? 'active' : ''; ?>">
@@ -1486,6 +1534,10 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
+<!-- World map for the geography card (choropleth by visits) -->
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/maps/world.min.js"></script>
+
 <script>
     const csrfToken = <?php echo json_encode($_SESSION['csrf_token']); ?>;
 
@@ -1651,70 +1703,6 @@ include __DIR__ . '/../admin_header.php';
         document.addEventListener('click', (e) => { if (!box.contains(e.target)) close(); });
     })();
 
-    // Landing-page breakdown doughnut (only rendered on All-traffic funnel).
-    (function () {
-        const canvas = document.getElementById('landingPagesChart');
-        if (!canvas || typeof Chart === 'undefined') return;
-
-        const labels = <?php echo json_encode($landing_chart_labels, JSON_UNESCAPED_SLASHES); ?>;
-        const counts = <?php echo json_encode($landing_chart_counts); ?>;
-        if (!labels.length) return;
-
-        // Reuse the palette other admin charts use so themes stay consistent.
-        // Expanded to 14 distinct hues now that the legend shows up to 14 pages;
-        // gray is reserved for the "Other" bucket so it always reads as the catch-all.
-        const palette = [
-            'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
-            'rgba(16, 185, 129, 0.85)',   // emerald
-            'rgba(245, 158, 11, 0.85)',   // amber
-            'rgba(239, 68, 68, 0.85)',    // red
-            'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
-            'rgba(236, 72, 153, 0.85)',   // pink
-            'rgba(20, 184, 166, 0.85)',   // teal
-            'rgba(132, 204, 22, 0.85)',   // lime
-            'rgba(249, 115, 22, 0.85)',   // orange
-            'rgba(99, 102, 241, 0.85)',   // indigo
-            'rgba(6, 182, 212, 0.85)',    // cyan
-            'rgba(217, 70, 239, 0.85)',   // fuchsia
-        ];
-        const GRAY = 'rgba(107, 114, 128, 0.85)';
-        const colors = labels.map((lbl, i) => lbl === 'Other' ? GRAY : palette[i % palette.length]);
-
-        document.querySelectorAll('.landing-breakdown-list .swatch').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-swatch-idx'), 10);
-            if (!Number.isNaN(idx) && colors[idx]) {
-                el.style.backgroundColor = colors[idx];
-            }
-        });
-
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '55%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    })();
-
     // Source-survey breakdown doughnut (unattributed installs only).
     (function () {
         const canvas = document.getElementById('surveySourcesChart');
@@ -1772,59 +1760,286 @@ include __DIR__ . '/../admin_header.php';
         });
     })();
 
-    // Where paying customers came from (pie).
+    // ---------------------------------------------------------------------
+    // Plausible-style dashboard: streamgraph funnel, channel donut, world map,
+    // dual-bar breakdown tooltips, inner tab switching, referrer details modal.
+    // ---------------------------------------------------------------------
+    <?php
+        // Country map values keyed by uppercase ISO-2, for the choropleth.
+        $map_values = [];
+        foreach ($analytics['countries'] as $mr) {
+            if (!preg_match('/^[A-Za-z]{2}$/', (string)$mr['key'])) continue;
+            $map_values[strtoupper($mr['key'])] = [
+                'visits'  => (int)$mr['visits'],
+                'revenue' => round((float)$mr['revenue'], 2),
+            ];
+        }
+        $channels_js = array_map(fn($r) => [
+            'label'   => $r['label'],
+            'visits'  => (int)$r['visits'],
+            'revenue' => round((float)$r['revenue'], 2),
+        ], $analytics['channels']);
+    ?>
     (function () {
-        const canvas = document.getElementById('payerSourcesChart');
-        if (!canvas || typeof Chart === 'undefined') return;
+        const FUNNEL      = <?php echo json_encode($funnel_stages, JSON_UNESCAPED_SLASHES); ?>;
+        const CHANNELS    = <?php echo json_encode($channels_js, JSON_UNESCAPED_SLASHES); ?>;
+        const MAP_VALUES  = <?php echo json_encode($map_values ?: new stdClass(), JSON_UNESCAPED_SLASHES); ?>;
 
-        const labels = <?php echo json_encode($payer_source_labels ?? [], JSON_UNESCAPED_SLASHES); ?>;
-        const counts = <?php echo json_encode($payer_source_counts ?? []); ?>;
-        if (!labels.length) return;
-
-        // Same palette as the other breakdown charts; "Direct / untracked" always
-        // takes the gray slot (last in the palette).
-        const palette = [
-            'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
-            'rgba(16, 185, 129, 0.85)',   // emerald
-            'rgba(245, 158, 11, 0.85)',   // amber
-            'rgba(239, 68, 68, 0.85)',    // red
-            'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
-            'rgba(107, 114, 128, 0.85)',  // gray
-        ];
-        const GRAY = palette[palette.length - 1];
-        const colors = labels.map((lbl, i) => lbl === 'Direct / untracked' ? GRAY : palette[i % (palette.length - 1)]);
-
-        document.querySelectorAll('.landing-breakdown-list .swatch[data-payer-swatch-idx]').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-payer-swatch-idx'), 10);
-            if (!Number.isNaN(idx) && colors[idx]) {
-                el.style.backgroundColor = colors[idx];
+        const nf = new Intl.NumberFormat('en-US');
+        const money = v => '$' + nf.format(Math.round(v));
+        const escapeHtml = s => String(s).replace(/[&<>"']/g, c => (
+            {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const fmtCount = n => {
+            n = Number(n) || 0;
+            if (Math.abs(n) >= 1000) {
+                const k = n / 1000;
+                return (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + 'k';
             }
+            return nf.format(n);
+        };
+        const isDark = () =>
+            (document.documentElement.getAttribute('data-theme') === 'dark') ||
+            (document.body.getAttribute('data-theme') === 'dark');
+
+        // ----- Inner tab switching (sources + geo cards) -----
+        document.querySelectorAll('.bd-tabs').forEach(tabs => {
+            const card = tabs.closest('.analytics-card');
+            tabs.addEventListener('click', e => {
+                const btn = e.target.closest('.bd-tab');
+                if (!btn) return;
+                const key = btn.getAttribute('data-bd');
+                tabs.querySelectorAll('.bd-tab').forEach(b => b.classList.toggle('active', b === btn));
+                card.querySelectorAll('.bd-panel').forEach(p =>
+                    p.classList.toggle('active', p.getAttribute('data-bd-panel') === key));
+                if (key === 'map' && window.__argoMap && typeof window.__argoMap.updateSize === 'function') {
+                    window.__argoMap.updateSize();
+                }
+            });
         });
 
-        new Chart(canvas, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
-                            }
-                        }
+        // ----- Shared tooltip for the dual-bar breakdown lists -----
+        const barTip = document.createElement('div');
+        barTip.className = 'bd-tip';
+        document.body.appendChild(barTip);
+        document.querySelectorAll('.bd-list').forEach(list => {
+            list.addEventListener('mousemove', e => {
+                const row = e.target.closest('.bd-row');
+                if (!row) { barTip.classList.remove('show'); return; }
+                barTip.textContent = row.getAttribute('data-tip') || '';
+                barTip.classList.add('show');
+                barTip.style.left = (e.clientX + 14) + 'px';
+                barTip.style.top  = (e.clientY + 16) + 'px';
+            });
+            list.addEventListener('mouseleave', () => barTip.classList.remove('show'));
+        });
+
+        // ----- Streamgraph funnel -----
+        (function renderFunnel() {
+            const host = document.getElementById('funnelStream');
+            if (!host || !FUNNEL.length) return;
+            const W = 1000, H = 300, cy = H / 2, pad = 18;
+            const n = FUNNEL.length;
+            const maxCount = Math.max(1, ...FUNNEL.map(s => s.count));
+            const halfMax = cy - pad;
+            const xs = FUNNEL.map((s, i) => n === 1 ? W / 2 : (i / (n - 1)) * W);
+            const hs = FUNNEL.map(s => Math.max(4, (s.count / maxCount) * halfMax));
+
+            const edge = sign => {
+                let d = `M ${xs[0].toFixed(1)} ${(cy + sign * hs[0]).toFixed(1)}`;
+                for (let i = 0; i < n - 1; i++) {
+                    const x0 = xs[i], x1 = xs[i + 1];
+                    const y0 = cy + sign * hs[i], y1 = cy + sign * hs[i + 1];
+                    const dx = (x1 - x0) / 2;
+                    d += ` C ${(x0 + dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 - dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+                }
+                return d;
+            };
+            let bottom = `L ${xs[n - 1].toFixed(1)} ${(cy + hs[n - 1]).toFixed(1)}`;
+            for (let i = n - 1; i > 0; i--) {
+                const x0 = xs[i], x1 = xs[i - 1];
+                const y0 = cy + hs[i], y1 = cy + hs[i - 1];
+                const dx = (x0 - x1) / 2;
+                bottom += ` C ${(x0 - dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 + dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+            }
+            const pathD = edge(-1) + ' ' + bottom + ' Z';
+
+            let guides = '', segs = '';
+            for (let i = 0; i < n; i++) {
+                if (i > 0) guides += `<line x1="${xs[i].toFixed(1)}" y1="0" x2="${xs[i].toFixed(1)}" y2="${H}" class="funnel-guide"/>`;
+                const left  = i === 0 ? 0 : (xs[i] + xs[i - 1]) / 2;
+                const right = i === n - 1 ? W : (xs[i] + xs[i + 1]) / 2;
+                segs += `<rect class="funnel-seg" data-i="${i}" x="${left.toFixed(1)}" y="0" width="${(right - left).toFixed(1)}" height="${H}"></rect>`;
+            }
+
+            const svg =
+                `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="funnel-svg">` +
+                `<defs><linearGradient id="funnelGrad" x1="0" y1="0" x2="0" y2="1">` +
+                `<stop offset="0%" stop-color="var(--funnel-grad-top)"/>` +
+                `<stop offset="100%" stop-color="var(--funnel-grad-bottom)"/></linearGradient></defs>` +
+                guides +
+                `<path d="${pathD}" fill="url(#funnelGrad)" class="funnel-shape"/>` +
+                segs + `</svg>`;
+
+            let pills = '<div class="funnel-pills">';
+            for (let i = 0; i < n - 1; i++) {
+                const midX = ((xs[i] + xs[i + 1]) / 2) / W * 100;
+                pills += `<span class="funnel-pill" style="left:${midX}%">-${FUNNEL[i + 1].lost}% <span class="arw">&rarr;</span></span>`;
+            }
+            pills += '</div>';
+
+            let labels = '<div class="funnel-labels">';
+            FUNNEL.forEach((s, i) => {
+                let pos;
+                if (i === 0) pos = 'left:0;text-align:left';
+                else if (i === n - 1) pos = 'left:100%;transform:translateX(-100%);text-align:right';
+                else pos = `left:${(xs[i] / W * 100).toFixed(2)}%;transform:translateX(-50%)`;
+                labels += `<div class="funnel-lbl" style="${pos}"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}</span></div>`;
+            });
+            labels += '</div>';
+
+            host.innerHTML = svg + pills + labels;
+
+            const tip = document.getElementById('funnelTip');
+            const showTip = (e, i) => {
+                const s = FUNNEL[i], prev = i > 0 ? FUNNEL[i - 1] : null;
+                let h = '';
+                if (prev) {
+                    h += `<div class="ft-line"><span>${escapeHtml(prev.label)}</span><b>${fmtCount(prev.count)}</b></div>`;
+                    h += `<div class="ft-line ft-drop"><span>Dropoff</span><b>-${fmtCount(s.dropoff)}</b></div>`;
+                }
+                h += `<div class="ft-line ft-cur"><span>${escapeHtml(s.label)}</span><b>${fmtCount(s.count)}</b></div>`;
+                h += `<div class="ft-sep"></div>`;
+                h += `<div class="ft-line"><span>Conversion</span><b>${s.retained === null ? '100%' : s.retained + '%'}</b></div>`;
+                h += `<div class="ft-line ft-sub"><span>from start</span><b>${s.pct_of_top}%</b></div>`;
+                h += `<div class="ft-line"><span>Step value</span><b>${money(s.step_value)}/visitor</b></div>`;
+                if ((s.top_sources && s.top_sources.length) || (s.top_countries && s.top_countries.length)) {
+                    const col = (title, rows) => `<div class="ft-col"><div class="ft-h">${title}</div>` +
+                        rows.map(r => `<div class="ft-row"><span>${r.flag ? r.flag + ' ' : ''}${escapeHtml(r.label)}</span><em>${r.pct}%</em></div>`).join('') + `</div>`;
+                    h += `<div class="ft-cols">` + col('Top sources', s.top_sources || []) + col('Top countries', s.top_countries || []) + `</div>`;
+                }
+                tip.innerHTML = h;
+                tip.setAttribute('aria-hidden', 'false');
+                tip.classList.add('show');
+                let x = e.clientX + 16;
+                if (x + 250 > window.innerWidth) x = e.clientX - 250;
+                tip.style.left = Math.max(4, x) + 'px';
+                tip.style.top = Math.max(4, e.clientY + 14) + 'px';
+            };
+            host.querySelectorAll('.funnel-seg').forEach(seg => {
+                const i = parseInt(seg.getAttribute('data-i'), 10);
+                seg.addEventListener('mouseenter', () => host.classList.add('hovering'));
+                seg.addEventListener('mousemove', e => showTip(e, i));
+                seg.addEventListener('mouseleave', () => {
+                    host.classList.remove('hovering');
+                    tip.classList.remove('show');
+                    tip.setAttribute('aria-hidden', 'true');
+                });
+            });
+        })();
+
+        // ----- Channel donut -----
+        (function renderChannelDonut() {
+            const canvas = document.getElementById('channelDonut');
+            if (!canvas || typeof Chart === 'undefined' || !CHANNELS.length) return;
+            const palette = {
+                'Direct': '#64748b', 'Organic search': '#3f63e8', 'Organic social': '#8b5cf6',
+                'AI': '#10b981', 'Referral': '#f59e0b', 'Newsletter': '#ec4899'
+            };
+            const colors = CHANNELS.map(c => palette[c.label] || '#94a3b8');
+            const total = CHANNELS.reduce((a, c) => a + c.visits, 0);
+            new Chart(canvas, {
+                type: 'doughnut',
+                data: { labels: CHANNELS.map(c => c.label), datasets: [{ data: CHANNELS.map(c => c.visits), backgroundColor: colors, borderWidth: 0 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '62%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => {
+                            const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                            const rev = CHANNELS[ctx.dataIndex] ? CHANNELS[ctx.dataIndex].revenue : 0;
+                            let l = ctx.label + ': ' + nf.format(ctx.parsed) + ' (' + pct + '%)';
+                            if (rev > 0) l += ' · ' + money(rev);
+                            return l;
+                        } } }
                     }
                 }
+            });
+            const legend = document.getElementById('channelLegend');
+            if (legend) {
+                legend.innerHTML = CHANNELS.map((c, i) => {
+                    const pct = total > 0 ? Math.round(c.visits / total * 100) : 0;
+                    return `<li><span class="dot" style="background:${colors[i]}"></span>` +
+                           `<span class="dl">${escapeHtml(c.label)}</span>` +
+                           `<span class="dv">${nf.format(c.visits)} &middot; ${pct}%</span></li>`;
+                }).join('');
             }
-        });
+        })();
+
+        // ----- World map choropleth -----
+        (function renderMap() {
+            const el = document.getElementById('worldMap');
+            if (!el || typeof jsVectorMap === 'undefined') {
+                if (el) el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
+                return;
+            }
+            const visitsByCode = {};
+            Object.keys(MAP_VALUES).forEach(k => { visitsByCode[k] = MAP_VALUES[k].visits; });
+            const dark = isDark();
+            try {
+                window.__argoMap = new jsVectorMap({
+                    selector: '#worldMap',
+                    map: 'world',
+                    zoomButtons: true,
+                    zoomOnScroll: false,
+                    backgroundColor: 'transparent',
+                    regionStyle: {
+                        initial: { fill: dark ? '#243044' : '#e5ecf6', stroke: dark ? '#0f172a' : '#ffffff', strokeWidth: 0.4 },
+                        hover: { fill: '#233a93' }
+                    },
+                    series: { regions: [{
+                        attribute: 'fill',
+                        scale: ['#c2cffb', '#233a93'],
+                        normalizeFunction: 'polynomial',
+                        values: visitsByCode
+                    }] },
+                    onRegionTooltipShow(event, tooltip, code) {
+                        const d = MAP_VALUES[code];
+                        let html = '<b>' + (tooltip.text() || code) + '</b>';
+                        if (d) {
+                            html += '<br>' + nf.format(d.visits) + ' visit' + (d.visits === 1 ? '' : 's');
+                            if (d.revenue > 0) html += ' &middot; ' + money(d.revenue);
+                        } else {
+                            html += '<br>No visits';
+                        }
+                        tooltip.text(html, true);
+                    }
+                });
+            } catch (err) {
+                el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
+            }
+        })();
+
+        // ----- Referrer "See all details" modal -----
+        (function referrerDetails() {
+            const btn = document.getElementById('referrerDetailsBtn');
+            const modal = document.getElementById('referrerDetailsModal');
+            const search = document.getElementById('referrerDetailsSearch');
+            if (!modal) return;
+            const rows = Array.from(modal.querySelectorAll('.bd-details-row'));
+            const filter = () => {
+                const q = (search.value || '').trim().toLowerCase();
+                rows.forEach(r => { r.style.display = (!q || r.getAttribute('data-name').includes(q)) ? '' : 'none'; });
+            };
+            window.closeReferrerDetails = () => { modal.style.display = 'none'; };
+            if (btn) btn.addEventListener('click', () => {
+                modal.style.display = 'block';
+                if (search) { search.value = ''; filter(); search.focus(); }
+            });
+            if (search) search.addEventListener('input', filter);
+            modal.addEventListener('mousedown', e => { if (e.target === modal) window.closeReferrerDetails(); });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && modal.style.display === 'block') window.closeReferrerDetails();
+            });
+        })();
     })();
 </script>

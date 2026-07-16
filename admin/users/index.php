@@ -294,6 +294,41 @@ if (isset($_SESSION['message'])) {
     unset($_SESSION['message_type']);
 }
 
+/**
+ * Most active community users, ranked by posts + comments. Moved here from the
+ * Website Stats page so community activity lives alongside user management.
+ */
+function get_most_active_users($limit = 25)
+{
+    global $pdo;
+    $query = "
+        SELECT
+            u.username,
+            u.email,
+            COUNT(DISTINCT p.id) as post_count,
+            COUNT(DISTINCT c.id) as comment_count,
+            SUM(p.views) as total_views,
+            (COUNT(DISTINCT p.id) + COUNT(DISTINCT c.id)) as activity_score
+        FROM community_users u
+        LEFT JOIN community_posts p ON u.id = p.user_id
+        LEFT JOIN community_comments c ON u.id = c.user_id
+        GROUP BY u.id, u.username, u.email
+        ORDER BY activity_score DESC
+        LIMIT ?";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
+
+    $data = [];
+    while ($row = $stmt->fetch()) {
+        $data[] = $row;
+    }
+
+    return $data;
+}
+
+$active_users = get_most_active_users();
+
 include __DIR__ . '/../admin_header.php';
 ?>
 
@@ -508,6 +543,37 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Most active community users (moved here from Website Stats) -->
+    <div class="table-container">
+        <h2>Most Active Community Users</h2>
+        <div class="table-responsive">
+            <table data-paginate="25">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Posts</th>
+                        <th>Comments</th>
+                        <th>Total Views</th>
+                        <th>Activity Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($active_users as $user): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($user['username']); ?></td>
+                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                            <td><?php echo $user['post_count']; ?></td>
+                            <td><?php echo $user['comment_count']; ?></td>
+                            <td><?php echo number_format($user['total_views']); ?></td>
+                            <td><?php echo $user['activity_score']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

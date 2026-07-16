@@ -80,9 +80,9 @@ $base_path = $in_subdir ? '../' : '';
                         'payments' => 'Payment Portal',
                     ],
                     'Growth' => [
+                        'marketing-funnel' => 'Funnel',
                         'referral-links'   => 'Referrals',
                         'affiliates'       => 'Affiliates',
-                        'marketing-funnel' => 'Funnel',
                         'marketing'        => 'Marketing',
                         'outreach'         => 'Outreach',
                         'reviews'          => 'Reviews',

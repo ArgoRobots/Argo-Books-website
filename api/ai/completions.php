@@ -336,6 +336,7 @@ if (is_array($parts)) {
         $content = implode('', $textSegments);
     }
 }
+$partCount = is_array($parts) ? count($parts) : 0;
 $finishReason = $candidate['finishReason'] ?? null;
 
 $usage = null;
@@ -369,6 +370,32 @@ if ($finishReason !== null && $finishReason !== 'STOP') {
 
 if ($content === null) {
     send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
+}
+
+// TEMPORARY DIAGNOSTIC: for receipt extraction, verify the JSON parses server-side. When it
+// doesn't, surface the real cause (finishReason, token usage, part count, and the tail of the
+// content where it cut off) as a normal {"error": ...} 200 response, which is the only shape the
+// desktop app displays verbatim. This replaces the cryptic client-side "truncated JSON" parse
+// error with something we can actually read, and confirms whether this deploy is even live.
+if ($isReceiptExtraction) {
+    json_decode($content);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $diag = sprintf(
+            'DIAG truncated: finishReason=%s model=%s budget=%d tokens(p/o/t)=%d/%d/%d parts=%d len=%d err=%s tail=[%s]',
+            $finishReason ?? 'null',
+            $model,
+            $maxTokens,
+            $usage['prompt_tokens'] ?? 0,
+            $usage['completion_tokens'] ?? 0,
+            $usage['total_tokens'] ?? 0,
+            $partCount,
+            strlen($content),
+            json_last_error_msg(),
+            substr($content, -140)
+        );
+        error_log('[gemini] ' . $diag);
+        $content = json_encode(['error' => $diag]);
+    }
 }
 
 // Record the server-measured timing (best-effort; never breaks the response).

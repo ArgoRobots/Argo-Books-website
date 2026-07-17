@@ -32,13 +32,6 @@ if ($event_type === 'page_view') {
         echo json_encode(['error' => 'bad page id']);
         exit;
     }
-    // The beacon forwards document.referrer so track_page_view()'s reddit-referrer
-    // detection still sees the original referrer (this POST's own Referer header
-    // is the same-origin tool page, not the inbound source).
-    $ref = is_array($body) ? (string)($body['referrer'] ?? '') : '';
-    if ($ref !== '') {
-        $_SERVER['HTTP_REFERER'] = $ref;
-    }
     track_page_view($event_data);
     echo json_encode(['ok' => true]);
     exit;

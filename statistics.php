@@ -278,10 +278,6 @@ function track_event($event_type, $event_data = '')
 function track_page_view($page)
 {
     $result = track_event('page_view', $page);
-    // Also emit a separate 'reddit_referrer' event if this visit came from
-    // a Reddit URL. Used by the admin Reddit dashboard to count profile-link
-    // clicks (the only Reddit traffic browsers expose a referrer for).
-    track_reddit_referrer_if_present($page);
     return $result;
 }
 
@@ -298,23 +294,6 @@ function defer_client_page_view(string $page): void
     if (preg_match('/^[a-z0-9_-]+$/', $page)) {
         $GLOBALS['__client_page_view'] = $page;
     }
-}
-
-/**
- * If the inbound request carries a reddit.com Referer header, emit a
- * 'reddit_referrer' statistics event. Called from track_page_view().
- * Same one-per-IP-per-day dedup behaviour as track_event() since it
- * piggybacks on that function.
- */
-function track_reddit_referrer_if_present($page)
-{
-    $referrer = $_SERVER['HTTP_REFERER'] ?? '';
-    if ($referrer === '') return;
-    if (!preg_match('#^https?://(www\.|old\.|new\.|m\.|i\.)?reddit\.com/?#i', $referrer)) return;
-    // event_data is the inbound page (the landing URL the Reddit visitor hit).
-    // We deliberately don't store the referrer itself, since it adds little
-    // beyond "reddit.com" and risks logging tracking params from share links.
-    track_event('reddit_referrer', $page);
 }
 
 /**

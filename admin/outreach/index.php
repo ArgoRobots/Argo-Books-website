@@ -17,8 +17,6 @@ if (empty($_SESSION['csrf_token'])) {
 require_once __DIR__ . '/tabs/ab-tests.php';
 require_once __DIR__ . '/tabs/settings.php';
 require_once __DIR__ . '/tabs/followups.php';
-require_once __DIR__ . '/tabs/reddit-threads.php';
-require_once __DIR__ . '/tabs/reddit-settings.php';
 
 // Dispatch POST submissions from tab-specific forms BEFORE any output so
 // redirects via header() still work. CSRF: every state-changing tab form
@@ -36,14 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
         ab_tests_tab_handle_post($pdo);
     } elseif ($postTab === 'settings') {
         settings_tab_handle_post($pdo);
-    } elseif ($postTab === 'reddit-settings') {
-        reddit_settings_tab_handle_post($pdo);
     }
 }
 
 // Determine active tab from ?tab=
 $activeTab = $_GET['tab'] ?? 'leads';
-$allowedTabs = ['discovery', 'leads', 'ab-tests', 'followups', 'settings', 'reddit-threads', 'reddit-settings'];
+$allowedTabs = ['discovery', 'leads', 'ab-tests', 'followups', 'settings'];
 if (!in_array($activeTab, $allowedTabs, true)) {
     $activeTab = 'leads';
 }
@@ -61,19 +57,17 @@ include __DIR__ . '/../admin_header.php';
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
 
 <?php
-// Determine which channel is active. Reddit sub-tabs map to the reddit pane;
-// everything else (including legacy URLs without a tab param) maps to email.
-$redditTabs = ['reddit-threads', 'reddit-settings'];
-$activeChannel = $_GET['channel'] ?? (in_array($activeTab, $redditTabs, true) ? 'reddit' : 'email');
-if (!in_array($activeChannel, ['email', 'reddit', 'editorial', 'creator'], true)) {
+// Determine which channel is active. Legacy URLs without a channel param
+// (including old Reddit links) fall back to email.
+$activeChannel = $_GET['channel'] ?? 'email';
+if (!in_array($activeChannel, ['email', 'editorial', 'creator'], true)) {
     $activeChannel = 'email';
 }
 ?>
 
-<!-- Channel-level tabs (Email | Reddit) -->
+<!-- Channel-level tabs -->
 <div class="channel-tabs">
     <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
-    <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
     <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial Partners</button>
     <button class="channel-tab <?php echo $activeChannel === 'creator' ? 'active' : ''; ?>" data-channel="creator">Creator Partners</button>
 </div>
@@ -428,30 +422,6 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 </div>
 
 </div> <!-- /.channel-pane[data-channel-pane="email"] -->
-
-<!-- Reddit channel -->
-<?php
-// If the URL points to the Reddit channel without a Reddit sub-tab, default to threads.
-if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'reddit-settings'], true)) {
-    $activeTab = 'reddit-threads';
-}
-?>
-<div class="channel-pane <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel-pane="reddit">
-
-    <!-- Reddit sub-tabs -->
-    <div class="section-tabs">
-        <button class="section-tab <?php echo $activeTab === 'reddit-threads' ? 'active' : ''; ?>" data-tab="reddit-threads">Threads</button>
-        <button class="section-tab <?php echo $activeTab === 'reddit-settings' ? 'active' : ''; ?>" data-tab="reddit-settings">Settings</button>
-    </div>
-
-    <div id="reddit-threads" class="tab-content <?php echo $activeTab === 'reddit-threads' ? 'active' : ''; ?>">
-        <?php reddit_threads_tab_render($pdo); ?>
-    </div>
-
-    <div id="reddit-settings" class="tab-content <?php echo $activeTab === 'reddit-settings' ? 'active' : ''; ?>">
-        <?php reddit_settings_tab_render($pdo); ?>
-    </div>
-</div> <!-- /.channel-pane[data-channel-pane="reddit"] -->
 
 <!-- Editorial channel -->
 <div class="channel-pane <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel-pane="editorial">
@@ -938,124 +908,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         <div class="modal-footer">
             <button class="btn btn-blue" onclick="closeBulkSendModal()">Cancel</button>
             <button class="btn btn-blue" id="btnBulkSend" disabled>Send All</button>
-        </div>
-    </div>
-</div>
-
-<!-- Reddit Thread Detail Modal -->
-<div id="redditThreadModal" class="modal" style="display:none;">
-    <div class="modal-content modal-large" style="height:auto; max-height:85vh;">
-        <div class="modal-header">
-            <h3 id="redditThreadTitle">Thread</h3>
-            <button class="modal-close" onclick="closeModal('redditThreadModal')">&times;</button>
-        </div>
-        <div class="modal-body reddit-thread-modal-body">
-            <div class="reddit-thread-meta">
-                <span><strong>Subreddit:</strong> <span id="redditThreadSubreddit"></span></span>
-                <span><strong>AI relevance:</strong> <span id="redditThreadAi"></span></span>
-                <span><strong>Status:</strong> <span id="redditThreadStatus"></span></span>
-                <span><strong>Posted:</strong> <span id="redditThreadPosted"></span></span>
-                <a id="redditThreadUrl" target="_blank" rel="noopener noreferrer">Open on Reddit ↗</a>
-            </div>
-            <div class="reddit-thread-section">
-                <h4>OP body</h4>
-                <pre id="redditThreadBody" class="reddit-thread-body"></pre>
-            </div>
-            <div class="reddit-thread-section">
-                <h4>Why this thread scored that way</h4>
-                <p id="redditThreadReason" class="text-muted"></p>
-            </div>
-            <div class="reddit-thread-section">
-                <h4>Draft</h4>
-                <textarea id="redditDraftBody" rows="10" placeholder="Draft will appear here..."></textarea>
-                <div class="reddit-draft-actions">
-                    <button class="btn btn-small btn-blue" onclick="generatePendingRedditDraft()" id="redditDraftGenerateBtn" style="display:none;">Generate draft</button>
-                    <button class="btn btn-small btn-blue" onclick="saveRedditDraft()">Save draft</button>
-                    <button class="btn btn-small btn-neutral" onclick="openRedditRegenerateFeedback()">Regenerate</button>
-                    <button class="btn btn-small btn-blue" onclick="copyRedditDraft(this)">Copy</button>
-                </div>
-                <div id="redditRegenerateFeedback" class="reddit-regenerate-feedback" style="display:none;">
-                    <label for="redditRegenerateFeedbackText">What should be different about the next draft? (optional)</label>
-                    <textarea id="redditRegenerateFeedbackText" rows="3" placeholder="e.g. too formal, don't mention QuickBooks, lead with the side-hustle angle, drop the disclosure phrasing..."></textarea>
-                    <div class="reddit-regenerate-feedback-actions">
-                        <button class="btn btn-small btn-neutral" onclick="cancelRedditRegenerate()">Cancel</button>
-                        <button class="btn btn-small btn-blue" onclick="submitRedditRegenerate(this)" id="redditRegenerateSubmitBtn">Regenerate</button>
-                    </div>
-                </div>
-            </div>
-            <div class="reddit-thread-section" id="redditReplyStatusSection" style="display:none;">
-                <h4>Posted reply status</h4>
-                <div id="redditReplyStatusBody" class="text-muted"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-neutral" onclick="markRedditSkipped()">Skip</button>
-            <button class="btn btn-blue" onclick="openMarkRedditRepliedModal()">Mark replied…</button>
-        </div>
-    </div>
-</div>
-
-<!-- Mark Replied Modal -->
-<div id="redditMarkRepliedModal" class="modal" style="display:none;">
-    <div class="modal-content" style="max-width:560px; height:auto; max-height:80vh;">
-        <div class="modal-header">
-            <h3>Mark replied</h3>
-            <button class="modal-close" onclick="closeModal('redditMarkRepliedModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p class="text-muted" style="font-size:13px;">After posting your reply on Reddit, paste the comment permalink here so we can track whether it survives auto-removal.</p>
-            <div class="form-group">
-                <label for="redditReplyPermalink">Reddit comment permalink</label>
-                <input type="url" id="redditReplyPermalink" placeholder="https://www.reddit.com/r/.../comments/.../slug/abc123/" required>
-                <p class="form-help">Right-click the timestamp on your comment in Reddit and copy the link.</p>
-            </div>
-            <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="redditMentionedProduct" checked>
-                    Mentioned Argo Books in this reply (counts toward post limit)
-                </label>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-neutral" onclick="closeModal('redditMarkRepliedModal')">Cancel</button>
-            <button class="btn btn-blue" onclick="confirmMarkRedditReplied()" id="redditConfirmMarkRepliedBtn">Confirm</button>
-        </div>
-    </div>
-</div>
-
-<!-- Add Reddit Thread Modal -->
-<div id="addRedditThreadModal" class="modal" style="display:none;">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3>Add Reddit Thread</h3>
-            <button class="modal-close" onclick="closeModal('addRedditThreadModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p class="text-muted" style="margin-top:0; font-size:13px;">
-                Paste a Reddit post URL. We'll try to fetch the title, subreddit, and body automatically; fill the fields in below if it can't reach Reddit. The thread lands in the queue as drafted-pending so you can generate a reply for it.
-            </p>
-            <div class="form-group">
-                <label>Reddit post URL <span class="required">*</span></label>
-                <input type="url" id="addRedditUrl" placeholder="https://www.reddit.com/r/smallbusiness/comments/abc123/...">
-            </div>
-            <div class="detail-grid">
-                <div class="form-group">
-                    <label>Subreddit</label>
-                    <input type="text" id="addRedditSubreddit" placeholder="e.g. smallbusiness">
-                </div>
-            </div>
-            <div class="form-group full-width">
-                <label>Title</label>
-                <input type="text" id="addRedditTitle" placeholder="Auto-filled from the URL when possible">
-            </div>
-            <div class="form-group full-width">
-                <label>OP body (optional)</label>
-                <textarea id="addRedditBody" rows="5" placeholder="Paste the post body to improve the generated draft"></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-blue" onclick="closeModal('addRedditThreadModal')">Cancel</button>
-            <button class="btn btn-blue" onclick="addRedditThread()">Add Thread</button>
         </div>
     </div>
 </div>

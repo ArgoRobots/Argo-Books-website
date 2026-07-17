@@ -862,7 +862,7 @@ async function init() {
   state = loadDraft(nicheDefaults);
 
   // If we landed on a niche page with defaults AND localStorage had no draft,
-  // the niche defaults won. Fire an event so the admin Reddit/conversion dashboard
+  // the niche defaults won. Fire an event so the admin conversion dashboard
   // can attribute niche-page hydration distinctly from generic visits.
   if (!hadLocalDraftBefore && nicheDefaults && typeof nicheDefaults === 'object') {
     const slug = (typeof window !== 'undefined' && window.INVOICE_NICHE_SLUG)

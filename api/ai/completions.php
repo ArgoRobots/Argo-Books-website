@@ -74,7 +74,7 @@ if (empty($data['systemPrompt']) && empty($data['userPrompt'])) {
 $systemPrompt = $data['systemPrompt'] ?? '';
 $userPrompt = $data['userPrompt'] ?? '';
 $requestedModel = $data['model'] ?? '';
-$maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-16k
+$maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 32000)); // Clamp 1-32k
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 $base64Image = $data['base64Image'] ?? null;
 $mimeType = $data['mimeType'] ?? 'image/jpeg';

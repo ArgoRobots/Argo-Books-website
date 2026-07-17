@@ -86,6 +86,15 @@ $operation = isset($data['operation']) ? (string) $data['operation'] : 'completi
 $sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ? (int) $data['sizeFeature'] : null;
 $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
+// Receipt scans on the gemini-3.x thinking models spend a large, variable chunk of
+// maxOutputTokens on hidden reasoning before writing the JSON answer, so budgets that
+// were fine on the old model now truncate mid-JSON. Enforce a generous floor here rather
+// than depend on every installed desktop build shipping a higher maxTokens - older builds
+// still send 16000, which is no longer enough. Server-side so the fix is live immediately.
+if ($operation === 'receipt_scan' && !empty($base64Image)) {
+    $maxTokens = max($maxTokens, 32000);
+}
+
 // Installed desktop builds pin a model id that Google has since retired (e.g.
 // gemini-2.5-flash); empty requests also need a default. Remap both to a current
 // model so existing installs keep working without a forced app update instead of
@@ -294,9 +303,27 @@ if (!empty($uploadedFileName)) {
     curl_exec($ch);
 }
 
-// Extract content + finish reason from the Gemini response.
+// Extract content + finish reason from the Gemini response. The gemini-3.x models can
+// split the answer across several parts (and emit separate "thought" parts), so read only
+// the earlier parts[0] would drop the tail and yield truncated JSON. Concatenate every
+// non-thought text part instead.
 $candidate = $responseData['candidates'][0] ?? [];
-$content = $candidate['content']['parts'][0]['text'] ?? null;
+$content = null;
+$parts = $candidate['content']['parts'] ?? [];
+if (is_array($parts)) {
+    $textSegments = [];
+    foreach ($parts as $part) {
+        if (!empty($part['thought'])) {
+            continue; // reasoning trace, not part of the answer
+        }
+        if (isset($part['text']) && is_string($part['text'])) {
+            $textSegments[] = $part['text'];
+        }
+    }
+    if (!empty($textSegments)) {
+        $content = implode('', $textSegments);
+    }
+}
 $finishReason = $candidate['finishReason'] ?? null;
 
 $usage = null;

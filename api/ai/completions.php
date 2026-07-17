@@ -91,7 +91,8 @@ $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 // were fine on the old model now truncate mid-JSON. Enforce a generous floor here rather
 // than depend on every installed desktop build shipping a higher maxTokens - older builds
 // still send 16000, which is no longer enough. Server-side so the fix is live immediately.
-if ($operation === 'receipt_scan' && !empty($base64Image)) {
+$isReceiptExtraction = ($operation === 'receipt_scan' && !empty($base64Image));
+if ($isReceiptExtraction) {
     $maxTokens = max($maxTokens, 32000);
 }
 
@@ -236,13 +237,24 @@ if (!empty($userParts)) {
     $contents[] = ['role' => 'user', 'parts' => $userParts];
 }
 
+$generationConfig = [
+    'temperature' => $temperature,
+    'maxOutputTokens' => $maxTokens,
+    'responseMimeType' => 'application/json',
+];
+
+// gemini-3.x defaults to dynamic ("medium"/high) thinking, which draws from maxOutputTokens.
+// On hard-to-read receipts the model reasons so heavily it exhausts the budget before writing
+// the JSON, truncating the answer (finishReason=MAX_TOKENS) regardless of how high the budget
+// is. Receipt extraction is a structured OCR task, not a reasoning task, so cap thinking to
+// "low" - enough for spatial/digit disambiguation, bounded so the JSON always gets written.
+if ($isReceiptExtraction) {
+    $generationConfig['thinkingConfig'] = ['thinkingLevel' => 'low'];
+}
+
 $geminiPayload = [
     'contents' => $contents,
-    'generationConfig' => [
-        'temperature' => $temperature,
-        'maxOutputTokens' => $maxTokens,
-        'responseMimeType' => 'application/json',
-    ],
+    'generationConfig' => $generationConfig,
 ];
 if ($systemInstruction) {
     $geminiPayload['system_instruction'] = $systemInstruction;

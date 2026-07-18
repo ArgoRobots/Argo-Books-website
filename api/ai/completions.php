@@ -243,13 +243,62 @@ $generationConfig = [
     'responseMimeType' => 'application/json',
 ];
 
-// gemini-3.x defaults to dynamic ("medium"/high) thinking, which draws from maxOutputTokens.
-// On hard-to-read receipts the model reasons so heavily it exhausts the budget before writing
-// the JSON, truncating the answer (finishReason=MAX_TOKENS) regardless of how high the budget
-// is. Receipt extraction is a structured OCR task, not a reasoning task, so cap thinking to
-// "low" - enough for spatial/digit disambiguation, bounded so the JSON always gets written.
 if ($isReceiptExtraction) {
+    // Cap thinking to "low": gemini-3.x defaults to dynamic thinking that draws from
+    // maxOutputTokens; extraction is a structured OCR task, not a reasoning task.
     $generationConfig['thinkingConfig'] = ['thinkingLevel' => 'low'];
+
+    // Constrain generation to a strict schema. Without it, gemini-3.5-flash intermittently
+    // emits invalid JSON even in JSON mode (extra brackets, objects cut off mid-field) with
+    // finishReason=STOP - the model thinks it finished but the payload won't parse. A
+    // responseSchema forces constrained decoding, so the output is always well-formed JSON
+    // matching this shape. Fields are optional/nullable so the "not a receipt" error path and
+    // any missing values still work; the app reads every field defensively.
+    $numberOrNull = ['type' => 'number', 'nullable' => true];
+    $stringOrNull = ['type' => 'string', 'nullable' => true];
+    $nameAmountItem = [
+        'type' => 'object',
+        'properties' => [
+            'name' => ['type' => 'string'],
+            'amount' => ['type' => 'number'],
+        ],
+        'propertyOrdering' => ['name', 'amount'],
+    ];
+    $generationConfig['responseSchema'] = [
+        'type' => 'object',
+        'properties' => [
+            'supplierName' => $stringOrNull,
+            'transactionDate' => $stringOrNull,
+            'subtotal' => $numberOrNull,
+            'taxes' => ['type' => 'array', 'items' => $nameAmountItem, 'nullable' => true],
+            'discounts' => ['type' => 'array', 'items' => $nameAmountItem, 'nullable' => true],
+            'shipping' => $numberOrNull,
+            'totalAmount' => $numberOrNull,
+            'currencyCode' => $stringOrNull,
+            'paymentMethod' => $stringOrNull,
+            'confidence' => $numberOrNull,
+            'lineItems' => [
+                'type' => 'array',
+                'nullable' => true,
+                'items' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'description' => ['type' => 'string'],
+                        'quantity' => ['type' => 'number'],
+                        'unitPrice' => ['type' => 'number'],
+                        'totalPrice' => ['type' => 'number'],
+                        'confidence' => ['type' => 'number'],
+                    ],
+                    'propertyOrdering' => ['description', 'quantity', 'unitPrice', 'totalPrice', 'confidence'],
+                ],
+            ],
+            'error' => $stringOrNull,
+        ],
+        'propertyOrdering' => [
+            'supplierName', 'transactionDate', 'subtotal', 'taxes', 'discounts', 'shipping',
+            'totalAmount', 'currencyCode', 'paymentMethod', 'confidence', 'lineItems', 'error',
+        ],
+    ];
 }
 
 $geminiPayload = [

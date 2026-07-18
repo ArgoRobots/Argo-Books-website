@@ -105,7 +105,7 @@ $pricing = get_pricing_config();
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
                                 <li><strong>Redesigned invoice editor:</strong> Build invoices right on the invoice itself, so what you see on screen is exactly what your customer receives. Click any part of the invoice to edit line items, dates, or notes, and pick products and services from a dropdown as you type. No more filling out a separate form and hoping the layout looks right.</li>
-                                <li><strong>Recurring invoices, expenses, and revenue:</strong> Set any invoice, expense, or revenue entry to repeat on a schedule you choose. Perfect for retainers, subscriptions, rent, and any regular bill or income. Argo Books creates each one automatically, so your books stay up to date without the repeat data entry.</li>
+                                <li><strong>Recurring invoices:</strong> Set any invoice to repeat on a schedule you choose. Perfect for subscriptions, rent, and any regular income.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">

@@ -218,6 +218,13 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                     <h3>Read-only and safe</h3>
                     <p>You connect with a restricted, read-only key. Argo can read your payouts and charges but can never move money or change anything.</p>
                 </div>
+                <div class="why-card animate-on-scroll">
+                    <div class="why-card-icon">
+                        <?= svg_icon('eye', 28) ?>
+                    </div>
+                    <h3>You stay in control</h3>
+                    <p>Sync when you want, review a summary before anything is imported, and undo a whole sync in one step.</p>
+                </div>
             </div>
         </div>
     </section>

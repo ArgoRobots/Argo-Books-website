@@ -41,13 +41,19 @@
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Integrations</span>
                 <a class="dropdown-item" href="<?= $base ?>integrations/stripe/">Stripe</a>
-                <a class="dropdown-item" href="<?= $base ?>integrations/">All integrations</a>
               </div>
             </div>
-            <a class="dropdown-all-features" href="<?= $base ?>features/">
-              View all features
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
+            <div class="dropdown-footer-links">
+              <a class="dropdown-all-features" href="<?= $base ?>features/">
+                View all features
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="dropdown-footer-divider"></span>
+              <a class="dropdown-all-features" href="<?= $base ?>integrations/">
+                View all integrations
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
           </div>
         </li>
         <li><a class="pricing" href="<?= $base ?>pricing/">Pricing</a></li>

@@ -348,16 +348,29 @@ header .header-inner .menu-container ul li a:hover::after {
   color: var(--blue-700) !important;
 }
 
-/* Full-width CTA separated from the feature list so it reads as "see everything",
-   not another feature people scan past. */
+/* Bottom bar of "see everything" links, separated from the columns by a line so they
+   read as navigation to the full lists, not another item people scan past. */
+.dropdown-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 6px;
+  padding-top: 11px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.dropdown-footer-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--gray-200);
+}
+
 .dropdown-all-features {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 6px;
-  padding-top: 11px;
-  border-top: 1px solid var(--gray-200);
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.3 !important;

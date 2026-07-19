@@ -35,6 +35,7 @@ $sidebarSections = [
             'invoicing' => ['title' => 'Invoicing & Payments'],
             'bank-statement-import' => ['title' => 'Bank Statement Import'],
             'bank-matching' => ['title' => 'Bank Matching'],
+            'stripe-integration' => ['title' => 'Stripe Integration'],
             'rental' => ['title' => 'Rental Management'],
             'customers' => ['title' => 'Customer Management'],
             'product-management' => ['title' => 'Product Management'],

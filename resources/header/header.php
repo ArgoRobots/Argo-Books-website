@@ -38,6 +38,11 @@
                 <a class="dropdown-item" href="<?= $base ?>features/rental-management/">Rental Management</a>
                 <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
               </div>
+              <div class="dropdown-col">
+                <span class="dropdown-col-header">Integrations</span>
+                <a class="dropdown-item" href="<?= $base ?>integrations/stripe/">Stripe</a>
+                <a class="dropdown-item" href="<?= $base ?>integrations/">All integrations</a>
+              </div>
             </div>
             <a class="dropdown-all-features" href="<?= $base ?>features/">
               View all features

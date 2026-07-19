@@ -87,9 +87,9 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="bank-matching.php" class="nav-button prev">
+                <a href="stripe-integration.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Bank Matching</span>
+                    <span class="nav-title">&larr; Stripe Integration</span>
                 </a>
                 <a href="customers.php" class="nav-button next">
                     <span class="nav-label">Next</span>

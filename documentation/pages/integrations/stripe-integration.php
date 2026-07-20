@@ -12,7 +12,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>Connect your Stripe account to Argo Books to automatically import your sales, processing fees, tax, discounts, customers, and refunds. You connect with a read-only key, so Argo can read your Stripe activity but can never move money.</p>
 
             <h2>Create a Read-Only Stripe Key</h2>
-            <p>In your Stripe dashboard, turn on Test mode first if you want to try it safely. Go to <strong>Developers</strong>, then <strong>API keys</strong>. Click <strong>Create restricted key</strong>. Choose "Providing this key to a third-party application", name it Argo Books. Check "Customise permissions" and grant <strong>Read</strong> access to Balance transactions, Charges, and Payouts (leave everything else at None). Create the key and copy the value (it starts with <code>rk_</code>).</p>
+            <p>In your Stripe dashboard, turn on Test mode first if you want to try it safely. Go to <strong>Developers</strong>, then <strong>API keys</strong>. Click <strong>Create restricted key</strong>. Choose "Providing this key to a third-party application", name it "Argo Books", or whatever you would like. Check "Customise permissions" and grant <strong>Read</strong> access to Balance transactions, Charges, and Payouts (leave everything else at None). Create the key and copy the value (it starts with <code>rk_</code>).</p>
 
             <h2>Connect It in Argo Books</h2>
             <p>Open <strong>Settings</strong>, then <strong>Integrations</strong>. On the Stripe card, paste your key and click <strong>Connect</strong>. Argo validates it and shows Connected.</p>

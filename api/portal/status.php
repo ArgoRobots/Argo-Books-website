@@ -67,6 +67,7 @@ send_json_response(200, [
     'company' => [
         'name' => $company['company_name'],
         'logo_url' => $company['company_logo_url'],
+        'owner_email' => $company['owner_email'] ?? null,
     ],
     'payment_methods' => $paymentMethods,
     'connectedProviders' => [

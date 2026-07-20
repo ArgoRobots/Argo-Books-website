@@ -88,12 +88,13 @@ $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
 // Receipt scans on the gemini-3.x thinking models spend a large, variable chunk of
 // maxOutputTokens on hidden reasoning before writing the JSON answer, so budgets that
-// were fine on the old model now truncate mid-JSON. Enforce a generous floor here rather
-// than depend on every installed desktop build shipping a higher maxTokens - older builds
-// still send 16000, which is no longer enough. Server-side so the fix is live immediately.
+// were fine on the old model now truncate mid-JSON. The receipt budget is authoritative
+// from .env (RECEIPT_SCAN_MAX_OUTPUT_TOKENS) and ignores whatever the client sent, so it
+// can be tuned for all client versions instantly (older builds still send 16000) without
+// an app release. Overrides the generic clamp above for this operation only.
 $isReceiptExtraction = ($operation === 'receipt_scan' && !empty($base64Image));
 if ($isReceiptExtraction) {
-    $maxTokens = max($maxTokens, 32000);
+    $maxTokens = max(1, (int)($_ENV['RECEIPT_SCAN_MAX_OUTPUT_TOKENS'] ?? 32000));
 }
 
 // Installed desktop builds pin a model id that Google has since retired (e.g.

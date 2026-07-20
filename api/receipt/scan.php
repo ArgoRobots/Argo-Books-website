@@ -360,7 +360,7 @@ function rs_call_gemini(string $key, string $model, string $mime, string $base64
         'system_instruction' => ['parts' => [['text' => RECEIPT_SCAN_SYSTEM_PROMPT]]],
         'generationConfig' => [
             'temperature' => 0.0,
-            'maxOutputTokens' => 16000,
+            'maxOutputTokens' => (int)($_ENV['RECEIPT_SCAN_MAX_OUTPUT_TOKENS'] ?? 32000),
             'responseMimeType' => 'application/json',
         ],
     ];
@@ -383,9 +383,9 @@ function rs_call_gemini(string $key, string $model, string $mime, string $base64
     }
     $data = json_decode($resp, true);
     $candidate = $data['candidates'][0] ?? [];
-    // gemini-2.5-flash spends hidden "thinking" tokens out of maxOutputTokens. The
-    // 16000 budget above matches the desktop fix that stopped silent truncation;
-    // log any non-STOP finish so future truncation is visible rather than silent.
+    // gemini-3.x models spend hidden "thinking" tokens out of maxOutputTokens. The
+    // budget above comes from RECEIPT_SCAN_MAX_OUTPUT_TOKENS in .env (shared with the
+    // app receipt scanner); log any non-STOP finish so future truncation is visible.
     $finish = $candidate['finishReason'] ?? null;
     if ($finish !== null && $finish !== 'STOP') {
         error_log('[receipt-scan] non-STOP finishReason=' . $finish);

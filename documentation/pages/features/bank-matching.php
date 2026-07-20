@@ -67,9 +67,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Bank Statement Import</span>
                 </a>
-                <a href="stripe-integration.php" class="nav-button next">
+                <a href="rental.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Stripe Integration &rarr;</span>
+                    <span class="nav-title">Rental Management &rarr;</span>
                 </a>
             </div>
         </div>

@@ -24,6 +24,7 @@ $fullTitle = $pageTitle . ' - Argo Books Documentation';
 $categoryInfo = [
     'getting-started' => ['name' => 'Getting Started', 'color' => 'emerald'],
     'features' => ['name' => 'Core Features', 'color' => 'blue'],
+    'integrations' => ['name' => 'Integrations', 'color' => 'sky'],
     'reference' => ['name' => 'Reference', 'color' => 'amber'],
     'security' => ['name' => 'Security', 'color' => 'purple']
 ];

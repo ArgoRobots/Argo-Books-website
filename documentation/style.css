@@ -230,6 +230,12 @@ body.docs-landing {
   border: 1px solid var(--blue-200);
 }
 
+.category-icon.integrations {
+  background: linear-gradient(135deg, var(--sky-50) 0%, var(--sky-200) 100%);
+  color: var(--sky-600);
+  border: 1px solid var(--sky-200);
+}
+
 .category-icon.reference {
   background: linear-gradient(135deg, var(--amber-50) 0%, var(--amber-100) 100%);
   color: var(--amber-600);

@@ -144,7 +144,7 @@ require_once __DIR__ . '/../track_referral.php';
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Connect Your Tools</span>
-                <h2 class="section-title">Live now, and more on the way</h2>
+                <h2 class="section-title">Where you take payments</h2>
                 <p class="section-desc">Start with Stripe today. We're building out support for the other platforms below next.</p>
             </div>
             <div class="features-grid">

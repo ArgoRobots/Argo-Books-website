@@ -319,6 +319,28 @@ $isDocsLanding = true;
             </div>
         </section>
 
+        <!-- Integrations Section -->
+        <section class="docs-category" data-category="integrations">
+            <div class="category-header">
+                <div class="category-icon integrations">
+                    <?= svg_icon('credit-card', 24) ?>
+                </div>
+                <div class="category-info">
+                    <h2>Integrations</h2>
+                    <p>Bring the tools you already use into your books</p>
+                </div>
+            </div>
+            <div class="category-cards">
+                <a href="pages/integrations/stripe-integration.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('credit-card', 20) ?>
+                    </div>
+                    <h3>Stripe Integration</h3>
+                    <p>Import your Stripe sales, fees, tax, and customers</p>
+                </a>
+            </div>
+        </section>
+
         <!-- Reference Section -->
         <section class="docs-category" data-category="reference">
             <div class="category-header">

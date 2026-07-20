@@ -18,41 +18,47 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
           </a>
           <div class="dropdown-menu">
-            <div class="dropdown-columns">
-              <div class="dropdown-col">
-                <span class="dropdown-col-header">Automation</span>
-                <a class="dropdown-item" href="<?= $base ?>features/receipt-scanning/">Receipt Scanning</a>
-                <a class="dropdown-item" href="<?= $base ?>features/bank-statement-import/">Bank Statement Import</a>
-                <a class="dropdown-item" href="<?= $base ?>features/spreadsheet-import/">Spreadsheet Import</a>
-                <a class="dropdown-item" href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a>
+            <div class="dropdown-split">
+              <div class="dropdown-side">
+                <div class="dropdown-columns">
+                  <div class="dropdown-col">
+                    <span class="dropdown-col-header">Automation</span>
+                    <a class="dropdown-item" href="<?= $base ?>features/receipt-scanning/">Receipt Scanning</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/bank-statement-import/">Bank Statement Import</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/spreadsheet-import/">Spreadsheet Import</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a>
+                  </div>
+                  <div class="dropdown-col">
+                    <span class="dropdown-col-header">Financial Tools</span>
+                    <a class="dropdown-item" href="<?= $base ?>features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/invoicing/">Invoicing</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/report-builder/">Report Builder</a>
+                  </div>
+                  <div class="dropdown-col">
+                    <span class="dropdown-col-header">Operations</span>
+                    <a class="dropdown-item" href="<?= $base ?>features/inventory-management/">Inventory Management</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/rental-management/">Rental Management</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
+                  </div>
+                </div>
+                <a class="dropdown-all-features" href="<?= $base ?>features/">
+                  View all features
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
               </div>
-              <div class="dropdown-col">
-                <span class="dropdown-col-header">Financial Tools</span>
-                <a class="dropdown-item" href="<?= $base ?>features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
-                <a class="dropdown-item" href="<?= $base ?>features/invoicing/">Invoicing</a>
-                <a class="dropdown-item" href="<?= $base ?>features/report-builder/">Report Builder</a>
+              <div class="dropdown-vline"></div>
+              <div class="dropdown-side">
+                <div class="dropdown-columns">
+                  <div class="dropdown-col">
+                    <span class="dropdown-col-header">Integrations</span>
+                    <a class="dropdown-item" href="<?= $base ?>integrations/stripe/">Stripe</a>
+                  </div>
+                </div>
+                <a class="dropdown-all-features" href="<?= $base ?>integrations/">
+                  View all integrations
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
               </div>
-              <div class="dropdown-col">
-                <span class="dropdown-col-header">Operations</span>
-                <a class="dropdown-item" href="<?= $base ?>features/inventory-management/">Inventory Management</a>
-                <a class="dropdown-item" href="<?= $base ?>features/rental-management/">Rental Management</a>
-                <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
-              </div>
-              <div class="dropdown-col">
-                <span class="dropdown-col-header">Integrations</span>
-                <a class="dropdown-item" href="<?= $base ?>integrations/stripe/">Stripe</a>
-              </div>
-            </div>
-            <div class="dropdown-footer-links">
-              <a class="dropdown-all-features" href="<?= $base ?>features/">
-                View all features
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
-              <span class="dropdown-footer-divider"></span>
-              <a class="dropdown-all-features" href="<?= $base ?>integrations/">
-                View all integrations
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
             </div>
           </div>
         </li>

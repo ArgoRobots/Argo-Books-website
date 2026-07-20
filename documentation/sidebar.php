@@ -35,7 +35,6 @@ $sidebarSections = [
             'invoicing' => ['title' => 'Invoicing & Payments'],
             'bank-statement-import' => ['title' => 'Bank Statement Import'],
             'bank-matching' => ['title' => 'Bank Matching'],
-            'stripe-integration' => ['title' => 'Stripe Integration'],
             'rental' => ['title' => 'Rental Management'],
             'customers' => ['title' => 'Customer Management'],
             'product-management' => ['title' => 'Product Management'],
@@ -49,6 +48,12 @@ $sidebarSections = [
             'spreadsheet-import' => ['title' => 'AI Spreadsheet Import'],
             'spreadsheet-export' => ['title' => 'Spreadsheet Export'],
             'history-modal' => ['title' => 'Version History']
+        ]
+    ],
+    'Integrations' => [
+        'folder' => 'pages/integrations',
+        'pages' => [
+            'stripe-integration' => ['title' => 'Stripe Integration']
         ]
     ],
     'Reference' => [

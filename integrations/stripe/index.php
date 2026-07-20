@@ -179,8 +179,8 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">What You Get</span>
-                <h2 class="section-title">Everything Stripe sends, sorted for you</h2>
-                <p class="section-desc">Five things happen automatically the moment you connect.</p>
+                <h2 class="section-title">Everything from Stripe, sorted for you</h2>
+                <p class="section-desc">Connect once, and here is what you get.</p>
             </div>
             <div class="why-grid">
                 <div class="why-card animate-on-scroll">

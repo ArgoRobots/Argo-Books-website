@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Stripe Integration';
 $pageDescription = 'Connect your Stripe account to Argo Books to automatically import your sales, processing fees, tax, discounts, customers, and refunds with a read-only key.';
 $currentPage = 'stripe-integration';
-$pageCategory = 'features';
+$pageCategory = 'integrations';
 
 include __DIR__ . '/../../docs-header.php';
 ?>
@@ -31,11 +31,11 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="bank-matching.php" class="nav-button prev">
+                <a href="../features/bank-matching.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Bank Matching</span>
                 </a>
-                <a href="rental.php" class="nav-button next">
+                <a href="../features/rental.php" class="nav-button next">
                     <span class="nav-label">Next</span>
                     <span class="nav-title">Rental Management &rarr;</span>
                 </a>

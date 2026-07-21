@@ -91,9 +91,10 @@ body:has(.guides-hub) {
 .guides-hub-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
   max-width: 640px;
-  margin: 0 auto 34px;
+  margin: 0 auto 40px;
 }
 
 .guides-hub-pill {
@@ -102,11 +103,11 @@ body:has(.guides-hub) {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--hub-muted);
-  background: transparent;
+  color: var(--hub-text-soft);
+  background: var(--hub-surface);
   border: 1px solid var(--hub-rule);
   border-radius: 999px;
-  padding: 7px 15px 6px;
+  padding: 8px 16px 7px;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }

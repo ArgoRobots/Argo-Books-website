@@ -805,8 +805,6 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     notes TEXT DEFAULT NULL,
     feedback_summary TEXT DEFAULT NULL,
     draft_subject VARCHAR(500) DEFAULT NULL,
-    ab_test_id INT DEFAULT NULL,
-    ab_variant_id INT DEFAULT NULL,
     draft_body TEXT DEFAULT NULL,
     drafted_at DATETIME DEFAULT NULL,
     approved_at DATETIME DEFAULT NULL,
@@ -823,19 +821,8 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_approval (approval_status),
     INDEX idx_outreach_company_size (company_size),
     INDEX idx_unsubscribe_token (unsubscribe_token),
-    INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
-    INDEX idx_outreach_ab_variant (ab_variant_id),
     INDEX idx_outreach_followup_due (next_followup_due_at, status, followup_count)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- For existing installs, add the A/B columns:
---   ALTER TABLE outreach_leads
---     ADD COLUMN ab_test_id INT NULL AFTER draft_subject,
---     ADD COLUMN ab_variant_id INT NULL AFTER ab_test_id,
---     ADD INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
---     ADD INDEX idx_outreach_ab_variant (ab_variant_id);
--- (Existing installs that already added idx_outreach_ab need only:
---   ALTER TABLE outreach_leads ADD INDEX idx_outreach_ab_variant (ab_variant_id);)
 --
 -- Existing installs also need 'email_bounced' added to the status ENUM
 -- so the Resend webhook can flag bounced/complained recipients:
@@ -972,41 +959,6 @@ CREATE TABLE IF NOT EXISTS outreach_email_events (
     INDEX idx_email_events_occurred (occurred_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- A/B tests for outreach email variants. variant_type covers every test type
--- the framework supports: subject, body, sender, cta, preheader, format,
--- personalization, followup_sequence. One first-touch test (everything except followup_sequence)
--- and one follow-up test (followup_sequence) can be active concurrently; activating a test
--- pauses any other active test in the same phase only.
-CREATE TABLE IF NOT EXISTS outreach_ab_tests (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(120) NOT NULL,
-    variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject',
-    status ENUM('draft','active','paused','completed') NOT NULL DEFAULT 'draft',
-    notes TEXT DEFAULT NULL,
-    started_at DATETIME DEFAULT NULL,
-    completed_at DATETIME DEFAULT NULL,
-    winner_variant_id INT DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_ab_test_status (status),
-    INDEX idx_ab_test_type_status (variant_type, status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Variants that belong to an A/B test
-CREATE TABLE IF NOT EXISTS outreach_ab_variants (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    test_id INT NOT NULL,
-    label VARCHAR(60) NOT NULL,
-    content TEXT NOT NULL,
-    is_default TINYINT(1) NOT NULL DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (test_id) REFERENCES outreach_ab_tests(id) ON DELETE CASCADE,
-    INDEX idx_ab_variant_test (test_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- For existing installs, expand the variant_type ENUM:
---   ALTER TABLE outreach_ab_tests
---     MODIFY COLUMN variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject';
-
 -- ─────────────────────────────────────────────────────────────────────
 -- outreach_followups
 -- One row per scheduled follow-up touch (touch 1 = original first-touch
@@ -1018,10 +970,6 @@ CREATE TABLE IF NOT EXISTS outreach_ab_variants (
 --      └─→ halted (replied/unsubscribed/bounced/manual/max_reached)
 --      └─→ skipped (admin clicked skip on the drafted row)
 --      └─→ failed  (Gemini call failed 3 times)
---
--- ab_test_id / ab_variant_id are copied from the lead's assignment at
--- creation time so the whole sequence shares one variant (we test
--- strategies, not arbitrary mixes).
 -- ─────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS outreach_followups (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -1034,8 +982,6 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
     draft_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
     status ENUM('scheduled','drafted','approved','sent','halted','skipped','failed') NOT NULL DEFAULT 'scheduled',
     halt_reason VARCHAR(100) DEFAULT NULL,
-    ab_test_id INT DEFAULT NULL,
-    ab_variant_id INT DEFAULT NULL,
     sent_at DATETIME DEFAULT NULL,
     message_id VARCHAR(255) DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

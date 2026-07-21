@@ -4,9 +4,7 @@ Argo Books has a built-in outreach system that finds small businesses and writes
 - **Auto-send:** The system generates drafts and sends them automatically.
 - **Review before send:** The system generates drafts, but stops there. You open each lead in the Leads tab, read the email, then send it (or tweak it and then send it). Nothing goes out until you click.
 
-It also has a A/B test system to learn what works, so it constantly improves itself.
-
-Everything lives in the admin dashboard under **Outreach**, which has five tabs: **Discovery**, **Leads**, **Follow-ups**, **A/B Tests**, and **Settings**.
+Everything lives in the admin dashboard under **Outreach**, which has four tabs: **Discovery**, **Leads**, **Follow-ups**, and **Settings**.
 
 ## Google Places channel
 
@@ -21,12 +19,11 @@ Google Places finds small brick-and-mortar businesses.
    - Businesses with more Google reviews than the review-count ceiling are skipped. The default is 15, since chains and long-established shops accrue lots of reviews. You can change it in Outreach, Settings (Discovery filters), and it also reads `OUTREACH_MAX_REVIEW_COUNT` from `.env`.
    - Before drafting, the system reads the business's own website and skips ones that look clearly established: an old founding year (older than `OUTREACH_ESTABLISHED_MAX_AGE_YEARS`, default 8 years), copyright dates, or "20+ years experience" style claims. A cheap text check handles the obvious cases, then a quick AI pass catches softer signals (decades of awards, long client lists) with no literal year. Sparse, brand-new, or "now open" sites pass through. This is a deliberate skew, not a perfect classifier.
 3. **Writes each one a short email** with Gemini (currently `gemini-2.5-flash`). The email references the kind of business they run and the everyday headaches that category tends to have.
-4. **Runs a A/B test** alongside the send. It splits traffic across 2–4 variants and keeps the one that gets the most clicks or replies.
-5. **Sends the first emails**, up to the daily cap (`OUTREACH_DAILY_SEND_LIMIT`), with a tracked link so clicks can be attributed back to the lead and variant.
-6. **Schedules follow-ups**: when a first email goes out, the system queues a follow-up sequence (default: 3 more emails at +3, +7, and +14 days). The schedule is configurable in Settings.
-7. **Halts follow-ups** for any lead who replied, unsubscribed, or hard-bounced since the last run.
-8. **Drafts each follow-up** with Gemini about a day before it's due to send. Each one personalizes against the lead's business, the original first email, and a per-touch "intent" (e.g. "gentle bump", "different angle", "final note before closing"). The intent comes from the active follow-up A/B test or the default in Settings.
-9. **Sends follow-ups** that are approved, up to the daily follow-up cap (`OUTREACH_DAILY_FOLLOWUP_LIMIT`, default 75 across all touch positions). In Auto-send mode, drafts auto-approve and go straight out. In Review-before-send mode, they queue in the Follow-ups tab for you to approve.
+4. **Sends the first emails**, up to the daily cap (`OUTREACH_DAILY_SEND_LIMIT`), with a tracked link so clicks can be attributed back to the lead.
+5. **Schedules follow-ups**: when a first email goes out, the system queues a follow-up sequence (default: 3 more emails at +3, +7, and +14 days). The schedule is configurable in Settings.
+6. **Halts follow-ups** for any lead who replied, unsubscribed, or hard-bounced since the last run.
+7. **Drafts each follow-up** with Gemini about a day before it's due to send. Each one personalizes against the lead's business, the original first email, and a per-touch "intent" (e.g. "gentle bump", "different angle", "final note before closing"). The intent comes from the default set for that touch in Settings.
+8. **Sends follow-ups** that are approved, up to the daily follow-up cap (`OUTREACH_DAILY_FOLLOWUP_LIMIT`, default 75 across all touch positions). In Auto-send mode, drafts auto-approve and go straight out. In Review-before-send mode, they queue in the Follow-ups tab for you to approve.
 
 ## Shopify channel
 
@@ -59,7 +56,7 @@ From here you can:
 - **Bulk-generate drafts** or **bulk-send emails** for a group of leads you've selected.
 - **See the full activity history** for any lead: every draft, every send, every click.
 
-Every outreach email's `argorobots.com` link is rewritten to include a `?source=outreach-{leadId}` parameter (plus `-v{variantId}` when the lead was assigned to an A/B variant). Hits land in `referral_visits` and show up on the A/B table as "Clicked" automatically.
+Every outreach email's `argorobots.com` link is rewritten to include a `?source=outreach-{leadId}` parameter. Hits land in `referral_visits` and show up against the lead as "Clicked" automatically.
 
 ## The Follow-ups tab
 
@@ -84,57 +81,6 @@ Bulk-select via checkboxes to approve, skip, or halt sequences for multiple rows
 
 You can also see the per-lead sequence (every touch + status + scheduled date) by opening any lead in the Leads tab.
 
-## The A/B Tests tab
-
-This is where the system runs experiments on the things that affect open and click rate. You don't have to create tests manually because it's automated. But you can also create your own if you want to try a specific idea.
-
-### What it can test
-
-Each test targets one **variant type**:
-
-- **Subject line**: the biggest single factor in whether a cold email gets opened.
-- **Email body**: the AI's writing style and structure for the message itself.
-- **CTA / offer**: the framing of what the recipient gets ("free 1-year license for feedback" vs other offers).
-- **Sender from-name**: the name the email appears to come from (e.g. `Evan` vs `Evan from Argo Books` vs `Argo Books`).
-- **Preheader**: the snippet most inboxes show next to the subject as a preview.
-- **Format**: full HTML email with logo and styling vs plain text. Plain text often outperforms styled HTML in cold outreach because it looks like a human's email rather than marketing.
-- **Personalization depth**: with vs without the AI-generated business summary (which costs a Gemini call per lead). Use this to find out whether that extra call is worth keeping.
-- **Follow-up sequence**: tests the whole follow-up strategy as one unit. Each variant defines an intent per touch (e.g. variant A: bump → reframe → close; variant B: value tip → question → close; variant C: persistent bump). A lead gets assigned a variant when their first email goes out and stays on it through the whole sequence so attribution is clean. The system ships with 3 starter variants out of the box in `draft` status. Activate from this tab when ready.
-
-One first-touch test (subject / body / CTA / sender / preheader / format / personalization) and one follow-up test (follow-up sequence) can be active at the same time, since they measure different emails and don't confound each other's attribution. Activating a test in one phase pauses any other active test in **the same phase only**. The auto-loop creates the next cycle in each phase as soon as that phase's current test promotes.
-
-### How variants work
-
-Each test has 2–4 variants. The way variant content is interpreted depends on the type:
-
-- **Subject / body / CTA** can be either:
-  - **A literal value**: used exactly as written for every email in that variant. Good for "I have specific wording I want to try."
-  - **A style directive** prefixed with `directive:` (e.g. `directive: ask a curiosity question referencing their city`). The AI generates fresh content in that style for each lead. Good for testing *kinds* of writing, not specific wordings. Anything without the prefix is treated as a literal.
-- **Sender / preheader** are always literal strings.
-- **Format / personalization** use a fixed two-variant template (`html` vs `plain`, `on` vs `off`). The form fills these automatically when you pick the type. You don't author them.
-
-When you create a test by hand, the form adapts to the type you pick. When the system creates a test automatically, it uses directives for subject (so they generalise across different businesses) or the fixed pool for sender / format / personalization.
-
-### How the experiment runs
-
-While a test is active, every new email gets assigned to a variant by deterministic round-robin (A, B, C, A, B, C…), so the split stays exactly even regardless of cron run boundaries. The `-v{id}` suffix on the `?source=` URL is how clicks get credited to the right variant.
-
-On the test's detail page you'll see, for each variant: assigned count, sends, clicks, CTR, and once there's enough data, a confidence tag vs the current leader.
-
-### How a winner gets picked
-
-With automation on, the cron ends a test and promotes the leader when **any** of these is true:
-
-- **Significant**: the leader's z-test vs every other variant is significant at p<0.05, and every variant has ≥30 sends.
-- **Time-boxed**: the test is ≥14 days old and every variant has ≥20 sends.
-- **Hard timeout**: the test is ≥28 days old; leader picked by CTR so the loop doesn't stall on low volume.
-
-Once a winner is promoted, the cron immediately starts the next cycle.
-
-### Safety pause
-
-The follow-up sequence A/B type auto-pauses if the configured touch count changes while a test is active (e.g. you add a 4th touch in Settings but the active test only has intents for 3 touches). The mismatch shows up in the A/B Tests tab so you can either match the test to the new shape or revert the Settings change.
-
 ## The Settings tab
 
 The Settings tab has two runtime controls plus the sequence configuration:
@@ -142,9 +88,9 @@ The Settings tab has two runtime controls plus the sequence configuration:
 - **Outreach system**: master enable/disable for the whole pipeline.
 - **Send mode**: Auto-send vs Review-before-send (affects both first emails AND follow-ups).
 - **Discovery filters**: the Google Places review-count ceiling. Lower it to bias discovery toward newer and smaller businesses; raise it to cast a wider net. Leave it blank to fall back to `OUTREACH_MAX_REVIEW_COUNT` in `.env` (or the built-in default of 15). The panel shows the value currently in effect and where it comes from.
-- **Follow-up sequence**: an editable table of touches. Each row is one touch: how many days after the previous touch it sends (1-90), and a default "intent" string that drives Gemini's wording (used when no follow-up A/B test is active). Add/remove rows for between 0 and 6 follow-up touches. Setting 0 touches disables follow-ups entirely.
+- **Follow-up sequence**: an editable table of touches. Each row is one touch: how many days after the previous touch it sends (1-90), and a default "intent" string that drives Gemini's wording. Add/remove rows for between 0 and 6 follow-up touches. Setting 0 touches disables follow-ups entirely.
 
-A/B automation runs unconditionally whenever the outreach system is enabled. The Settings tab also shows the active A/B test snapshot and a tail of the day's pipeline log for quick health checks.
+The Settings tab also shows a tail of the day's pipeline log for a quick health check.
 
 ## What you should do
 

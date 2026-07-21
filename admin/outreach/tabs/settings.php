@@ -5,8 +5,7 @@
  * Renders toggles for:
  *   - Auto-send vs Review-before-send (state: auto_send_mode)
  *
- * Plus read-only status: current A/B test, daily send limit,
- * and a tail of today's pipeline log filtered to automation lines.
+ * Plus read-only status: daily send limit and a tail of today's pipeline log.
  *
  * Exposes:
  *   settings_tab_handle_post($pdo)
@@ -132,7 +131,7 @@ function settings_tab_handle_post($pdo)
 
 function settings_tab_render($pdo)
 {
-    // ─── First-deploy seed: followup sequence config + A/B starter test ───
+    // ─── First-deploy seed: followup sequence config ───
     $existingFuCfg = settings_tab_get_state($pdo, 'followup_sequence_config', null);
     if ($existingFuCfg === null) {
         $defaultCfg = [
@@ -141,10 +140,6 @@ function settings_tab_render($pdo)
             ['touch' => 4, 'days_after_prev' => 14, 'default_intent' => 'final note before closing'],
         ];
         settings_tab_set_state($pdo, 'followup_sequence_config', json_encode($defaultCfg, JSON_UNESCAPED_SLASHES));
-
-        // Seed the A/B starter test (requires ab_helpers)
-        require_once __DIR__ . '/../../../cron/lib/ab_helpers.php';
-        ensure_followup_starter_test($pdo);
     }
 
     // Master enable flag for the whole outreach system; defaults ON so a
@@ -157,69 +152,18 @@ function settings_tab_render($pdo)
     $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', 'auto');
     if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = 'auto';
 
-    require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
-    $rotationOrder = ab_auto_rotation_order();
-    $abNextType = settings_tab_get_state($pdo, 'ab_auto_next_type', $rotationOrder[0]);
-    if (!in_array($abNextType, $rotationOrder, true)) {
-        $abNextType = $rotationOrder[0];
-    }
-
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
     $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
 
-    // Active A/B test snapshot: shows the most-recently-started active
-    // test. A first-touch test and a follow-up test can run concurrently;
-    // this widget surfaces one; the full list is on the A/B Tests tab.
-    $active = null;
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests WHERE status = 'active' ORDER BY started_at DESC, id DESC LIMIT 1");
-        $stmt->execute();
-        $active = $stmt->fetch();
-    } catch (PDOException $e) {
-        $active = null; // Tables may not exist yet
-    }
-
-    $activeStats = null;
-    if ($active) {
-        require_once __DIR__ . '/../../../cron/lib/ab_helpers.php';
-        $variants = load_variants_with_stats($pdo, (int) $active['id']);
-        $totalSent = array_sum(array_column($variants, 'sent_count'));
-        $totalClicks = array_sum(array_column($variants, 'clicked_count'));
-        $totalReplies = array_sum(array_column($variants, 'replied_count'));
-        $scoringMetric = $totalReplies > 0 ? 'reply_rate' : 'ctr';
-        $leaderIdx = find_leader_idx($variants, $scoringMetric);
-        $days = max(0, (int) floor((time() - strtotime($active['started_at'] ?: $active['created_at'])) / 86400));
-        $activeStats = [
-            'variants' => count($variants),
-            'sent' => $totalSent,
-            'clicked' => $totalClicks,
-            'replied' => $totalReplies,
-            'days' => $days,
-            'metric' => $scoringMetric,
-            'leader' => ($leaderIdx !== null) ? $variants[$leaderIdx]['label'] : null,
-            'leader_ctr' => ($leaderIdx !== null && $variants[$leaderIdx]['sent_count'] > 0)
-                ? $variants[$leaderIdx]['ctr'] : null,
-            'leader_reply_rate' => ($leaderIdx !== null && $variants[$leaderIdx]['sent_count'] > 0)
-                ? $variants[$leaderIdx]['reply_rate'] : null,
-        ];
-    }
-
-    // Tail today's pipeline log for automation-related lines
+    // Tail today's pipeline log (last 40 lines) for a quick health check.
     $logLines = [];
     $logPath = __DIR__ . '/../../../cron/logs/outreach_pipeline_' . date('Y-m-d') . '.log';
     if (is_readable($logPath)) {
         // Logs are date-rotated daily so a single file stays small (typically a few KB
-        // per cron run). Load the day's file, take the last 200 lines, then filter
-        // for A/B-related events.
+        // per cron run).
         $lines = @file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (is_array($lines)) {
-            $tail = array_slice($lines, -200);
-            foreach ($tail as $line) {
-                if (preg_match('/A\/B|ab_auto|stepManageAbTests|auto-cycle|auto-rotation|Promoted variant/i', $line)) {
-                    $logLines[] = $line;
-                }
-            }
-            $logLines = array_slice($logLines, -40);
+            $logLines = array_slice($lines, -40);
         }
     }
     ?>
@@ -363,7 +307,7 @@ function settings_tab_render($pdo)
                         <tr>
                             <th>Touch #</th>
                             <th>Days after previous touch (1-90)</th>
-                            <th>Default intent (used if no active A/B test)</th>
+                            <th>Default intent</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -432,70 +376,13 @@ function settings_tab_render($pdo)
 
     <div class="panel">
         <div class="panel-header">
-            <h2>Current A/B status</h2>
-        </div>
-        <div class="panel-content">
-            <?php if ($active && $activeStats): ?>
-                <div class="test-meta">
-                    <div class="meta-item">
-                        <div class="meta-label">Active test</div>
-                        <div class="meta-value">
-                            <a href="?tab=ab-tests&test_id=<?php echo (int) $active['id']; ?>" class="link-strong">
-                                <?php echo htmlspecialchars($active['name']); ?>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Type</div>
-                        <div class="meta-value"><?php echo htmlspecialchars($active['variant_type']); ?></div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Running for</div>
-                        <div class="meta-value"><?php echo (int) $activeStats['days']; ?> day<?php echo $activeStats['days'] === 1 ? '' : 's'; ?></div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Variants</div>
-                        <div class="meta-value"><?php echo (int) $activeStats['variants']; ?></div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Sent / replied / clicked</div>
-                        <div class="meta-value"><?php echo (int) $activeStats['sent']; ?> / <?php echo (int) $activeStats['replied']; ?> / <?php echo (int) $activeStats['clicked']; ?></div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Current leader</div>
-                        <div class="meta-value">
-                            <?php if ($activeStats['leader']): ?>
-                                <?php echo htmlspecialchars($activeStats['leader']); ?>
-                                <span class="hint" style="margin:0; font-size:12px;">
-                                    (<?php
-                                        if ($activeStats['metric'] === 'reply_rate' && $activeStats['leader_reply_rate'] !== null) {
-                                            echo number_format($activeStats['leader_reply_rate'] * 100, 1) . '% reply rate';
-                                        } elseif ($activeStats['leader_ctr'] !== null) {
-                                            echo number_format($activeStats['leader_ctr'] * 100, 1) . '% CTR';
-                                        }
-                                    ?>)
-                                </span>
-                            <?php else: ?>
-                                —
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            <?php else: ?>
-                <p class="empty-state">No active A/B test. The next pipeline run will create one.</p>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-header">
-            <h2>Today's automation log</h2>
+            <h2>Today's pipeline log</h2>
         </div>
         <div class="panel-content">
             <?php if (!empty($logLines)): ?>
                 <pre class="log-tail"><?php echo htmlspecialchars(implode("\n", $logLines)); ?></pre>
             <?php else: ?>
-                <p class="empty-state">No automation entries in today's log yet.</p>
+                <p class="empty-state">No pipeline entries in today's log yet.</p>
             <?php endif; ?>
         </div>
     </div>

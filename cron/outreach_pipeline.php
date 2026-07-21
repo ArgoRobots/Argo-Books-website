@@ -195,11 +195,6 @@ try {
         stepDiscoverShopify($pdo, $dryRun);
     }
 
-    // ─── STEP 2.5: Manage A/B Tests (auto-promote winners, auto-create next cycle) ───
-    if ($runAll || $draftOnly) {
-        stepManageAbTests($pdo, $dryRun);
-    }
-
     // ─── STEP 3: Generate AI Drafts ───
     if ($runAll || $draftOnly) {
         stepGenerateDrafts($pdo, $dryRun);
@@ -731,168 +726,6 @@ function stepDiscoverShopify($pdo, $dryRun)
     cron_metric_incr('shopify_rejected', $totalRejected);
 }
 
-function stepManageAbTests($pdo, $dryRun)
-{
-    logPipeline('--- Step 2.5: Manage A/B Tests ---');
-
-    // followup_sequence-specific shape check: if the active followup_sequence
-    // test's variant intents no longer match the current followup_sequence_config
-    // touch list (e.g. admin added a touch), auto-pause it.
-    if (!$dryRun) {
-        $shapeResult = check_followup_sequence_shape_match($pdo);
-        if ($shapeResult['action'] === 'paused') {
-            logPipeline($shapeResult['reason'] ?? 'followup_sequence test auto-paused for shape mismatch', 'WARN');
-        }
-    }
-
-    $allTypes = ab_known_variant_types();
-
-    if ($dryRun) {
-        $anyActive = false;
-        foreach ($allTypes as $type) {
-            $active = get_active_ab_test($pdo, $type);
-            if ($active) {
-                logPipeline("[DRY RUN] Would evaluate active $type test #{$active['test']['id']} '{$active['test']['name']}' for promotion.");
-                $anyActive = true;
-            }
-        }
-        if (!$anyActive) {
-            $order = ab_auto_rotation_order();
-            $next = getState($pdo, 'ab_auto_next_type', $order[0]);
-            if (!in_array($next, $order, true)) $next = $order[0];
-            logPipeline("[DRY RUN] Would create a new auto-cycle for variant_type '$next'.");
-        }
-        return;
-    }
-
-    // 1) Evaluate the active test of every known type for promotion. Only
-    //    one test can be active at a time per the framework's invariant; the
-    //    loop is type-agnostic so any wired type can promote cleanly.
-    $anyStillRunning = false;
-    foreach ($allTypes as $type) {
-        $evalResult = ab_check_and_promote_active_test($pdo, $type);
-        $type = $evalResult['variant_type'] ?? $type;
-
-        if ($evalResult['action'] === 'promoted') {
-            cron_metric_incr('ab_tests_promoted');
-            $metric = $evalResult['metric'] ?? 'ctr';
-            logPipeline(sprintf(
-                "A/B auto-promoted winner: %s test #%d '%s': variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
-                $type,
-                $evalResult['test_id'],
-                $evalResult['test_name'],
-                $evalResult['winner_label'],
-                ($evalResult['winner_reply_rate'] ?? 0) * 100,
-                $evalResult['winner_ctr'] * 100,
-                $evalResult['trigger'],
-                $metric,
-                $evalResult['age_days']
-            ));
-        } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {
-            logPipeline(sprintf(
-                "A/B %s test #%d '%s' still running (age %d days, min sent %d): no promotion criteria met yet.",
-                $type,
-                $evalResult['test_id'] ?? 0,
-                $evalResult['test_name'] ?? '',
-                $evalResult['age_days'] ?? 0,
-                $evalResult['min_sent'] ?? 0
-            ));
-            $anyStillRunning = true;
-        }
-    }
-
-    // 3) Auto-create the next cycle. The ab_auto_next_type pointer rotates
-    //    across ab_auto_rotation_order() so the pipeline tests one lever,
-    //    then the next, and so on. body / cta / preheader aren't in the
-    //    rotation; they need crafted copy and stay admin-initiated.
-    $order = ab_auto_rotation_order();
-    $cycleType = getState($pdo, 'ab_auto_next_type', $order[0]);
-    if (!in_array($cycleType, $order, true)) {
-        $cycleType = $order[0];
-    }
-    $cyclePhase = ab_phase_of_type($cycleType);
-
-    // If any test in the SAME phase as the next cycle type is still running,
-    // don't start a new one yet. Different-phase tests are fine to coexist
-    // (e.g. an active subject test doesn't block a new followup_sequence
-    // cycle and vice versa).
-    if ($anyStillRunning) {
-        $stillRunningSamePhase = false;
-        foreach ($allTypes as $type) {
-            if (ab_phase_of_type($type) !== $cyclePhase) continue;
-            $hasActive = $pdo->prepare("SELECT 1 FROM outreach_ab_tests WHERE status = 'active' AND variant_type = ? LIMIT 1");
-            $hasActive->execute([$type]);
-            if ($hasActive->fetchColumn()) { $stillRunningSamePhase = true; break; }
-        }
-        if ($stillRunningSamePhase) return;
-    }
-
-    // 2) Defensive backstop: never start a new cycle while a same-phase
-    //    status='active' test row exists, even one the per-type promotion
-    //    sweep couldn't evaluate (e.g. zero or one variant attached, which
-    //    can't happen via the UI but could from direct DB edits). Two active
-    //    tests in the same phase would silently corrupt round-robin attribution.
-    $samePhaseTypes = $cyclePhase === 'follow_up'
-        ? ['followup_sequence']
-        : ab_first_touch_types();
-    $phasePlaceholders = implode(',', array_fill(0, count($samePhaseTypes), '?'));
-    $activeCheck = $pdo->prepare("SELECT id, name, variant_type,
-        (SELECT COUNT(*) FROM outreach_ab_variants v WHERE v.test_id = t.id) AS variant_count
-        FROM outreach_ab_tests t WHERE status = 'active' AND variant_type IN ($phasePlaceholders) ORDER BY id ASC LIMIT 1");
-    $activeCheck->execute($samePhaseTypes);
-    $activeCheck = $activeCheck->fetch();
-    if ($activeCheck) {
-        if ((int) $activeCheck['variant_count'] < 2) {
-            logPipeline(sprintf(
-                "A/B auto-cycle blocked: active %s test #%d '%s' is misconfigured (%d variant(s)). Admin intervention required.",
-                $activeCheck['variant_type'],
-                (int) $activeCheck['id'],
-                $activeCheck['name'],
-                (int) $activeCheck['variant_count']
-            ), 'WARN');
-        } else {
-            logPipeline(sprintf(
-                "A/B auto-cycle blocked: active %s test #%d '%s' still exists. Not creating a second active test.",
-                $activeCheck['variant_type'],
-                (int) $activeCheck['id'],
-                $activeCheck['name']
-            ));
-        }
-        return;
-    }
-
-    // 3) Auto-create the next cycle. $cycleType / $order were determined
-    //    above (before the phase-aware blockers) so the same value flows
-    //    through here.
-    $newCycle = ab_start_new_cycle($pdo, $cycleType);
-    if ($newCycle['action'] === 'created') {
-        logPipeline(sprintf(
-            "A/B auto-created %s cycle: test #%d '%s' with %d variants (source: %s%s).",
-            $cycleType,
-            $newCycle['test_id'],
-            $newCycle['test_name'],
-            $newCycle['variant_count'],
-            $newCycle['source'],
-            $newCycle['carried_winner'] ? ', prior winner carried forward' : ''
-        ));
-        $idx = array_search($cycleType, $order, true);
-        $advanced = $order[($idx + 1) % count($order)];
-        setState($pdo, 'ab_auto_next_type', $advanced);
-        logPipeline("A/B auto-rotation pointer advanced: next type will be '$advanced'.");
-    } else {
-        logPipeline('A/B auto-create failed for ' . $cycleType . ': ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
-        // Advance the pointer past an unsupported type so rotation doesn't
-        // get stuck. Other failure modes (DB error, Gemini down) are retried
-        // on the next run with the same pointer.
-        if (strpos((string) ($newCycle['error'] ?? ''), 'unsupported') !== false) {
-            $idx = array_search($cycleType, $order, true);
-            $advanced = $order[($idx + 1) % count($order)];
-            setState($pdo, 'ab_auto_next_type', $advanced);
-            logPipeline("A/B auto-rotation skipped unsupported type '$cycleType'; pointer advanced to '$advanced'.");
-        }
-    }
-}
-
 function stepGenerateDrafts($pdo, $dryRun)
 {
     logPipeline('--- Step 3: Generate AI Drafts ---');
@@ -1040,7 +873,7 @@ function stepSendEmails($pdo, $dryRun)
     // approval_status, but explicitly excluding here means a disqualified row
     // can never appear in the send queue regardless of approval_status state.
     $stmt = $pdo->prepare("
-        SELECT id, business_name, email, draft_subject, draft_body, unsubscribe_token, ab_test_id, ab_variant_id
+        SELECT id, business_name, email, draft_subject, draft_body, unsubscribe_token
         FROM outreach_leads
         WHERE approval_status = 'approved'
           AND draft_subject IS NOT NULL AND draft_subject != ''
@@ -1080,35 +913,13 @@ function stepSendEmails($pdo, $dryRun)
         try {
             $reason = null;
             if (send_outreach_lead($pdo, $lead, $reason)) {
-                $variantTag = !empty($lead['ab_variant_id'])
-                    ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
-                    : '';
-                log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email . $variantTag);
-                logPipeline("Sent email to $businessName <$email> (lead #$id)" . $variantTag);
+                log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email);
+                logPipeline("Sent email to $businessName <$email> (lead #$id)");
 
                 // Schedule the multi-touch follow-up sequence (if any configured).
-                // For the followup_sequence A/B assignment, we look up the active
-                // followup_sequence test and pick a variant for this lead now,
-                // separate from any A/B variant the first-touch is on (which is
-                // usually subject/sender/format/etc., not followup_sequence).
-                $fuVariantId = null;
-                $fuTestId = null;
-                $fuActive = $pdo->query("SELECT id FROM outreach_ab_tests WHERE variant_type = 'followup_sequence' AND status = 'active' LIMIT 1")->fetch();
-                if ($fuActive) {
-                    $fuTestId = (int) $fuActive['id'];
-                    $fuVariants = $pdo->prepare("SELECT * FROM outreach_ab_variants WHERE test_id = ?");
-                    $fuVariants->execute([$fuTestId]);
-                    $fuVariantList = $fuVariants->fetchAll();
-                    if (count($fuVariantList) >= 2) {
-                        $picked = pick_ab_variant($pdo, ['id' => $fuTestId], $fuVariantList, $lead);
-                        if ($picked) {
-                            $fuVariantId = (int) $picked['id'];
-                        }
-                    }
-                }
-                $scheduled = schedule_followups_for_lead($pdo, $id, $fuTestId, $fuVariantId);
+                $scheduled = schedule_followups_for_lead($pdo, $id);
                 if ($scheduled > 0) {
-                    logPipeline("Scheduled $scheduled follow-up(s) for lead #$id" . ($fuVariantId ? " [followup A/B variant #$fuVariantId]" : ''));
+                    logPipeline("Scheduled $scheduled follow-up(s) for lead #$id");
                 }
 
                 $successCount++;

@@ -11,7 +11,7 @@ function getFilterParams() {
 }
 
 function updateUrlParams() {
-    // Start from the current URL so non-filter params (tab, test_id, etc.) survive.
+    // Start from the current URL so non-filter params (tab, etc.) survive.
     const params = new URLSearchParams(window.location.search);
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
@@ -1311,7 +1311,6 @@ function renderFollowupRow(r, view) {
     const scheduledStr = r.scheduled_for ? formatScheduled(r.scheduled_for) : '';
     const sentStr = r.sent_at ? formatScheduled(r.sent_at) : '';
     const haltReason = r.halt_reason ? ' · Reason: ' + escapeHtml(r.halt_reason) : '';
-    const abLabel = r.ab_variant_label ? ' · A/B: ' + escapeHtml(r.ab_variant_label) : '';
 
     let actions = '';
     let bodyEditor = '';
@@ -1346,7 +1345,6 @@ function renderFollowupRow(r, view) {
             '</div>' +
             (bodyEditor ? '<div style="margin-bottom:8px;">' + bodyEditor + '</div>' :
                 (r.draft_subject ? '<div style="font-size:13px; color:#666;">Subject: ' + escapeHtml(r.draft_subject) + '</div>' : '')) +
-            '<div style="font-size:12px; color:#999; margin-top:6px;">' + abLabel + '</div>' +
             (actions ? '<div style="margin-top:10px;">' + actions + '</div>' : '') +
         '</div>' +
     '</div>';
@@ -1473,7 +1471,7 @@ window.loadLeadFollowups = async function() {
         list.innerHTML = '<p class="empty-state-text">No follow-ups scheduled for this lead. Sequence is configured in Settings; rows are created when the first-touch email sends.</p>';
         return;
     }
-    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th><th>A/B variant</th></tr></thead><tbody>' +
+    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th></tr></thead><tbody>' +
         data.rows.map(r =>
             '<tr>' +
                 '<td>' + r.touch_number + '</td>' +
@@ -1481,7 +1479,6 @@ window.loadLeadFollowups = async function() {
                 '<td>' + (r.scheduled_for || '—') + '</td>' +
                 '<td>' + (r.sent_at || '—') + '</td>' +
                 '<td>' + (r.halt_reason ? escapeHtml(r.halt_reason) : '—') + '</td>' +
-                '<td>' + (r.ab_variant_label ? escapeHtml(r.ab_variant_label) : '—') + '</td>' +
             '</tr>'
         ).join('') +
     '</tbody></table>';

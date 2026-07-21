@@ -294,7 +294,8 @@ function get_leads($pdo)
     ];
     $orderBy = $orderMap[$sort] ?? 'ol.date_added DESC';
 
-    // Match both legacy source codes ("outreach-42") and A/B-tagged ones ("outreach-42-v7")
+    // Match the current source code ("outreach-42") plus any legacy variant-tagged
+    // codes from before A/B was removed ("outreach-42-v7") so old clicks still count.
     $stmt = $pdo->prepare("SELECT ol.*, MIN(rv.visited_at) AS clicked_at FROM outreach_leads ol LEFT JOIN referral_visits rv ON (rv.source_code = CONCAT('outreach-', ol.id) OR rv.source_code LIKE CONCAT('outreach-', ol.id, '-v%')) $whereClause GROUP BY ol.id ORDER BY $orderBy");
     $stmt->execute($params);
     $leads = $stmt->fetchAll();
@@ -504,8 +505,8 @@ function get_stats($pdo)
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
 
-    // Count distinct leads clicked. SUBSTRING_INDEX collapses "outreach-42-v7" → "outreach-42"
-    // so a lead that received multiple variants and had any of them clicked counts once.
+    // Count distinct leads clicked. SUBSTRING_INDEX collapses any legacy
+    // variant-tagged code "outreach-42-v7" → "outreach-42" so a lead counts once.
     $rows['clicked'] = $pdo->query("SELECT COUNT(DISTINCT SUBSTRING_INDEX(rv.source_code, '-v', 1)) FROM referral_visits rv WHERE rv.source_code LIKE 'outreach-%'")->fetchColumn();
 
     json_response([
@@ -1566,7 +1567,7 @@ function creator_add_url($pdo)
     }
 
     $platform = trim((string) ($meta['platform'] ?? creator_platform_from_url($canonical)));
-    $name     = trim((string) ($meta['creator_name'] ?? '')) ?: editorial_domain_from_url($canonical);
+    $name     = trim((string) ($meta['creator_name'] ?? '')) ?: creator_name_from_url($canonical);
     $email    = trim((string) ($meta['email'] ?? ''));
     $summary  = trim((string) ($meta['business_summary'] ?? ''));
     if ($summary === '') {
@@ -1644,12 +1645,12 @@ function creator_import($pdo)
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         json_response(['success' => false, 'message' => 'The provided email is not valid'], 400);
     }
+    require_once __DIR__ . '/../../cron/lib/creator_discovery.php';
     if ($platform === '') {
-        require_once __DIR__ . '/../../cron/lib/creator_discovery.php';
         $platform = creator_platform_from_url($canonicalUrl);
     }
     if ($name === '') {
-        $name = $canonicalUrl;
+        $name = creator_name_from_url($canonicalUrl);
     }
     if ($summary === '') {
         $summary = 'Creator to recruit as an affiliate' . ($platform !== '' ? " (platform: {$platform})" : '') . '. Goal: recruit as an Argo Books affiliate partner.';
@@ -1866,10 +1867,7 @@ function send_outreach_email($pdo)
 
     $reason = null;
     if (send_outreach_lead($pdo, $lead, $reason)) {
-        $variantTag = !empty($lead['ab_variant_id'])
-            ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
-            : '';
-        log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email'] . $variantTag);
+        log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email']);
         json_response(['success' => true, 'message' => 'Email sent successfully']);
     }
 
@@ -2056,11 +2054,9 @@ function get_followups($pdo)
         $view = 'pending_review';
     }
 
-    $sql = "SELECT f.*, l.business_name, l.email AS lead_email, l.city, l.draft_subject AS original_subject,
-                   v.label AS ab_variant_label
+    $sql = "SELECT f.*, l.business_name, l.email AS lead_email, l.city, l.draft_subject AS original_subject
             FROM outreach_followups f
             JOIN outreach_leads l ON l.id = f.lead_id
-            LEFT JOIN outreach_ab_variants v ON v.id = f.ab_variant_id
             WHERE ";
 
     switch ($view) {
@@ -2218,7 +2214,7 @@ function get_followups_for_lead($pdo)
     if ($leadId <= 0) {
         echo json_encode(['success' => false, 'message' => 'Invalid lead_id']); return;
     }
-    $stmt = $pdo->prepare("SELECT f.*, v.label AS ab_variant_label FROM outreach_followups f LEFT JOIN outreach_ab_variants v ON v.id = f.ab_variant_id WHERE f.lead_id = ? ORDER BY f.touch_number ASC");
+    $stmt = $pdo->prepare("SELECT f.* FROM outreach_followups f WHERE f.lead_id = ? ORDER BY f.touch_number ASC");
     $stmt->execute([$leadId]);
     echo json_encode(['success' => true, 'rows' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
 }

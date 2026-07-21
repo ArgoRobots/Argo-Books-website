@@ -30,14 +30,13 @@ $cronConfig = [
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
         'frequency' => 'daily',
-        'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, schedules follow-ups, and runs A/B tests on the wording. This is the main engine that finds and contacts new leads.',
+        'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, and schedules follow-ups. This is the main engine that finds and contacts new leads.',
         'metrics'   => [
             'leads_discovered'          => 'Leads discovered',
             'first_emails_sent'         => 'First emails sent',
             'followups_sent'            => 'Follow-ups sent',
             'drafts_generated'          => 'Drafts generated',
             'followup_drafts_generated' => 'Follow-up drafts',
-            'ab_tests_promoted'         => 'A/B tests promoted',
             'shopify_rejected'          => 'Shopify stores rejected',
         ],
         'expected_interval_hours' => 48,

@@ -14,7 +14,6 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 // Tab partials (load render + POST handlers)
-require_once __DIR__ . '/tabs/ab-tests.php';
 require_once __DIR__ . '/tabs/settings.php';
 require_once __DIR__ . '/tabs/followups.php';
 
@@ -30,16 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
         header('Location: index.php?tab=' . urlencode($_POST['tab'])); exit;
     }
     $postTab = $_POST['tab'];
-    if ($postTab === 'ab-tests') {
-        ab_tests_tab_handle_post($pdo);
-    } elseif ($postTab === 'settings') {
+    if ($postTab === 'settings') {
         settings_tab_handle_post($pdo);
     }
 }
 
 // Determine active tab from ?tab=
 $activeTab = $_GET['tab'] ?? 'leads';
-$allowedTabs = ['discovery', 'leads', 'ab-tests', 'followups', 'settings'];
+$allowedTabs = ['discovery', 'leads', 'followups', 'settings'];
 if (!in_array($activeTab, $allowedTabs, true)) {
     $activeTab = 'leads';
 }
@@ -80,7 +77,6 @@ if (!in_array($activeChannel, ['email', 'editorial', 'creator'], true)) {
     <button class="section-tab <?php echo $activeTab === 'discovery' ? 'active' : ''; ?>" data-tab="discovery">Discovery</button>
     <button class="section-tab <?php echo $activeTab === 'leads' ? 'active' : ''; ?>" data-tab="leads">Leads</button>
     <button class="section-tab <?php echo $activeTab === 'followups' ? 'active' : ''; ?>" data-tab="followups">Follow-ups</button>
-    <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
     <button class="section-tab <?php echo $activeTab === 'settings' ? 'active' : ''; ?>" data-tab="settings">Settings</button>
 </div>
 
@@ -411,10 +407,6 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 
 <div id="followups" class="tab-content <?php echo $activeTab === 'followups' ? 'active' : ''; ?>">
     <?php followups_tab_render($pdo); ?>
-</div>
-
-<div id="ab-tests" class="tab-content <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>">
-    <?php ab_tests_tab_render($pdo, (int) ($_GET['test_id'] ?? 0)); ?>
 </div>
 
 <div id="settings" class="tab-content <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">

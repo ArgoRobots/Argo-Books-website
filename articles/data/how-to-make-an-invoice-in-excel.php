@@ -85,7 +85,7 @@ HTML,
 <ul>
 <li><strong>Total due:</strong> =D23+D24</li>
 </ul>
-<p>If you've already taken a deposit, add one more row under the total: <strong>Less deposit paid</strong> as a negative number, then a final <strong>Balance due</strong> cell of <strong>=D25-D26</strong> so the client sees exactly what's left to pay. Format every money cell as currency (highlight them, then Format Cells, then Currency) so the sheet shows $4,500.00 instead of 4500.</p>
+<p>If you've already taken a deposit, add one more row under the total: <strong>Less deposit paid</strong> as a positive number in D26, then a final <strong>Balance due</strong> cell of <strong>=D25-D26</strong> so the client sees exactly what's left to pay. Format every money cell as currency (highlight them, then Format Cells, then Currency) so the sheet shows $4,500.00 instead of 4500.</p>
 <p>Change any quantity or rate now and watch the whole stack recalculate. That's the payoff for setting the formulas up once.</p>
 HTML,
     ],

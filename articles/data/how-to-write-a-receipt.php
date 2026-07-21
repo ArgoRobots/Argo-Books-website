@@ -147,12 +147,12 @@ HTML,
       'h2' => 'Let Argo Books handle both sides of the receipt',
       'anchor' => 'argo-books',
       'step_name' => 'Automate receipts with Argo Books',
-      'step_text' => 'Mark an invoice paid in Argo Books to produce a receipt for the customer, and scan supplier receipts with your phone so the ones you receive get recorded too.',
+      'step_text' => 'Mark an invoice paid in Argo Books to produce a receipt for the customer, and import a photo of each supplier receipt so the ones you receive get recorded too.',
       'html' => <<<'HTML'
 <p>Once you're doing more than the occasional sale, writing each receipt by hand adds up, and that's where software saves the time. Argo Books deals with both sides of a receipt: the ones you give out and the ones you get.</p>
 <p><strong>The receipts you issue.</strong> When you mark an invoice as paid in Argo Books, it produces a receipt for the customer. The invoice status changes to Paid, the balance shows zero, and the document becomes the proof of payment you can send. Because the app tracks partial payments and deposits, a receipt reflects exactly what's been paid and what, if anything, is still owed, without you doing the math. Your copy stays in the app, so there's no separate folder to keep.</p>
 {{illustration:invoice-doc}}
-<p><strong>The receipts you receive.</strong> Every receipt a supplier hands you is a business expense worth recording, and Argo Books lets you snap a photo of it. The built-in AI receipt scanner reads the vendor, date, amount, and tax off the photo and turns it into a recorded expense, so the tax you paid on purchases gets tracked alongside the tax you collected. The free tier scans 10 receipts a month and Premium raises that to 500, and there's a free receipt scanner on the website too. See <a href="/how-to-scan-and-organize-receipts/">how to scan and organize receipts</a> for the full workflow.</p>
+<p><strong>The receipts you receive.</strong> Every receipt a supplier hands you is a business expense worth recording, and Argo Books lets you import a photo of it. The built-in AI receipt scanner reads the vendor, date, amount, and tax off the photo and turns it into a recorded expense, so the tax you paid on purchases gets tracked alongside the tax you collected. The free tier scans 10 receipts a month and Premium raises that to 500, and there's a free receipt scanner on the website too. See <a href="/how-to-scan-and-organize-receipts/">how to scan and organize receipts</a> for the full workflow.</p>
 <p>The result is one place where the receipts you write and the receipts you collect both live, backing up your income on one side and your deductible expenses on the other. That's the record you'll be glad to have at tax time.</p>
 HTML,
     ],

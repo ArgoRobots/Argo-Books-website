@@ -64,12 +64,12 @@ unset($list);
 $groups = [];
 foreach ($category_labels as $key => $label) {
     if (!empty($by_category[$key])) {
-        $groups[] = ['label' => $label, 'items' => $by_category[$key]];
+        $groups[] = ['key' => $key, 'label' => $label, 'items' => $by_category[$key]];
         unset($by_category[$key]);
     }
 }
 foreach ($by_category as $items) {
-    $groups[] = ['label' => 'More', 'items' => $items];
+    $groups[] = ['key' => 'more', 'label' => 'More', 'items' => $items];
 }
 
 // Flat list for numbering + the ItemList schema.
@@ -92,6 +92,18 @@ foreach ($groups as $g) {
             'url' => INVGEN_BASE . '/' . $it['slug'] . '/',
         ];
     }
+}
+
+// Filter pills: one per distinct category group, in render order (deduped by
+// key so multiple leftover "More" groups collapse into a single pill).
+$filter_pills = [];
+$seen_pill = [];
+foreach ($groups as $g) {
+    if (isset($seen_pill[$g['key']])) {
+        continue;
+    }
+    $seen_pill[$g['key']] = true;
+    $filter_pills[] = ['key' => $g['key'], 'label' => $g['label']];
 }
 
 $page_title = 'Guides for Small Businesses | Argo Books';
@@ -177,16 +189,25 @@ ob_start();
     })();
   </script>
 
+  <?php if (count($filter_pills) > 1): ?>
+    <div class="guides-hub-filter" role="group" aria-label="Filter guides by category">
+      <button type="button" class="guides-hub-pill is-active" data-filter="all" aria-pressed="true">All</button>
+      <?php foreach ($filter_pills as $p): ?>
+        <button type="button" class="guides-hub-pill" data-filter="<?= htmlspecialchars($p['key']) ?>" aria-pressed="false"><?= htmlspecialchars($p['label']) ?></button>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+
   <ol class="guides-hub-list" role="list">
     <?php $position = 0; ?>
     <?php foreach ($groups as $group): ?>
-      <li class="guides-hub-group" role="presentation">
+      <li class="guides-hub-group" role="presentation" data-category="<?= htmlspecialchars($group['key']) ?>">
         <h2 class="guides-hub-group-label"><?= htmlspecialchars($group['label']) ?></h2>
         <span class="guides-hub-group-rule" aria-hidden="true"></span>
       </li>
 
       <?php foreach ($group['items'] as $a): $position++; ?>
-        <li class="guides-hub-entry">
+        <li class="guides-hub-entry" data-category="<?= htmlspecialchars($group['key']) ?>">
           <a class="guides-hub-link"
              href="<?= INVGEN_BASE ?>/<?= htmlspecialchars($a['slug']) ?>/"
              style="--entry-delay: <?= (($position - 1) * 45) ?>ms;">
@@ -209,6 +230,42 @@ ob_start();
       <?php endforeach; ?>
     <?php endforeach; ?>
   </ol>
+
+  <script>
+    (function () {
+      var filter = document.querySelector('.guides-hub-filter');
+      if (!filter) { return; }
+      var list = document.querySelector('.guides-hub-list');
+      var pills = filter.querySelectorAll('.guides-hub-pill');
+
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+      function apply(cat) {
+        var count = 0;
+        list.querySelectorAll('[data-category]').forEach(function (el) {
+          var show = (cat === 'all' || el.getAttribute('data-category') === cat);
+          el.hidden = !show;
+          // Re-number the visible entries so the count reads 01, 02, 03...
+          if (show && el.classList.contains('guides-hub-entry')) {
+            var num = el.querySelector('.guides-hub-num');
+            if (num) { num.textContent = pad(++count); }
+          }
+        });
+      }
+
+      pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+          pills.forEach(function (p) {
+            p.classList.remove('is-active');
+            p.setAttribute('aria-pressed', 'false');
+          });
+          pill.classList.add('is-active');
+          pill.setAttribute('aria-pressed', 'true');
+          apply(pill.getAttribute('data-filter'));
+        });
+      });
+    })();
+  </script>
 
   <aside class="guides-hub-banner" role="complementary">
     <div class="guides-hub-banner-copy">

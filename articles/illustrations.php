@@ -251,5 +251,140 @@ SVG,
 SVG,
         ],
 
+        // Financial statement / report with a small bar chart: P&L, income
+        // statement, tax summary, any generated report.
+        'report-statement' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 200 190" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <path class="ai-soft" d="M48 24 h104 v150 h-104 z" stroke="none"/>
+  <rect x="40" y="20" width="104" height="150" rx="8"/>
+  <line x1="58" y1="46" x2="126" y2="46"/>
+  <line x1="58" y1="62" x2="104" y2="62"/>
+  <rect class="ai-soft" x="58" y="120" width="15" height="28" rx="2" stroke="none"/>
+  <rect class="ai-soft" x="82" y="104" width="15" height="44" rx="2" stroke="none"/>
+  <rect class="ai-accent" x="106" y="86" width="15" height="62" rx="2"/>
+  <line x1="52" y1="148" x2="132" y2="148"/>
+</svg>
+SVG,
+        ],
+
+        // T-account with an equals badge: a balance sheet (assets = liabilities
+        // + equity), things that balance.
+        'balance-sheet' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 220 190" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="34" y="26" width="152" height="140" rx="8"/>
+  <line x1="34" y1="54" x2="186" y2="54"/>
+  <line x1="110" y1="54" x2="110" y2="166"/>
+  <line x1="50" y1="76" x2="96" y2="76"/>
+  <line x1="50" y1="96" x2="96" y2="96"/>
+  <line x1="50" y1="116" x2="88" y2="116"/>
+  <line x1="124" y1="76" x2="170" y2="76"/>
+  <line x1="124" y1="96" x2="162" y2="96"/>
+  <circle class="ai-accent" cx="110" cy="150" r="15" fill="#fff"/>
+  <path class="ai-accent" d="M103 146 h14 M103 154 h14"/>
+</svg>
+SVG,
+        ],
+
+        // Stacked bar split into an accent profit segment and a soft cost/tax
+        // segment: gross vs net, what you keep vs what goes out.
+        'profit-split' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <rect class="ai-soft" x="82" y="98" width="58" height="54" rx="5" stroke="none"/>
+  <rect x="82" y="98" width="58" height="54" rx="5"/>
+  <rect class="ai-accent" x="82" y="40" width="58" height="56" rx="5"/>
+  <path d="M58 152 h108"/>
+  <path class="ai-accent" d="M150 52 h16"/>
+  <path d="M150 124 h16"/>
+</svg>
+SVG,
+        ],
+
+        // Jar of coins with a percent badge: setting money aside, tax savings.
+        'tax-jar' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 200 190" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <path class="ai-soft" d="M54 80 h84 v66 a14 14 0 0 1 -14 14 h-56 a14 14 0 0 1 -14 -14 z" stroke="none"/>
+  <path d="M54 80 h84 v66 a14 14 0 0 1 -14 14 h-56 a14 14 0 0 1 -14 -14 z"/>
+  <rect x="64" y="60" width="64" height="22" rx="6"/>
+  <ellipse cx="96" cy="134" rx="24" ry="8"/>
+  <ellipse cx="96" cy="118" rx="24" ry="8"/>
+  <circle class="ai-accent" cx="150" cy="60" r="22" fill="#fff"/>
+  <text class="ai-accent-fill" x="150" y="68" font-size="20" text-anchor="middle" font-weight="700" stroke="none">%</text>
+</svg>
+SVG,
+        ],
+
+        // Two separated wallets with a dashed divider: keeping business and
+        // personal money apart.
+        'wallet-split' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 240 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="28" y="62" width="80" height="58" rx="9"/>
+  <line x1="28" y1="84" x2="108" y2="84"/>
+  <circle cx="68" cy="100" r="8"/>
+  <rect class="ai-accent" x="132" y="62" width="80" height="58" rx="9"/>
+  <line class="ai-accent" x1="132" y1="84" x2="212" y2="84"/>
+  <circle class="ai-accent" cx="172" cy="100" r="8"/>
+  <path class="ai-accent" d="M120 34 v112" stroke-dasharray="2 9"/>
+</svg>
+SVG,
+        ],
+
+        // Price tag with a $: pricing your work, setting rates.
+        'price-tag' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 200 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <rect class="ai-soft" x="48" y="52" width="104" height="76" rx="12" stroke="none"/>
+  <rect x="48" y="52" width="104" height="76" rx="12"/>
+  <circle cx="70" cy="74" r="7"/>
+  <path d="M64 60 l-22 -22"/>
+  <text class="ai-accent-fill" x="112" y="102" font-size="34" text-anchor="middle" font-weight="700" stroke="none">$</text>
+</svg>
+SVG,
+        ],
+
+        // App window with a check: choosing / comparing software, the pick.
+        'app-check' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="34" y="34" width="152" height="112" rx="10"/>
+  <line x1="34" y1="60" x2="186" y2="60"/>
+  <circle cx="50" cy="47" r="3.5" fill="currentColor" stroke="none"/>
+  <circle cx="62" cy="47" r="3.5" fill="currentColor" stroke="none"/>
+  <circle cx="74" cy="47" r="3.5" fill="currentColor" stroke="none"/>
+  <circle class="ai-soft" cx="110" cy="102" r="30" stroke="none"/>
+  <circle class="ai-accent" cx="110" cy="102" r="30"/>
+  <path class="ai-accent" d="M97 102 l9 9 l18 -20"/>
+</svg>
+SVG,
+        ],
+
+        // Shop front with a check badge: a new business getting set up.
+        'storefront' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 220 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M46 80 l64 -36 l64 36"/>
+  <path class="ai-soft" d="M58 80 h104 v74 h-104 z" stroke="none"/>
+  <rect x="58" y="80" width="104" height="74" rx="4"/>
+  <rect x="98" y="112" width="24" height="42" rx="3"/>
+  <rect x="72" y="98" width="18" height="18" rx="2"/>
+  <rect x="130" y="98" width="18" height="18" rx="2"/>
+  <circle class="ai-accent" cx="152" cy="66" r="14" fill="#fff"/>
+  <path class="ai-accent" d="M146 66 l5 5 l9 -10"/>
+</svg>
+SVG,
+        ],
+
     ];
 }

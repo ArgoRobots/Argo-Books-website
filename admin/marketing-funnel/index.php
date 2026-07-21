@@ -94,6 +94,49 @@ function funnel_render_bar_list(array $rows, array $opts = []): string
 }
 
 /**
+ * Full-list "See all details" modal, matching the Referrer modal. Rendered once
+ * per breakdown that wants a searchable overflow list (referrer / country /
+ * region / city). $rows are the same rows fed to funnel_render_bar_list. Returns
+ * '' when there's nothing to show, so callers can echo unconditionally.
+ */
+function funnel_render_details_modal(string $id, string $title, array $rows, bool $show_revenue = true): string
+{
+    if (empty($rows)) {
+        return '';
+    }
+    $h  = '<div id="' . htmlspecialchars($id) . '" class="modal bd-details-modal" style="display:none;">';
+    $h .= '<div class="modal-content">';
+    $h .= '<span class="modal-close bd-details-close">&times;</span>';
+    $h .= '<h2>' . htmlspecialchars($title) . '</h2>';
+    $h .= '<input type="text" class="bd-details-search" placeholder="Search&hellip;" autocomplete="off" spellcheck="false">';
+    $h .= '<div class="bd-details-list">';
+    foreach ($rows as $r) {
+        $h .= '<div class="bd-details-row" data-name="' . htmlspecialchars(strtolower($r['label'])) . '">';
+        $h .= '<span class="bd-details-name">' . htmlspecialchars($r['label']) . '</span>';
+        $h .= '<span class="bd-details-visits">' . number_format((int)$r['visits']) . '</span>';
+        if ($show_revenue) {
+            $h .= '<span class="bd-details-revenue">$' . number_format((float)$r['revenue'], 0) . '</span>';
+        }
+        $h .= '</div>';
+    }
+    $h .= '</div></div></div>';
+    return $h;
+}
+
+/**
+ * "See all details" trigger button, targeting a modal rendered by
+ * funnel_render_details_modal(). Returns '' when the list is empty.
+ */
+function funnel_render_details_btn(string $target_id, array $rows): string
+{
+    if (empty($rows)) {
+        return '';
+    }
+    return '<button type="button" class="bd-details-btn" data-details-target="'
+        . htmlspecialchars($target_id) . '">See all details</button>';
+}
+
+/**
  * Compact visitor-count formatting: 1900 -> "1.9k", 782 -> "782".
  */
 function funnel_kfmt(int $n): string
@@ -992,6 +1035,14 @@ include __DIR__ . '/../admin_header.php';
         $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
         $bd_city     = funnel_render_bar_list($analytics['cities'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No city data yet. Collecting going forward.']);
 
+        // Page breakdowns (popular / entry / exit) come from the site-wide
+        // page_view stream, not the referral funnel, so they ignore the source
+        // pill and only honor the period window.
+        $pages       = funnel_page_breakdowns($funnel_period_start_dt);
+        $bd_popular  = funnel_render_bar_list($pages['popular'], ['revenue' => false, 'limit' => 9, 'empty' => 'No page views in this period yet.']);
+        $bd_entry    = funnel_render_bar_list($pages['entry'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No entry pages in this period yet.']);
+        $bd_exit     = funnel_render_bar_list($pages['exit'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No exit pages in this period yet.']);
+
         $channel_total_visits = array_sum(array_map(fn($r) => (int)$r['visits'], $analytics['channels']));
     ?>
     <div class="analytics-row">
@@ -1023,9 +1074,7 @@ include __DIR__ . '/../admin_header.php';
 
             <div class="bd-panel" data-bd-panel="referrer">
                 <?php echo $bd_ref; ?>
-                <?php if (count($analytics['referrers']) > 0): ?>
-                    <button type="button" class="bd-details-btn" id="referrerDetailsBtn">See all details</button>
-                <?php endif; ?>
+                <?php echo funnel_render_details_btn('referrerDetailsModal', $analytics['referrers']); ?>
             </div>
 
             <div class="bd-panel" data-bd-panel="campaign"><?php echo $bd_campaign; ?></div>
@@ -1049,30 +1098,55 @@ include __DIR__ . '/../admin_header.php';
                     <span class="map-legend-label">More visits</span>
                 </div>
             </div>
-            <div class="bd-panel" data-bd-panel="country"><?php echo $bd_country; ?></div>
-            <div class="bd-panel" data-bd-panel="region"><?php echo $bd_region; ?></div>
-            <div class="bd-panel" data-bd-panel="city"><?php echo $bd_city; ?></div>
-        </div>
-    </div>
-
-    <!-- Full referrer list (opened from the Referrer tab's "See all details") -->
-    <div id="referrerDetailsModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeReferrerDetails()">&times;</span>
-            <h2>Referrer</h2>
-            <input type="text" class="bd-details-search" id="referrerDetailsSearch"
-                   placeholder="Search&hellip;" autocomplete="off" spellcheck="false">
-            <div class="bd-details-list" id="referrerDetailsList">
-                <?php foreach ($analytics['referrers'] as $r): ?>
-                    <div class="bd-details-row" data-name="<?php echo htmlspecialchars(strtolower($r['label'])); ?>">
-                        <span class="bd-details-name"><?php echo htmlspecialchars($r['label']); ?></span>
-                        <span class="bd-details-visits"><?php echo number_format((int)$r['visits']); ?></span>
-                        <span class="bd-details-revenue">$<?php echo number_format((float)$r['revenue'], 0); ?></span>
-                    </div>
-                <?php endforeach; ?>
+            <div class="bd-panel" data-bd-panel="country">
+                <?php echo $bd_country; ?>
+                <?php echo funnel_render_details_btn('countryDetailsModal', $analytics['countries']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="region">
+                <?php echo $bd_region; ?>
+                <?php echo funnel_render_details_btn('regionDetailsModal', $analytics['regions']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="city">
+                <?php echo $bd_city; ?>
+                <?php echo funnel_render_details_btn('cityDetailsModal', $analytics['cities']); ?>
             </div>
         </div>
     </div>
+
+    <!-- Pages: most popular / entry / exit (site-wide page_view stream) -->
+    <div class="analytics-row analytics-row-full">
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="popular">Popular pages</button>
+                <button class="bd-tab" data-bd="entry">Entry page</button>
+                <button class="bd-tab" data-bd="exit">Exit page</button>
+            </div>
+
+            <div class="bd-panel active" data-bd-panel="popular">
+                <?php echo $bd_popular; ?>
+                <?php echo funnel_render_details_btn('popularPagesDetailsModal', $pages['popular']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="entry">
+                <?php echo $bd_entry; ?>
+                <?php echo funnel_render_details_btn('entryPagesDetailsModal', $pages['entry']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="exit">
+                <?php echo $bd_exit; ?>
+                <?php echo funnel_render_details_btn('exitPagesDetailsModal', $pages['exit']); ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full breakdown lists (opened from each tab's "See all details") -->
+    <?php
+        echo funnel_render_details_modal('referrerDetailsModal', 'Referrer', $analytics['referrers'], true);
+        echo funnel_render_details_modal('countryDetailsModal',  'Country',  $analytics['countries'], true);
+        echo funnel_render_details_modal('regionDetailsModal',   'Region',   $analytics['regions'],   false);
+        echo funnel_render_details_modal('cityDetailsModal',     'City',     $analytics['cities'],    false);
+        echo funnel_render_details_modal('popularPagesDetailsModal', 'Most popular pages', $pages['popular'], false);
+        echo funnel_render_details_modal('entryPagesDetailsModal',   'Entry pages',        $pages['entry'],   false);
+        echo funnel_render_details_modal('exitPagesDetailsModal',    'Exit pages',         $pages['exit'],    false);
+    ?>
 
         <?php
             $survey_by_answer = $survey_breakdown['by_answer'];
@@ -2057,26 +2131,37 @@ include __DIR__ . '/../admin_header.php';
             }
         })();
 
-        // ----- Referrer "See all details" modal -----
-        (function referrerDetails() {
-            const btn = document.getElementById('referrerDetailsBtn');
-            const modal = document.getElementById('referrerDetailsModal');
-            const search = document.getElementById('referrerDetailsSearch');
-            if (!modal) return;
-            const rows = Array.from(modal.querySelectorAll('.bd-details-row'));
-            const filter = () => {
-                const q = (search.value || '').trim().toLowerCase();
-                rows.forEach(r => { r.style.display = (!q || r.getAttribute('data-name').includes(q)) ? '' : 'none'; });
-            };
-            window.closeReferrerDetails = () => { modal.style.display = 'none'; };
-            if (btn) btn.addEventListener('click', () => {
-                modal.style.display = 'block';
-                if (search) { search.value = ''; filter(); search.focus(); }
+        // ----- "See all details" modals (referrer / country / region / city) -----
+        (function breakdownDetails() {
+            const close = modal => { modal.style.display = 'none'; };
+
+            document.querySelectorAll('.bd-details-modal').forEach(modal => {
+                const search = modal.querySelector('.bd-details-search');
+                const rows = Array.from(modal.querySelectorAll('.bd-details-row'));
+                const filter = () => {
+                    const q = (search.value || '').trim().toLowerCase();
+                    rows.forEach(r => { r.style.display = (!q || r.getAttribute('data-name').includes(q)) ? '' : 'none'; });
+                };
+                if (search) search.addEventListener('input', filter);
+                modal.querySelectorAll('.bd-details-close').forEach(x => x.addEventListener('click', () => close(modal)));
+                modal.addEventListener('mousedown', e => { if (e.target === modal) close(modal); });
             });
-            if (search) search.addEventListener('input', filter);
-            modal.addEventListener('mousedown', e => { if (e.target === modal) window.closeReferrerDetails(); });
+
+            document.querySelectorAll('.bd-details-btn[data-details-target]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modal = document.getElementById(btn.getAttribute('data-details-target'));
+                    if (!modal) return;
+                    modal.style.display = 'block';
+                    const search = modal.querySelector('.bd-details-search');
+                    if (search) { search.value = ''; search.dispatchEvent(new Event('input')); search.focus(); }
+                });
+            });
+
             document.addEventListener('keydown', e => {
-                if (e.key === 'Escape' && modal.style.display === 'block') window.closeReferrerDetails();
+                if (e.key !== 'Escape') return;
+                document.querySelectorAll('.bd-details-modal').forEach(m => {
+                    if (m.style.display === 'block') close(m);
+                });
             });
         })();
     })();

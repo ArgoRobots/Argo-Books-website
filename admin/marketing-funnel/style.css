@@ -780,6 +780,9 @@
     margin-bottom: 24px;
 }
 
+/* Single full-width card (e.g. the Pages breakdown) rather than a 2-up split. */
+.analytics-row-full { grid-template-columns: 1fr; }
+
 .analytics-card {
     background: var(--white);
     border-radius: 8px;
@@ -824,7 +827,9 @@
 .bd-panel.active { display: flex; flex-direction: column; }
 .bd-panel[data-bd-panel="referrer"], .bd-panel[data-bd-panel="campaign"],
 .bd-panel[data-bd-panel="keyword"], .bd-panel[data-bd-panel="country"],
-.bd-panel[data-bd-panel="region"], .bd-panel[data-bd-panel="city"] { overflow-y: auto; }
+.bd-panel[data-bd-panel="region"], .bd-panel[data-bd-panel="city"],
+.bd-panel[data-bd-panel="popular"], .bd-panel[data-bd-panel="entry"],
+.bd-panel[data-bd-panel="exit"] { overflow-y: auto; }
 
 /* ─── Dual-bar breakdown lists (blue visits + orange revenue) ──────────── */
 

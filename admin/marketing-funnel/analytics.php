@@ -454,3 +454,79 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         'stage_sources'   => funnel_stage_dimension('source_code',  $period_start, $source_filter),
     ];
 }
+
+/**
+ * Page breakdowns for the "Pages" analytics card: most-viewed pages, entry
+ * pages, and exit pages. Source is the site-wide page_view stream in the
+ * `statistics` table (event_type = 'page_view', event_data = the page).
+ *
+ * Notes / caveats, so the numbers are read honestly:
+ *   - track_event() records each (page, ip) at most once per calendar day, so a
+ *     "view" here is a distinct page-per-visitor-per-day, matching how the rest
+ *     of the dashboard counts visitors rather than raw hits.
+ *   - Entry / exit are derived per (ip_address, day) from insert order: the
+ *     first page_view row (MIN(id)) is the entry, the last (MAX(id)) is the
+ *     exit. A single-page day counts as both (a bounce). Because a page is only
+ *     recorded on its FIRST view that day, "exit" is the last NEW page the
+ *     visitor reached, not necessarily where they truly left if they backtracked
+ *     to an already-seen page. It's an approximation at this granularity.
+ *   - `statistics` has no environment or source columns, so these lists are
+ *     whole-site and ignore the source pill; only the period window applies.
+ *   - The query string is stripped (SUBSTRING_INDEX on '?') so the homepage,
+ *     which stores the raw REQUEST_URI, collapses to one row instead of one per
+ *     query-string variant.
+ *
+ * @return array{popular: list<array>, entry: list<array>, exit: list<array>}
+ */
+function funnel_page_breakdowns(?string $period_start): array
+{
+    global $pdo;
+
+    $period_clause = $period_start !== null ? ' AND created_at >= ?' : '';
+    $params = $period_start !== null ? [$period_start] : [];
+    $base_where = "event_type = 'page_view' AND event_data IS NOT NULL AND event_data <> ''" . $period_clause;
+
+    // Most popular: straight count of page views per page.
+    $popular_sql = "SELECT SUBSTRING_INDEX(event_data, '?', 1) AS page, COUNT(*) AS visits
+                      FROM statistics
+                     WHERE $base_where
+                     GROUP BY page
+                     ORDER BY visits DESC, page ASC";
+
+    // Entry / exit: the first / last page_view row per visitor per day, keyed by
+    // MIN(id) / MAX(id) so same-second ties resolve deterministically by insert
+    // order. Grouping the picked rows by page gives the entry/exit distribution.
+    $edge_sql = fn(string $agg) =>
+        "SELECT SUBSTRING_INDEX(s.event_data, '?', 1) AS page, COUNT(*) AS visits
+           FROM statistics s
+           JOIN (
+                SELECT $agg(id) AS eid
+                  FROM statistics
+                 WHERE $base_where
+                 GROUP BY ip_address, DATE(created_at)
+           ) e ON e.eid = s.id
+          GROUP BY page
+          ORDER BY visits DESC, page ASC";
+
+    $run = function (string $sql, array $sql_params) use ($pdo) {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($sql_params);
+        $rows = [];
+        foreach ($stmt->fetchAll() as $r) {
+            $page = (string)$r['page'];
+            $rows[] = [
+                'key'     => $page,
+                'label'   => $page,
+                'visits'  => (int)$r['visits'],
+                'revenue' => 0.0, // funnel_render_bar_list reads this on every row
+            ];
+        }
+        return $rows;
+    };
+
+    return [
+        'popular' => $run($popular_sql,       $params),
+        'entry'   => $run($edge_sql('MIN'),   $params),
+        'exit'    => $run($edge_sql('MAX'),   $params),
+    ];
+}

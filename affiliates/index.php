@@ -14,6 +14,10 @@ $premium_yearly  = (float) $pricing['premium_yearly_price'];    // e.g. 100.00
 $rate            = 0.50;
 $commission_rate_pct = (int) round($rate * 100);
 $window_months   = 12;
+// Referral attribution window: how long a click keeps crediting the affiliate.
+// Pulled from the same env-backed setting the checkout enforces, so the copy can
+// never claim a window the commission logic doesn't actually honor.
+$cookie_days     = affiliate_attribution_days();
 $c_month         = $premium_monthly * $rate;                    // per-month commission, monthly plan
 $c_year          = $premium_yearly * $rate;                     // per-customer commission, yearly plan
 
@@ -179,13 +183,13 @@ $fmt = function (float $n): string {
                     </div>
                     <div class="aff-card aff-reveal">
                         <span class="aff-card-figure">12<span class="aff-card-figure-unit">mo</span></span>
-                        <h3>A full year per customer</h3>
-                        <p>You earn on every payment for twelve months, renewals included, not just the first sale.</p>
+                        <h3>Recurring for a full year</h3>
+                        <p>You earn on every payment for twelve months, renewals included, not just the first sale. Monthly subscribers pay you every single month, so referrals compound as they add up.</p>
                     </div>
                     <div class="aff-card aff-reveal">
-                        <span class="aff-card-icon"><?php echo svg_icon('refresh', 26); ?></span>
-                        <h3>Recurring, not one-time</h3>
-                        <p>Monthly subscribers pay you every single month. Referrals compound as they add up.</p>
+                        <span class="aff-card-icon"><?php echo svg_icon('clock', 26); ?></span>
+                        <h3><?php echo (int) $cookie_days; ?>-day referral cookie</h3>
+                        <p>When someone clicks your link, you're credited if they subscribe any time in the next <?php echo (int) $cookie_days; ?> days. No rush, no short window.</p>
                     </div>
                     <div class="aff-card aff-reveal">
                         <span class="aff-card-icon"><?php echo svg_icon('analytics', 26); ?></span>
@@ -244,7 +248,7 @@ $fmt = function (float $n): string {
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>How are referrals tracked?<?php echo svg_icon('chevron-down', 20); ?></summary>
-                        <p>Your unique link tags every visitor you send. When they sign up and subscribe, the sale is credited to you automatically, and it keeps earning on their renewals for a full year.</p>
+                        <p>Your unique link tags every visitor you send. The tag lasts <?php echo (int) $cookie_days; ?> days, so if they subscribe any time in that window the sale is credited to you automatically, and it keeps earning on their renewals for a full year.</p>
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>Where do I track everything?<?php echo svg_icon('chevron-down', 20); ?></summary>

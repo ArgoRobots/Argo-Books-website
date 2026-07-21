@@ -879,6 +879,17 @@ try {
             $referralSource = get_referral_source_for_visitor($visitorId);
         }
 
+        // Enforce the affiliate referral cookie window: an affiliate is only
+        // credited when their first click on this visitor is recent enough. Stale
+        // affiliate clicks drop attribution so no commission is earned on a sale
+        // the affiliate didn't meaningfully drive. Non-affiliate sources pass through.
+        if (!empty($referralSource)) {
+            require_once __DIR__ . '/../../../community/affiliate/affiliate_functions.php';
+            if (!affiliate_source_within_window($visitorId, $referralSource, current_environment())) {
+                $referralSource = null;
+            }
+        }
+
         if (!empty($referralSource)) {
             try {
                 $refStmt = $pdo->prepare("UPDATE referral_visits SET converted = 1, license_key = ? WHERE source_code = ? AND converted = 0 ORDER BY visited_at DESC LIMIT 1");

@@ -46,6 +46,70 @@ if (!function_exists('affiliate_hold_days')) {
     }
 }
 
+if (!function_exists('affiliate_attribution_days')) {
+    /**
+     * Referral cookie window: how long after a click an affiliate can still be
+     * credited for the resulting purchase. The visitor cookie itself lives a year
+     * (analytics), but affiliate attribution is deliberately capped shorter so we
+     * don't pay commission on sales an affiliate didn't meaningfully drive.
+     * Override via AFFILIATE_ATTRIBUTION_DAYS; defaults to 100.
+     */
+    function affiliate_attribution_days(): int
+    {
+        $raw = $_ENV['AFFILIATE_ATTRIBUTION_DAYS'] ?? getenv('AFFILIATE_ATTRIBUTION_DAYS');
+        $days = (int) ($raw !== false && $raw !== null && $raw !== '' ? $raw : 100);
+        return $days > 0 ? $days : 100;
+    }
+}
+
+if (!function_exists('affiliate_source_within_window')) {
+    /**
+     * Whether a resolved referral source should still be credited to an affiliate
+     * for a purchase happening now. Enforces the affiliate cookie window at
+     * conversion time so it decides attribution once, permanently, rather than
+     * retroactively re-scoring history when the setting changes.
+     *
+     * Only affiliate source codes are gated. Non-affiliate channels (ads, AI,
+     * social) always pass through untouched. Fails open (returns true) on any
+     * missing data or DB error so a lookup gap never silently drops a legitimate
+     * referral; the only case that strips attribution is a confirmed affiliate
+     * whose first recorded click for this visitor is older than the window.
+     */
+    function affiliate_source_within_window(?string $visitor_id, ?string $source_code, string $environment): bool
+    {
+        global $pdo;
+        if (empty($source_code) || !$pdo) {
+            return true;
+        }
+        try {
+            $isAff = $pdo->prepare('SELECT 1 FROM affiliates WHERE source_code = ? AND environment = ? LIMIT 1');
+            $isAff->execute([$source_code, $environment]);
+            if (!$isAff->fetchColumn()) {
+                return true; // not an affiliate code; leave attribution untouched
+            }
+            if (empty($visitor_id)) {
+                return true; // no visitor to trace a click for; don't strip
+            }
+            // A cookie refreshes on every click, so measure the window from the
+            // most recent click for this source: credit the affiliate if they were
+            // clicked at all within the window, even if there's also an older click.
+            $stmt = $pdo->prepare(
+                'SELECT MAX(created_at) FROM referral_events
+                  WHERE visitor_id = ? AND source_code = ? AND environment = ?'
+            );
+            $stmt->execute([$visitor_id, $source_code, $environment]);
+            $latest = $stmt->fetchColumn();
+            if ($latest === false || $latest === null) {
+                return true; // no recorded click; leave attribution
+            }
+            return strtotime((string) $latest) >= strtotime('-' . affiliate_attribution_days() . ' days');
+        } catch (PDOException $e) {
+            error_log('affiliate_source_within_window failed: ' . $e->getMessage());
+            return true; // fail open
+        }
+    }
+}
+
 if (!function_exists('compute_commission')) {
     /**
      * Pure commission math (no DB) so it can be unit-tested in isolation.

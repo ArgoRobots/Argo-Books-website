@@ -15,7 +15,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta name="description"
         content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, with more integrations on the way.">
     <meta name="keywords"
-        content="Argo Books integrations, Stripe integration, Square integration, PayPal integration, Shopify integration, accounting software integrations, connect Stripe to accounting software">
+        content="Argo Books integrations, Stripe integration, Square integration, PayPal integration, Shopify integration, Etsy integration, WooCommerce integration, Gumroad integration, Argo Books API, accounting software integrations, connect Stripe to accounting software">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Integrations | Argo Books">
@@ -187,6 +187,46 @@ require_once __DIR__ . '/../track_referral.php';
                     </div>
                     <h3>Shopify</h3>
                     <p>Coming soon.</p>
+                </div>
+
+                <!-- Etsy (coming soon) -->
+                <div class="feature-card integration-card-disabled animate-on-scroll">
+                    <span class="integration-card-badge soon">Coming Soon</span>
+                    <div class="feature-card-icon red">
+                        <?= svg_icon('package', 24) ?>
+                    </div>
+                    <h3>Etsy</h3>
+                    <p>Coming soon.</p>
+                </div>
+
+                <!-- WooCommerce (coming soon) -->
+                <div class="feature-card integration-card-disabled animate-on-scroll">
+                    <span class="integration-card-badge soon">Coming Soon</span>
+                    <div class="feature-card-icon purple">
+                        <?= svg_icon('globe', 24) ?>
+                    </div>
+                    <h3>WooCommerce</h3>
+                    <p>Coming soon.</p>
+                </div>
+
+                <!-- Gumroad (coming soon) -->
+                <div class="feature-card integration-card-disabled animate-on-scroll">
+                    <span class="integration-card-badge soon">Coming Soon</span>
+                    <div class="feature-card-icon cyan">
+                        <?= svg_icon('download', 24) ?>
+                    </div>
+                    <h3>Gumroad</h3>
+                    <p>Coming soon.</p>
+                </div>
+
+                <!-- Argo API (coming soon) -->
+                <div class="feature-card integration-card-disabled animate-on-scroll">
+                    <span class="integration-card-badge soon">Coming Soon</span>
+                    <div class="feature-card-icon green">
+                        <?= svg_icon('bolt', 24) ?>
+                    </div>
+                    <h3>Argo API</h3>
+                    <p>Connect your own website or app and send sales into your books directly. Coming soon.</p>
                 </div>
             </div>
         </div>

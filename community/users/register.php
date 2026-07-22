@@ -130,6 +130,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Create an Account</h1>
             <p class="auth-subtitle">Join Argo Community to share ideas and connect with other users</p>
 
+            <div class="account-note">
+                <strong>Just here for the free app?</strong> No account needed. Download it and start right away. An account is only for Argo Premium or joining the community.
+            </div>
+
             <?php if ($error): ?>
                 <div class="error-message" id="server-error-message">
                     <?php echo htmlspecialchars($error); ?>

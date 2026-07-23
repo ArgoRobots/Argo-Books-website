@@ -1,0 +1,186 @@
+/* Mac waitlist admin page. Bulk-actions bar + modal copied from
+   admin/users/style.css so the two pages look identical; common-style.css
+   supplies the dark-theme overrides for the shared class names. */
+
+/* Bulk Actions Bar */
+.bulk-actions-bar {
+  padding: 1rem 1.5rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.selection-info {
+  font-size: 0.875rem;
+  color: var(--admin-text);
+  font-weight: 500;
+}
+
+.selection-info #selected-count {
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-bulk {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-bulk svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-bulk:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-email {
+  background: var(--blue-600);
+  color: var(--white);
+}
+
+.btn-email:not(:disabled):hover {
+  background: var(--blue-700);
+}
+
+/* Send-email modal (same shell as the users page ban modal) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.modal-overlay .modal-content {
+  background: var(--white);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--admin-text);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body .form-group {
+  margin-bottom: 14px;
+}
+
+.modal-body label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.modal-body input[type="text"],
+.modal-body textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.modal-note {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin: 4px 0 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--gray-border);
+}
+
+.btn-secondary {
+  background: var(--gray-bg-light);
+  color: var(--admin-text);
+  border: 1px solid var(--gray-border);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .modal-body input[type="text"],
+[data-theme="dark"] .modal-body textarea {
+  background: var(--gray-700);
+  border-color: var(--gray-600);
+  color: var(--white);
+}
+
+/* Keep the per-row Delete button at its natural size instead of stretching
+   across the (wide) Actions column. */
+.action-buttons {
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .bulk-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bulk-actions {
+    width: 100%;
+  }
+
+  .btn-bulk {
+    flex: 1;
+    justify-content: center;
+  }
+}

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_sender.php';
+require_once __DIR__ . '/../../resources/icons.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
@@ -157,6 +158,7 @@ $page_description = 'Emails collected from the "notify me when the Mac version s
 include __DIR__ . '/../admin_header.php';
 ?>
 
+<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
 
 <?php if ($flash): ?>
@@ -177,7 +179,7 @@ include __DIR__ . '/../admin_header.php';
 </div>
 
 <div class="table-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
         <h2 style="margin:0;">Signups</h2>
         <?php if ($total > 0): ?>
             <a href="index.php?export=csv" class="btn btn-small btn-blue">Export CSV</a>
@@ -190,15 +192,34 @@ include __DIR__ . '/../admin_header.php';
             <p>The form lives on the downloads page under the macOS card.</p>
         </div>
     <?php else: ?>
-        <form method="POST" action="index.php" id="waitlistSendForm">
+        <form id="bulk-form" method="POST" action="index.php">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
             <input type="hidden" name="action" value="send_email">
+            <input type="hidden" name="subject" id="subject_input">
+            <input type="hidden" name="html_body" id="html_body_input">
+
+            <div class="bulk-actions-bar">
+                <div class="selection-info">
+                    <span id="selected-count">0</span> signup(s) selected
+                </div>
+                <div class="bulk-actions">
+                    <button type="button" class="btn btn-bulk btn-email" id="send-email-btn" disabled>
+                        <?= svg_icon('mail') ?>
+                        Send Email
+                    </button>
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table data-paginate="25">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" class="select-all" id="waitlistSelectAll"></th>
+                            <th class="checkbox-column">
+                                <div class="checkbox">
+                                    <input type="checkbox" id="select-all">
+                                    <label for="select-all"></label>
+                                </div>
+                            </th>
                             <th>Email</th>
                             <th>Platform</th>
                             <th>Source</th>
@@ -210,12 +231,15 @@ include __DIR__ . '/../admin_header.php';
                     <tbody>
                         <?php foreach ($rows as $r): ?>
                             <tr>
-                                <td>
-                                    <!-- Rows already notified start unchecked so a launch
-                                         send doesn't re-email them by accident. -->
-                                    <input type="checkbox" class="row-check" name="waitlist_ids[]"
-                                           value="<?php echo (int)$r['id']; ?>"
-                                           <?php echo $r['notified_at'] === null ? 'checked' : ''; ?>>
+                                <td class="checkbox-column">
+                                    <div class="checkbox">
+                                        <input type="checkbox"
+                                               name="waitlist_ids[]"
+                                               value="<?php echo (int)$r['id']; ?>"
+                                               class="row-checkbox"
+                                               id="wl-<?php echo (int)$r['id']; ?>">
+                                        <label for="wl-<?php echo (int)$r['id']; ?>"></label>
+                                    </div>
                                 </td>
                                 <td><?php echo htmlspecialchars($r['email']); ?></td>
                                 <td><?php echo htmlspecialchars($r['platform']); ?></td>
@@ -240,28 +264,6 @@ include __DIR__ . '/../admin_header.php';
                     </tbody>
                 </table>
             </div>
-
-            <h2 style="margin-top:28px;">Email selected</h2>
-            <p class="subtext" style="margin-top:0;">
-                The body accepts HTML and is wrapped in the standard Argo email template, with a
-                "you asked to be notified about Argo Books for Mac" footer appended automatically.
-                Sending stamps each recipient's Notified date (first send only).
-            </p>
-            <div class="form-group">
-                <label for="subject">Subject *</label>
-                <input type="text" name="subject" id="subject" maxlength="300" required
-                       placeholder="Argo Books for Mac is here"
-                       style="width:100%; padding:10px 12px; border:1px solid var(--gray-input-border); border-radius:6px; font-size:14px;">
-            </div>
-            <div class="form-group">
-                <label for="html_body">Body (HTML) *</label>
-                <textarea name="html_body" id="html_body" rows="8" required
-                          placeholder="<p>Hi,</p>&#10;<p>Argo Books for Mac is now available to download&hellip;</p>"
-                          style="width:100%; padding:10px 12px; border:1px solid var(--gray-input-border); border-radius:6px; font-size:14px; font-family:inherit;"></textarea>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-blue">Send to selected</button>
-            </div>
         </form>
 
         <form method="POST" action="index.php" id="waitlistDeleteForm" style="display:none;">
@@ -269,21 +271,108 @@ include __DIR__ . '/../admin_header.php';
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" id="waitlistDeleteId" value="">
         </form>
+
+        <!-- Send Email Modal -->
+        <div id="send-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Email selected signups</h3>
+                    <button type="button" class="modal-close" id="send-modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Send an email to <strong><span id="send-modal-count">0</span></strong> selected signup(s).</p>
+                    <div class="form-group">
+                        <label for="send-modal-subject">Subject</label>
+                        <input type="text" id="send-modal-subject" maxlength="300"
+                               placeholder="Argo Books for Mac is here">
+                    </div>
+                    <div class="form-group">
+                        <label for="send-modal-body">Body (HTML)</label>
+                        <textarea id="send-modal-body" rows="8"
+                                  placeholder="<p>Hi,</p>&#10;<p>Argo Books for Mac is now available to download&hellip;</p>"></textarea>
+                    </div>
+                    <p class="modal-note">
+                        The body is wrapped in the standard Argo email template, with a "you asked
+                        to be notified about Argo Books for Mac" footer appended automatically.
+                        Sending stamps each recipient's Notified date (first send only).
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="send-modal-cancel">Cancel</button>
+                    <button type="button" class="btn btn-bulk btn-email" id="send-modal-confirm">Send email</button>
+                </div>
+            </div>
+        </div>
     <?php endif; ?>
 </div>
 
 <script>
-    // Select-all toggles every row checkbox.
-    const selectAll = document.getElementById('waitlistSelectAll');
-    if (selectAll) {
-        selectAll.addEventListener('change', function () {
-            document.querySelectorAll('.row-check').forEach(function (cb) {
-                cb.checked = selectAll.checked;
-            });
-        });
+    // Bulk selection: mirrors admin/users. Count updates enable the bulk button;
+    // select-all syncs with the row checkboxes.
+    const selectAll = document.getElementById('select-all');
+    const rowChecks = Array.from(document.querySelectorAll('.row-checkbox'));
+    const selectedCount = document.getElementById('selected-count');
+    const sendEmailBtn = document.getElementById('send-email-btn');
+
+    function updateSelection() {
+        const checked = rowChecks.filter(cb => cb.checked).length;
+        if (selectedCount) selectedCount.textContent = checked;
+        if (sendEmailBtn) sendEmailBtn.disabled = checked === 0;
+        if (selectAll) {
+            selectAll.checked = checked > 0 && checked === rowChecks.length;
+            selectAll.indeterminate = checked > 0 && checked < rowChecks.length;
+        }
     }
 
-    // Delete buttons live inside the send form, so they post through a separate
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            rowChecks.forEach(cb => { cb.checked = selectAll.checked; });
+            updateSelection();
+        });
+    }
+    rowChecks.forEach(cb => cb.addEventListener('change', updateSelection));
+    updateSelection();
+
+    // Send-email modal wiring (same shape as the users page ban modal).
+    const sendModal = document.getElementById('send-modal');
+    const sendModalCount = document.getElementById('send-modal-count');
+    const sendModalSubject = document.getElementById('send-modal-subject');
+    const sendModalBody = document.getElementById('send-modal-body');
+    const bulkForm = document.getElementById('bulk-form');
+
+    function closeSendModal() {
+        if (sendModal) sendModal.style.display = 'none';
+    }
+
+    if (sendEmailBtn) {
+        sendEmailBtn.addEventListener('click', function () {
+            sendModalCount.textContent = rowChecks.filter(cb => cb.checked).length;
+            sendModal.style.display = 'flex';
+            sendModalSubject.focus();
+        });
+    }
+    document.getElementById('send-modal-cancel')?.addEventListener('click', closeSendModal);
+    document.getElementById('send-modal-close')?.addEventListener('click', closeSendModal);
+    if (sendModal) {
+        sendModal.addEventListener('mousedown', function (e) {
+            if (e.target === sendModal) closeSendModal();
+        });
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sendModal && sendModal.style.display === 'flex') closeSendModal();
+    });
+
+    document.getElementById('send-modal-confirm')?.addEventListener('click', function () {
+        const subject = sendModalSubject.value.trim();
+        const body = sendModalBody.value.trim();
+        if (!subject) { sendModalSubject.focus(); return; }
+        if (!body) { sendModalBody.focus(); return; }
+        document.getElementById('subject_input').value = subject;
+        document.getElementById('html_body_input').value = body;
+        bulkForm.submit();
+    });
+
+    // Delete buttons live inside the bulk form, so they post through a separate
     // hidden form to avoid submitting the bulk-send by accident.
     document.querySelectorAll('.waitlist-delete-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -292,22 +381,6 @@ include __DIR__ . '/../admin_header.php';
             document.getElementById('waitlistDeleteForm').submit();
         });
     });
-
-    // Confirm before sending, with the selected count.
-    const sendForm = document.getElementById('waitlistSendForm');
-    if (sendForm) {
-        sendForm.addEventListener('submit', function (e) {
-            const checked = document.querySelectorAll('.row-check:checked').length;
-            if (checked === 0) {
-                e.preventDefault();
-                alert('No signups selected.');
-                return;
-            }
-            if (!confirm('Send this email to ' + checked + ' recipient(s)?')) {
-                e.preventDefault();
-            }
-        });
-    }
 </script>
 
 </main>

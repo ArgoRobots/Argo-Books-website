@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../email_sender.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
@@ -13,21 +14,45 @@ if (empty($_SESSION['csrf_token'])) {
 
 /**
  * Waitlist rows for the current environment, newest first, with the referral
- * link's display name when the source is a known link.
+ * link's display name when the source is a known link. $idFilter re-scopes a
+ * bulk-send POST to rows that actually exist in this environment (defence in
+ * depth, same pattern as admin/email-customers).
  */
-function get_waitlist_rows(): array
+function get_waitlist_rows(?array $idFilter = null): array
 {
     global $pdo;
-    $stmt = $pdo->prepare(
-        'SELECT w.id, w.email, w.platform, w.source_code, w.notified_at, w.created_at,
-                rl.name AS source_name
-           FROM platform_waitlist w
-           LEFT JOIN referral_links rl ON rl.source_code = w.source_code
-          WHERE w.environment = ?
-          ORDER BY w.created_at DESC, w.id DESC'
-    );
-    $stmt->execute([current_environment()]);
+    $sql = 'SELECT w.id, w.email, w.platform, w.source_code, w.notified_at, w.created_at,
+                   rl.name AS source_name
+              FROM platform_waitlist w
+              LEFT JOIN referral_links rl ON rl.source_code = w.source_code
+             WHERE w.environment = ?';
+    $params = [current_environment()];
+
+    if ($idFilter !== null && count($idFilter) > 0) {
+        $placeholders = implode(',', array_fill(0, count($idFilter), '?'));
+        $sql .= " AND w.id IN ($placeholders)";
+        $params = array_merge($params, array_values(array_map('intval', $idFilter)));
+    }
+
+    $sql .= ' ORDER BY w.created_at DESC, w.id DESC';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     return $stmt->fetchAll();
+}
+
+/**
+ * Footer for waitlist emails. These recipients aren't marketing subscribers;
+ * they asked for a launch notification on the downloads page, so the footer
+ * says exactly that instead of the standard broadcast unsubscribe blurb.
+ */
+function waitlist_footer_html(): string
+{
+    return '<hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">'
+        . '<p style="font-size:12px;color:#6b7280;">'
+        . "You're receiving this because you asked to be notified about Argo Books "
+        . 'for Mac on <a href="https://argorobots.com/downloads/">argorobots.com</a>. '
+        . 'Questions? Just reply to this email.'
+        . '</p>';
 }
 
 // CSV export (before any output).
@@ -50,20 +75,70 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     exit;
 }
 
-// Delete handler.
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+$flash = null;
+$flash_type = null;
+
+// ─── POST handlers: bulk send + delete ──────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_token = $_POST['csrf_token'] ?? '';
     if (!is_string($posted_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $posted_token)) {
         http_response_code(403);
         die('Invalid CSRF token. Reload the page and try again.');
     }
-    $id = (int)($_POST['id'] ?? 0);
-    $stmt = $pdo->prepare('DELETE FROM platform_waitlist WHERE id = ? AND environment = ?');
-    $stmt->execute([$id, current_environment()]);
-    $_SESSION['message'] = 'Waitlist entry deleted.';
-    $_SESSION['message_type'] = 'success';
-    header('Location: index.php');
-    exit;
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'send_email') {
+        $selected = $_POST['waitlist_ids'] ?? [];
+        $subject  = trim($_POST['subject'] ?? '');
+        $body     = trim($_POST['html_body'] ?? '');
+
+        if (!is_array($selected) || count($selected) === 0) {
+            $flash = 'No signups selected.';
+            $flash_type = 'error';
+        } elseif ($subject === '' || $body === '') {
+            $flash = 'Subject and body are both required.';
+            $flash_type = 'error';
+        } else {
+            $recipients = get_waitlist_rows($selected);
+            $sent = 0;
+            $failed = 0;
+            $html = $body . waitlist_footer_html();
+
+            foreach ($recipients as $r) {
+                $ok = send_styled_email(
+                    $r['email'],
+                    $subject,
+                    $html,
+                    'blue',
+                    'noreply@argorobots.com',
+                    'Argo Books',
+                    'contact@argorobots.com'
+                );
+                if ($ok) {
+                    $sent++;
+                    // Keep the first notification date if this is a re-send.
+                    $upd = $pdo->prepare(
+                        'UPDATE platform_waitlist SET notified_at = COALESCE(notified_at, NOW())
+                          WHERE id = ? AND environment = ?'
+                    );
+                    $upd->execute([(int)$r['id'], current_environment()]);
+                } else {
+                    $failed++;
+                }
+            }
+
+            $flash = "Sent {$sent} email(s)." . ($failed > 0 ? " {$failed} failed, check the error log." : '');
+            $flash_type = $failed > 0 ? 'error' : 'success';
+        }
+    } elseif ($action === 'delete') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $pdo->prepare('DELETE FROM platform_waitlist WHERE id = ? AND environment = ?');
+        $stmt->execute([$id, current_environment()]);
+        $_SESSION['message'] = 'Waitlist entry deleted.';
+        $_SESSION['message_type'] = 'success';
+        header('Location: index.php');
+        exit;
+    }
 }
 
 $rows = get_waitlist_rows();
@@ -81,6 +156,12 @@ $page_description = 'Emails collected from the "notify me when the Mac version s
 
 include __DIR__ . '/../admin_header.php';
 ?>
+
+<link rel="stylesheet" href="../../resources/styles/checkbox.css">
+
+<?php if ($flash): ?>
+    <div class="alert alert-<?php echo htmlspecialchars($flash_type); ?>"><?php echo htmlspecialchars($flash); ?></div>
+<?php endif; ?>
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -109,50 +190,125 @@ include __DIR__ . '/../admin_header.php';
             <p>The form lives on the downloads page under the macOS card.</p>
         </div>
     <?php else: ?>
-        <div class="table-responsive">
-            <table data-paginate="25">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Platform</th>
-                        <th>Source</th>
-                        <th>Signed up</th>
-                        <th>Notified</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($rows as $r): ?>
+        <form method="POST" action="index.php" id="waitlistSendForm">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+            <input type="hidden" name="action" value="send_email">
+
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($r['email']); ?></td>
-                            <td><?php echo htmlspecialchars($r['platform']); ?></td>
-                            <td>
-                                <?php if ($r['source_name'] !== null): ?>
-                                    <?php echo htmlspecialchars($r['source_name']); ?>
-                                <?php elseif ($r['source_code'] !== null): ?>
-                                    <code><?php echo htmlspecialchars($r['source_code']); ?></code>
-                                <?php else: ?>
-                                    Direct
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo htmlspecialchars(date('M j, Y', strtotime($r['created_at']))); ?></td>
-                            <td><?php echo $r['notified_at'] !== null ? htmlspecialchars(date('M j, Y', strtotime($r['notified_at']))) : '—'; ?></td>
-                            <td class="action-buttons">
-                                <form method="POST" action="index.php" style="display:inline;"
-                                      onsubmit="return confirm('Remove <?php echo htmlspecialchars($r['email'], ENT_QUOTES); ?> from the waitlist?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?php echo (int)$r['id']; ?>">
-                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                    <button type="submit" class="btn-small btn-red">Delete</button>
-                                </form>
-                            </td>
+                            <th><input type="checkbox" class="select-all" id="waitlistSelectAll"></th>
+                            <th>Email</th>
+                            <th>Platform</th>
+                            <th>Source</th>
+                            <th>Signed up</th>
+                            <th>Notified</th>
+                            <th>Actions</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($rows as $r): ?>
+                            <tr>
+                                <td>
+                                    <!-- Rows already notified start unchecked so a launch
+                                         send doesn't re-email them by accident. -->
+                                    <input type="checkbox" class="row-check" name="waitlist_ids[]"
+                                           value="<?php echo (int)$r['id']; ?>"
+                                           <?php echo $r['notified_at'] === null ? 'checked' : ''; ?>>
+                                </td>
+                                <td><?php echo htmlspecialchars($r['email']); ?></td>
+                                <td><?php echo htmlspecialchars($r['platform']); ?></td>
+                                <td>
+                                    <?php if ($r['source_name'] !== null): ?>
+                                        <?php echo htmlspecialchars($r['source_name']); ?>
+                                    <?php elseif ($r['source_code'] !== null): ?>
+                                        <code><?php echo htmlspecialchars($r['source_code']); ?></code>
+                                    <?php else: ?>
+                                        Direct
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo htmlspecialchars(date('M j, Y', strtotime($r['created_at']))); ?></td>
+                                <td><?php echo $r['notified_at'] !== null ? htmlspecialchars(date('M j, Y', strtotime($r['notified_at']))) : '—'; ?></td>
+                                <td class="action-buttons">
+                                    <button type="button" class="btn-small btn-red waitlist-delete-btn"
+                                            data-id="<?php echo (int)$r['id']; ?>"
+                                            data-email="<?php echo htmlspecialchars($r['email'], ENT_QUOTES); ?>">Delete</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 style="margin-top:28px;">Email selected</h2>
+            <p class="subtext" style="margin-top:0;">
+                The body accepts HTML and is wrapped in the standard Argo email template, with a
+                "you asked to be notified about Argo Books for Mac" footer appended automatically.
+                Sending stamps each recipient's Notified date (first send only).
+            </p>
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" name="subject" id="subject" maxlength="300" required
+                       placeholder="Argo Books for Mac is here"
+                       style="width:100%; padding:10px 12px; border:1px solid var(--gray-input-border); border-radius:6px; font-size:14px;">
+            </div>
+            <div class="form-group">
+                <label for="html_body">Body (HTML) *</label>
+                <textarea name="html_body" id="html_body" rows="8" required
+                          placeholder="<p>Hi,</p>&#10;<p>Argo Books for Mac is now available to download&hellip;</p>"
+                          style="width:100%; padding:10px 12px; border:1px solid var(--gray-input-border); border-radius:6px; font-size:14px; font-family:inherit;"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-blue">Send to selected</button>
+            </div>
+        </form>
+
+        <form method="POST" action="index.php" id="waitlistDeleteForm" style="display:none;">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" id="waitlistDeleteId" value="">
+        </form>
     <?php endif; ?>
 </div>
+
+<script>
+    // Select-all toggles every row checkbox.
+    const selectAll = document.getElementById('waitlistSelectAll');
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            document.querySelectorAll('.row-check').forEach(function (cb) {
+                cb.checked = selectAll.checked;
+            });
+        });
+    }
+
+    // Delete buttons live inside the send form, so they post through a separate
+    // hidden form to avoid submitting the bulk-send by accident.
+    document.querySelectorAll('.waitlist-delete-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            if (!confirm('Remove ' + btn.dataset.email + ' from the waitlist?')) return;
+            document.getElementById('waitlistDeleteId').value = btn.dataset.id;
+            document.getElementById('waitlistDeleteForm').submit();
+        });
+    });
+
+    // Confirm before sending, with the selected count.
+    const sendForm = document.getElementById('waitlistSendForm');
+    if (sendForm) {
+        sendForm.addEventListener('submit', function (e) {
+            const checked = document.querySelectorAll('.row-check:checked').length;
+            if (checked === 0) {
+                e.preventDefault();
+                alert('No signups selected.');
+                return;
+            }
+            if (!confirm('Send this email to ' + checked + ' recipient(s)?')) {
+                e.preventDefault();
+            }
+        });
+    }
+</script>
 
 </main>
 </div>

@@ -226,10 +226,11 @@ body {
 }
 
 /* Override the full-width platform button rule: the submit shares its row
-   with the email input. flex-shrink: 0 stops the flexed email input from
-   squishing it. */
+   with the email input. The base .btn has no horizontal padding (it relies
+   on a fixed width), so with width: auto we must supply our own. */
 .platform-actions .waitlist-fields .btn {
     width: auto;
+    padding: 10px 16px;
     white-space: nowrap;
     flex-shrink: 0;
 }

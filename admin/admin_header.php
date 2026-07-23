@@ -85,6 +85,7 @@ $base_path = $in_subdir ? '../' : '';
                         'affiliates'       => 'Affiliates',
                         'outreach'         => 'Outreach',
                         'email-customers'  => 'Email customers',
+                        'mac-waitlist'     => 'Mac waitlist',
                     ],
                     'Analytics' => [
                         'app-stats'     => 'App Stats',

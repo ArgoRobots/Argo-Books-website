@@ -251,7 +251,8 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 </div>
             </div>
 
-            <!-- macOS -->
+            <!-- macOS: no build yet, so the action is a launch-notification
+                 waitlist signup (api/waitlist/subscribe.php). -->
             <div class="platform-card platform-macos">
                 <div class="platform-icon">
                     <?= svg_icon('apple') ?>
@@ -259,11 +260,25 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 <div class="platform-info">
                     <h2>macOS</h2>
                     <p class="platform-desc">For macOS 14 Sonoma and later</p>
+                    <div class="version-details">
+                        <span class="version-tag">Coming soon</span>
+                    </div>
                 </div>
                 <div class="platform-actions">
-                    <button class="btn btn-gray download-btn disabled" disabled>
-                        Coming Soon
-                    </button>
+                    <form class="waitlist-form" id="macWaitlistForm" autocomplete="off" novalidate>
+                        <div class="waitlist-fields">
+                            <input type="email" name="email" class="waitlist-email" placeholder="you@example.com"
+                                   required aria-label="Email address for the Mac release notification">
+                            <button type="submit" class="btn btn-blue waitlist-submit">Notify me</button>
+                        </div>
+                        <!-- Honeypot: hidden from real users, bots autofill it -->
+                        <input type="text" name="website" class="waitlist-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <p class="waitlist-note" id="macWaitlistNote">One email when the Mac version ships. Nothing else.</p>
+                    </form>
+                    <div class="waitlist-success" id="macWaitlistSuccess" hidden>
+                        <?= svg_icon('check', 16) ?>
+                        <span>You're on the list</span>
+                    </div>
                 </div>
             </div>
 
@@ -451,6 +466,64 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 }
             });
         });
+
+        // macOS waitlist signup ("notify me when the Mac version ships")
+        (function () {
+            const form = document.getElementById('macWaitlistForm');
+            const success = document.getElementById('macWaitlistSuccess');
+            const note = document.getElementById('macWaitlistNote');
+            if (!form || !success || !note) return;
+            const defaultNote = note.textContent;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const emailInput = form.querySelector('.waitlist-email');
+                const submitBtn = form.querySelector('.waitlist-submit');
+                const email = (emailInput.value || '').trim();
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    note.textContent = 'Please enter a valid email address.';
+                    note.classList.add('waitlist-note-error');
+                    emailInput.focus();
+                    return;
+                }
+                note.textContent = defaultNote;
+                note.classList.remove('waitlist-note-error');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Adding…';
+
+                fetch('../api/waitlist/subscribe.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        email: email,
+                        platform: 'macos',
+                        website: form.querySelector('.waitlist-hp').value || ''
+                    })
+                }).then(function (res) {
+                    return res.json().catch(function () { return {}; }).then(function (data) {
+                        return { ok: res.ok, data: data };
+                    });
+                }).then(function (r) {
+                    if (r.ok && r.data.success) {
+                        form.hidden = true;
+                        success.hidden = false;
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'mac_waitlist_signup', { 'event_category': 'software' });
+                        }
+                    } else {
+                        note.textContent = (r.data && r.data.error) || 'Something went wrong. Please try again.';
+                        note.classList.add('waitlist-note-error');
+                    }
+                }).catch(function () {
+                    note.textContent = 'Something went wrong. Please try again.';
+                    note.classList.add('waitlist-note-error');
+                }).finally(function () {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Notify me';
+                });
+            });
+        })();
 
         // Linux installation instructions modal
         const installModal = document.getElementById('linuxInstallModal');

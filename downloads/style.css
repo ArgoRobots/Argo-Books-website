@@ -198,6 +198,76 @@ body {
     opacity: 0.7;
 }
 
+/* macOS launch-notification waitlist ("notify me" form) */
+.waitlist-form {
+    width: 100%;
+}
+
+.waitlist-fields {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.waitlist-email {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-input-border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: var(--white);
+    color: var(--black);
+}
+
+.waitlist-email:focus {
+    outline: none;
+    border-color: var(--blue-500);
+}
+
+/* Override the full-width platform button rule: the submit shares its row
+   with the email input. */
+.platform-actions .waitlist-fields .btn {
+    width: auto;
+    white-space: nowrap;
+}
+
+/* Honeypot: visually gone but still autofillable by bots */
+.waitlist-hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.waitlist-note {
+    margin: 8px 0 0;
+    font-size: 0.8rem;
+    color: var(--black);
+    opacity: 0.65;
+    text-align: center;
+}
+
+.waitlist-note-error {
+    color: var(--red-600);
+    opacity: 1;
+}
+
+.waitlist-success {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--green-50);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
 .btn-icon {
     width: 18px;
     height: 18px;

@@ -226,10 +226,12 @@ body {
 }
 
 /* Override the full-width platform button rule: the submit shares its row
-   with the email input. */
+   with the email input. flex-shrink: 0 stops the flexed email input from
+   squishing it. */
 .platform-actions .waitlist-fields .btn {
     width: auto;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Honeypot: visually gone but still autofillable by bots */
@@ -266,6 +268,12 @@ body {
     background: var(--green-50);
     color: var(--green-700);
     font-weight: 600;
+}
+
+/* display: flex above would override the hidden attribute's UA default, so
+   restate it: hidden must always win. */
+.waitlist-success[hidden] {
+    display: none;
 }
 
 .btn-icon {

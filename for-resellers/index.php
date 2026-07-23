@@ -128,6 +128,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -151,7 +152,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <h1 class="animate-fade-in">Accounting software for resellers</h1>
             <p class="hero-subtitle animate-fade-in">Track what every item cost you, where it sold, and what the margin actually was. Sourcing receipts, inventory, and the tax-time picture, all in one app.</p>
             <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -162,6 +163,12 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
+
+    <!-- SmartScreen walkthrough, revealed by lp-direct-download.php after a
+         Windows direct-download click. -->
+    <div class="container">
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+    </div>
 
     <section class="made-for-intro">
         <div class="container">
@@ -250,7 +257,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <span class="section-label">An Honest Take</span>
                 <h2>What Argo Books isn't</h2>
                 <p class="section-desc">Argo Books does not connect directly to eBay, Amazon, Etsy, or Mercari. It does not pull your marketplace sales in automatically, it does not print shipping labels, and it does not sync inventory across channels. If you sell at high volume and need that automation, tools like A2X, Link My Books, or QuickBooks Commerce are built for it. For solo and side-hustle resellers who can spend ten minutes a week logging sales by hand or importing a marketplace CSV, Argo Books gives you the cost-of-goods, margin, and tax-prep picture without the integration costs. Free desktop app, no monthly fee creeping up, your data stays on your computer.</p>
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary honest-take-cta">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -406,7 +413,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <h2>Ready to know your margin in real time?</h2>
                     <p>Download Argo Books for free. Add your first item to inventory, scan a sourcing receipt, and log a sale in under ten minutes.</p>
                     <div class="cta-buttons">
-                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
@@ -446,6 +453,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             });
         });
     </script>
+<?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>
 </body>
 
 </html>

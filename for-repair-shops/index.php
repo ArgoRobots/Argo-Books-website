@@ -128,6 +128,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -151,7 +152,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <h1 class="animate-fade-in">Accounting software for repair shops</h1>
             <p class="hero-subtitle animate-fade-in">Built for the way you actually bill: the diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.</p>
             <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -162,6 +163,12 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
+
+    <!-- SmartScreen walkthrough, revealed by lp-direct-download.php after a
+         Windows direct-download click. -->
+    <div class="container">
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+    </div>
 
     <section class="made-for-intro">
         <div class="container">
@@ -250,7 +257,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <span class="section-label">An Honest Take</span>
                 <h2>What Argo Books isn't</h2>
                 <p class="section-desc">Argo Books is bookkeeping software, not shop management software. It does not run a work-order queue, send pickup-ready texts to customers, or look up labor times from a VIN. If you need Shopmonkey, Tekmetric, or RepairShopr for the front-of-shop workflow, run them side by side: those for the queue, Argo Books for your books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary honest-take-cta">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -406,7 +413,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <h2>Ready to close out the books like you close out a repair?</h2>
                     <p>Download Argo Books for free. Set up your first customer, scan a parts receipt, and send a repair invoice in under ten minutes.</p>
                     <div class="cta-buttons">
-                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
@@ -446,6 +453,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             });
         });
     </script>
+<?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>
 </body>
 
 </html>

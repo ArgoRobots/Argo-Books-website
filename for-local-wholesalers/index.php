@@ -128,6 +128,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -151,7 +152,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <h1 class="animate-fade-in">Accounting software for local wholesalers</h1>
             <p class="hero-subtitle animate-fade-in">Built for net-30 invoicing, standing orders, and the inventory that has to be on the truck Tuesday morning. Inventory management is included, not an upsell.</p>
             <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -162,6 +163,12 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
+
+    <!-- SmartScreen walkthrough, revealed by lp-direct-download.php after a
+         Windows direct-download click. -->
+    <div class="container">
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+    </div>
 
     <section class="made-for-intro">
         <div class="container">
@@ -250,7 +257,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <span class="section-label">An Honest Take</span>
                 <h2>What Argo Books isn't</h2>
                 <p class="section-desc">Argo Books handles inventory, customer accounts, net-30 invoicing, and standing orders for local-scale wholesale. It is not a warehouse management system, it does not do Electronic Data Interchange with national retail chains, and it does not optimize delivery routes. If you sell into Walmart, Loblaws, or Sysco-scale customers, NetSuite, Cin7, or Unleashed are built for that and Argo Books is not the right fit. It also doesn't do payroll yet. For local distributors with dozens of small accounts, Argo Books is the right size. Free desktop app, inventory built in, books stay simple.</p>
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary honest-take-cta">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -406,7 +413,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <h2>Ready to know what's in stock and who owes you what?</h2>
                     <p>Download Argo Books for free. Add your first SKU, set a reorder point, and send a net-30 invoice in under ten minutes.</p>
                     <div class="cta-buttons">
-                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
@@ -446,6 +453,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             });
         });
     </script>
+<?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>
 </body>
 
 </html>

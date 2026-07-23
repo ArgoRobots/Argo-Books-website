@@ -154,6 +154,17 @@ function serveFile(array $installer): void
 $requestedVersion  = $_GET['version']  ?? null;
 $requestedPlatform = $_GET['platform'] ?? null;
 
+// Optional ?source= from direct-download links on the paid landing pages
+// (e.g. /download/avalonia/win?source=paid-lp-contractors). First-touch only,
+// same rule as track_referral_visit() in statistics.php: an existing session
+// source (set on the original landing) always wins, this is just the fallback
+// for visitors whose session was lost between landing and download.
+if (!isset($_SESSION['referral_source'])
+    && !empty($_GET['source'])
+    && preg_match('/^[a-zA-Z0-9_-]{1,50}$/', $_GET['source'])) {
+    $_SESSION['referral_source'] = $_GET['source'];
+}
+
 // Platform is required
 if (!$requestedPlatform || !isset($platformPatterns[$requestedPlatform])) {
     http_response_code(400);

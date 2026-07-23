@@ -128,6 +128,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -151,7 +152,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <h1 class="animate-fade-in">Accounting software for rental businesses</h1>
             <p class="hero-subtitle animate-fade-in">Built around what you rent, who has it, when it's coming back, and what they owe. Rental management is included, not an add-on.</p>
             <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -162,6 +163,12 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
+
+    <!-- SmartScreen walkthrough, revealed by lp-direct-download.php after a
+         Windows direct-download click. -->
+    <div class="container">
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+    </div>
 
     <section class="made-for-intro">
         <div class="container">
@@ -250,7 +257,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <span class="section-label">An Honest Take</span>
                 <h2>What Argo Books isn't</h2>
                 <p class="section-desc">Argo Books has rental management for the operating and bookkeeping side, but it is not an online booking platform. It does not run a reservation calendar on your website, send automated pickup-and-return SMS reminders, or handle customer-facing self-service rentals. If those are critical, Booqable, Rentle, or EZRentOut handle the booking, and Argo Books handles the books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the rental tracking is built in, and your data stays on your computer.</p>
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary honest-take-cta">
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -410,7 +417,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <h2>Ready to track your fleet and your books in one place?</h2>
                     <p>Download Argo Books for free. Add your first rental item, check it out to a customer, and build the closing invoice in under ten minutes.</p>
                     <div class="cta-buttons">
-                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
@@ -450,6 +457,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             });
         });
     </script>
+<?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>
 </body>
 
 </html>

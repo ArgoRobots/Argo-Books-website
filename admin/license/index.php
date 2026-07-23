@@ -44,7 +44,14 @@ function get_premium_subscriptions($search_filter = '')
                       AND p.amount > 0
                     ORDER BY p.created_at DESC
                     LIMIT 1
-                ) AS last_paid_amount
+                ) AS last_paid_amount,
+                (
+                    SELECT COALESCE(SUM(p.amount), 0)
+                    FROM premium_subscription_payments p
+                    WHERE p.subscription_id = s.subscription_id
+                      AND p.status = 'completed'
+                      AND p.payment_type != 'credit'
+                ) AS total_spent
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE s.payment_method != 'free_key'
@@ -618,6 +625,7 @@ include __DIR__ . '/../admin_header.php';
                                     <th>End Date</th>
                                     <th>Receipt Scans</th>
                                     <th>AI Imports</th>
+                                    <th>Total Spent</th>
                                     <th>Credit</th>
                                 </tr>
                             </thead>
@@ -664,6 +672,7 @@ include __DIR__ . '/../admin_header.php';
                                         ?>
                                         <td><span class="usage-count <?php echo $scans >= $receipt_limit ? 'usage-maxed' : ''; ?>"><?php echo $scans; ?> / <?php echo $receipt_limit; ?></span></td>
                                         <td><span class="usage-count <?php echo $imports >= $ai_import_limit ? 'usage-maxed' : ''; ?>"><?php echo $imports; ?> / <?php echo $ai_import_limit; ?></span></td>
+                                        <td>$<?php echo number_format((float) ($sub['total_spent'] ?? 0), 2); ?></td>
                                         <td>$<?php echo number_format($sub['credit_balance'] ?? 0, 2); ?></td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -64,18 +64,9 @@
 <div class="footer-bottom">
   <p>&copy; 2026 Argo Books. All Rights Reserved.</p>
 </div>
-<script>
-// Confirms this page view as coming from a real browser (see
-// api/referral/confirm.php). Bots that never run JS stay unconfirmed and are
-// excluded from the marketing funnel. Fire-and-forget; never blocks the page.
-(function () {
-  try {
-    var url = '<?= $base ?? "/" ?>api/referral/confirm.php';
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(url, new Blob(['{}'], { type: 'application/json' }));
-    } else {
-      fetch(url, { method: 'POST', body: '{}', keepalive: true, credentials: 'same-origin' }).catch(function () {});
-    }
-  } catch (e) { /* analytics must never break the page */ }
-})();
-</script>
+<?php
+// JS-confirmation beacon (bot filter for the marketing funnel); shared with
+// shared/layout.php via the single partial.
+$confirm_url_js = json_encode(($base ?? '/') . 'api/referral/confirm.php');
+include __DIR__ . '/../referral-confirm-beacon.php';
+?>

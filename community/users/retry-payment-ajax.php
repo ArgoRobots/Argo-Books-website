@@ -342,24 +342,18 @@ try {
                 }
             }
 
-            // Fire premium_paid event for the retry payment
-            try {
-                $attr = find_visitor_for_subscription($subscription_id);
-                track_referral_event('premium_paid', [
-                    'visitor_id'      => $attr['visitor_id'] ?? ($_COOKIE[ARGO_VISITOR_COOKIE] ?? null),
-                    'source_code'     => $attr['source_code'],
-                    'subscription_id' => $subscription_id,
-                    'user_id'         => $attr['user_id'] ?? ($_SESSION['user_id'] ?? null),
-                    'event_data'      => [
-                        'amount'         => $amount,
-                        'currency'       => 'CAD',
-                        'payment_type'   => 'retry',
-                        'payment_method' => $payment_method,
-                    ],
-                ]);
-            } catch (Exception $e) {
-                error_log('Retry premium_paid event failed: ' . $e->getMessage());
-            }
+            // Fire premium_paid event for the retry payment. Runs in a real
+            // browser session, so keep the bot filter (allow_bot false) and fall
+            // back to the live cookie/session when signup attribution is missing.
+            track_subscription_event('premium_paid', $subscription_id, [
+                'amount'         => $amount,
+                'currency'       => 'CAD',
+                'payment_type'   => 'retry',
+                'payment_method' => $payment_method,
+            ], [
+                'visitor_id' => $_COOKIE[ARGO_VISITOR_COOKIE] ?? null,
+                'user_id'    => $_SESSION['user_id'] ?? null,
+            ], ['allow_bot' => false]);
 
             // Send reactivation email with end date (current end date for
             // PayPal; newly-extended date for Stripe/Square).

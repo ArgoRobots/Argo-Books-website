@@ -61,6 +61,26 @@ function get_or_set_visitor_id(): string
 }
 
 /**
+ * 8-char HMAC token tying an installer download to a visitor_id.
+ *
+ * The ONLY place this recipe may live. get_avalonia_installer.php embeds the
+ * token in the served installer filename; api/track-app-event.php recomputes
+ * it per candidate visitor to resolve the install back to the original click.
+ * Any change here (length, algorithm, casing) must ship to both sides at once,
+ * which is exactly why they share this function.
+ *
+ * Returns '' when REFERRAL_TOKEN_SECRET is not configured.
+ */
+function referral_install_token(string $visitor_id): string
+{
+    $secret = $_ENV['REFERRAL_TOKEN_SECRET'] ?? '';
+    if ($secret === '') {
+        return '';
+    }
+    return substr(hash_hmac('sha256', $visitor_id, $secret), 0, 8);
+}
+
+/**
  * Look up country + region + city for an IP, reusing prior lookups when
  * possible so we don't burn ipinfo.io quota for an IP we've already resolved.
  *
@@ -308,6 +328,49 @@ function get_referral_source_for_visitor(string $visitor_id): ?string
     } catch (PDOException $e) {
         error_log('get_referral_source_for_visitor failed: ' . $e->getMessage());
         return null;
+    }
+}
+
+/**
+ * Fire a subscription-keyed funnel event (premium_paid / premium_churned) from
+ * a webhook, cron, or portal handler.
+ *
+ * Wraps the resolve-attribution + track + log dance those call sites used to
+ * copy-paste. Attribution (visitor_id / source_code / user_id) is resolved
+ * from the subscription's premium_signup event; $fallbacks fills any field
+ * that resolves to null (browser contexts pass their cookie/session values so
+ * a missing signup event still attributes).
+ *
+ * Never throws: funnel logging must not break payment processing. Failures go
+ * to error_log unless $opts['log'] provides a callable (crons pass their own
+ * logger so failures land in the cron log).
+ *
+ * $opts:
+ *   - allow_bot (bool, default true): crons and webhooks have no browser UA,
+ *     so the bot/IP filters must be bypassed. Browser contexts (portal cancel,
+ *     payment retry) pass false to keep them.
+ *   - log (callable(string):void): custom failure logger.
+ */
+function track_subscription_event(string $event_type, string $subscription_id, array $event_data, array $fallbacks = [], array $opts = []): bool
+{
+    try {
+        $attr = find_visitor_for_subscription($subscription_id);
+        return track_referral_event($event_type, [
+            'visitor_id'      => $attr['visitor_id'] ?? ($fallbacks['visitor_id'] ?? null),
+            'source_code'     => $attr['source_code'] ?? ($fallbacks['source_code'] ?? null),
+            'subscription_id' => $subscription_id,
+            'user_id'         => $attr['user_id'] ?? ($fallbacks['user_id'] ?? null),
+            'event_data'      => $event_data,
+            'allow_bot'       => $opts['allow_bot'] ?? true,
+        ]);
+    } catch (Throwable $e) {
+        $msg = "$event_type funnel event failed for $subscription_id: " . $e->getMessage();
+        if (isset($opts['log']) && is_callable($opts['log'])) {
+            ($opts['log'])($msg);
+        } else {
+            error_log($msg);
+        }
+        return false;
     }
 }
 

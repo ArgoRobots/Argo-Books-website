@@ -18,6 +18,11 @@
  * functions) so they run on any MySQL 8 / MariaDB 10 build.
  */
 
+// Shared host -> source map; the AI / social host lists for channel
+// classification are derived from it so new entries there update both source
+// attribution and the channel donut together.
+require_once __DIR__ . '/../../referral_sources.php';
+
 /**
  * SQL fragment that extracts the bare host from the referer URL stored in
  * event_data.$.referer: strips scheme, path, query, port and a leading "www.".
@@ -121,10 +126,10 @@ function funnel_classify_channel(?string $host, ?string $source_code): string
         return 'Newsletter';
     }
 
+    [$ai, $social] = funnel_channel_host_lists();
+
     // AI assistants first so gemini.google.com / copilot.microsoft.com don't
     // fall through to the search or referral buckets.
-    $ai = ['chatgpt.com', 'chat.openai.com', 'openai.com', 'claude.ai', 'perplexity.ai',
-           'gemini.google.com', 'copilot.microsoft.com', 'you.com', 'phind.com', 'poe.com', 'meta.ai'];
     if (funnel_host_matches($host, $ai)) {
         return 'AI';
     }
@@ -139,15 +144,45 @@ function funnel_classify_channel(?string $host, ?string $source_code): string
         return 'Organic search';
     }
 
-    $social = ['reddit.com', 'x.com', 'twitter.com', 't.co', 'linkedin.com', 'lnkd.in',
-               'facebook.com', 'instagram.com', 'youtube.com', 'youtu.be', 'tiktok.com',
-               'news.ycombinator.com', 'pinterest.com', 'mastodon.social', 'threads.net',
-               'producthunt.com'];
     if (funnel_host_matches($host, $social)) {
         return 'Organic social';
     }
 
     return 'Referral';
+}
+
+/**
+ * AI + social host lists for channel classification, derived from the shared
+ * get_auto_referral_sources() map (ai-* / social-* code prefixes) so a channel
+ * added there is classified correctly here without a second edit.
+ *
+ * Deliberate deviations from the map:
+ *   - duckduckgo.com is excluded from AI: the map files it under ai-duckduckgo
+ *     for source attribution, but as a referer it's classified Organic search.
+ *   - Extra hosts that appear as referers but aren't in the map (no utm/ref
+ *     traffic expected from them) are appended per list.
+ *
+ * @return array{0: list<string>, 1: list<string>} [ai_hosts, social_hosts]
+ */
+function funnel_channel_host_lists(): array
+{
+    static $lists = null;
+    if ($lists !== null) {
+        return $lists;
+    }
+    $ai = ['openai.com'];
+    $social = ['pinterest.com', 'mastodon.social', 'threads.net'];
+    foreach (get_auto_referral_sources() as $host => $m) {
+        if ($host === 'duckduckgo.com') {
+            continue; // stays Organic search as a referer (see docblock)
+        }
+        if (strncmp($m['code'], 'ai-', 3) === 0) {
+            $ai[] = $host;
+        } elseif (strncmp($m['code'], 'social-', 7) === 0) {
+            $social[] = $host;
+        }
+    }
+    return $lists = [$ai, $social];
 }
 
 /**

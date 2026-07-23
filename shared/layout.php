@@ -134,19 +134,12 @@ $site_schema = [
 })();
 </script>
 <?php endif; ?>
-<script>
-// Confirms this page view as a real browser for the referral funnel (see
-// api/referral/confirm.php); bots that never run JS stay unconfirmed.
-(function () {
-  try {
-    var url = (window.INVGEN_BASE || '') + '/api/referral/confirm.php';
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(url, new Blob(['{}'], { type: 'application/json' }));
-    } else {
-      fetch(url, { method: 'POST', body: '{}', keepalive: true, credentials: 'same-origin' }).catch(function () {});
-    }
-  } catch (e) { /* analytics must never break the page */ }
-})();
-</script>
+<?php
+// JS-confirmation beacon (bot filter for the marketing funnel); shared with
+// resources/footer/footer.php via the single partial. URL is a JS expression
+// because the base path here is only known client-side (window.INVGEN_BASE).
+$confirm_url_js = "(window.INVGEN_BASE || '') + '/api/referral/confirm.php'";
+include __DIR__ . '/../resources/referral-confirm-beacon.php';
+?>
 </body>
 </html>

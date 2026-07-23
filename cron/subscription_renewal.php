@@ -172,25 +172,13 @@ foreach ($subscriptions as $subscription) {
             $creditTransactionId = 'CREDIT_RENEWAL_' . strtoupper(bin2hex(random_bytes(8)));
             $stmt->execute([$subscriptionId, $paymentMethod, $creditTransactionId, current_environment()]);
 
-            try {
-                $attr = find_visitor_for_subscription($subscriptionId);
-                track_referral_event('premium_paid', [
-                    'visitor_id'      => $attr['visitor_id'],
-                    'source_code'     => $attr['source_code'],
-                    'subscription_id' => $subscriptionId,
-                    'user_id'         => $attr['user_id'],
-                    'event_data'      => [
-                        'amount'         => 0,
-                        'currency'       => 'CAD',
-                        'payment_type'   => 'credit',
-                        'payment_method' => $paymentMethod,
-                        'transaction_id' => $creditTransactionId,
-                    ],
-                    'allow_bot' => true,
-                ]);
-            } catch (Exception $e) {
-                logMessage('Credit-renewal premium_paid event failed: ' . $e->getMessage(), 'WARNING');
-            }
+            track_subscription_event('premium_paid', $subscriptionId, [
+                'amount'         => 0,
+                'currency'       => 'CAD',
+                'payment_type'   => 'credit',
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $creditTransactionId,
+            ], [], ['log' => fn($m) => logMessage($m, 'WARNING')]);
 
             // DO NOT send receipt email for $0 credit-based renewals
             logMessage("Successfully renewed $subscriptionId using credit - new end date: $newEndDate, remaining credit: $$newCreditBalance");
@@ -307,25 +295,13 @@ foreach ($subscriptions as $subscription) {
                 );
             }
 
-            try {
-                $attr = find_visitor_for_subscription($subscriptionId);
-                track_referral_event('premium_paid', [
-                    'visitor_id'      => $attr['visitor_id'],
-                    'source_code'     => $attr['source_code'],
-                    'subscription_id' => $subscriptionId,
-                    'user_id'         => $attr['user_id'],
-                    'event_data'      => [
-                        'amount'         => $amountToCharge,
-                        'currency'       => 'CAD',
-                        'payment_type'   => 'renewal',
-                        'payment_method' => $paymentMethod,
-                        'transaction_id' => $transactionId,
-                    ],
-                    'allow_bot' => true,
-                ]);
-            } catch (Exception $e) {
-                logMessage('Renewal premium_paid event failed: ' . $e->getMessage(), 'WARNING');
-            }
+            track_subscription_event('premium_paid', $subscriptionId, [
+                'amount'         => $amountToCharge,
+                'currency'       => 'CAD',
+                'payment_type'   => 'renewal',
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+            ], [], ['log' => fn($m) => logMessage($m, 'WARNING')]);
 
             $creditMessage = $creditUsed > 0 ? " ($$creditUsed credit applied)" : "";
             logMessage("Successfully renewed $subscriptionId - new end date: $newEndDate, charged: $$amountToCharge$creditMessage");
@@ -362,23 +338,11 @@ foreach ($subscriptions as $subscription) {
             $stmt->execute([$subscriptionId]);
             logMessage("Subscription $subscriptionId suspended after $failureCount failures", 'WARNING');
 
-            try {
-                $attr = find_visitor_for_subscription($subscriptionId);
-                track_referral_event('premium_churned', [
-                    'visitor_id'      => $attr['visitor_id'],
-                    'source_code'     => $attr['source_code'],
-                    'subscription_id' => $subscriptionId,
-                    'user_id'         => $attr['user_id'],
-                    'event_data'      => [
-                        'reason'         => 'payment_failed',
-                        'failure_count'  => $failureCount,
-                        'payment_method' => $paymentMethod,
-                    ],
-                    'allow_bot' => true,
-                ]);
-            } catch (Exception $ee) {
-                logMessage('Churn (3-strike) premium_churned event failed: ' . $ee->getMessage(), 'WARNING');
-            }
+            track_subscription_event('premium_churned', $subscriptionId, [
+                'reason'         => 'payment_failed',
+                'failure_count'  => $failureCount,
+                'payment_method' => $paymentMethod,
+            ], [], ['log' => fn($m) => logMessage($m, 'WARNING')]);
         }
 
         $failedCount++;
@@ -410,19 +374,9 @@ try {
     $expiredCount = $stmt->rowCount();
 
     foreach ($expiringIds as $expiredSubId) {
-        try {
-            $attr = find_visitor_for_subscription($expiredSubId);
-            track_referral_event('premium_churned', [
-                'visitor_id'      => $attr['visitor_id'],
-                'source_code'     => $attr['source_code'],
-                'subscription_id' => $expiredSubId,
-                'user_id'         => $attr['user_id'],
-                'event_data'      => ['reason' => 'auto_expired', 'source' => 'renewal_cron'],
-                'allow_bot'       => true,
-            ]);
-        } catch (Exception $ee) {
-            logMessage('Auto-expire premium_churned event failed: ' . $ee->getMessage(), 'WARNING');
-        }
+        track_subscription_event('premium_churned', $expiredSubId,
+            ['reason' => 'auto_expired', 'source' => 'renewal_cron'],
+            [], ['log' => fn($m) => logMessage($m, 'WARNING')]);
     }
 
     if ($expiredCount > 0) {

@@ -222,6 +222,43 @@ function get_active_referral_links(): array
 }
 
 /**
+ * SQL fragment: TRUE when a referral_events row's visitor also has a
+ * JS-confirmed page view. Used to bot-filter download_click, which is a
+ * server-side file-request event with no JS beacon, so js_confirmed can't
+ * filter it directly. The check is deliberately not period-scoped: a real
+ * user's landing may predate the selected period. Bots fetching the installer
+ * URL directly mint a fresh cookieless visitor_id per request and never
+ * produce a confirmed page view, so this drops them.
+ *
+ * $alias is how the outer query refers to referral_events (table name or alias).
+ * Shared by the all-traffic funnel and the per-source table so the bot rule
+ * can never drift between the two.
+ */
+function funnel_confirmed_visitor_sql(string $alias): string
+{
+    return "EXISTS (
+        SELECT 1 FROM referral_events pv
+         WHERE pv.visitor_id = {$alias}.visitor_id
+           AND pv.event_type IN ('landing', 'downloads_page')
+           AND pv.js_confirmed = 1
+           AND pv.environment = {$alias}.environment)";
+}
+
+/**
+ * SQL fragment: dedupe key for app_first_run rows. Rows can have
+ * visitor_id = NULL (install token missing or outside the 14-day attribution
+ * window); COUNT(DISTINCT visitor_id) would silently drop those real installs,
+ * so fall back to the per-machine UUID the desktop reporter stamps into
+ * event_data, then the row id.
+ */
+function funnel_first_run_key_sql(): string
+{
+    return "COALESCE(visitor_id,
+        JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')),
+        CONCAT('row-', id))";
+}
+
+/**
  * Returns the start datetime for the active period filter. Periods:
  *   '30d' (default) | '90d' | 'all'
  */
@@ -241,6 +278,13 @@ function funnel_period_start(string $period): ?string
  * Top-of-funnel stages (landing through premium_signup) count distinct
  * visitors so a user firing the same event twice doesn't double-count.
  *
+ * download_click only counts visitors who also have a JS-confirmed page view,
+ * since bots that fetch the installer URL directly bypass the js_confirmed
+ * filter (see the inline comment on $confirmed_visitor_exists).
+ *
+ * app_first_run counts unattributed installs too (visitor_id NULL) by falling
+ * back to the machine_uuid recorded in event_data.
+ *
  * premium_paid and premium_churned count distinct subscription_id instead:
  * they're subscription-keyed events that can fire for visitors we never
  * resolved (webhook context), and premium_paid is restricted to the initial
@@ -254,6 +298,9 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
     // downloads_page); non-page-view stages are inserted already-confirmed.
     $where_clauses = ['environment = ?', 'js_confirmed = 1'];
     $params = [current_environment()];
+
+    $confirmed_visitor_exists = funnel_confirmed_visitor_sql('referral_events');
+    $first_run_key = funnel_first_run_key_sql();
 
     if ($period_start !== null) {
         $where_clauses[] = 'created_at >= ?';
@@ -269,8 +316,10 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
         SELECT
           COUNT(DISTINCT CASE WHEN event_type='landing'        THEN visitor_id END) AS landing,
           COUNT(DISTINCT CASE WHEN event_type='downloads_page' THEN visitor_id END) AS downloads_page,
-          COUNT(DISTINCT CASE WHEN event_type='download_click' THEN visitor_id END) AS download_click,
-          COUNT(DISTINCT CASE WHEN event_type='app_first_run'  THEN visitor_id END) AS app_first_run,
+          COUNT(DISTINCT CASE WHEN event_type='download_click'
+                               AND $confirmed_visitor_exists
+                              THEN visitor_id END) AS download_click,
+          COUNT(DISTINCT CASE WHEN event_type='app_first_run' THEN $first_run_key END) AS app_first_run,
           COUNT(DISTINCT CASE WHEN event_type='premium_signup' THEN visitor_id END) AS premium_signup,
           COUNT(DISTINCT CASE WHEN event_type='premium_paid'
                                 AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.payment_type')) = 'initial'
@@ -301,6 +350,11 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
 function get_funnel_per_source(?string $period_start, string $environment): array
 {
     global $pdo;
+
+    // Same bot-filter + first-run dedupe rules as get_funnel_stage_counts(),
+    // via the shared fragment helpers ('re' is this query's table alias).
+    $confirmed_click = funnel_confirmed_visitor_sql('re');
+    $first_run_key   = funnel_first_run_key_sql();
 
     $params = [$environment];
     $event_period_clause = '';
@@ -344,8 +398,11 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
               source_code,
               COUNT(DISTINCT CASE WHEN event_type='landing'        THEN visitor_id END) AS landings,
               COUNT(DISTINCT CASE WHEN event_type='downloads_page' THEN visitor_id END) AS dl_pages,
-              COUNT(DISTINCT CASE WHEN event_type='download_click' THEN visitor_id END) AS dl_clicks,
-              COUNT(DISTINCT CASE WHEN event_type='app_first_run'  THEN visitor_id END) AS first_runs,
+              COUNT(DISTINCT CASE WHEN event_type='download_click'
+                                   AND {$confirmed_click}
+                                  THEN visitor_id END) AS dl_clicks,
+              COUNT(DISTINCT CASE WHEN event_type='app_first_run'
+                                  THEN {$first_run_key} END) AS first_runs,
               COUNT(DISTINCT CASE WHEN event_type='premium_signup' THEN visitor_id END) AS signups,
               COUNT(DISTINCT CASE WHEN event_type='premium_paid'
                                    AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.payment_type')) = 'initial'
@@ -574,112 +631,71 @@ function get_campaign_spend_rows(): array
  * environment-scoped. statistics.track_event() also dedupes by IP per day,
  * which means counts are unique-visitor-per-day rather than raw events.
  */
-function get_tool_sessions_per_day(?string $period_start): array
+
+/**
+ * Run one tool-metric query with the optional period filter spliced in.
+ * $sql must contain a {PERIOD} placeholder inside its WHERE clause; it becomes
+ * " AND created_at >= ?" when a period is set and '' for all-time.
+ */
+function tool_stat_rows(string $sql, ?string $period_start): array
 {
     global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_%'
-                AND created_at >= ?
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_%'
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-    }
+    $sql = str_replace('{PERIOD}', $period_start !== null ? ' AND created_at >= ?' : '', $sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($period_start !== null ? [$period_start] : []);
     return $stmt->fetchAll();
+}
+
+function get_tool_sessions_per_day(?string $period_start): array
+{
+    return tool_stat_rows(
+        "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_%'{PERIOD}
+       GROUP BY day
+       ORDER BY day ASC",
+        $period_start
+    );
 }
 
 function get_tool_downloads_per_day(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT DATE(created_at) AS day,
-                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
-                    SUM(event_type = 'invgen_docx_downloaded') AS docx
-               FROM statistics
-              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
-                AND created_at >= ?
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT DATE(created_at) AS day,
-                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
-                    SUM(event_type = 'invgen_docx_downloaded') AS docx
-               FROM statistics
-              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT DATE(created_at) AS day,
+                SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
+                SUM(event_type = 'invgen_docx_downloaded') AS docx
+           FROM statistics
+          WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded'){PERIOD}
+       GROUP BY day
+       ORDER BY day ASC",
+        $period_start
+    );
 }
 
 function get_cta_ctr_by_placement(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS placement, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_cta_clicked'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS placement, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_cta_clicked'
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS placement, COUNT(*) AS clicks
+           FROM statistics
+          WHERE event_type = 'invgen_cta_clicked'{PERIOD}
+       GROUP BY event_data
+       ORDER BY clicks DESC",
+        $period_start
+    );
 }
 
 function get_niche_traffic(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_niche\\_%'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_niche\\_%'
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_niche\\_%'{PERIOD}
+       GROUP BY event_data
+       ORDER BY views DESC",
+        $period_start
+    );
 }
 
 /**
@@ -693,79 +709,39 @@ function get_niche_traffic(?string $period_start): array
  */
 function get_template_page_views(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_template\\_%'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_template\\_%'
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_template\\_%'{PERIOD}
+       GROUP BY event_data
+       ORDER BY views DESC",
+        $period_start
+    );
 }
 
 function get_template_cta_clicks(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS style_format, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_template_cta_clicked'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS style_format, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_template_cta_clicked'
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS style_format, COUNT(*) AS clicks
+           FROM statistics
+          WHERE event_type = 'invgen_template_cta_clicked'{PERIOD}
+       GROUP BY event_data
+       ORDER BY clicks DESC",
+        $period_start
+    );
 }
 
 function get_template_downloads(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS style_format, COUNT(*) AS downloads
-               FROM statistics
-              WHERE event_type = 'invgen_template_download'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY downloads DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS style_format, COUNT(*) AS downloads
-               FROM statistics
-              WHERE event_type = 'invgen_template_download'
-           GROUP BY event_data
-           ORDER BY downloads DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS style_format, COUNT(*) AS downloads
+           FROM statistics
+          WHERE event_type = 'invgen_template_download'{PERIOD}
+       GROUP BY event_data
+       ORDER BY downloads DESC",
+        $period_start
+    );
 }
 
 // Resolve which tab is active. Default to funnel.

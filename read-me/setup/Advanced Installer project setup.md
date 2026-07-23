@@ -232,4 +232,4 @@ Reinstall, then inspect `%LOCALAPPDATA%\ArgoBooks\install_token_debug.txt`. Most
 ## Notes
 
 - For details on the desktop-app side of the token flow (`FirstRunReporter`, marker file, retry logic), see `ArgoBooks.Core/Services/FirstRunReporter.cs` in the Avalonia repo.
-- For the server side of how `_xxxxxxxx` tokens are generated, see [`get_avalonia_installer.php`](../../get_avalonia_installer.php) (`computeInstallerToken()`).
+- For the server side of how `_xxxxxxxx` tokens are generated, see `referral_install_token()` in [`track_referral_event.php`](../../track_referral_event.php). It is the single shared recipe: [`get_avalonia_installer.php`](../../get_avalonia_installer.php) embeds the token in the served filename and `api/track-app-event.php` verifies it on first run.

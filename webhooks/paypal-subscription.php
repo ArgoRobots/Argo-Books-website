@@ -246,19 +246,8 @@ function handleSubscriptionCancelled($resource) {
             error_log("Failed to send cancellation admin notification: " . $e->getMessage());
         }
 
-        try {
-            $attr = find_visitor_for_subscription($subscription['subscription_id']);
-            track_referral_event('premium_churned', [
-                'visitor_id'      => $attr['visitor_id'],
-                'source_code'     => $attr['source_code'],
-                'subscription_id' => $subscription['subscription_id'],
-                'user_id'         => $attr['user_id'],
-                'event_data'      => ['reason' => 'cancelled', 'source' => 'paypal_webhook'],
-                'allow_bot'       => true,
-            ]);
-        } catch (Exception $e) {
-            error_log('PayPal premium_churned (cancel) event failed: ' . $e->getMessage());
-        }
+        track_subscription_event('premium_churned', $subscription['subscription_id'],
+            ['reason' => 'cancelled', 'source' => 'paypal_webhook']);
 
         logPayPalWebhookEvent('BILLING.SUBSCRIPTION.CANCELLED', $resource, 'subscription_cancelled');
     } else {
@@ -292,19 +281,8 @@ function handleSubscriptionExpired($resource) {
     $stmt->execute([$paypalSubscriptionId]);
 
     if ($subRow !== false) {
-        try {
-            $attr = find_visitor_for_subscription($subRow['subscription_id']);
-            track_referral_event('premium_churned', [
-                'visitor_id'      => $attr['visitor_id'],
-                'source_code'     => $attr['source_code'],
-                'subscription_id' => $subRow['subscription_id'],
-                'user_id'         => $attr['user_id'],
-                'event_data'      => ['reason' => 'expired', 'source' => 'paypal_webhook'],
-                'allow_bot'       => true,
-            ]);
-        } catch (Exception $e) {
-            error_log('PayPal premium_churned (expire) event failed: ' . $e->getMessage());
-        }
+        track_subscription_event('premium_churned', $subRow['subscription_id'],
+            ['reason' => 'expired', 'source' => 'paypal_webhook']);
     }
 
     logPayPalWebhookEvent('BILLING.SUBSCRIPTION.EXPIRED', $resource, 'subscription_expired');
@@ -506,27 +484,15 @@ function handlePaymentCompleted($resource) {
         throw $e;
     }
 
-    // Fire funnel event for this payment. Webhook has no session/cookie,
-    // so resolve attribution from the original premium_signup event.
-    try {
-        $attr = find_visitor_for_subscription($subscription['subscription_id']);
-        track_referral_event('premium_paid', [
-            'visitor_id'      => $attr['visitor_id'],
-            'source_code'     => $attr['source_code'],
-            'subscription_id' => $subscription['subscription_id'],
-            'user_id'         => $attr['user_id'],
-            'event_data'      => [
-                'amount'         => $amount,
-                'currency'       => $currency,
-                'payment_type'   => $paymentType,
-                'payment_method' => 'paypal',
-                'transaction_id' => $transactionId,
-            ],
-            'allow_bot' => true,
-        ]);
-    } catch (Exception $e) {
-        error_log('PayPal premium_paid event failed: ' . $e->getMessage());
-    }
+    // Fire funnel event for this payment. Webhook has no session/cookie;
+    // track_subscription_event resolves attribution from the premium_signup event.
+    track_subscription_event('premium_paid', $subscription['subscription_id'], [
+        'amount'         => $amount,
+        'currency'       => $currency,
+        'payment_type'   => $paymentType,
+        'payment_method' => 'paypal',
+        'transaction_id' => $transactionId,
+    ]);
 
     if ($cycleSwitchFirstBill) {
         // First bill after a cycle switch: record the sale (above), but

@@ -96,18 +96,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
                 error_log("Failed to send cancellation admin notification: " . $e->getMessage());
             }
 
-            try {
-                $attr = find_visitor_for_subscription($subscription['subscription_id']);
-                track_referral_event('premium_churned', [
-                    'visitor_id'      => $attr['visitor_id'] ?? ($_COOKIE[ARGO_VISITOR_COOKIE] ?? null),
-                    'source_code'     => $attr['source_code'],
-                    'subscription_id' => $subscription['subscription_id'],
-                    'user_id'         => $attr['user_id'] ?? $user_id,
-                    'event_data'      => ['reason' => 'user_cancelled', 'source' => 'portal'],
-                ]);
-            } catch (Exception $e) {
-                error_log('Portal cancel premium_churned event failed: ' . $e->getMessage());
-            }
+            // Runs in a real browser session, so keep the bot filter (allow_bot
+            // false) and fall back to the live cookie/session user when signup
+            // attribution is missing.
+            track_subscription_event('premium_churned', $subscription['subscription_id'],
+                ['reason' => 'user_cancelled', 'source' => 'portal'],
+                [
+                    'visitor_id' => $_COOKIE[ARGO_VISITOR_COOKIE] ?? null,
+                    'user_id'    => $user_id,
+                ],
+                ['allow_bot' => false]);
         }
 
         $successMsg = 'Your Premium subscription has been cancelled. You will retain access until the end of your billing period.';

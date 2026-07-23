@@ -164,8 +164,7 @@ if ($event_type === 'signup_survey') {
 function resolve_visitor_from_token(string $token): ?string
 {
     global $pdo;
-    $secret = $_ENV['REFERRAL_TOKEN_SECRET'] ?? '';
-    if ($secret === '' || !preg_match('/^[0-9a-f]{8}$/i', $token)) {
+    if (!preg_match('/^[0-9a-f]{8}$/i', $token)) {
         return null;
     }
     // Limit the scan to recent visitors so this stays fast as the table grows.
@@ -177,8 +176,10 @@ function resolve_visitor_from_token(string $token): ?string
     $stmt->execute();
     while ($row = $stmt->fetch()) {
         $candidate = $row['visitor_id'];
-        $expected = substr(hash_hmac('sha256', $candidate, $secret), 0, 8);
-        if (hash_equals($expected, strtolower($token))) {
+        // Shared recipe with the installer-filename side; see
+        // referral_install_token() in track_referral_event.php.
+        $expected = referral_install_token($candidate);
+        if ($expected !== '' && hash_equals($expected, strtolower($token))) {
             return $candidate;
         }
     }

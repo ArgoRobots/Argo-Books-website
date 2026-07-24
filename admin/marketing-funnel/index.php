@@ -627,15 +627,22 @@ function get_campaign_spend_rows(): array
  * "what happens after install." Telemetry carries no environment or source, so
  * these counts are all-environment and all-source.
  *
+ * Scoped to the same period as the funnel via $period_start (only events on/after
+ * it count; null = all time). Note this counts ACTIVE app users in the window
+ * (new + returning), which is a different population from the "App first run"
+ * install count above, so the two intentionally won't match.
+ *
+ * @param ?string $period_start 'Y-m-d H:i:s' lower bound, or null for all time.
  * @return array{seen:int, activated:int, returned:int, activated_pct:float, returned_pct:float, has_data:bool}
  */
-function get_app_activation_stats(): array
+function get_app_activation_stats(?string $period_start = null): array
 {
     require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
     // "Activation" = the user did a real bookkeeping action (got value).
     $activationFeatures = ['InvoiceCreated', 'ReceiptScanned', 'ExpenseCreated'];
     $dirs = [__DIR__ . '/../data-logs/telemetry/', __DIR__ . '/../data-logs/'];
+    $period_ts = ($period_start !== null) ? strtotime($period_start) : null;
 
     $seenFiles = [];
     $users = [];
@@ -665,9 +672,6 @@ function get_app_activation_stats(): array
                 continue; // unattributable or the founder's own machine
             }
 
-            if (!isset($users[$authId])) {
-                $users[$authId] = ['days' => [], 'activated' => false];
-            }
             foreach ($data['events'] as $ev) {
                 if (!is_array($ev)) {
                     continue;
@@ -675,6 +679,14 @@ function get_app_activation_stats(): array
                 $ts = isset($ev['timestamp']) ? strtotime((string)$ev['timestamp']) : false;
                 if ($ts === false) {
                     continue;
+                }
+                // Scope to the funnel's period: skip events before the window.
+                // A user only counts if they have at least one in-window event.
+                if ($period_ts !== null && $ts < $period_ts) {
+                    continue;
+                }
+                if (!isset($users[$authId])) {
+                    $users[$authId] = ['days' => [], 'activated' => false];
                 }
                 $users[$authId]['days'][gmdate('Y-m-d', $ts)] = true;
                 if (($ev['dataType'] ?? '') === 'FeatureUsage'
@@ -975,8 +987,9 @@ include __DIR__ . '/../admin_header.php';
             $prev_count = $c;
         }
 
-        // Anonymous in-app activation/retention for the "App first run" info popover.
-        $app_activation = get_app_activation_stats();
+        // Anonymous in-app activation/retention for the "App first run" info
+        // popover, scoped to the same period as the funnel.
+        $app_activation = get_app_activation_stats($funnel_period_start_dt);
 
         $biggest_drop_index = null;
         $biggest_drop_pct = 101;
@@ -2079,7 +2092,7 @@ include __DIR__ . '/../admin_header.php';
             FUNNEL.forEach((s, i) => {
                 const left = ((i + 0.5) * colW) / W * 100;
                 const info = (s.key === 'app_first_run')
-                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention">After install</button>`
+                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention"></button>`
                     : '';
                 labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}${info}</span></div>`;
             });
@@ -2096,12 +2109,12 @@ include __DIR__ . '/../admin_header.php';
                 pop.hidden = true;
                 pop.innerHTML = a.has_data
                     ? (`<div class="fap-title">After install &middot; anonymous app data</div>` +
-                       `<div class="fap-row"><span>Users seen</span><b>${fmtCount(a.seen)}</b></div>` +
+                       `<div class="fap-row"><span>Active app users</span><b>${fmtCount(a.seen)}</b></div>` +
                        `<div class="fap-row"><span>Did a bookkeeping action</span><b>${fmtCount(a.activated)} &middot; ${a.activated_pct}%</b></div>` +
                        `<div class="fap-row"><span>Came back another day</span><b>${fmtCount(a.returned)} &middot; ${a.returned_pct}%</b></div>` +
-                       `<div class="fap-note">In-app usage, separate from the website counts above and not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense.</div>`)
+                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense.</div>`)
                     : (`<div class="fap-title">After install &middot; anonymous app data</div>` +
-                       `<div class="fap-note">No in-app usage data yet. Once people run the app and it uploads anonymous telemetry, this shows how many did a bookkeeping action (invoice, receipt, or expense) and how many came back another day.</div>`);
+                       `<div class="fap-note">No in-app usage data for this period yet. Once people run the app and it uploads anonymous telemetry, this shows how many did a bookkeeping action (invoice, receipt, or expense) and how many came back another day.</div>`);
                 document.body.appendChild(pop);
 
                 const closePop = () => { pop.hidden = true; };

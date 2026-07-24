@@ -639,8 +639,17 @@ function get_app_activation_stats(?string $period_start = null): array
 {
     require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
-    // "Activation" = the user did a real bookkeeping action (got value).
-    $activationFeatures = ['InvoiceCreated', 'ReceiptScanned', 'ExpenseCreated'];
+    // "Activation" = the user did a real bookkeeping action (got value from the
+    // app), as opposed to setup/scaffolding (creating a customer, supplier,
+    // product, or rentable item), cosmetic changes (theme/language), or backups.
+    // DataImported covers both bank-statement and spreadsheet imports: the app
+    // tags which kind in a field it doesn't send to the server, so they can't be
+    // told apart here, but either one counts as a real action.
+    $activationFeatures = [
+        'InvoiceCreated', 'ExpenseCreated', 'RevenueCreated', 'PaymentRecorded',
+        'ReceiptScanned', 'DataImported', 'ReportGenerated',
+        'PurchaseOrderCreated', 'StockAdjusted', 'RentalRecordCreated',
+    ];
     $dirs = [__DIR__ . '/../data-logs/telemetry/', __DIR__ . '/../data-logs/'];
     $period_ts = ($period_start !== null) ? strtotime($period_start) : null;
 
@@ -2132,7 +2141,7 @@ include __DIR__ . '/../admin_header.php';
                        `<div class="fap-row"><span>Skipped setup tutorial</span><b>${fmtCount(a.skipped)} &middot; ${a.skipped_pct}%</b></div>` +
                        `<div class="fap-row"><span>Did a bookkeeping action</span><b>${fmtCount(a.activated)} &middot; ${a.activated_pct}%</b></div>` +
                        `<div class="fap-row"><span>Came back another day</span><b>${fmtCount(a.returned)} &middot; ${a.returned_pct}%</b></div>` +
-                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense. Setup-tutorial figures need app 2.0.11+.</div>`)
+                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = a real bookkeeping action: invoice, expense, revenue, payment, receipt scan, bank/spreadsheet import, report, purchase order, stock change, or rental record. Setup-tutorial figures need app 2.0.11+.</div>`)
                     : (`<div class="fap-title">After install &middot; anonymous app data</div>` +
                        `<div class="fap-note">No in-app usage data for this period yet. Once people run the app and it uploads anonymous telemetry, this shows how many finished setup, did a bookkeeping action (invoice, receipt, or expense), and came back another day.</div>`);
                 document.body.appendChild(pop);

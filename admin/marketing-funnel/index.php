@@ -2079,7 +2079,7 @@ include __DIR__ . '/../admin_header.php';
             FUNNEL.forEach((s, i) => {
                 const left = ((i + 0.5) * colW) / W * 100;
                 const info = (s.key === 'app_first_run')
-                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention">i</button>`
+                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention">After install</button>`
                     : '';
                 labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}${info}</span></div>`;
             });

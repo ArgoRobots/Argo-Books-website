@@ -2,18 +2,18 @@
 
 A start-to-finish guide for setting up a Google Ads Search campaign for Argo Books. This is what was done for the first "QuickBooks Alternative" campaign in May 2026, written so future campaigns (targeting other competitors, other keyword themes) can follow the same recipe.
 
-**NOTE:** Some numbers, including the CPA are estimates until we get real data.
+**This doc is the setup recipe: how to build the campaign. The unit economics, the funnel math, and the actual cost numbers live in [Google Ads economics.md](../Google%20Ads%20economics.md), which is kept up to date as real data comes in. Dollar amounts in this recipe are setup defaults, not performance figures.**
 
-**Terminology note:** 
-- **CPC** = Cost Per Click (\$3 here)
-- **CPA** = Cost Per Acquisition = cost per conversion (\$75 here).
-- **CLV / LTV** = Customer Lifetime Value ($180 here).
+**Terminology note:**
+- **CPC** = Cost Per Click.
+- **CPA** = Cost Per Acquisition, the cost per conversion. The tracked Google conversion is a `/downloads/` visit, not a paying customer.
+- **CLV / LTV** = Customer Lifetime Value.
 
 ## What this campaign does
 
 Targets people in Canada searching for terms like "quickbooks alternative" and "free accounting software" on Google Search. When they click the ad, they land on the Argo Books vs QuickBooks comparison page. Their visit is tracked via `?source=google-ads-qb-alt` so attribution shows up in the admin referral dashboard. If they then visit `/downloads/`, that counts as a conversion in Google Ads.
 
-Budget: CA\$15/day (about CA$450/month). All settings can be changed after launch except budget type (daily vs. total).
+Budget: a small daily amount (start around CA$10 to CA$15/day; see [Google Ads economics.md](../Google%20Ads%20economics.md) for the current figure). All settings can be changed after launch except budget type (daily vs. total).
 
 ## Before you start
 
@@ -65,7 +65,7 @@ Search - QuickBooks Alternative - CA
 ### Step 6: Bidding
 
 - **What do you want to focus on?** → Change from "Conversions" to **Clicks**. Conversions-based smart bidding needs ~30+ conversions of data to optimize, which you don't have on day one.
-- Check **"Set a maximum cost per click bid limit"** → enter **`1.50`** CAD. This caps the worst-case spend per click. "QuickBooks alternative" keywords in Canada typically cost CA\$0.80 to \$2.00. $3 sits in the middle.
+- Check **"Set a maximum cost per click bid limit"** → enter a cap in CAD. This caps the worst-case spend per click. See [Google Ads economics.md](../Google%20Ads%20economics.md) for the current max CPC to use and what these keywords actually cost.
 - Leave **"Adjust your bidding to help acquire new customers"** unchecked.
 
 ### Step 7: Campaign settings
@@ -219,35 +219,11 @@ No Subscription
 
 ### Step 11: Budget
 
-Switch from Google's recommended budget to **Set custom budget**. Enter `$15`. Keep type as **Average daily budget**. Currency stays CAD.
+Switch from Google's recommended budget to **Set custom budget**. Enter your daily amount (see [Google Ads economics.md](../Google%20Ads%20economics.md) for the current figure). Keep type as **Average daily budget**. Currency stays CAD.
 
-At $15/day:
-- Monthly cap: about $450
-- Expected clicks at \$3 CPC: ~300/month
-- Expected `/downloads/` page visits at ~20% click-to-page rate: ~60/month
-- Expected CPA per `/downloads/` visit: ~$7.50
+Don't go under CA$10/day. Google needs minimum volume to optimize. Don't scale up before the funnel is converting; that just spends more at the same unfavorable ratio.
 
-What the math actually means:
-
-The tracked "conversion" is a visit to `/downloads/`, not a paying customer. The real funnel goes:
-
-```
-Ad click ($3)
-  → /downloads/ visit  (~20% of clicks)
-    → Download button click  (~60% of page visits)
-      → Installs + uses the app  (~50% of downloads)
-        → Hits a Free tier limit (5 receipt scans/mo, 25 invoices/mo)
-          → Upgrades to Premium at $10/mo
-```
-
-The variables you can control:
-
-- **`/downloads/`-to-active-user conversion** depends on install smoothness and the first-run experience
-- **Active-user-to-Premium conversion** depends on how aggressively the in-app upgrade prompts trigger when a user hits the 5-receipt-scans or 25-invoices monthly limit
-- **Retention** depends on how sticky Premium feels after the first 1-3 months (the highest-churn window)
-- **Free tier limits** are the single biggest revenue lever. Tighter limits force more upgrades but also more refusals to adopt. The Free tier is already moderately tight (5 receipt scans is the strongest pressure point); tightening further is a real option if data shows users churn out without upgrading
-
-Don't go under $10/day. Google needs minimum volume to optimize. Don't scale up before the funnel is converting; that just spends more at the same unfavorable ratio.
+The budget projections, the click-to-customer funnel model, and the revenue levers (Free tier limits, retention) all live in [Google Ads economics.md](../Google%20Ads%20economics.md).
 
 ### Step 12: Review and publish
 
@@ -262,6 +238,28 @@ Skim the summary. The most important things to confirm:
 - All 4 sitelinks point to pages that include `track_referral.php`
 
 Click **Publish campaign**.
+
+## Exclude mobile and tablet (critical for a desktop app)
+
+Argo Books is desktop only, so people on phones and tablets cannot install it. Every mobile or tablet click is wasted spend. This is not a small effect: in the first campaign, mobile and tablet took about 65% of the total spend (mobile alone was CA\$146 of a CA\$226 total) and produced zero real installs.
+
+Exclude both device types:
+
+1. Open the campaign.
+2. Left menu: **Insights and reports**, then **When and where ads showed**, then the **Devices** tab.
+3. In the **Bid adj.** column, hover over the dash on the **Mobile phones** row, click the pencil edit button, choose **Decrease by 100%**, and save.
+4. Repeat for the **Tablets** row.
+
+A -100% bid adjustment means "never show on this device".
+
+### The Mac problem (no exclusion available)
+
+You cannot exclude macOS on a Search campaign. Google Search targets only by device type (computer, mobile, tablet), never by operating system. Operating-system targeting exists only in Display, Video, and App campaigns. So Mac desktops still see and click the ads, and there is no setting to stop it.
+
+Two partial mitigations, both already in place:
+
+- **Ad copy.** Put "for Windows" in a headline or description so Mac users self-select out before they click. This is the closest thing to a Mac exclusion on Search.
+- **The downloads-page waitlist.** The macOS card on `/downloads/` collects an email instead of a dead-end "Coming soon", so Mac visitors who click through are captured for a future Mac launch rather than lost. See `admin/mac-waitlist/`.
 
 ## Conversion tracking setup
 
@@ -309,7 +307,7 @@ After 3-5 days:
 After 1 to 2 weeks:
 - Check `https://argorobots.com/admin/referral-links` for visit and conversion counts.
 - Compare Google Ads' reported conversion count to the admin dashboard count. They should roughly agree.
-- Watch the trend, not just absolute CPA. Every tracked conversion is a `/downloads/` visit, not a paying customer. Rough guide for CPA per `/downloads/` visit: under \$10 is promising, \$10-\$25 is normal early on, over \$50 means the keyword targeting or comparison page isn't converting clicks into deeper interest. The metric that actually pays the bills is Premium sign-ups, which you measure in your own admin, not in Google. At realistic funnel rates, expect 1-2 Premium sign-ups per month from this campaign's spend.
+- Watch the trend, not just absolute CPA. Every tracked conversion is a `/downloads/` visit, not a paying customer, so Google's CPA is cost per downloads-page visit, not cost per customer. The metric that actually pays the bills is Premium sign-ups, which you measure in your own admin, not in Google. See [Google Ads economics.md](../Google%20Ads%20economics.md) for the current CPA, what counts as normal, and the real cost per customer as it becomes measurable.
 
 After 30+ days:
 - Consider switching bid strategy from Manual CPC / Maximize Clicks to Maximize Conversions once you have 15+ conversions of data. Smart bidding works once it has signal.

@@ -30,7 +30,8 @@ const TELEMETRY_FEATURE_NAMES = [
     'ProductCreated', 'StockAdjusted', 'PurchaseOrderCreated',
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
-    'ThemeChanged', 'LanguageChanged'
+    'ThemeChanged', 'LanguageChanged',
+    'OnboardingCompleted', 'OnboardingSkipped'
 ];
 
 /**

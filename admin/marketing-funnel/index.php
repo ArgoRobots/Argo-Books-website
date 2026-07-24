@@ -633,7 +633,7 @@ function get_campaign_spend_rows(): array
  * install count above, so the two intentionally won't match.
  *
  * @param ?string $period_start 'Y-m-d H:i:s' lower bound, or null for all time.
- * @return array{seen:int, activated:int, returned:int, activated_pct:float, returned_pct:float, has_data:bool}
+ * @return array{seen:int, activated:int, returned:int, onboarded:int, skipped:int, activated_pct:float, returned_pct:float, onboarded_pct:float, skipped_pct:float, has_data:bool}
  */
 function get_app_activation_stats(?string $period_start = null): array
 {
@@ -686,12 +686,18 @@ function get_app_activation_stats(?string $period_start = null): array
                     continue;
                 }
                 if (!isset($users[$authId])) {
-                    $users[$authId] = ['days' => [], 'activated' => false];
+                    $users[$authId] = ['days' => [], 'activated' => false, 'onboarded' => false, 'skipped' => false];
                 }
                 $users[$authId]['days'][gmdate('Y-m-d', $ts)] = true;
-                if (($ev['dataType'] ?? '') === 'FeatureUsage'
-                    && in_array($ev['featureName'] ?? '', $activationFeatures, true)) {
-                    $users[$authId]['activated'] = true;
+                if (($ev['dataType'] ?? '') === 'FeatureUsage') {
+                    $fn = $ev['featureName'] ?? '';
+                    if (in_array($fn, $activationFeatures, true)) {
+                        $users[$authId]['activated'] = true;
+                    } elseif ($fn === 'OnboardingCompleted') {
+                        $users[$authId]['onboarded'] = true;
+                    } elseif ($fn === 'OnboardingSkipped') {
+                        $users[$authId]['skipped'] = true;
+                    }
                 }
             }
         }
@@ -700,6 +706,8 @@ function get_app_activation_stats(?string $period_start = null): array
     $seen = count($users);
     $activated = 0;
     $returned = 0;
+    $onboarded = 0;
+    $skipped = 0;
     foreach ($users as $u) {
         if ($u['activated']) {
             $activated++;
@@ -707,14 +715,24 @@ function get_app_activation_stats(?string $period_start = null): array
         if (count($u['days']) >= 2) {
             $returned++;
         }
+        if ($u['onboarded']) {
+            $onboarded++;
+        }
+        if ($u['skipped']) {
+            $skipped++;
+        }
     }
 
     return [
         'seen'          => $seen,
         'activated'     => $activated,
         'returned'      => $returned,
+        'onboarded'     => $onboarded,
+        'skipped'       => $skipped,
         'activated_pct' => $seen > 0 ? round($activated / $seen * 100, 1) : 0.0,
         'returned_pct'  => $seen > 0 ? round($returned / $seen * 100, 1) : 0.0,
+        'onboarded_pct' => $seen > 0 ? round($onboarded / $seen * 100, 1) : 0.0,
+        'skipped_pct'   => $seen > 0 ? round($skipped / $seen * 100, 1) : 0.0,
         'has_data'      => $seen > 0,
     ];
 }
@@ -2110,11 +2128,13 @@ include __DIR__ . '/../admin_header.php';
                 pop.innerHTML = a.has_data
                     ? (`<div class="fap-title">After install &middot; anonymous app data</div>` +
                        `<div class="fap-row"><span>Active app users</span><b>${fmtCount(a.seen)}</b></div>` +
+                       `<div class="fap-row"><span>Finished setup tutorial</span><b>${fmtCount(a.onboarded)} &middot; ${a.onboarded_pct}%</b></div>` +
+                       `<div class="fap-row"><span>Skipped setup tutorial</span><b>${fmtCount(a.skipped)} &middot; ${a.skipped_pct}%</b></div>` +
                        `<div class="fap-row"><span>Did a bookkeeping action</span><b>${fmtCount(a.activated)} &middot; ${a.activated_pct}%</b></div>` +
                        `<div class="fap-row"><span>Came back another day</span><b>${fmtCount(a.returned)} &middot; ${a.returned_pct}%</b></div>` +
-                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense.</div>`)
+                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense. Setup-tutorial figures need app 2.0.11+.</div>`)
                     : (`<div class="fap-title">After install &middot; anonymous app data</div>` +
-                       `<div class="fap-note">No in-app usage data for this period yet. Once people run the app and it uploads anonymous telemetry, this shows how many did a bookkeeping action (invoice, receipt, or expense) and how many came back another day.</div>`);
+                       `<div class="fap-note">No in-app usage data for this period yet. Once people run the app and it uploads anonymous telemetry, this shows how many finished setup, did a bookkeeping action (invoice, receipt, or expense), and came back another day.</div>`);
                 document.body.appendChild(pop);
 
                 const closePop = () => { pop.hidden = true; };

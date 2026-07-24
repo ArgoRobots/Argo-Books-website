@@ -617,6 +617,97 @@ function get_campaign_spend_rows(): array
 }
 
 /**
+ * Anonymous in-app activation + early retention, read from the desktop app's
+ * telemetry uploads (admin/data-logs/telemetry/). Powers the info popover on the
+ * "App first run" funnel stage: of users whose app sent telemetry, how many did a
+ * real bookkeeping action and how many came back on a later day.
+ *
+ * Keyed by the app's anonymous per-device / per-subscription id, so it can't be
+ * joined to individual website funnel visitors: it's a separate aggregate view of
+ * "what happens after install." Telemetry carries no environment or source, so
+ * these counts are all-environment and all-source.
+ *
+ * @return array{seen:int, activated:int, returned:int, activated_pct:float, returned_pct:float, has_data:bool}
+ */
+function get_app_activation_stats(): array
+{
+    require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+
+    // "Activation" = the user did a real bookkeeping action (got value).
+    $activationFeatures = ['InvoiceCreated', 'ReceiptScanned', 'ExpenseCreated'];
+    $dirs = [__DIR__ . '/../data-logs/telemetry/', __DIR__ . '/../data-logs/'];
+
+    $seenFiles = [];
+    $users = [];
+
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            continue;
+        }
+        foreach (glob($dir . '*.json') ?: [] as $file) {
+            $name = basename($file);
+            if (isset($seenFiles[$name])) {
+                continue; // same file in both dirs: count once
+            }
+            $seenFiles[$name] = true;
+
+            $raw = @file_get_contents($file);
+            if ($raw === false || trim($raw) === '') {
+                continue;
+            }
+            $data = json_decode($raw, true);
+            if (!is_array($data) || empty($data['events']) || !is_array($data['events'])) {
+                continue;
+            }
+
+            $authId = (string)($data['authId'] ?? '');
+            if ($authId === '' || is_excluded_auth_id($authId)) {
+                continue; // unattributable or the founder's own machine
+            }
+
+            if (!isset($users[$authId])) {
+                $users[$authId] = ['days' => [], 'activated' => false];
+            }
+            foreach ($data['events'] as $ev) {
+                if (!is_array($ev)) {
+                    continue;
+                }
+                $ts = isset($ev['timestamp']) ? strtotime((string)$ev['timestamp']) : false;
+                if ($ts === false) {
+                    continue;
+                }
+                $users[$authId]['days'][gmdate('Y-m-d', $ts)] = true;
+                if (($ev['dataType'] ?? '') === 'FeatureUsage'
+                    && in_array($ev['featureName'] ?? '', $activationFeatures, true)) {
+                    $users[$authId]['activated'] = true;
+                }
+            }
+        }
+    }
+
+    $seen = count($users);
+    $activated = 0;
+    $returned = 0;
+    foreach ($users as $u) {
+        if ($u['activated']) {
+            $activated++;
+        }
+        if (count($u['days']) >= 2) {
+            $returned++;
+        }
+    }
+
+    return [
+        'seen'          => $seen,
+        'activated'     => $activated,
+        'returned'      => $returned,
+        'activated_pct' => $seen > 0 ? round($activated / $seen * 100, 1) : 0.0,
+        'returned_pct'  => $seen > 0 ? round($returned / $seen * 100, 1) : 0.0,
+        'has_data'      => $seen > 0,
+    ];
+}
+
+/**
  * Invoice-generator tool metrics, all derived from the statistics table.
  *
  * Event shape (see api/invoice-generator/track.php and statistics.php):
@@ -883,6 +974,9 @@ include __DIR__ . '/../admin_header.php';
             ];
             $prev_count = $c;
         }
+
+        // Anonymous in-app activation/retention for the "App first run" info popover.
+        $app_activation = get_app_activation_stats();
 
         $biggest_drop_index = null;
         $biggest_drop_pct = 101;
@@ -1861,6 +1955,7 @@ include __DIR__ . '/../admin_header.php';
     ?>
     (function () {
         const FUNNEL      = <?php echo json_encode($funnel_stages, JSON_UNESCAPED_SLASHES); ?>;
+        const APP_ACTIVATION = <?php echo json_encode($app_activation, JSON_UNESCAPED_SLASHES); ?>;
         const CHANNELS    = <?php echo json_encode($channels_js, JSON_UNESCAPED_SLASHES); ?>;
         const MAP_VALUES  = <?php echo json_encode($map_values ?: new stdClass(), JSON_UNESCAPED_SLASHES); ?>;
 
@@ -1970,19 +2065,62 @@ include __DIR__ . '/../admin_header.php';
             let pills = '<div class="funnel-pills">';
             for (let i = 0; i < n - 1; i++) {
                 const midX = ((i + 1) * colW) / W * 100;
-                pills += `<span class="funnel-pill" style="left:${midX}%">-${FUNNEL[i + 1].lost}% <span class="arw">&rarr;</span></span>`;
+                // Drop-off is undefined when the previous stage had 0 (nothing to
+                // drop from) — show a dash rather than a null percentage.
+                const lost = FUNNEL[i + 1].lost;
+                const lostLabel = (lost === null || lost === undefined) ? '&ndash;' : `-${lost}%`;
+                pills += `<span class="funnel-pill" style="left:${midX}%">${lostLabel} <span class="arw">&rarr;</span></span>`;
             }
             pills += '</div>';
 
-            // Labels centred under each section.
+            // Labels centred under each section. The "App first run" label always
+            // gets an info button opening the anonymous in-app activation popover.
             let labels = '<div class="funnel-labels">';
             FUNNEL.forEach((s, i) => {
                 const left = ((i + 0.5) * colW) / W * 100;
-                labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}</span></div>`;
+                const info = (s.key === 'app_first_run')
+                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention">i</button>`
+                    : '';
+                labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}${info}</span></div>`;
             });
             labels += '</div>';
 
             host.innerHTML = svg + pills + labels;
+
+            // ----- "After install" activation popover on the App-first-run stage -----
+            const actBtn = host.querySelector('.fl-info');
+            if (actBtn) {
+                const a = APP_ACTIVATION || {};
+                const pop = document.createElement('div');
+                pop.className = 'funnel-activation-pop';
+                pop.hidden = true;
+                pop.innerHTML = a.has_data
+                    ? (`<div class="fap-title">After install &middot; anonymous app data</div>` +
+                       `<div class="fap-row"><span>Users seen</span><b>${fmtCount(a.seen)}</b></div>` +
+                       `<div class="fap-row"><span>Did a bookkeeping action</span><b>${fmtCount(a.activated)} &middot; ${a.activated_pct}%</b></div>` +
+                       `<div class="fap-row"><span>Came back another day</span><b>${fmtCount(a.returned)} &middot; ${a.returned_pct}%</b></div>` +
+                       `<div class="fap-note">In-app usage, separate from the website counts above and not tied to individual visitors. Activated = created an invoice, scanned a receipt, or recorded an expense.</div>`)
+                    : (`<div class="fap-title">After install &middot; anonymous app data</div>` +
+                       `<div class="fap-note">No in-app usage data yet. Once people run the app and it uploads anonymous telemetry, this shows how many did a bookkeeping action (invoice, receipt, or expense) and how many came back another day.</div>`);
+                document.body.appendChild(pop);
+
+                const closePop = () => { pop.hidden = true; };
+                actBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (pop.hidden) {
+                        const r = actBtn.getBoundingClientRect();
+                        pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 300)) + 'px';
+                        pop.style.top = (r.bottom + window.scrollY + 8) + 'px';
+                        pop.hidden = false;
+                    } else {
+                        closePop();
+                    }
+                });
+                document.addEventListener('click', (e) => {
+                    if (e.target !== actBtn && !pop.contains(e.target)) closePop();
+                });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+            }
 
             const tip = document.getElementById('funnelTip');
             const showTip = (e, i) => {

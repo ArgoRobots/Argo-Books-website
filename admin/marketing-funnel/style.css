@@ -771,6 +771,52 @@
 .ft-row em { font-style: normal; color: var(--gray-500); }
 [data-theme="dark"] .ft-row { color: var(--white); }
 
+/* "App first run" info button + the after-install activation popover */
+.fl-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 5px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.fl-info:hover { filter: brightness(1.12); }
+
+.funnel-activation-pop {
+    position: absolute;
+    z-index: 2100;
+    width: 280px;
+    background: var(--white);
+    color: var(--admin-text);
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 12px 32px var(--shadow-default);
+    font-size: 13px;
+}
+[data-theme="dark"] .funnel-activation-pop {
+    background: var(--gray-800);
+    border-color: var(--black);
+    color: var(--white);
+}
+.funnel-activation-pop[hidden] { display: none; }
+.fap-title { font-weight: 700; margin-bottom: 8px; }
+.fap-row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.fap-row b { font-variant-numeric: tabular-nums; }
+.fap-note { margin-top: 8px; font-size: 11px; color: var(--gray-500); line-height: 1.45; }
+[data-theme="dark"] .fap-note { color: var(--gray-400); }
+
 /* ─── Analytics row (sources + geography cards) ────────────────────────── */
 
 .analytics-row {

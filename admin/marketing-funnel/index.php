@@ -927,7 +927,7 @@ include __DIR__ . '/../admin_header.php';
         $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 
         // Plausible-style breakdowns for the channel donut, the referrer /
-        // campaign / keyword bar lists, and the map / country / region / city
+        // campaign bar lists, and the map / country / region / city
         // lists. Each row carries visits + attributed revenue.
         $analytics = build_funnel_analytics($funnel_period_start_dt, $funnel_source_filter ?: null, $referral_links);
 
@@ -1026,7 +1026,6 @@ include __DIR__ . '/../admin_header.php';
                 $biggest_drop_index = $i;
             }
         }
-        $overall_conversion = $funnel_stages[count($funnel_stages) - 1]['pct_of_top'] ?? 0;
     ?>
     <div class="control-bar">
         <div class="control-group">
@@ -1126,7 +1125,6 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             </h2>
             <div class="funnel-conv">
-                <span class="funnel-conv-rate"><?php echo $overall_conversion; ?>% conversion rate</span>
                 <span class="funnel-conv-range"><?php echo htmlspecialchars($range_label); ?></span>
             </div>
         </div>
@@ -1140,7 +1138,6 @@ include __DIR__ . '/../admin_header.php';
         // donut and the world map are drawn client-side from the JSON below.
         $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 9, 'icon' => true]);
         $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 9, 'icon' => true, 'empty' => 'No tracked source categories in this period yet.']);
-        $bd_keyword  = funnel_render_bar_list($analytics['keywords'],  ['revenue' => true,  'limit' => 9, 'empty' => 'No keywords captured yet. Collecting from ?utm_term going forward.']);
         $bd_country  = funnel_render_bar_list($analytics['countries'], ['revenue' => true,  'limit' => 9, 'flag' => true]);
         $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
         $bd_city     = funnel_render_bar_list($analytics['cities'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No city data yet. Collecting going forward.']);
@@ -1156,13 +1153,12 @@ include __DIR__ . '/../admin_header.php';
         $channel_total_visits = array_sum(array_map(fn($r) => (int)$r['visits'], $analytics['channels']));
     ?>
     <div class="analytics-row">
-        <!-- Traffic sources: channel / referrer / campaign / keyword -->
+        <!-- Traffic sources: channel / referrer / campaign -->
         <div class="analytics-card">
             <div class="bd-tabs" role="tablist">
                 <button class="bd-tab active" data-bd="channel">Channel</button>
                 <button class="bd-tab" data-bd="referrer">Referrer</button>
                 <button class="bd-tab" data-bd="campaign">Category</button>
-                <button class="bd-tab" data-bd="keyword">Keyword</button>
             </div>
 
             <div class="bd-panel active" data-bd-panel="channel">
@@ -1188,7 +1184,6 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <div class="bd-panel" data-bd-panel="campaign"><?php echo $bd_campaign; ?></div>
-            <div class="bd-panel" data-bd-panel="keyword"><?php echo $bd_keyword; ?></div>
         </div>
 
         <!-- Geography: map / country / region / city -->

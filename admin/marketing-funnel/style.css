@@ -674,15 +674,7 @@
 }
 
 .funnel-conv { text-align: right; }
-.funnel-conv-rate {
-    display: block;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--admin-text);
-    font-variant-numeric: tabular-nums;
-}
 .funnel-conv-range { display: block; font-size: 12px; color: var(--gray-500); }
-[data-theme="dark"] .funnel-conv-rate { color: var(--white); }
 
 .funnel-stream {
     position: relative;

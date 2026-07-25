@@ -3,7 +3,7 @@
  * Marketing-funnel analytics data layer.
  *
  * Powers the Plausible-style dashboard on the Funnel tab: the channel donut,
- * the referrer / campaign / keyword bar lists, and the map / country / region /
+ * the referrer / campaign bar lists, and the map / country / region /
  * city bar lists. Every breakdown carries both a visits count and attributed
  * revenue so the UI can draw the twin blue (visits) + orange (revenue) bars.
  *
@@ -11,7 +11,7 @@
  *   - Visits are distinct visitors with a `landing` event in the period,
  *     grouped by the dimension recorded on that landing row.
  *   - Revenue is first-touch: each paying subscription's revenue is credited to
- *     the referer host / keyword captured on that visitor's earliest landing,
+ *     the referer host captured on that visitor's earliest landing,
  *     and to the source_code / country recorded on the premium_signup event.
  *
  * All queries are environment-scoped and use plain GROUP BY (no window
@@ -265,8 +265,8 @@ function funnel_paying_rows(?string $period_start, ?string $source_filter): arra
 }
 
 /**
- * First-touch referer host + keyword for the given visitor ids.
- * Returns [visitor_id => ['host' => ?string, 'keyword' => ?string]].
+ * First-touch referer host for the given visitor ids.
+ * Returns [visitor_id => ['host' => ?string]].
  */
 function funnel_first_touch(array $visitor_ids): array
 {
@@ -278,7 +278,7 @@ function funnel_first_touch(array $visitor_ids): array
 
     $placeholders = implode(',', array_fill(0, count($visitor_ids), '?'));
     $expr = FUNNEL_REF_HOST_SQL;
-    $sql = "SELECT visitor_id, $expr AS host, keyword
+    $sql = "SELECT visitor_id, $expr AS host
               FROM referral_events
              WHERE event_type = 'landing' AND js_confirmed = 1 AND environment = ?
                AND visitor_id IN ($placeholders)
@@ -291,7 +291,7 @@ function funnel_first_touch(array $visitor_ids): array
     while ($row = $stmt->fetch()) {
         $vid = $row['visitor_id'];
         if (!isset($out[$vid])) { // first row per visitor wins (earliest)
-            $out[$vid] = ['host' => $row['host'], 'keyword' => $row['keyword']];
+            $out[$vid] = ['host' => $row['host']];
         }
     }
     return $out;
@@ -375,7 +375,7 @@ function funnel_stage_dimension(string $column, ?string $period_start, ?string $
  *
  * @return array{
  *   channels: list<array>, referrers: list<array>, campaigns: list<array>,
- *   keywords: list<array>, countries: list<array>, regions: list<array>,
+ *   countries: list<array>, regions: list<array>,
  *   cities: list<array>, total_visits:int, total_revenue:float,
  *   stage_countries: array, stage_sources: array
  * }
@@ -385,7 +385,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
     // ---- Visits (distinct visitors) per dimension ----
     $host_visits    = funnel_visits_by(FUNNEL_REF_HOST_SQL, $period_start, $source_filter);
     $source_visits  = funnel_visits_by('source_code',  $period_start, $source_filter);
-    $keyword_visits = funnel_visits_by('keyword',       $period_start, $source_filter);
     $country_visits = funnel_visits_by('country_code',  $period_start, $source_filter);
     $region_visits  = funnel_visits_by('region',        $period_start, $source_filter);
     $city_visits    = funnel_visits_by('city',          $period_start, $source_filter);
@@ -409,7 +408,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         }
         return $m;
     };
-    $keyword_visits_map = $mapize($keyword_visits, '(no keyword)');
     $country_visits_map = $mapize($country_visits, 'Unknown');
     $region_visits_map  = $mapize($region_visits,  'Unknown');
     $city_visits_map    = $mapize($city_visits,    'Unknown');
@@ -420,7 +418,7 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
     $first_touch = funnel_first_touch($visitor_ids);
 
     $rev_by_ref = $rev_by_channel = $rev_by_category = [];
-    $rev_by_country = $rev_by_keyword = [];
+    $rev_by_country = [];
     $total_revenue = 0.0;
     foreach ($paying as $p) {
         $amt = (float)$p['amount'];
@@ -435,7 +433,7 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         $cc = ($p['country_code'] === null || $p['country_code'] === '') ? 'Unknown' : $p['country_code'];
         $rev_by_country[$cc] = ($rev_by_country[$cc] ?? 0) + $amt;
 
-        $ft   = $first_touch[$p['visitor_id']] ?? ['host' => null, 'keyword' => null];
+        $ft   = $first_touch[$p['visitor_id']] ?? ['host' => null];
         $host = $ft['host'];
         $ref_label = ($host === null || $host === '' || $host === 'null') ? FUNNEL_DIRECT_LABEL : $host;
         $rev_by_ref[$ref_label] = ($rev_by_ref[$ref_label] ?? 0) + $amt;
@@ -443,8 +441,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         $ch = funnel_classify_channel($host, $p['source_code']);
         $rev_by_channel[$ch] = ($rev_by_channel[$ch] ?? 0) + $amt;
 
-        $kw = ($ft['keyword'] === null || $ft['keyword'] === '') ? '(no keyword)' : $ft['keyword'];
-        $rev_by_keyword[$kw] = ($rev_by_keyword[$kw] ?? 0) + $amt;
     }
 
     // ---- Category rollup (matches referral-links "By category") ----
@@ -468,7 +464,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
     $channels  = funnel_merge_breakdown($channel_visits,     $rev_by_channel, $identity);
     $referrers = funnel_merge_breakdown($ref_visits_map,     $rev_by_ref,     $identity);
     $campaigns = funnel_merge_breakdown($category_visits,    $rev_by_category, $category_labeler);
-    $keywords  = funnel_merge_breakdown($keyword_visits_map, $rev_by_keyword, $identity);
     $countries = funnel_merge_breakdown($country_visits_map, $rev_by_country, $country_labeler);
     $regions   = funnel_merge_breakdown($region_visits_map,  [],              $identity);
     $cities    = funnel_merge_breakdown($city_visits_map,    [],              $identity);
@@ -479,7 +474,6 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         'channels'        => $channels,
         'referrers'       => $referrers,
         'campaigns'       => $campaigns,
-        'keywords'        => $keywords,
         'countries'       => $countries,
         'regions'         => $regions,
         'cities'          => $cities,

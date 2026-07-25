@@ -82,5 +82,19 @@
       "quantum":   { "label": "Quantum Accounting", "monthly": 470, "yearly": 5636 },
       "autoentry": { "label": "AutoEntry document-capture add-on (500 credits)", "monthly": 145 }
     }
+  },
+
+  "zoho-books": {
+    "name": "Zoho Books",
+    "currency": "CAD",
+    "_note": "Zoho Books official Canadian pricing (billed-annually rate): Free $0 / Standard $15 / Professional $30 / Premium $40 / Elite $165 / Ultimate $290 CAD. Cloud-only. Free plan is capped to micro-businesses (low annual-revenue limit, 1 user).",
+    "plans": {
+      "free":         { "label": "Free",         "monthly": 0   },
+      "standard":     { "label": "Standard",     "monthly": 15  },
+      "professional": { "label": "Professional", "monthly": 30  },
+      "premium":      { "label": "Premium",      "monthly": 40  },
+      "elite":        { "label": "Elite",        "monthly": 165 },
+      "ultimate":     { "label": "Ultimate",     "monthly": 290 }
+    }
   }
 }

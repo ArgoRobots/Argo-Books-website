@@ -12,6 +12,7 @@ $comparisons = [
     ['slug' => 'odoo',       'name' => 'Odoo',       'hook' => 'One flat price instead of Odoo\'s per-user ERP billing.'],
     ['slug' => 'honeybook',  'name' => 'HoneyBook',  'hook' => 'Argo keeps your actual books; HoneyBook just books clients and invoices.'],
     ['slug' => 'sage',       'name' => 'Sage',       'hook' => 'A fraction of Sage 50\'s price, modern and cross-platform, minus the complexity.'],
+    ['slug' => 'zoho-books', 'name' => 'Zoho Books', 'hook' => 'Desktop, offline, and standalone, without getting pulled into Zoho\'s cloud suite.'],
 ];
 ?>
 <!DOCTYPE html>

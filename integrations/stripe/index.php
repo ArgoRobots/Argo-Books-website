@@ -145,6 +145,70 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                 margin: 0 auto;
             }
         }
+
+        /* ---- Stripe flow showpiece (unique to this page) ---- */
+        .stripe-flow {
+            padding: 110px 0 120px;
+            background: linear-gradient(180deg, #ffffff 0%, #f6f7fb 100%);
+            overflow: hidden;
+        }
+        .stripe-flow .flow-scene {
+            max-width: 960px;
+            margin: 44px auto 0;
+        }
+        .stripe-flow .flow-scene svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .stripe-flow .flow-caption {
+            text-align: center;
+            margin-top: 26px;
+            font-size: 0.95rem;
+            color: var(--gray-500);
+        }
+        .stripe-flow .flow-caption strong { color: var(--gray-900); font-weight: 600; }
+
+        /* flowing "pipe" between Stripe and Argo */
+        .sf-pipe {
+            stroke-dasharray: 1 9;
+            animation: sfPipe 0.9s linear infinite;
+        }
+        @keyframes sfPipe { to { stroke-dashoffset: -20; } }
+
+        /* breathing glow behind the Stripe card */
+        .sf-glow { animation: sfGlow 3.2s ease-in-out infinite; }
+        @keyframes sfGlow { 0%, 100% { opacity: 0.28; } 50% { opacity: 0.55; } }
+
+        /* pulsing ring on the "booked" check */
+        .sf-ring {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: sfRing 2.4s ease-out infinite;
+        }
+        @keyframes sfRing {
+            0% { transform: scale(0.7); opacity: 0.55; }
+            70%, 100% { transform: scale(2.9); opacity: 0; }
+        }
+
+        /* each booked row's accent lights up in sequence, in time with arrivals */
+        .sf-accent {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: sfAccent 2.4s ease-in-out infinite;
+        }
+        .sf-accent.d2 { animation-delay: 0.18s; }
+        .sf-accent.d3 { animation-delay: 0.36s; }
+        .sf-accent.d4 { animation-delay: 0.54s; }
+        @keyframes sfAccent { 0%, 62%, 100% { opacity: 0.22; } 20% { opacity: 1; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sf-pipe, .sf-glow, .sf-ring, .sf-accent { animation: none; }
+        }
+
+        @media (max-width: 600px) {
+            .stripe-flow { padding: 70px 0 80px; }
+        }
     </style>
 </head>
 
@@ -174,6 +238,134 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                     <span>View Pricing</span>
                 </a>
             </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         STRIPE FLOW SHOWPIECE (unique to this page)
+         ============================================= -->
+    <section class="stripe-flow">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">The magic part</span>
+                <h2 class="section-title">One charge in, a full set of books out</h2>
+                <p class="section-desc">A Stripe payment lands, and Argo Books turns it into a complete entry, the sale, the processing fee, the customer, and the tax, without you touching a thing.</p>
+            </div>
+
+            <div class="flow-scene animate-on-scroll">
+                <svg viewBox="0 0 900 430" role="img" aria-label="A Stripe payment flowing into Argo Books and being recorded as revenue, fee, customer, and tax automatically" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
+                    <defs>
+                        <linearGradient id="sfStripe" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#8b85ff"/><stop offset="1" stop-color="#635bff"/>
+                        </linearGradient>
+                        <linearGradient id="sfCoin" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#9d97ff"/><stop offset="1" stop-color="#3f63e8"/>
+                        </linearGradient>
+                        <linearGradient id="sfBrand" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#3f63e8"/><stop offset="1" stop-color="#2740b5"/>
+                        </linearGradient>
+                        <radialGradient id="sfScene" cx="50%" cy="45%" r="60%">
+                            <stop offset="0" stop-color="#635bff" stop-opacity="0.10"/>
+                            <stop offset="1" stop-color="#635bff" stop-opacity="0"/>
+                        </radialGradient>
+                        <filter id="sfSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+                        <filter id="sfShadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+                        <path id="sfFlow" d="M 316 210 C 404 210 474 150 560 150" fill="none"/>
+                    </defs>
+
+                    <ellipse cx="450" cy="212" rx="440" ry="190" fill="url(#sfScene)"/>
+
+                    <!-- ============ Stripe charge card ============ -->
+                    <rect class="sf-glow" x="44" y="122" width="276" height="188" rx="22" fill="#635bff" filter="url(#sfSoft)"/>
+                    <rect x="48" y="120" width="268" height="188" rx="18" fill="#1a1f36"/>
+                    <rect x="70" y="142" width="26" height="26" rx="7" fill="url(#sfStripe)"/>
+                    <text x="83" y="161" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">S</text>
+                    <text x="106" y="161" font-size="14" font-weight="600" fill="#ffffff">Stripe</text>
+                    <circle cx="292" cy="155" r="1.7" fill="#6b7394"/><circle cx="298" cy="155" r="1.7" fill="#6b7394"/><circle cx="304" cy="155" r="1.7" fill="#6b7394"/>
+                    <text x="70" y="198" font-size="10" font-weight="600" letter-spacing="1" fill="#8b93b8">PAYMENT RECEIVED</text>
+                    <text x="70" y="228" font-size="30" font-weight="700" fill="#ffffff">$1,240.00</text>
+                    <text x="70" y="258" font-size="13" fill="#aab2d5">&#8226;&#8226;&#8226;&#8226; 4242</text>
+                    <text x="294" y="258" text-anchor="end" font-size="12" font-weight="700" fill="#ffffff" letter-spacing="1">VISA</text>
+                    <rect x="70" y="272" width="108" height="22" rx="11" fill="#10b981" fill-opacity="0.16"/>
+                    <path d="M80 283 l3 3 l6 -7" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <text x="96" y="287" font-size="11" font-weight="600" fill="#34d399">Succeeded</text>
+
+                    <!-- ============ flow pipe + coins ============ -->
+                    <use href="#sfFlow" stroke="#c9c6ff" stroke-width="2.5" fill="none" opacity="0.7"/>
+                    <use class="sf-pipe" href="#sfFlow" stroke="#635bff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+                    <g opacity="0">
+                        <circle r="16" fill="url(#sfCoin)" opacity="0.22" filter="url(#sfSoft)"/>
+                        <circle r="12" fill="url(#sfCoin)"/>
+                        <text x="0" y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">$</text>
+                        <animateMotion dur="2.4s" begin="0s" repeatCount="indefinite"><mpath href="#sfFlow"/></animateMotion>
+                        <animate attributeName="opacity" dur="2.4s" begin="0s" repeatCount="indefinite" values="0;1;1;1;0" keyTimes="0;0.12;0.5;0.85;1"/>
+                    </g>
+                    <g opacity="0">
+                        <circle r="16" fill="url(#sfCoin)" opacity="0.22" filter="url(#sfSoft)"/>
+                        <circle r="12" fill="url(#sfCoin)"/>
+                        <text x="0" y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">$</text>
+                        <animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#sfFlow"/></animateMotion>
+                        <animate attributeName="opacity" dur="2.4s" begin="0.8s" repeatCount="indefinite" values="0;1;1;1;0" keyTimes="0;0.12;0.5;0.85;1"/>
+                    </g>
+                    <g opacity="0">
+                        <circle r="16" fill="url(#sfCoin)" opacity="0.22" filter="url(#sfSoft)"/>
+                        <circle r="12" fill="url(#sfCoin)"/>
+                        <text x="0" y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">$</text>
+                        <animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite"><mpath href="#sfFlow"/></animateMotion>
+                        <animate attributeName="opacity" dur="2.4s" begin="1.6s" repeatCount="indefinite" values="0;1;1;1;0" keyTimes="0;0.12;0.5;0.85;1"/>
+                    </g>
+
+                    <!-- ============ Argo Books window ============ -->
+                    <rect x="560" y="86" width="306" height="284" rx="16" fill="#0f172a" opacity="0.10" filter="url(#sfShadow)"/>
+                    <rect x="556" y="78" width="306" height="284" rx="16" fill="#ffffff" stroke="#e8edf5"/>
+                    <rect x="578" y="96" width="22" height="22" rx="6" fill="url(#sfBrand)"/>
+                    <text x="608" y="112" font-family="Fraunces, Georgia, serif" font-size="13" font-weight="600" fill="#0f172a">Argo Books</text>
+                    <rect x="772" y="98" width="72" height="18" rx="9" fill="#efeeff"/>
+                    <text x="808" y="111" text-anchor="middle" font-size="9" font-weight="600" fill="#635bff">via Stripe</text>
+                    <line x1="556" y1="128" x2="862" y2="128" stroke="#f1f5f9" stroke-width="1"/>
+
+                    <!-- booked header -->
+                    <circle class="sf-ring" cx="590" cy="152" r="11" fill="#10b981"/>
+                    <circle cx="590" cy="152" r="11" fill="#10b981"/>
+                    <path d="M585 152 l3.5 3.5 l6 -7" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <text x="610" y="149" font-size="12.5" font-weight="600" fill="#0f172a">Recorded automatically</text>
+                    <text x="610" y="163" font-size="9.5" fill="#94a3b8">from one Stripe charge</text>
+
+                    <!-- rows -->
+                    <g>
+                        <rect class="sf-accent" x="574" y="182" width="3" height="26" rx="1.5" fill="#10b981"/>
+                        <text x="590" y="192" font-size="12" font-weight="600" fill="#0f172a">Sale &#183; Design retainer</text>
+                        <text x="590" y="206" font-size="9.5" fill="#94a3b8">Revenue</text>
+                        <text x="846" y="197" text-anchor="end" font-size="13" font-weight="700" fill="#15803d">+$1,240.00</text>
+                    </g>
+                    <line x1="590" y1="220" x2="846" y2="220" stroke="#f5f7fa" stroke-width="1"/>
+                    <g>
+                        <rect class="sf-accent d2" x="574" y="228" width="3" height="26" rx="1.5" fill="#ef4444"/>
+                        <text x="590" y="238" font-size="12" font-weight="600" fill="#0f172a">Stripe processing fee</text>
+                        <text x="590" y="252" font-size="9.5" fill="#94a3b8">Expense &#183; linked to the sale</text>
+                        <text x="846" y="243" text-anchor="end" font-size="13" font-weight="700" fill="#b91c1c">&#8722;$36.28</text>
+                    </g>
+                    <line x1="590" y1="266" x2="846" y2="266" stroke="#f5f7fa" stroke-width="1"/>
+                    <g>
+                        <rect class="sf-accent d3" x="574" y="274" width="3" height="26" rx="1.5" fill="#8b5cf6"/>
+                        <circle cx="600" cy="288" r="11" fill="#ede9fe"/>
+                        <text x="600" y="291" text-anchor="middle" font-size="9" font-weight="700" fill="#6d28d9">SL</text>
+                        <text x="620" y="285" font-size="12" font-weight="600" fill="#0f172a">Sarah Lee</text>
+                        <text x="620" y="298" font-size="9.5" fill="#94a3b8">Customer created</text>
+                        <rect x="792" y="279" width="54" height="18" rx="9" fill="#f3e8ff"/>
+                        <text x="819" y="291" text-anchor="middle" font-size="9" font-weight="600" fill="#7c3aed">New</text>
+                    </g>
+                    <line x1="590" y1="312" x2="846" y2="312" stroke="#f5f7fa" stroke-width="1"/>
+                    <g>
+                        <rect class="sf-accent d4" x="574" y="320" width="3" height="26" rx="1.5" fill="#3f63e8"/>
+                        <text x="590" y="330" font-size="12" font-weight="600" fill="#0f172a">GST collected (5%)</text>
+                        <text x="590" y="344" font-size="9.5" fill="#94a3b8">Tax tracked</text>
+                        <text x="846" y="335" text-anchor="end" font-size="13" font-weight="700" fill="#0f172a">$59.05</text>
+                    </g>
+                </svg>
+            </div>
+            <p class="flow-caption"><strong>Zero manual entry.</strong> Every charge arrives fully sorted, fees and refunds included.</p>
         </div>
     </section>
 

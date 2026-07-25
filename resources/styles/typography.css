@@ -1,0 +1,25 @@
+/* ============================================================
+   Brand typography (shared).
+
+   Load this on any marketing page together with the Google Fonts <link>
+   for Fraunces + IBM Plex Sans to give the page the same type system as the
+   landing and comparison pages. It defines the font tokens and applies them
+   to the body and headings only, so component-level fonts (set via classes)
+   are never overridden. Deliberately NOT added to custom-colors.css, because
+   that file is also loaded on the community/app pages.
+   ============================================================ */
+:root {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}

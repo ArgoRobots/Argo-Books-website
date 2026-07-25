@@ -116,7 +116,14 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
 
     <script src="../../resources/scripts/main.js"></script>
 
+    <!-- Brand typefaces, matched to the home page so this comparison reads as
+         the same product. Fraunces = display, IBM Plex Sans = body. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/faq.css">
@@ -124,7 +131,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
     <link rel="stylesheet" href="../../resources/footer/style.css">
 </head>
 
-<body>
+<body class="compare-page">
     <header>
         <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
@@ -137,53 +144,137 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1 class="animate-fade-in">Argo Books vs ZipBooks</h1>
-            <p class="hero-subtitle animate-fade-in">Both simple, both free to start. But Argo Books gives you more for less.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Try Argo Books Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+            <div class="hero-content animate-fade-in">
+                <span class="hero-eyebrow">ZipBooks alternative</span>
+                <h1>Argo Books <span class="text-gradient">vs ZipBooks</span></h1>
+                <p class="hero-subtitle">Both simple, both free to start. But Argo Books works offline, includes AI, and costs less to upgrade.</p>
+                <div class="hero-ctas">
+                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
+                        <span>Try Argo Books Free</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
+                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
+                        <span>View Pricing</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual animate-fade-in">
+                <div class="hero-device">
+                    <img src="../../resources/images/dashboard.webp"
+                         srcset="../../resources/images/dashboard-800.webp 800w, ../../resources/images/dashboard-1200.webp 1200w, ../../resources/images/dashboard-1600.webp 1600w"
+                         sizes="(max-width: 900px) 90vw, 540px"
+                         alt="The Argo Books dashboard" width="2400" height="1528" fetchpriority="high">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Key Differences -->
-    <section class="key-differences">
+    <!-- Differences: narrative + product visual -->
+    <section class="differences">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-label">Why Switch?</span>
-                <h2>Same simplicity, more features, lower price</h2>
-                <p class="section-desc">ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and has seen limited development since. Argo Books offers AI receipt scanning, predictive analytics, and local data storage at a lower price, with active support and development.</p>
+                <span class="section-label">The short version</span>
+                <h2>What's the difference between Argo Books and ZipBooks?</h2>
+                <p class="section-desc">Both are simple, and both are free to start. The difference is where your data lives, what's built in, and what you pay to unlock more. Argo Books works offline, includes AI, and costs less to upgrade.</p>
             </div>
-            <div class="diff-grid">
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon">
-                        <?= svg_icon('dollar', 28, '', 1.5) ?>
-                    </div>
-                    <h3>Lower premium price</h3>
-                    <p>ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month, with AI receipt scanning, predictive analytics, and inventory management included.</p>
+            <div class="diff-split">
+                <div class="diff-copy animate-on-scroll">
+                    <h3>Why choose Argo Books over ZipBooks?</h3>
+                    <ul class="why-list">
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>A more capable free plan.</strong> Both are free to start, but Argo's Free tier adds AI receipt scanning and inventory that ZipBooks' free plan doesn't include.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. ZipBooks is cloud-only.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>AI that's built in.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included, features ZipBooks doesn't offer at all.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>One predictable price.</strong> Everything in Premium for $<?= $argo_monthly ?> CAD/month, less than ZipBooks Smarter, with no per-client fees or upsells.</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon purple">
-                        <?= svg_icon('bolt', 28, '', 1.5) ?>
+                <div class="diff-visual animate-on-scroll">
+                    <div class="diff-mockup">
+                        <!-- Decorative price-comparison mockup. aria-hidden so it adds no
+                             indexable text (no duplicate-content/SEO impact). -->
+                        <svg viewBox="0 0 640 460" role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
+                            <defs>
+                                <clipPath id="dmClip2"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
+                            </defs>
+                            <?php
+                                $barX0  = 205;
+                                $barMax = 340; // px width for the $50 top of scale
+                                $premW  = (int) round($argo_monthly     / 50 * $barMax);
+                                $smartW = (int) round($zb_smarter        / 50 * $barMax);
+                                $sophW  = (int) round($zb_sophisticated  / 50 * $barMax);
+                            ?>
+                            <g clip-path="url(#dmClip2)">
+                                <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
+
+                                <!-- Title -->
+                                <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Both free to start. Argo's paid plan costs less.</text>
+
+                                <!-- Legend -->
+                                <rect x="40" y="99" width="12" height="12" rx="3" fill="#3f63e8"/>
+                                <text x="58" y="109" font-size="13" fill="#0f172a">Argo Books</text>
+                                <rect x="150" y="99" width="12" height="12" rx="3" fill="#ef4444"/>
+                                <text x="168" y="109" font-size="13" fill="#0f172a">ZipBooks</text>
+
+                                <!-- Row 1: Argo Free $0 -->
+                                <rect x="205" y="145" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="162" font-size="13" font-weight="600" fill="#0f172a">Argo Free</text>
+                                <rect x="205" y="145" width="4" height="26" rx="2" fill="#cbd5e1"/>
+                                <text x="219" y="162" font-size="13" font-weight="700" fill="#64748b">$0</text>
+
+                                <!-- Row 2: ZipBooks Starter $0 -->
+                                <rect x="205" y="201" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Starter</text>
+                                <rect x="205" y="201" width="4" height="26" rx="2" fill="#cbd5e1"/>
+                                <text x="219" y="218" font-size="13" font-weight="700" fill="#64748b">$0</text>
+
+                                <!-- Row 3: Argo Premium $15 -->
+                                <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="274" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <rect x="205" y="257" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
+                                <text x="<?= 205 + $premW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?></text>
+
+                                <!-- Row 4: ZipBooks Smarter $20 -->
+                                <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Smarter</text>
+                                <rect x="205" y="313" width="<?= $smartW ?>" height="26" rx="5" fill="#ef4444"/>
+                                <text x="<?= 205 + $smartW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $zb_smarter ?></text>
+
+                                <!-- Row 5: ZipBooks Sophisticated $50 -->
+                                <rect x="205" y="369" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="386" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Sophisticated</text>
+                                <rect x="205" y="369" width="<?= $sophW ?>" height="26" rx="5" fill="#ef4444"/>
+                                <text x="<?= 205 + $sophW + 8 ?>" y="386" font-size="13" font-weight="700" fill="#ef4444">$<?= $zb_sophisticated ?></text>
+                            </g>
+                            <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                        </svg>
                     </div>
-                    <h3>Works offline</h3>
-                    <p>ZipBooks is cloud-only: no internet, no access. Argo Books is a desktop app that works offline, with your data stored locally on your device for full privacy and control.</p>
-                </div>
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon green">
-                        <?= svg_icon('map-pin', 28, '', 1.5) ?>
+                    <div class="diff-callout">
+                        <span class="diff-callout-title">Less, for more</span>
+                        <span class="diff-callout-sub">Argo Premium is cheaper than ZipBooks Smarter and does more</span>
                     </div>
-                    <h3>Made in Canada</h3>
-                    <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Feature showcase (shared partial, also used on the landing page) -->
+    <?php include __DIR__ . '/../../resources/sections/feature-tour.php'; ?>
 
     <!-- Feature Comparison Table -->
     <section class="comparison-table-section">
@@ -281,83 +372,85 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
         </div>
     </section>
 
-    <!-- Pricing Comparison -->
-    <section class="pricing-comparison">
+    <!-- Pros & Cons -->
+    <section class="pros-cons-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-label">Pricing</span>
-                <h2>Both free to start. Here's how they compare</h2>
-                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month, while Argo Books Premium is $<?= $argo_monthly ?> CAD/month with AI receipt scanning, inventory, and predictive analytics included.</p>
+                <span class="section-label">The honest verdict</span>
+                <h2>Argo Books vs ZipBooks: pros &amp; cons</h2>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Books</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD/month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
+            <div class="pros-cons-grid">
+                <div class="pc-card pc-argo animate-on-scroll">
+                    <div class="pc-block">
+                        <h3>Argo Books pros</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No accounting jargon</strong>, built for business owners rather than accountants</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month, cheaper than ZipBooks Smarter, with no upsells</span></li>
+                        </ul>
+                    </div>
+                    <div class="pc-block">
+                        <h3>Argo Books cons</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Desktop-first, so there's no browser or mobile-web access the way a cloud tool offers</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>A newer platform with a smaller ecosystem than longer-established tools</span></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box competitor-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">ZipBooks</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Starter</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">free</span>
-                                </div>
-                                <span class="tier-limit">Basic invoicing &amp; reports</span>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Smarter</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $zb_smarter ?></span>
-                                    <span class="tier-period">CAD/month</span>
-                                </div>
-                                <span class="tier-limit">Recurring invoices, time tracking</span>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Sophisticated</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $zb_sophisticated ?></span>
-                                    <span class="tier-period">CAD/month</span>
-                                </div>
-                                <span class="tier-limit">Tagging, custom categories</span>
-                            </div>
-                        </div>
+                <div class="pc-card pc-competitor animate-on-scroll">
+                    <div class="pc-block">
+                        <h3>ZipBooks cons</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, no offline access, so no internet means no access to your books</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No AI</strong> receipt scanning or spreadsheet import, and no predictive analytics</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No inventory management</strong>, and your data lives on their servers rather than your machine</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Limited development</strong> since the BILL Holdings acquisition</span></li>
+                        </ul>
                     </div>
+                    <div class="pc-block">
+                        <h3>ZipBooks pros</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Free Starter tier with basic invoicing and reports</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Simple and clean, with no accounting knowledge required</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Cloud-based and accessible from any browser</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Differences -->
+    <section class="key-differences">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Why Switch?</span>
+                <h2>Same simplicity, more features, lower price</h2>
+                <p class="section-desc">ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and has seen limited development since. Argo Books offers AI receipt scanning, predictive analytics, and local data storage at a lower price, with active support and development.</p>
+            </div>
+            <div class="diff-grid">
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon">
+                        <?= svg_icon('dollar', 30, '', 1.5) ?>
+                    </div>
+                    <h3>Lower premium price</h3>
+                    <p>ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month, with AI receipt scanning, predictive analytics, and inventory management included.</p>
+                </div>
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon purple">
+                        <?= svg_icon('bolt', 30, '', 1.5) ?>
+                    </div>
+                    <h3>Works offline</h3>
+                    <p>ZipBooks is cloud-only: no internet, no access. Argo Books is a desktop app that works offline, with your data stored locally on your device for full privacy and control.</p>
+                </div>
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon green">
+                        <?= svg_icon('map-pin', 30, '', 1.5) ?>
+                    </div>
+                    <h3>Made in Canada</h3>
+                    <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>
                 </div>
             </div>
         </div>
@@ -377,6 +470,35 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Other comparisons -->
+    <section class="other-comparisons">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Keep comparing</span>
+                <h2>How does Argo Books compare to other accounting software?</h2>
+            </div>
+            <div class="compare-cards animate-on-scroll">
+                <?php
+                $other_comparisons = [
+                    'argo-books-vs-quickbooks' => 'QuickBooks',
+                    'argo-books-vs-wave'       => 'Wave',
+                    'argo-books-vs-freshbooks' => 'FreshBooks',
+                    'argo-books-vs-xero'       => 'Xero',
+                    'argo-books-vs-odoo'       => 'Odoo',
+                ];
+                foreach ($other_comparisons as $slug => $name): ?>
+                <a class="compare-card" href="../<?= $slug ?>/">
+                    <span>Argo Books vs. <?= $name ?></span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -528,6 +650,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
             });
         });
     </script>
+    <script src="../../resources/scripts/feature-tour.js"></script>
 </body>
 
 </html>

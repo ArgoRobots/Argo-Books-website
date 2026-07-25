@@ -116,7 +116,14 @@ $odoo_custom   = competitor_price('odoo', 'custom');
 
     <script src="../../resources/scripts/main.js"></script>
 
+    <!-- Brand typefaces, matched to the home page so this comparison reads as
+         the same product. Fraunces = display, IBM Plex Sans = body. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/faq.css">
@@ -124,7 +131,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
     <link rel="stylesheet" href="../../resources/footer/style.css">
 </head>
 
-<body>
+<body class="compare-page">
     <header>
         <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
@@ -137,53 +144,126 @@ $odoo_custom   = competitor_price('odoo', 'custom');
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1 class="animate-fade-in">Argo Books vs Odoo</h1>
-            <p class="hero-subtitle animate-fade-in">Simple finance management without the ERP complexity.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Try Argo Books Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+            <div class="hero-content animate-fade-in">
+                <span class="hero-eyebrow">Odoo alternative</span>
+                <h1>Argo Books <span class="text-gradient">vs Odoo</span></h1>
+                <p class="hero-subtitle">A simpler, more affordable way to manage your small business finances. All the essentials, none of the ERP complexity or the per-user price creep.</p>
+                <div class="hero-ctas">
+                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
+                        <span>Try Argo Books Free</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
+                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
+                        <span>View Pricing</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual animate-fade-in">
+                <div class="hero-device">
+                    <img src="../../resources/images/dashboard.webp"
+                         srcset="../../resources/images/dashboard-800.webp 800w, ../../resources/images/dashboard-1200.webp 1200w, ../../resources/images/dashboard-1600.webp 1600w"
+                         sizes="(max-width: 900px) 90vw, 540px"
+                         alt="The Argo Books dashboard" width="2400" height="1528" fetchpriority="high">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Key Differences -->
-    <section class="key-differences">
+    <!-- Differences: narrative + product visual -->
+    <section class="differences">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-label">Why Switch?</span>
-                <h2>Built for small businesses, not enterprise ERP</h2>
-                <p class="section-desc">Odoo is a full ERP suite with hundreds of apps designed for mid-to-large businesses. Argo Books is purpose-built for small businesses that need finance and inventory management without the complexity.</p>
+                <span class="section-label">The short version</span>
+                <h2>What's the difference between Argo Books and Odoo?</h2>
+                <p class="section-desc">Both can handle your finances. The difference is scope. Odoo is a full modular ERP built for growing, multi-department companies and priced per user; Argo Books is built for the business owner who just needs their books, and priced as one flat plan for the whole team.</p>
             </div>
-            <div class="diff-grid">
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon">
-                        <?= svg_icon('dollar', 28, '', 1.5) ?>
-                    </div>
-                    <h3>More affordable</h3>
-                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $<?= $argo_monthly ?> CAD/month, with no per-user fees.</p>
+            <div class="diff-split">
+                <div class="diff-copy animate-on-scroll">
+                    <h3>Why choose Argo Books over Odoo?</h3>
+                    <ul class="why-list">
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no ERP modules to install or configure and no accounting jargon to learn.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>A genuinely usable free plan.</strong> All the core finance features forever, no credit card. Odoo's free plan is limited to a single app, so a second module already means paying per user.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>AI that's included, not upsold.</strong> Receipt scanning, spreadsheet import, and predictive analytics come built in, with no consultant or implementation project required.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>One predictable price.</strong> Everything in Premium for $<?= $argo_monthly ?> CAD/month, flat. No per-user fees, so your cost doesn't climb as your team grows.</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon purple">
-                        <?= svg_icon('bolt', 28, '', 1.5) ?>
+                <div class="diff-visual animate-on-scroll">
+                    <div class="diff-mockup">
+                        <!-- Decorative cost mockup. aria-hidden so it adds no
+                             indexable text (no duplicate-content/SEO impact). -->
+                        <svg viewBox="0 0 640 460" role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
+                            <defs>
+                                <clipPath id="dmClip2"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
+                            </defs>
+                            <g clip-path="url(#dmClip2)">
+                                <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
+
+                                <!-- Title -->
+                                <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Argo is one flat price. Odoo bills per user.</text>
+
+                                <!-- Legend -->
+                                <rect x="40" y="100" width="14" height="10" rx="2" fill="#3f63e8"/>
+                                <text x="60" y="109" font-size="13" fill="#0f172a">Argo Books</text>
+                                <rect x="166" y="100" width="14" height="10" rx="2" fill="#ef4444"/>
+                                <text x="186" y="109" font-size="13" fill="#0f172a">Odoo Standard</text>
+
+                                <!-- Bars: width proportional to price, max ($220) = 380px wide -->
+                                <!-- Argo Premium (flat) $15 -->
+                                <text x="40" y="156" font-size="13" font-weight="600" fill="#0f172a">Argo Premium (flat)</text>
+                                <rect x="40" y="166" width="26" height="26" rx="5" fill="#3f63e8"/>
+                                <text x="76" y="184" font-size="14" font-weight="700" fill="#0f172a">$15</text>
+
+                                <!-- Odoo, 1 user $44 -->
+                                <text x="40" y="216" font-size="13" font-weight="600" fill="#0f172a">Odoo, 1 user</text>
+                                <rect x="40" y="226" width="76" height="26" rx="5" fill="#ef4444"/>
+                                <text x="126" y="244" font-size="14" font-weight="700" fill="#0f172a">$44</text>
+
+                                <!-- Odoo, 3 users $132 -->
+                                <text x="40" y="276" font-size="13" font-weight="600" fill="#0f172a">Odoo, 3 users</text>
+                                <rect x="40" y="286" width="228" height="26" rx="5" fill="#ef4444"/>
+                                <text x="278" y="304" font-size="14" font-weight="700" fill="#0f172a">$132</text>
+
+                                <!-- Odoo, 5 users $220 -->
+                                <text x="40" y="336" font-size="13" font-weight="600" fill="#0f172a">Odoo, 5 users</text>
+                                <rect x="40" y="346" width="380" height="26" rx="5" fill="#ef4444"/>
+                                <text x="430" y="364" font-size="14" font-weight="700" fill="#0f172a">$220</text>
+
+                                <!-- Flat-price reminder -->
+                                <rect x="40" y="402" width="26" height="18" rx="5" fill="#eef2fe"/>
+                                <line x1="53" y1="406" x2="53" y2="416" stroke="#3f63e8" stroke-width="2.4" stroke-linecap="round"/>
+                                <text x="76" y="416" font-size="13" font-weight="600" fill="#3f63e8">Argo stays $15 for the whole team</text>
+                            </g>
+                            <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                        </svg>
                     </div>
-                    <h3>Simple from day one</h3>
-                    <p>Odoo's learning curve is steep: it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
-                </div>
-                <div class="diff-card animate-on-scroll">
-                    <div class="diff-icon green">
-                        <?= svg_icon('map-pin', 28, '', 1.5) ?>
+                    <div class="diff-callout">
+                        <span class="diff-callout-title">Billed per user</span>
+                        <span class="diff-callout-sub">Odoo charges per user, per month. Argo is one flat price for your whole team</span>
                     </div>
-                    <h3>Made in Canada</h3>
-                    <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Feature showcase (shared partial, also used on the landing page) -->
+    <?php include __DIR__ . '/../../resources/sections/feature-tour.php'; ?>
 
     <!-- Feature Comparison Table -->
     <section class="comparison-table-section">
@@ -287,83 +367,85 @@ $odoo_custom   = competitor_price('odoo', 'custom');
         </div>
     </section>
 
-    <!-- Pricing Comparison -->
-    <section class="pricing-comparison">
+    <!-- Pros & Cons -->
+    <section class="pros-cons-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-label">Pricing</span>
-                <h2>Flat pricing vs per-user fees</h2>
-                <p class="section-desc">Odoo's Enterprise plan starts at $<?= $odoo_standard ?> CAD/user/month and scales up with every team member. Argo Books is a flat $<?= $argo_monthly ?> CAD/month for Premium, with no per-user charges.</p>
+                <span class="section-label">The honest verdict</span>
+                <h2>Argo Books vs Odoo: pros &amp; cons</h2>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Books</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD/month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
+            <div class="pros-cons-grid">
+                <div class="pc-card pc-argo animate-on-scroll">
+                    <div class="pc-block">
+                        <h3>Argo Books pros</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month for your whole team, with no per-user fees</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>All your finances in one app</strong>: invoicing, expenses, inventory, and reporting, with no ERP modules to configure</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with no server to host</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Simple from day one</strong>, no consultant or implementation project to get started</span></li>
+                        </ul>
+                    </div>
+                    <div class="pc-block">
+                        <h3>Argo Books cons</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No CRM or sales pipeline, so Odoo is the better fit if you need those</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No HR or payroll modules</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>A focused finance tool, not a full modular suite with hundreds of apps</span></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box competitor-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Odoo</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">One App Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">one app only</span>
-                                </div>
-                                <span class="tier-limit">Unlimited users, single app</span>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Standard</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $odoo_standard ?></span>
-                                    <span class="tier-period">CAD/user/month</span>
-                                </div>
-                                <span class="tier-limit">All apps, cloud hosting</span>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Custom</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $odoo_custom ?></span>
-                                    <span class="tier-period">CAD/user/month</span>
-                                </div>
-                                <span class="tier-limit">All apps, multi-company, on-premise</span>
-                            </div>
-                        </div>
+                <div class="pc-card pc-competitor animate-on-scroll">
+                    <div class="pc-block">
+                        <h3>Odoo cons</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Priced per user</strong>: from $<?= $odoo_standard ?> CAD/user/month, so cost climbs fast as your team grows</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Complex to set up</strong>, a full ERP that often needs configuration or a consultant</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Developer-oriented</strong>, and the free plan is limited to a single app</span></li>
+                        </ul>
                     </div>
+                    <div class="pc-block">
+                        <h3>Odoo pros</h3>
+                        <ul class="pc-list">
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Extremely powerful, a full modular ERP that scales to complex needs</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Huge app ecosystem: CRM, HR, manufacturing, e-commerce, and hundreds more</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Deeply customizable for growing, multi-department companies</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Differences -->
+    <section class="key-differences">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Why Switch?</span>
+                <h2>Built for small businesses, not enterprise ERP</h2>
+                <p class="section-desc">Odoo is a full ERP suite with hundreds of apps designed for mid-to-large businesses. Argo Books is purpose-built for small businesses that need finance and inventory management without the complexity.</p>
+            </div>
+            <div class="diff-grid">
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon">
+                        <?= svg_icon('dollar', 30, '', 1.5) ?>
+                    </div>
+                    <h3>More affordable</h3>
+                    <p>Odoo charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $<?= $argo_monthly ?> CAD/month, with no per-user fees.</p>
+                </div>
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon purple">
+                        <?= svg_icon('bolt', 30, '', 1.5) ?>
+                    </div>
+                    <h3>Simple from day one</h3>
+                    <p>Odoo's learning curve is steep: it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
+                </div>
+                <div class="diff-card animate-on-scroll">
+                    <div class="diff-icon green">
+                        <?= svg_icon('map-pin', 30, '', 1.5) ?>
+                    </div>
+                    <h3>Made in Canada</h3>
+                    <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>
                 </div>
             </div>
         </div>
@@ -383,6 +465,35 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Other comparisons -->
+    <section class="other-comparisons">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Keep comparing</span>
+                <h2>How does Argo Books compare to other accounting software?</h2>
+            </div>
+            <div class="compare-cards animate-on-scroll">
+                <?php
+                $other_comparisons = [
+                    'argo-books-vs-quickbooks' => 'QuickBooks',
+                    'argo-books-vs-wave'       => 'Wave',
+                    'argo-books-vs-freshbooks' => 'FreshBooks',
+                    'argo-books-vs-xero'       => 'Xero',
+                    'argo-books-vs-zipbooks'   => 'ZipBooks',
+                ];
+                foreach ($other_comparisons as $slug => $name): ?>
+                <a class="compare-card" href="../<?= $slug ?>/">
+                    <span>Argo Books vs. <?= $name ?></span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -534,6 +645,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
             });
         });
     </script>
+    <script src="../../resources/scripts/feature-tour.js"></script>
 </body>
 
 </html>

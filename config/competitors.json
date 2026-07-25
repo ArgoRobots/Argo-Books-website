@@ -59,5 +59,28 @@
       "standard":     { "label": "Standard",     "monthly": 44, "per_user": true },
       "custom":       { "label": "Custom",       "monthly": 69, "per_user": true }
     }
+  },
+
+  "honeybook": {
+    "name": "HoneyBook",
+    "currency": "CAD",
+    "_note": "VERIFY: converted from USD list prices (Starter $29 / Essentials $49 / Premium $109, billed-yearly rate) at ~1.37 USD->CAD. No free plan (7-day trial).",
+    "plans": {
+      "starter":    { "label": "Starter",    "monthly": 40  },
+      "essentials": { "label": "Essentials", "monthly": 67  },
+      "premium":    { "label": "Premium",    "monthly": 149 }
+    }
+  },
+
+  "sage": {
+    "name": "Sage",
+    "currency": "CAD",
+    "_note": "VERIFY: Sage 50 (desktop app), billed annually; monthly = annual/12 rounded. Pro $814/yr (1 user), Premium $1,219/yr (2 users), Quantum $5,636/yr (5 users). No free plan (trial).",
+    "plans": {
+      "pro":       { "label": "Pro Accounting",     "monthly": 68,  "yearly": 814  },
+      "premium":   { "label": "Premium Accounting", "monthly": 102, "yearly": 1219 },
+      "quantum":   { "label": "Quantum Accounting", "monthly": 470, "yearly": 5636 },
+      "autoentry": { "label": "AutoEntry document-capture add-on (500 credits)", "monthly": 145 }
+    }
   }
 }

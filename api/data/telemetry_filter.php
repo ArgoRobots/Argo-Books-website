@@ -27,11 +27,13 @@ const TELEMETRY_FEATURE_NAMES = [
     'ReceiptScanned',
     'DataImported', 'BackupCreated', 'BackupRestored',
     'InvoiceCreated', 'ExpenseCreated', 'RevenueCreated', 'PaymentRecorded',
-    'ProductCreated', 'StockAdjusted', 'PurchaseOrderCreated',
+    'BankMatchConfirmed',
+    'ProductCreated', 'CategoryCreated', 'LocationCreated', 'StockAdjusted',
+    'PurchaseOrderCreated', 'ReturnRecorded', 'LostDamagedRecorded',
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
     'ThemeChanged', 'LanguageChanged',
-    'OnboardingCompleted', 'OnboardingSkipped'
+    'CompanyCreated', 'OnboardingCompleted', 'OnboardingSkipped'
 ];
 
 /**

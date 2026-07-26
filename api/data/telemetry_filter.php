@@ -33,7 +33,7 @@ const TELEMETRY_FEATURE_NAMES = [
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
     'ThemeChanged', 'LanguageChanged',
-    'CompanyCreated', 'OnboardingCompleted', 'OnboardingSkipped'
+    'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped'
 ];
 
 /**
@@ -121,6 +121,10 @@ function filter_telemetry_event(array $event): ?array
         case 'FeatureUsage':
             return $base + [
                 'featureName' => telemetry_validate_enum($event['featureName'] ?? null, TELEMETRY_FEATURE_NAMES),
+                // Free-form detail the app attaches to a feature event (checklist
+                // step id, import source, chart type). Cleaned, not enum-checked,
+                // so new context values don't need a server change to survive.
+                'context' => telemetry_clean_string($event['context'] ?? null, 64),
                 'durationMs' => telemetry_clean_int($event['durationMs'] ?? null),
             ];
 

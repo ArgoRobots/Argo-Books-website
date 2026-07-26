@@ -27,6 +27,13 @@ $currency = $pricing['currency'];
 
 echo json_encode([
     'plans' => $plans,
+    // Raw numeric limits. The same figures appear inside the plan feature strings
+    // (e.g. "10/month"), but the desktop app needs them as numbers to compose its own
+    // sentences, and parsing them back out of display text would be fragile.
+    'limits' => [
+        'free_invoice_monthly_limit'      => (int) $pricing['free_invoice_monthly_limit'],
+        'free_receipt_scan_monthly_limit' => (int) $pricing['free_receipt_scan_monthly_limit'],
+    ],
     'pricing' => [
         'currency' => $currency,
         'premium_monthly_price' => $monthlyPrice,

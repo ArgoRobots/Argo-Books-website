@@ -92,7 +92,9 @@ function get_premium_subscription_keys()
         // paid subscription; keep unredeemed keys (no subscription yet) and keys
         // redeemed into a free_key subscription.
         $stmt = $pdo->query("
-            SELECT k.*
+            SELECT k.*,
+                   s.end_date AS subscription_end_date,
+                   s.status   AS subscription_status
             FROM premium_subscription_keys k
             LEFT JOIN premium_subscriptions s ON s.subscription_id = k.subscription_id
             WHERE s.subscription_id IS NULL OR s.payment_method = 'free_key'
@@ -104,6 +106,46 @@ function get_premium_subscription_keys()
     }
 
     return $keys;
+}
+
+/**
+ * Work out the display status of a free/promo subscription key.
+ *
+ * A key has no shelf life of its own: duration_months is the length of the
+ * subscription minted at redemption, so an unredeemed key never expires no
+ * matter how old it is. Once redeemed, the term runs out and the key should
+ * stop reading as a live "Redeemed" key.
+ *
+ * Prefer the linked subscription's end_date/status. If the subscription row is
+ * missing (deleted, or never created), fall back to redeemed_at + duration,
+ * which is the same anchor _recreate_subscription_for_key() uses in
+ * license_functions.php, so both agree on whether access has run out.
+ *
+ * @param array $key Row from get_premium_subscription_keys()
+ * @return string 'available' | 'redeemed' | 'expired'
+ */
+function get_subscription_key_status(array $key)
+{
+    if (empty($key['redeemed_at'])) {
+        return 'available';
+    }
+
+    // Permanent keys (duration 0) never expire.
+    if ((int)$key['duration_months'] === 0) {
+        return 'redeemed';
+    }
+
+    if (!empty($key['subscription_status']) && $key['subscription_status'] === 'expired') {
+        return 'expired';
+    }
+
+    if (!empty($key['subscription_end_date'])) {
+        return strtotime($key['subscription_end_date']) <= time() ? 'expired' : 'redeemed';
+    }
+
+    // No subscription row to read: derive the term from the redemption date.
+    $end = strtotime($key['redeemed_at'] . ' +' . (int)$key['duration_months'] . ' months');
+    return $end !== false && $end <= time() ? 'expired' : 'redeemed';
 }
 
 // Function to generate Premium subscription key
@@ -459,9 +501,23 @@ foreach ($premium_subscriptions as $sub) {
     if ($sub['status'] === 'active') $active_ai_subs++;
 }
 
+// Buckets for the stat cards. Expired keys are redeemed keys whose term has
+// run out, so they're counted separately rather than inflating "Redeemed":
+// total = redeemed + expired + available.
 $unredeemed_keys = 0;
+$redeemed_keys = 0;
+$expired_keys = 0;
 foreach ($premium_subscription_keys as $key) {
-    if ($key['redeemed_at'] === null) $unredeemed_keys++;
+    switch (get_subscription_key_status($key)) {
+        case 'available':
+            $unredeemed_keys++;
+            break;
+        case 'expired':
+            $expired_keys++;
+            break;
+        default:
+            $redeemed_keys++;
+    }
 }
 
 // Flash messages
@@ -719,11 +775,15 @@ include __DIR__ . '/../admin_header.php';
             </div>
             <div class="stat-card pending">
                 <h3>Redeemed Keys</h3>
-                <div class="value"><?php echo count($premium_subscription_keys) - $unredeemed_keys; ?></div>
+                <div class="value"><?php echo $redeemed_keys; ?></div>
             </div>
             <div class="stat-card free">
                 <h3>Available Keys</h3>
                 <div class="value"><?php echo $unredeemed_keys; ?></div>
+            </div>
+            <div class="stat-card">
+                <h3>Expired Keys</h3>
+                <div class="value"><?php echo $expired_keys; ?></div>
             </div>
         </div>
 
@@ -745,7 +805,13 @@ include __DIR__ . '/../admin_header.php';
                         <input type="email" id="sub_email" name="sub_email" placeholder="customer@example.com" required>
                     </div>
                     <div class="form-group">
-                        <label for="duration_months">Duration</label>
+                        <div class="label-with-tip">
+                            <label for="duration_months">Duration</label>
+                            <span class="info-tip" tabindex="0" role="button" aria-label="What does Duration mean?" aria-describedby="duration-tip">
+                                <span class="info-tip-icon" aria-hidden="true">i</span>
+                                <span class="info-tip-tooltip" id="duration-tip" role="tooltip">The countdown starts when the recipient redeems the key, not when you generate it. A key that is never redeemed never expires.</span>
+                            </span>
+                        </div>
                         <select id="duration_months" name="duration_months">
                             <option value="1">1 month</option>
                             <option value="3">3 months</option>
@@ -813,6 +879,7 @@ include __DIR__ . '/../admin_header.php';
                             </thead>
                             <tbody id="free-keys-table-body">
                                 <?php foreach ($premium_subscription_keys as $key): ?>
+                                    <?php $key_status = get_subscription_key_status($key); ?>
                                     <tr class="<?php echo $key['redeemed_at'] ? 'redeemed-row' : ''; ?>">
                                         <td class="checkbox-column">
                                             <div class="checkbox">
@@ -827,7 +894,9 @@ include __DIR__ . '/../admin_header.php';
                                         <td class="col-nowrap"><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
                                         <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--admin-text);">Any user</span>'; ?></td>
                                         <td>
-                                            <?php if ($key['redeemed_at']): ?>
+                                            <?php if ($key_status === 'expired'): ?>
+                                                <span class="badge badge-expired" title="Redeemed <?php echo date('M j, Y', strtotime($key['redeemed_at'])); ?><?php echo !empty($key['subscription_end_date']) ? ' &middot; ended ' . date('M j, Y', strtotime($key['subscription_end_date'])) : ''; ?>">Expired</span>
+                                            <?php elseif ($key_status === 'redeemed'): ?>
                                                 <span class="badge badge-redeemed">Redeemed</span>
                                             <?php else: ?>
                                                 <span class="badge badge-free">Available</span>

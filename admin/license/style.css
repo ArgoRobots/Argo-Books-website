@@ -20,6 +20,18 @@ table th {
     font-weight: 500;
     color: var(--admin-text);
 }
+/* Label paired with the shared .info-tip button (common-style.css). The tip sits
+   outside the <label> on purpose: nested inside, clicking it would forward the
+   click to the field and pop the select open. */
+.label-with-tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+.label-with-tip label {
+    margin-bottom: 0;
+}
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 10px 12px;

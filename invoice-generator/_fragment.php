@@ -161,7 +161,9 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=' . html
       <div class="meta-parties">
         <div class="meta-block meta-from">
           <input type="text" class="editable-text editable-label" data-label="from" aria-label="From label">
-          <textarea id="field-from" data-field="from" rows="3" placeholder="Your business name&#10;Address&#10;City, State ZIP&#10;EIN/Tax ID (optional)"></textarea>
+          <!-- rows="4" because this placeholder is four lines, one more than the
+               Bill To / Ship To ones. At rows="3" the last line was cut off. -->
+          <textarea id="field-from" data-field="from" rows="4" placeholder="Your business name&#10;Address&#10;City, State ZIP&#10;EIN/Tax ID (optional)"></textarea>
         </div>
 
         <div class="meta-bill-ship">

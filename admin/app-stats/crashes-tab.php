@@ -16,6 +16,11 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
+// Date-range bounds come from the host page. Defaulted here so this partial
+// still renders if it's ever included somewhere that doesn't set them.
+$rangeStartTs = $rangeStartTs ?? null;
+$rangeEndTs = $rangeEndTs ?? PHP_INT_MAX;
+
 $crashDir = __DIR__ . '/../data-logs/crashes';
 $crashFiles = is_dir($crashDir) ? (glob($crashDir . '/argo_crash_*.json') ?: []) : [];
 
@@ -51,6 +56,21 @@ foreach ($crashFiles as $crashFile) {
         if (!is_array($c)) {
             continue;
         }
+
+        $ts = $c['timestamp'] ?? $meta['receivedAt'];
+        // Compare on parsed epochs, not raw strings: reports use ISO 8601 while
+        // the receivedAt fallback is "Y-m-d H:i:s", which don't sort together.
+        $tsEpoch = $ts !== null ? (strtotime((string) $ts) ?: 0) : 0;
+
+        // Honour the page's date range, so this tab agrees with the charts. A
+        // report we can't date stays visible in every range: silently hiding a
+        // crash is worse than showing one that may be older than the window.
+        if ($tsEpoch > 0) {
+            if ($tsEpoch > $rangeEndTs || ($rangeStartTs !== null && $tsEpoch < $rangeStartTs)) {
+                continue;
+            }
+        }
+
         $crashTotal++;
         if ($meta['authId']) {
             $crashDevices[$meta['authId']] = true;
@@ -67,10 +87,6 @@ foreach ($crashFiles as $crashFile) {
         $type = (string) ($c['exceptionType'] ?? 'UnknownException');
         $source = (string) ($c['source'] ?? '');
         $sig = $type . '|' . $source;
-        $ts = $c['timestamp'] ?? $meta['receivedAt'];
-        // Compare on parsed epochs, not raw strings: reports use ISO 8601 while
-        // the receivedAt fallback is "Y-m-d H:i:s", which don't sort together.
-        $tsEpoch = $ts !== null ? (strtotime((string) $ts) ?: 0) : 0;
 
         if (!isset($crashGroups[$sig])) {
             $crashGroups[$sig] = [
@@ -185,7 +201,11 @@ if (!function_exists('crash_fmt')) {
 <?php if (count($crashGroups) === 0): ?>
     <div class="crash-empty">
         <div class="big">No crashes reported</div>
-        <div>Either nothing has crashed, or no reports have arrived yet.</div>
+        <?php if (count($crashFiles) > 0 && isset($rangeDisplay)): ?>
+            <div>Nothing crashed in <?= htmlspecialchars($rangeDisplay) ?>. Widen the date range to look further back.</div>
+        <?php else: ?>
+            <div>Either nothing has crashed, or no reports have arrived yet.</div>
+        <?php endif; ?>
     </div>
 <?php else: ?>
     <?php foreach ($crashGroups as $g):

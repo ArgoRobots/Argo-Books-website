@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+require_once __DIR__ . '/../date-range.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -25,6 +26,28 @@ if (!in_array($tierFilter, ['all', 'free', 'premium'], true)) {
     $tierFilter = 'all';
 }
 
+// Date range (shared presets: admin/date-range.php). It scopes the charts and
+// detail tables only. The Active Users KPI cards below are fixed-window metrics
+// by definition (DAU / WAU / MAU are always measured against today), so they are
+// computed from every event regardless of what is selected here.
+//
+// "All Time" can't resolve a floor up front the way the SQL pages do, since the
+// earliest telemetry event isn't known until the files are parsed. It's treated
+// as "no lower bound" during the parse and the display date is backfilled from
+// the oldest event afterwards.
+$presets = date_range_presets();
+$selectedRange = selected_date_range_preset();
+$customStartRaw = $_GET['start'] ?? null;
+$customEndRaw   = $_GET['end'] ?? null;
+
+$range      = resolve_date_range($selectedRange, $customStartRaw, $customEndRaw);
+$rangeStart = $range['start'];
+$rangeEnd   = $range['end'];
+
+$rangeStartTs = $selectedRange === 'All Time' ? null : $rangeStart->getTimestamp();
+$rangeEndTs   = $rangeEnd->getTimestamp();
+$earliestEventTs = null;
+
 $aggregatedData = [
     'dataPoints' => [
         'Export' => [],
@@ -43,6 +66,10 @@ $aggregatedData = [
         'free' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
         'premium' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
     ],
+    // Active Users KPI cards. Respect the tier filter, ignore the date range.
+    'fixedKpis' => ['totalUsers' => 0, 'dau' => 0, 'wau' => 0, 'mau' => 0],
+    // Selected range, so the charts can build their axes from it instead of "today".
+    'range' => ['preset' => $selectedRange, 'start' => null, 'end' => null],
 ];
 $fileInfo = [];
 
@@ -185,6 +212,13 @@ if (empty($dataDirs)) {
         ];
         $mauThreshold = time() - 30 * 86400;
 
+        // Last-seen per user for the Active Users KPI cards: tier-filtered like the
+        // rest of the page, but never date-range filtered, so DAU/WAU/MAU keep
+        // measuring against today no matter which range is selected.
+        $kpiLastSeen = [];
+        $dauThreshold = strtotime('today');
+        $wauThreshold = time() - 7 * 86400;
+
         // Process all JSON files and aggregate the data
         foreach ($dataFiles as $file) {
             $jsonDataRaw = file_get_contents($file);
@@ -257,6 +291,30 @@ if (empty($dataDirs)) {
                         continue;
                     }
 
+                    // An event with no readable timestamp can't be placed on any axis.
+                    $eventTs = strtotime($data['timestamp'] ?? '');
+                    if ($eventTs === false) {
+                        continue;
+                    }
+
+                    if ($earliestEventTs === null || $eventTs < $earliestEventTs) {
+                        $earliestEventTs = $eventTs;
+                    }
+
+                    // KPI cards: filled before the date-range gate below, so they stay
+                    // range-independent. Keyed like main.js (events with a hashedIP).
+                    if (!empty($data['hashedIP'])) {
+                        $kpiKey = $data['hashedIP'];
+                        if (!isset($kpiLastSeen[$kpiKey]) || $eventTs > $kpiLastSeen[$kpiKey]) {
+                            $kpiLastSeen[$kpiKey] = $eventTs;
+                        }
+                    }
+
+                    // Charts and detail tables respect the selected date range.
+                    if ($eventTs > $rangeEndTs || ($rangeStartTs !== null && $eventTs < $rangeStartTs)) {
+                        continue;
+                    }
+
                     $category = $result['category'];
                     if (!isset($aggregatedData['dataPoints'][$category])) {
                         $aggregatedData['dataPoints'][$category] = [];
@@ -279,6 +337,19 @@ if (empty($dataDirs)) {
         foreach (['free', 'premium'] as $t) {
             $aggregatedData['tierStats'][$t]['totalUsers'] = count($tierUsers[$t]['all']);
             $aggregatedData['tierStats'][$t]['mauUsers'] = count($tierUsers[$t]['mau']);
+        }
+
+        // Finalize the fixed-window Active Users KPIs
+        $aggregatedData['fixedKpis']['totalUsers'] = count($kpiLastSeen);
+        foreach ($kpiLastSeen as $lastSeen) {
+            if ($lastSeen >= $dauThreshold) $aggregatedData['fixedKpis']['dau']++;
+            if ($lastSeen >= $wauThreshold) $aggregatedData['fixedKpis']['wau']++;
+            if ($lastSeen >= $mauThreshold) $aggregatedData['fixedKpis']['mau']++;
+        }
+
+        // "All Time" had no lower bound during the parse; show the real oldest event.
+        if ($selectedRange === 'All Time' && $earliestEventTs !== null) {
+            $rangeStart = (new DateTime())->setTimestamp($earliestEventTs)->setTime(0, 0, 0);
         }
 
         // Store file processing information
@@ -307,6 +378,10 @@ if (empty($dataDirs)) {
         }
     }
 }
+
+$rangeDisplay = format_date_range($rangeStart, $rangeEnd);
+$aggregatedData['range']['start'] = $rangeStart->format('Y-m-d');
+$aggregatedData['range']['end']   = $rangeEnd->format('Y-m-d');
 
 // Convert aggregated data to JSON for JavaScript. Escape HTML-meaningful characters
 // (<, >, &, ', ") as \u00xx so a telemetry string containing "</script>" cannot break
@@ -483,6 +558,12 @@ include __DIR__ . '/../admin_header.php';
                             $isActive = $tierFilter === $tierKey;
                             $pillHref = '?tier=' . urlencode($tierKey);
                             if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
+                            // Carry the date range across a tier switch, the same way the tab is carried.
+                            $pillHref .= '&range=' . urlencode($selectedRange);
+                            if ($selectedRange === 'Custom Range') {
+                                $pillHref .= '&start=' . urlencode($rangeStart->format('Y-m-d'))
+                                           . '&end=' . urlencode($rangeEnd->format('Y-m-d'));
+                            }
                     ?>
                         <a href="<?= htmlspecialchars($pillHref) ?>"
                            class="control-pill <?= $isActive ? 'active' : '' ?>">
@@ -491,6 +572,35 @@ include __DIR__ . '/../admin_header.php';
                     <?php endforeach; ?>
                 </div>
             </div>
+
+            <!-- Date range: scopes the charts and detail tables. The Active Users KPI
+                 cards are fixed-window metrics and deliberately ignore it. -->
+            <form method="get" id="rangeForm" class="range-controls">
+                <input type="hidden" name="tier" value="<?= htmlspecialchars($tierFilter) ?>">
+                <input type="hidden" name="tab" id="rangeTabInput" value="<?= htmlspecialchars($currentTab) ?>">
+                <div class="control-group">
+                    <span class="control-label">Date Range:</span>
+                    <select name="range" id="rangePreset" class="control-select" onchange="onRangeChange()">
+                        <?php foreach ($presets as $presetOption): ?>
+                            <option value="<?= htmlspecialchars($presetOption) ?>" <?= $presetOption === $selectedRange ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($presetOption) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="range-display"><?= htmlspecialchars($rangeDisplay) ?></span>
+                    <span class="info-tip" tabindex="0" role="button" aria-label="What does the date range affect?" aria-describedby="range-tip">
+                        <span class="info-tip-icon" aria-hidden="true">i</span>
+                        <span class="info-tip-tooltip" id="range-tip" role="tooltip">Scopes the charts and detail tables. The Active Users cards (today, this week, this month) always measure against today, so they don't follow this range.</span>
+                    </span>
+                </div>
+
+                <div class="control-group range-custom" id="rangeCustom" style="display: <?= $selectedRange === 'Custom Range' ? 'flex' : 'none' ?>;">
+                    <input type="date" name="start" id="rangeStart" class="control-input" value="<?= htmlspecialchars($rangeStart->format('Y-m-d')) ?>" <?= $selectedRange === 'Custom Range' ? '' : 'disabled' ?>>
+                    <span>to</span>
+                    <input type="date" name="end" id="rangeEnd" class="control-input" value="<?= htmlspecialchars($rangeEnd->format('Y-m-d')) ?>" <?= $selectedRange === 'Custom Range' ? '' : 'disabled' ?>>
+                    <button type="submit" class="control-pill">Apply</button>
+                </div>
+            </form>
         </div>
     <?php endif; ?>
 
@@ -503,7 +613,12 @@ include __DIR__ . '/../admin_header.php';
     <?php elseif (!$currentViewHasData): ?>
         <div class="no-data">
             <h3>No Data Available</h3>
-            <?php if ($tierFilter !== 'all'): ?>
+            <?php if ($hasAnyData): ?>
+                <p>
+                    No <?= $tierFilter !== 'all' ? htmlspecialchars($tierFilter) . '-tier ' : '' ?>data
+                    for <?= htmlspecialchars($rangeDisplay) ?>. Widen the date range<?= $tierFilter !== 'all' ? ' or switch tier' : '' ?> above.
+                </p>
+            <?php elseif ($tierFilter !== 'all'): ?>
                 <p>No <?= htmlspecialchars($tierFilter) ?>-tier data has been collected yet. Switch to a different tier above.</p>
             <?php else: ?>
                 <p>No anonymous data has been collected yet. Data will appear here once users start using the application and uploading their analytics.</p>
@@ -858,12 +973,17 @@ include __DIR__ . '/../admin_header.php';
     <?php endif; ?>
 </div>
 
+<?php if (!$errorMessage && $currentViewHasData): ?>
 <script>
 // Tab switching is handled centrally by admin/section-tabs.js
 // Pass PHP data to JavaScript
 window.dashboardData = <?= $jsonData ?>;
 </script>
+<!-- Only loaded when the tabs above were rendered: every chart generator in
+     main.js assumes its canvas exists, so running it against the empty-state
+     page (no data for the selected range or tier) would throw. -->
 <script src="main.js?v=<?= filemtime(__DIR__ . '/main.js') ?>"></script>
+<?php endif; ?>
 
 <script>
 // Preserve scroll position when switching tier filter (shared admin pattern; see CLAUDE.md)
@@ -891,5 +1011,50 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (err) { /* URL API missing; fall back to server-rendered href */ }
         });
     });
+});
+
+// Date range control. Mirrors admin/website-stats: presets submit immediately,
+// "Custom Range" reveals the date inputs and waits for Apply.
+function onRangeChange() {
+    var preset = document.getElementById('rangePreset').value;
+    var custom = document.getElementById('rangeCustom');
+    var start = document.getElementById('rangeStart');
+    var end = document.getElementById('rangeEnd');
+
+    if (preset === 'Custom Range') {
+        custom.style.display = 'flex';
+        start.disabled = false;
+        end.disabled = false;
+        // Wait for the user to pick dates and press Apply.
+    } else {
+        custom.style.display = 'none';
+        // Disable so stale custom dates aren't appended to the URL.
+        start.disabled = true;
+        end.disabled = true;
+        submitRangeForm();
+    }
+}
+
+// The hidden tab field is rendered server-side at load; section-tabs.js only
+// updates the URL, so refresh it here to keep the active tab across a reload.
+function submitRangeForm() {
+    var activeBtn = document.querySelector('.section-tab.active[data-tab]');
+    var currentTab = activeBtn
+        ? activeBtn.dataset.tab
+        : new URLSearchParams(window.location.search).get('tab');
+    document.getElementById('rangeTabInput').value = currentTab || '';
+    sessionStorage.setItem('scrollPosition', window.scrollY);
+    document.getElementById('rangeForm').submit();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    var rangeForm = document.getElementById('rangeForm');
+    if (rangeForm) {
+        // Apply button (custom range) goes through the same tab-preserving path.
+        rangeForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitRangeForm();
+        });
+    }
 });
 </script>

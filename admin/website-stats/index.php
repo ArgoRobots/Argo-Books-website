@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../country_names.php';
+require_once __DIR__ . '/../date-range.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -14,116 +15,32 @@ $page_title = "Website Statistics";
 $page_description = "View comprehensive analytics, user statistics, and performance metrics";
 
 // ---------------------------------------------------------------------------
-// Date range + automatic bucketing.
+// Automatic bucketing.
 //
-// Mirrors the desktop app (ArgoBooks): a single date-range selection drives
-// everything, and the chart bucket (day / week / month) is derived from the
-// range length rather than chosen manually.
+// The date-range selection itself lives in admin/date-range.php, shared with
+// the other dashboards. What stays here is the SQL-side bucketing: the chart
+// bucket (day / week / month) is derived from the range length rather than
+// chosen manually.
 //   - range  < 90 days  -> daily buckets
 //   - range  < 365 days -> weekly buckets (Sunday-start)
 //   - range >= 365 days -> monthly buckets
-// See ReportChartDataService.GetTimeBucket and ChartSettingsService in the
-// Avalonia repo.
+// See ReportChartDataService.GetTimeBucket in the Avalonia repo.
 // ---------------------------------------------------------------------------
 
-/** Preset display names, in dropdown order (matches DateRangePreset.GetStandardOptions()). */
-function date_range_presets()
-{
-    return [
-        'This Month', 'Last Month', 'Last 30 Days', 'Last 100 Days', 'Last 365 Days',
-        'This Quarter', 'Last Quarter', 'This Year', 'Last Year', 'All Time', 'Custom Range',
-    ];
-}
-
 /**
- * Resolve a preset (plus optional custom start/end) to concrete [start, end]
- * DateTime bounds. Mirrors ChartSettingsService.UpdateDateRangeFromSelection():
- * the end is always end-of-day so rows saved later in the day aren't filtered out.
+ * Earliest record on this page, used as the floor for the "All Time" preset.
  */
-function resolve_date_range($preset, $custom_start = null, $custom_end = null)
+function website_stats_all_time_start()
 {
     global $pdo;
 
-    $now   = new DateTime('now');
-    $today = (new DateTime('now'))->setTime(0, 0, 0);
-    $year  = (int)$now->format('Y');
+    $row = $pdo->query("
+        SELECT LEAST(
+            COALESCE((SELECT MIN(created_at) FROM statistics), NOW()),
+            COALESCE((SELECT MIN(created_at) FROM community_users), NOW())
+        ) AS earliest")->fetch();
 
-    // Defaults (used as-is for "Custom Range" with missing/invalid input).
-    $start = clone $today;
-    $end   = (new DateTime('now'))->setTime(23, 59, 59);
-
-    switch ($preset) {
-        case 'This Month':
-            $start = (new DateTime('first day of this month'))->setTime(0, 0, 0);
-            break;
-
-        case 'Last Month':
-            $start = (new DateTime('first day of last month'))->setTime(0, 0, 0);
-            $end   = (new DateTime('last day of last month'))->setTime(23, 59, 59);
-            break;
-
-        case 'Last 30 Days':
-            $start = (clone $today)->modify('-29 days');
-            break;
-
-        case 'Last 100 Days':
-            $start = (clone $today)->modify('-99 days');
-            break;
-
-        case 'Last 365 Days':
-            $start = (clone $today)->modify('-364 days');
-            break;
-
-        case 'This Quarter':
-            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
-            $start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
-            break;
-
-        case 'Last Quarter':
-            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
-            $this_q_start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
-            $last_q_end   = (clone $this_q_start)->modify('-1 day')->setTime(23, 59, 59);
-            $lqm = intdiv((int)$last_q_end->format('n') - 1, 3) * 3 + 1;
-            $start = (new DateTime())->setDate((int)$last_q_end->format('Y'), $lqm, 1)->setTime(0, 0, 0);
-            $end   = $last_q_end;
-            break;
-
-        case 'This Year':
-            $start = (new DateTime())->setDate($year, 1, 1)->setTime(0, 0, 0);
-            break;
-
-        case 'Last Year':
-            $start = (new DateTime())->setDate($year - 1, 1, 1)->setTime(0, 0, 0);
-            $end   = (new DateTime())->setDate($year - 1, 12, 31)->setTime(23, 59, 59);
-            break;
-
-        case 'All Time':
-            $row = $pdo->query("
-                SELECT LEAST(
-                    COALESCE((SELECT MIN(created_at) FROM statistics), NOW()),
-                    COALESCE((SELECT MIN(created_at) FROM community_users), NOW())
-                ) AS earliest")->fetch();
-            $start = (!empty($row['earliest']))
-                ? (new DateTime($row['earliest']))->setTime(0, 0, 0)
-                : clone $today;
-            break;
-
-        case 'Custom Range':
-            $s = $custom_start ? DateTime::createFromFormat('Y-m-d', $custom_start) : false;
-            $e = $custom_end ? DateTime::createFromFormat('Y-m-d', $custom_end) : false;
-            if ($s && $e) {
-                if ($s > $e) {
-                    $tmp = $s;
-                    $s = $e;
-                    $e = $tmp;
-                }
-                $start = $s->setTime(0, 0, 0);
-                $end   = $e->setTime(23, 59, 59);
-            }
-            break;
-    }
-
-    return ['start' => $start, 'end' => $end];
+    return !empty($row['earliest']) ? new DateTime($row['earliest']) : null;
 }
 
 /** Choose the bucket granularity from the range length (mirrors GetTimeBucket). */
@@ -515,14 +432,12 @@ function get_conversion_data()
 
 // ---- Resolve the selected date range and derive the chart bucket ----
 $presets = date_range_presets();
-$selected_range = isset($_GET['range']) ? $_GET['range'] : 'Last 30 Days';
-if (!in_array($selected_range, $presets, true)) {
-    $selected_range = 'Last 30 Days';
-}
+$selected_range = selected_date_range_preset();
 $custom_start_raw = isset($_GET['start']) ? $_GET['start'] : null;
 $custom_end_raw   = isset($_GET['end']) ? $_GET['end'] : null;
 
-$range       = resolve_date_range($selected_range, $custom_start_raw, $custom_end_raw);
+$all_time_start = $selected_range === 'All Time' ? website_stats_all_time_start() : null;
+$range       = resolve_date_range($selected_range, $custom_start_raw, $custom_end_raw, $all_time_start);
 $range_start = $range['start'];
 $range_end   = $range['end'];
 $bucket      = pick_time_bucket($range_start, $range_end);
@@ -572,7 +487,7 @@ $bounce_overall   = get_bounce_rate_overall($range_start, $range_end);
 $visitor_overview = get_visitor_overview($range_start, $range_end);
 
 // Pretty range string for the toolbar pill (e.g. "Sep 14, 2025 – Oct 14, 2025").
-$range_display = $range_start->format('M j, Y') . ' – ' . $range_end->format('M j, Y');
+$range_display = format_date_range($range_start, $range_end);
 
 // Format post views numbers
 $total_post_views = isset($post_views['total_views']) ? number_format($post_views['total_views']) : 0;

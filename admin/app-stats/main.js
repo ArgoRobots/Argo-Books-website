@@ -1704,6 +1704,34 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================
   // Active Users Tab
   // =====================
+
+  // Total / DAU / WAU / MAU are counted server-side across every event, not just
+  // the ones inside the selected date range: "active today" has to mean today
+  // whatever range is being charted. See the fixedKpis note in index.php.
+  function setFixedKpis(rawData) {
+    const kpis = rawData.fixedKpis;
+    if (!kpis) return;
+    const cards = {
+      kpiTotalUsers: kpis.totalUsers,
+      kpiDAU: kpis.dau,
+      kpiWAU: kpis.wau,
+      kpiMAU: kpis.mau,
+    };
+    for (const id of Object.keys(cards)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = cards[id];
+    }
+  }
+
+  // End of the selected range as a local Date, for charts that draw a fixed
+  // number of trailing days. Falls back to today if the range is missing.
+  function rangeEndDate(rawData) {
+    const end = rawData.range && rawData.range.end;
+    if (!end) return new Date();
+    const d = new Date(end + "T00:00:00");
+    return isNaN(d.getTime()) ? new Date() : d;
+  }
+
   function generateActiveUsersTab(rawData) {
     // Collect all events from all categories
     const allEvents = [];
@@ -1715,9 +1743,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Filter to events with a hashedIP
     const eventsWithUser = allEvents.filter((e) => e.hashedIP);
 
+    // The KPI cards are fixed-window and range-independent, so they're filled from
+    // the server's own count before any early return below: an empty date range
+    // must not blank out numbers that don't depend on the range.
+    setFixedKpis(rawData);
+
     if (eventsWithUser.length === 0) {
-      document.getElementById("activeUsersKpiGrid").innerHTML =
-        '<div class="chart-no-data" style="grid-column: 1 / -1;">No active user data available</div>';
       document.getElementById("dauChart").parentElement.innerHTML =
         '<div class="chart-no-data">No active user data available</div>';
       document.getElementById("platformBreakdownChart").parentElement.innerHTML =
@@ -1731,7 +1762,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const now = new Date();
     const msPerDay = 86400000;
 
     // Local date string YYYY-MM-DD (not UTC). This dashboard is read in the
@@ -1749,8 +1779,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // (T00:00:00) so it isn't shifted back a day.
     const fmtDayLabel = (d) =>
       new Date(d + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
-
-    const todayStr = toLocalDateStr(now);
 
     // Helper: date string YYYY-MM-DD from timestamp (local)
     function toDateStr(ts) {
@@ -1789,26 +1817,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const allUsers = Object.keys(userMap);
-    const totalUsers = allUsers.length;
-
-    // DAU / WAU / MAU
-    const todayUsers = new Set();
-    const weekUsers = new Set();
-    const monthUsers = new Set();
-    const sevenDaysAgo = now.getTime() - 7 * msPerDay;
-    const thirtyDaysAgo = now.getTime() - 30 * msPerDay;
-
-    allUsers.forEach((ip) => {
-      const u = userMap[ip];
-      if (u.lastSeen >= new Date(todayStr + "T00:00:00").getTime()) todayUsers.add(ip);
-      if (u.lastSeen >= sevenDaysAgo) weekUsers.add(ip);
-      if (u.lastSeen >= thirtyDaysAgo) monthUsers.add(ip);
-    });
-
-    document.getElementById("kpiTotalUsers").textContent = totalUsers;
-    document.getElementById("kpiDAU").textContent = todayUsers.size;
-    document.getElementById("kpiWAU").textContent = weekUsers.size;
-    document.getElementById("kpiMAU").textContent = monthUsers.size;
 
     // --- Daily Active Users line chart (last 30 days) ---
     const dailyUsers = {};
@@ -1818,10 +1826,13 @@ document.addEventListener("DOMContentLoaded", function () {
       dailyUsers[dateStr].add(e.hashedIP);
     });
 
-    // Build last 30 days labels
+    // Build last 30 days labels, anchored to the end of the selected range rather
+    // than to today, so a past range renders its own 30 days instead of an empty
+    // chart. With the default range the anchor is today and nothing changes.
+    const axisEnd = rangeEndDate(rawData);
     const last30Dates = [];
     for (let i = 29; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * msPerDay);
+      const d = new Date(axisEnd.getTime() - i * msPerDay);
       last30Dates.push(toLocalDateStr(d));
     }
     const dauData = last30Dates.map((d) =>

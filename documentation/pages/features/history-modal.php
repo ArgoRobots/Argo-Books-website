@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Version History';
-$pageDescription = 'Learn how to use the Version History modal in Argo Books to review changes, undo or redo actions, search past events, and restore previous states of your data.';
+$pageDescription = 'Learn how to use the Version History modal in Argo Books to review every change made to your company data, and to search and filter past events.';
 $currentPage = 'history-modal';
 $pageCategory = 'features';
 
@@ -9,7 +9,7 @@ include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>The Version History modal gives you a complete timeline of every change made to your company data. You can review past actions, undo or redo specific changes, and search through your history to find exactly what you're looking for.</p>
+            <p>The Version History modal gives you a complete timeline of every change made to your company data. It is a read-only record: you can review and search everything that has happened, but changes are made and reversed elsewhere in Argo Books, not from this modal.</p>
 
             <h2>Opening Version History</h2>
             <p>Click the clock icon in the header bar to open the Version History modal.</p>
@@ -23,14 +23,14 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Description:</strong> A summary of what happened</li>
             </ul>
 
-            <h3>Nested Undo/Redo Events</h3>
-            <p>When you undo or redo a change, the resulting event is displayed as a nested sub-item under the original event. This keeps your timeline organized and makes it easy to trace the relationship between an action and its reversal.</p>
+            <h3>Undo and Redo Entries</h3>
+            <p>Undo and redo are done with the undo and redo buttons in Argo Books, not from this modal. When you use them, the reversal is recorded here as its own entry in the timeline, listed newest first alongside everything else. So a change and its later reversal both appear, each with its own timestamp.</p>
 
-            <h2>Searching History</h2>
-            <p>Use the search bar or filter controls to find specific events.</p>
+            <h2>Searching and Filtering History</h2>
+            <p>Use the search bar to find events by name or description. You can also narrow the list by the type of item that changed, such as customers or products, or by the kind of action, such as Added or Deleted. A clear button resets the search and both filters at once.</p>
 
             <div class="info-box">
-                <strong>Tip:</strong> The system automatically prevents actions that don't make sense. For example, you can't undo an "Add" if the item was later deleted. This ensures your data stays consistent.
+                <strong>Tip:</strong> Version History is a permanent record rather than a control panel. Nothing you do in this modal changes your data, so you can search and filter freely without any risk of altering your books.
             </div>
 
             <div class="page-navigation">

@@ -51,7 +51,7 @@ include __DIR__ . '/../../docs-header.php';
                 </table>
             </div>
 
-            <h2>Selection & Editing</h2>
+            <h3>Selection & Editing</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -68,7 +68,7 @@ include __DIR__ . '/../../docs-header.php';
                 </table>
             </div>
 
-            <h2>Element Movement (Fine Control)</h2>
+            <h3>Element Movement (Fine Control)</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -86,7 +86,7 @@ include __DIR__ . '/../../docs-header.php';
                 </table>
             </div>
 
-            <h2>Element Movement (Large Steps)</h2>
+            <h3>Element Movement (Large Steps)</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -104,7 +104,7 @@ include __DIR__ . '/../../docs-header.php';
                 </table>
             </div>
 
-            <h2>Alignment</h2>
+            <h3>Alignment</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>

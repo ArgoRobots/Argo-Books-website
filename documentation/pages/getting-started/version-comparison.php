@@ -19,7 +19,7 @@ include __DIR__ . '/../../docs-header.php';
         <div class="docs-content">
             <p>Argo Books offers two tiers to match your business needs. Start with our free version,
             perfect for small businesses just getting started with inventory tracking. As your business
-            grows, upgrade to Premium for unlimited products and AI-powered features.</p>
+            grows, upgrade to Premium for unlimited products and higher monthly limits.</p>
 
             <p>Not sure which version is right for you? <a href="../../../downloads/" class="link">Try our free
                 version first</a> – you can always <a href="../../../pricing/" class="link">upgrade
@@ -75,10 +75,42 @@ include __DIR__ . '/../../docs-header.php';
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Ordered by how much the tiers differ: metered features first,
+                             then premium-only, then everything included on both. -->
                         <tr>
-                            <td>Products</td>
-                            <td>Up to 10</td>
+                            <td>Invoices & Payments</td>
+                            <td><?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices / month</td>
                             <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td>Receipt Scanning</td>
+                            <td><?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipts / month</td>
+                            <td><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipts / month</td>
+                        </tr>
+                        <tr>
+                            <td>Spreadsheet Import</td>
+                            <td><?= (int) $pricing['ai_import_monthly_limit'] ?> imports / month</td>
+                            <td><?= (int) $pricing['premium_ai_import_monthly_limit'] ?> imports / month</td>
+                        </tr>
+                        <tr>
+                            <td>Bank Statement Import</td>
+                            <td><?= (int) $pricing['bank_import_monthly_limit'] ?> imports / month</td>
+                            <td><?= (int) $pricing['premium_bank_import_monthly_limit'] ?> imports / month</td>
+                        </tr>
+                        <tr>
+                            <td>Predictive Analytics</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Biometric Login</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Support</td>
+                            <td>Standard</td>
+                            <td>Priority</td>
                         </tr>
                         <tr>
                             <td>Transactions</td>
@@ -86,7 +118,27 @@ include __DIR__ . '/../../docs-header.php';
                             <td>Unlimited</td>
                         </tr>
                         <tr>
-                            <td>Real-time Analytics</td>
+                            <td>Works Offline</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Inventory Management</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Customer Management</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Expense &amp; Revenue Tracking</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Rental Management</td>
                             <td>✓</td>
                             <td>✓</td>
                         </tr>
@@ -96,44 +148,19 @@ include __DIR__ . '/../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
+                            <td>Real-time Analytics</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Report Builder</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
                             <td>Excel Import/Export</td>
                             <td>✓</td>
                             <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>AI Spreadsheet Import</td>
-                            <td>✓</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Report Generator</td>
-                            <td>✓</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Biometric Login</td>
-                            <td>—</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Invoices & Payments</td>
-                            <td><?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices / month</td>
-                            <td>Unlimited</td>
-                        </tr>
-                        <tr>
-                            <td>AI Receipt Scanning</td>
-                            <td><?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipts / month</td>
-                            <td><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipts / month</td>
-                        </tr>
-                        <tr>
-                            <td>Predictive Analytics</td>
-                            <td>—</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Support</td>
-                            <td>Standard</td>
-                            <td>Priority</td>
                         </tr>
                     </tbody>
                 </table>

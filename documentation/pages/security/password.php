@@ -12,7 +12,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>Secure access to your business data with password protection and biometric login integration.</p>
 
             <h2>Setting Up Password Protection</h2>
-            <p>Adding a password encrypts your company file so that only you can access it.</p>
+            <p>Adding a password encrypts your company file so that only you can access it. This is the step that turns encryption on: until a company file has a password, it is stored unencrypted and anyone who obtains the file can read it. See <a href="encryption.php" class="link">Encryption</a> for what that protects and how.</p>
             <ol class="steps-list">
                 <li>Go to "Settings"</li>
                 <li>Select the "Security" tab</li>
@@ -23,8 +23,19 @@ include __DIR__ . '/../../docs-header.php';
             <p>Once a password is set, you'll be prompted to enter it each time you open the company file.</p>
 
             <div class="warning-box">
-                <strong>Important:</strong> There is no password recovery option. If you forget your password, you will not be able to access your company file. Consider storing your password in a secure password manager.
+                <strong>Important: there is no password recovery, and no way for us to help.</strong> Your password is not checked against something stored in the file. It is what the encryption key is built from, so nothing in the file, on your computer, or on our servers can reproduce it. If you forget it, the data cannot be recovered by you, by us, or by anyone else. Store your password in a password manager before you rely on it.
             </div>
+
+            <p>This is a deliberate design choice. A recovery option would mean a way into your books that doesn't need your password, and that would be available to anyone who took your file, not just to you.</p>
+
+            <h3>If you're locked out</h3>
+            <p>Support cannot unlock a company file, so please don't send us your file. There are only two things that genuinely work, and both depend on something you set up earlier:</p>
+            <ul>
+                <li><strong>Biometric login, if you enabled it.</strong> If Windows Hello or Touch ID is still set up for this file on this computer and under the same user account, you can open the file with it. Do that, then go straight to Settings &gt; Security and change the password to something you'll keep.</li>
+                <li><strong>A backup made before you set the password.</strong> A backup from before the password existed is unencrypted and will open. Backups made afterwards use the same password as the file itself, so those won't help.</li>
+            </ul>
+
+            <p>If neither applies, the data is not recoverable. We'd rather be straight with you about that than have you wait on a support ticket that can't succeed.</p>
 
             <h2>Changing Your Password</h2>
             <p>To change an existing password:</p>
@@ -55,6 +66,15 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Windows:</strong> Uses Windows Hello (fingerprint reader, facial recognition camera, or PIN)</li>
                 <li><strong>macOS:</strong> Uses Touch ID</li>
                 <li><strong>Linux:</strong> Biometric login is not currently supported</li>
+            </ul>
+
+            <h3>How Biometric Login Stores Your Password</h3>
+            <p>Biometrics don't replace your password, they unlock it. When you enable the toggle, Argo Books hands your password to your operating system's protected storage, which ties it to your computer and to your signed-in user account. Your fingerprint or face is never seen by Argo Books; the operating system simply confirms it's you and releases the password back.</p>
+
+            <p>Two things follow from that:</p>
+            <ul>
+                <li>Biometric login only works on that computer, under that user account. Copy the file to another machine and you'll need the password.</li>
+                <li>It is as strong as your computer login. Anyone who can sign in as you could open the file, so keep a strong Windows or macOS account password.</li>
             </ul>
 
             <div class="info-box">

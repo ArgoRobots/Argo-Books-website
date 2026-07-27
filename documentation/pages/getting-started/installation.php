@@ -38,12 +38,12 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Linux</h2>
             <ol class="steps-list">
                 <li>Download the <strong>AppImage</strong> file from the <a class="link" href="../../../downloads/">downloads page</a></li>
-                <li>Make the file executable: right-click the file, go to Properties > Permissions, and check "Allow executing file as program" (or run <code>chmod +x</code> on the file)</li>
+                <li>Make the file executable: right-click the file, go to Properties > Permissions, and check "Allow executing file as program". The exact wording varies between distributions. From a terminal, <code>chmod +x ArgoBooks-*-linux-x64.AppImage</code> does the same thing.</li>
                 <li>Double-click the AppImage to launch Argo Books</li>
             </ol>
 
             <div class="info-box">
-                <strong>Note:</strong> AppImage files are self-contained and don't require installation. You can move the file to any location on your system and run it from there.
+                <strong>Tip:</strong> AppImage files are self-contained and don't require installation. You can move the file to any location on your system and run it from there.
             </div>
 
             <h2>After Installation</h2>

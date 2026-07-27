@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
   const rawData = window.dashboardData;
+  // The page omits the payload (and normally this script) when it renders its
+  // empty state: no data for the selected range or tier. Nothing to draw.
+  if (!rawData) {
+    return;
+  }
   const isGeoEnabled = rawData.geoLocationEnabled || false;
 
   const typeColors = {
@@ -1830,6 +1835,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // than to today, so a past range renders its own 30 days instead of an empty
     // chart. With the default range the anchor is today and nothing changes.
     const axisEnd = rangeEndDate(rawData);
+    // Cutoff for the trailing-30-day charts further down (platform breakdown,
+    // peak usage hours), from the same anchor as the axis above.
+    const thirtyDaysAgo = axisEnd.getTime() - 30 * msPerDay;
     const last30Dates = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(axisEnd.getTime() - i * msPerDay);

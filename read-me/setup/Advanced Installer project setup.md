@@ -31,9 +31,17 @@ Azure Trusted Signing needs to be set up. See `Argo-Books-Avalonia/docs/setup/Az
 It should already exist at `Argo-Books-Avalonia/packaging/windows/trusted-signing-metadata.json`. Double-check it's there. If missing, see Step 13 in `Argo-Books-Avalonia/docs/setup/AzureSetup.md` for the contents and how to recreate it.
 
 ### Avalonia release build
-In JetBrains Rider, set the build configuration to **Release** and the target to **Desktop (Windows)**, then build. See `Argo-Books-Avalonia/docs/Publishing.md` for the CLI alternative and the full publishing flow.
+Run `dotnet publish`, do not use a Rider build:
 
-Build output ends up at `Argo-Books-Avalonia/ArgoBooks.Desktop/bin/Release/net10.0-windows10.0.17763.0/win-x64/`. Advanced Installer's synchronized folder (set up in Step 4) points at this path.
+```bash
+dotnet publish ArgoBooks.Desktop -c Release -f net10.0-windows10.0.17763.0 -r win-x64 --self-contained -o publish/win-x64
+```
+
+The project sets `PublishReadyToRun`, which precompiles the app to native code and cuts cold start from roughly 6.5 seconds to 3.7 seconds. That setting only takes effect during `publish`. A Rider Release build silently ignores it and produces a working but noticeably slower installer. See `Argo-Books-Avalonia/docs/Publishing.md` for the full publishing flow.
+
+Run the command from the solution root (`Argo-Books-Avalonia`), because `-o` is relative to the current directory rather than to the project folder.
+
+Publish output ends up at `Argo-Books-Avalonia/publish/win-x64/`, alongside `ArgoBooks.Desktop`, not inside it. The folder is gitignored. Advanced Installer's synchronized folder (set up in Step 4) points at this path.
 
 ### Icon and logo files
 Should already exist at `C:\Users\<you>\Desktop\Argo logos\Third\`. Double-check these three are there:
@@ -59,7 +67,8 @@ The wizard has nine screens. Click **Next** between each.
 - Choose **EXE setup file** (a single `.exe` with everything bundled inside). This is the format argorobots.com serves to users.
 
 **Screen 3 - Add files to your project:**
-- **Browse** to the Avalonia build output folder: `C:\Users\<you>\Desktop\Argo-Books-Avalonia\ArgoBooks.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64`.
+- **Browse** to the Avalonia publish output folder: `C:\Users\<you>\Desktop\Argo-Books-Avalonia\publish\win-x64`.
+- This must be the **publish** folder, not `bin\Release\...`. Both produce a working installer, so pointing at the wrong one fails silently: the only symptom is every user waiting an extra 2.5 seconds at launch.
 - Check **Synchronized folder: recheck the folder and update the package every time the project is loaded or built**. This makes AI re-sync new builds automatically so you don't have to re-add files after every release.
 
 **Screen 4 - Create shortcuts for your applications:**

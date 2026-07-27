@@ -78,7 +78,13 @@ Three changes required:
 
   This is the most important fix on the page. Search-only is the discipline that makes a small budget productive.
 
-- **Locations**: switch from "All countries" to **Canada**. Expand to US later once Canadian data shows what's working.
+- **Locations**: switch from "All countries" to **Canada**.
+
+  Then expand **Location options** below the picker and change **Include** from "Presence or interest" to **"Presence: People in or regularly in your included locations"**.
+
+  This matters more than it looks. Google defaults to "Presence or interest", which serves the ad to anyone who has merely shown interest in Canada, wherever they actually are. The first campaign ran on that default and paid for searches like `tally erp 9 download` (Indian accounting software, CA$18.85 across eight queries), `free ct600 filing software` (UK corporation tax) and `free uk bookkeeping software`. Two of its nine recorded conversions were UK users who could never become customers.
+
+  Expand to the US later once Canadian data shows what's working.
 
 - **Languages**: leave at English.
 
@@ -145,7 +151,14 @@ The auto-filled description is generated from your landing page and looks decent
 "small business accounting canada"
 "alternative to quickbooks"
 "free accounting software small business"
+[offline accounting software]
+[desktop accounting software]
+"offline accounting software"
+"accounting software offline"
+"desktop bookkeeping software"
 ```
+
+The `offline` and `desktop` terms were added after the first campaign's search terms report. `offline accounting software free download` was the cheapest converting click in the whole campaign at CA$1.78, and the theme was not being targeted deliberately at all. Those two words are what actually separate Argo Books from Wave, Xero and QuickBooks; every other keyword above competes in a category they already dominate.
 
 Match-type rules:
 - `[brackets]` = exact match: ad shows only for that exact query (or very close variants). Highest intent.
@@ -230,7 +243,7 @@ The budget projections, the click-to-customer funnel model, and the revenue leve
 Skim the summary. The most important things to confirm:
 
 - Network: Search only (no Display, no Search Partners)
-- Location: Canada
+- Location: Canada, with **Location options set to "Presence"**, not the default "Presence or interest"
 - Bid strategy: Maximize Clicks with $3 max CPC
 - Tracking template: `{lpurl}?source=google-ads-qb-alt`
 - AI Max: off
@@ -305,7 +318,7 @@ After 3-5 days:
 - Check Search terms report. This shows the actual queries that triggered your ads (vs. the keywords you targeted). Add irrelevant queries as negative keywords. This is the single highest-ROI ongoing maintenance task.
 
 After 1 to 2 weeks:
-- Check `https://argorobots.com/admin/referral-links` for visit and conversion counts.
+- Check `https://argorobots.com/admin/marketing-funnel` for visit and conversion counts.
 - Compare Google Ads' reported conversion count to the admin dashboard count. They should roughly agree.
 - Watch the trend, not just absolute CPA. Every tracked conversion is a `/downloads/` visit, not a paying customer, so Google's CPA is cost per downloads-page visit, not cost per customer. The metric that actually pays the bills is Premium sign-ups, which you measure in your own admin, not in Google. See [Google Ads economics.md](../Google%20Ads%20economics.md) for the current CPA, what counts as normal, and the real cost per customer as it becomes measurable.
 
@@ -321,7 +334,6 @@ Build a shared negative keyword list and apply it to the campaign. These prevent
 crack
 torrent
 pirate
-download windows xp
 jobs
 salary
 career
@@ -329,14 +341,25 @@ course
 tutorial
 training
 certification
-intuit
-quickbooks login
-quickbooks support
 students
 university
 tally
-sage
-xero
+tallyprime
+erp9
+vyapar
+busywin
+gnucash
+quicken
+excel
+android
+apk
+ct600
+"simply accounting"
+"open source"
+"quickbooks login"
+"quickbooks support"
+"intuit login"
+"intuit support"
 ```
 
 Plus anything you see in the Search terms report that's irrelevant to your product.

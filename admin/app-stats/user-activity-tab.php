@@ -20,6 +20,14 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
+// Tier and date range come from the page-level control bar, so this tab shows
+// the same slice as the charts. It used to carry its own tier and period
+// dropdowns; those were a second, conflicting set of filters. Defaulted here so
+// the partial still renders if it's ever included without them.
+$ua_tierFilter   = $tierFilter ?? 'all';
+$ua_rangeStartTs = $rangeStartTs ?? null;
+$ua_rangeEndTs   = $rangeEndTs ?? PHP_INT_MAX;
+
 $ua_dataDir   = __DIR__ . '/../data-logs/telemetry/';
 $ua_legacyDir = __DIR__ . '/../data-logs/';
 
@@ -124,6 +132,11 @@ foreach ($ua_files as $name => $path) {
         continue;
     }
 
+    // Page-level tier filter.
+    if ($ua_tierFilter !== 'all' && $tier !== $ua_tierFilter) {
+        continue;
+    }
+
     if (!isset($ua_users[$authId])) {
         $ua_users[$authId] = [
             'tier'      => $tier,
@@ -154,8 +167,17 @@ foreach ($ua_files as $name => $path) {
     if (empty($u['timezone']) && !empty($geo['timezone'])) $u['timezone'] = $geo['timezone'];
 
     foreach ($d['events'] as $ev) {
-        $u['events']++;
         $ts = isset($ev['timestamp']) ? strtotime($ev['timestamp']) : false;
+
+        // Page-level date range. An event we can't date is kept, matching how
+        // the crash tab treats undated reports.
+        if ($ts !== false) {
+            if ($ts > $ua_rangeEndTs || ($ua_rangeStartTs !== null && $ts < $ua_rangeStartTs)) {
+                continue;
+            }
+        }
+
+        $u['events']++;
         if ($ts !== false) {
             if ($u['first'] === null || $ts < $u['first']) $u['first'] = $ts;
             if ($u['last']  === null || $ts > $u['last'])  $u['last']  = $ts;
@@ -188,11 +210,27 @@ foreach ($ua_files as $name => $path) {
     unset($u);
 }
 
+// A user whose files hold no events inside the selected range isn't part of this
+// view. Their file list is still complete on the card, because "Delete this
+// user" removes every file they uploaded, not just the ones in range.
+$ua_users = array_filter($ua_users, function ($u) { return $u['events'] > 0; });
+
 // Sort users: free first (what you care about), then most-recent activity.
 uasort($ua_users, function ($a, $b) {
     if ($a['tier'] !== $b['tier']) return $a['tier'] === 'free' ? -1 : 1;
     return ($b['last'] ?? 0) <=> ($a['last'] ?? 0);
 });
+
+// Delete posts back to this tab with the current filters intact, so the page
+// doesn't snap back to the default range after removing a user's files.
+$ua_action = '?tab=user-activity&tier=' . urlencode($ua_tierFilter);
+if (isset($selectedRange)) {
+    $ua_action .= '&range=' . urlencode($selectedRange);
+    if ($selectedRange === 'Custom Range' && isset($rangeStart, $rangeEnd)) {
+        $ua_action .= '&start=' . urlencode($rangeStart->format('Y-m-d'))
+                    . '&end=' . urlencode($rangeEnd->format('Y-m-d'));
+    }
+}
 
 if (!function_exists('ua_fmt')) {
     // gmdate() renders in UTC regardless of the server's timezone, so the "UTC"
@@ -266,21 +304,18 @@ if (!function_exists('ua_kv')) {
 <?php if ($ua_flash): ?><div class="ua-flash"><?= $ua_flash ?></div><?php endif; ?>
 
 <?php if (!$ua_users): ?>
-    <p>No telemetry files found.</p>
+    <?php if ($ua_files && isset($rangeDisplay)): ?>
+        <p>
+            No <?= $ua_tierFilter !== 'all' ? htmlspecialchars($ua_tierFilter) . '-tier ' : '' ?>user
+            activity in <?= htmlspecialchars($rangeDisplay) ?>. Widen the date range<?= $ua_tierFilter !== 'all' ? ' or switch tier' : '' ?> above.
+        </p>
+    <?php else: ?>
+        <p>No telemetry files found.</p>
+    <?php endif; ?>
 <?php else: ?>
+    <!-- Search only. Tier and date range are set once in the page's control bar. -->
     <div class="ua-controls" id="ua-controls">
         <input type="text" id="ua-search" class="ua-input" placeholder="Search id, country, region, version&hellip;">
-        <select id="ua-tier" class="ua-input">
-            <option value="">All tiers</option>
-            <option value="free">Free</option>
-            <option value="premium">Premium</option>
-        </select>
-        <select id="ua-period" class="ua-input">
-            <option value="0">Any time</option>
-            <option value="7">Active last 7 days</option>
-            <option value="30">Active last 30 days</option>
-            <option value="90">Active last 90 days</option>
-        </select>
         <span class="ua-count" id="ua-count"></span>
     </div>
 
@@ -298,14 +333,11 @@ if (!function_exists('ua_kv')) {
             implode(' ', array_keys($u['platforms']))
         ));
     ?>
-    <tr class="ua-user"
-        data-tier="<?= htmlspecialchars($u['tier']) ?>"
-        data-last="<?= (int)($u['last'] ?? 0) ?>"
-        data-search="<?= htmlspecialchars($ua_haystack) ?>">
+    <tr class="ua-user" data-search="<?= htmlspecialchars($ua_haystack) ?>">
       <td class="ua-td">
         <div class="ua-card">
         <div class="ua-del">
-            <form method="post" action="?tab=user-activity"
+            <form method="post" action="<?= htmlspecialchars($ua_action) ?>"
                   onsubmit="return confirm('Delete ALL <?= count($u['files']) ?> file(s) for this user? This cannot be undone.');">
                 <input type="hidden" name="del_label" value="<?= htmlspecialchars($u['authId']) ?>">
                 <?php foreach ($u['files'] as $fn): ?>
@@ -356,10 +388,11 @@ if (!function_exists('ua_kv')) {
     </table>
     </div><!-- /.table-responsive -->
 
-    <p class="ua-noresults" id="ua-noresults" style="display:none;">No users match your filters.</p>
+    <p class="ua-noresults" id="ua-noresults" style="display:none;">No users match your search.</p>
 
     <script>
-    // Filtering only. Pagination is the shared admin TablePaginator, which we
+    // Text search only; tier and date range are applied server-side from the
+    // page's control bar. Pagination is the shared admin TablePaginator, which we
     // re-run via reset() after hiding non-matching rows. Rows we hide use
     // display:none WITHOUT the .pg-hidden class, so the paginator excludes them
     // from its counts and pages (see admin/pagination.js _rows()).
@@ -368,24 +401,16 @@ if (!function_exists('ua_kv')) {
         if (!table) return;
         var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr.ua-user'));
         var search = document.getElementById('ua-search');
-        var tierSel = document.getElementById('ua-tier');
-        var periodSel = document.getElementById('ua-period');
         var countEl = document.getElementById('ua-count');
         var noRes = document.getElementById('ua-noresults');
-        var nowSec = Math.floor(Date.now() / 1000);
         var t;
 
         function apply() {
             var q = (search.value || '').trim().toLowerCase();
-            var tier = tierSel.value;
-            var days = parseInt(periodSel.value, 10) || 0;
-            var cutoff = days > 0 ? nowSec - days * 86400 : 0;
             var visible = 0;
 
             rows.forEach(function (tr) {
-                var ok = (!tier || tr.dataset.tier === tier)
-                    && (!cutoff || (parseInt(tr.dataset.last, 10) || 0) >= cutoff)
-                    && (!q || (tr.dataset.search || '').indexOf(q) !== -1);
+                var ok = !q || (tr.dataset.search || '').indexOf(q) !== -1;
                 if (ok) {
                     tr.style.display = '';
                     visible++;
@@ -401,8 +426,6 @@ if (!function_exists('ua_kv')) {
         }
 
         search.addEventListener('input', function () { clearTimeout(t); t = setTimeout(apply, 150); });
-        tierSel.addEventListener('change', apply);
-        periodSel.addEventListener('change', apply);
         apply();
     })();
     </script>

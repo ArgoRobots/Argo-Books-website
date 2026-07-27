@@ -94,6 +94,42 @@ $pricing = get_pricing_config();
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.11 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.11</span>
+                        <span class="date-tag">July 27 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Password recovery:</strong> If you forget the password to a company file, our support team can now unlock it for you. Until now a forgotten password meant the file stayed closed for good. Your password itself is still private and cannot be read by anyone, including us.</li>
+                                <li><strong>Stripe integration:</strong> Connect your Stripe account and bring your payments straight into Argo Books. Sales, tax, discounts, processing fees, and refunds all come across. Argo Books also remembers your Stripe payouts, so when you later import your bank statement it skips the matching deposit instead of counting that income twice.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Much faster startup:</strong> Argo Books opens around 40% faster on Windows, and a loading screen now appears right away so you can see it starting.</li>
+                                <li><strong>Setup starts with a receipt scan:</strong> The getting-started guide now begins by scanning a sample receipt, so you can see what Argo Books does within seconds of opening it for the first time.</li>
+                                <li><strong>Better with long receipts:</strong> Receipt scanning now handles longer, more detailed receipts with many line items.</li>
+                                <li><strong>Clearer settings layout:</strong> Settings tabs have moved to the side, so all the sections are visible at once.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes &amp; Improvements</h4>
+                            <p class="changelog-intro">Working in several company files side by side is smoother, dark theme is easier to read throughout, and there is the usual round of polish and performance work across the app.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.10 -->
             <div class="version-card">
                 <div class="version-header">

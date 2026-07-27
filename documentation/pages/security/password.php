@@ -20,22 +20,23 @@ include __DIR__ . '/../../docs-header.php';
                 <li>Enter and confirm your password</li>
             </ol>
 
-            <p>Once a password is set, you'll be prompted to enter it each time you open the company file.</p>
+            <p>Once a password is set, you'll be required to enter it each time you open the company file.</p>
 
-            <div class="warning-box">
-                <strong>Important: there is no password recovery, and no way for us to help.</strong> Your password is not checked against something stored in the file. It is what the encryption key is built from, so nothing in the file, on your computer, or on our servers can reproduce it. If you forget it, the data cannot be recovered by you, by us, or by anyone else. Store your password in a password manager before you rely on it.
-            </div>
+            <h3 id="locked-out">If you're locked out</h3>
+            <p>Try these in order.</p>
 
-            <p>This is a deliberate design choice. A recovery option would mean a way into your books that doesn't need your password, and that would be available to anyone who took your file, not just to you.</p>
+            <ol class="steps-list">
+                <li><strong>Biometric login, if you enabled it.</strong> If Windows Hello or Touch ID is still set up for this file, on this computer, under the same user account, open the file with it. Then go straight to Settings &gt; Security and change the password to something you'll keep.</li>
+                <li><strong>A backup made before you set the password.</strong> A backup from before the password existed isn't encrypted and will open normally. Backups made afterwards use the same password as the file, so those won't help.</li>
+                <li><strong>Ask us to recover it.</strong> Email <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a> and we'll walk you through it.</li>
+            </ol>
 
-            <h3>If you're locked out</h3>
-            <p>Support cannot unlock a company file, so please don't send us your file. There are only two things that genuinely work, and both depend on something you set up earlier:</p>
-            <ul>
-                <li><strong>Biometric login, if you enabled it.</strong> If Windows Hello or Touch ID is still set up for this file on this computer and under the same user account, you can open the file with it. Do that, then go straight to Settings &gt; Security and change the password to something you'll keep.</li>
-                <li><strong>A backup made before you set the password.</strong> A backup from before the password existed is unencrypted and will open. Backups made afterwards use the same password as the file itself, so those won't help.</li>
-            </ul>
+            <h3>How recovery works</h3>
+            <p>You will have to send us the company file. We confirm you're the owner, unlock it using a key only we hold, and send back a copy with the password removed. You can then open it and set a new password.</p>
 
-            <p>If neither applies, the data is not recoverable. We'd rather be straight with you about that than have you wait on a support ticket that can't succeed.</p>
+            <p><strong>We have to be able to confirm the file is yours.</strong> Anyone who steals a laptop also has the company file, so simply possessing it isn't proof. Expect us to check it against your account and purchase details before we unlock anything.</p>
+
+            <p>Password recovery is a safety net, not a substitute for remebering your password. Make sure to write it down or keep it stored in a password manager.</p>
 
             <h2>Changing Your Password</h2>
             <p>To change an existing password:</p>

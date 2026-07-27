@@ -278,7 +278,7 @@ function funnel_first_touch(array $visitor_ids): array
 
     $placeholders = implode(',', array_fill(0, count($visitor_ids), '?'));
     $expr = FUNNEL_REF_HOST_SQL;
-    $sql = "SELECT visitor_id, $expr AS host
+    $sql = "SELECT visitor_id, $expr AS host, page_url
               FROM referral_events
              WHERE event_type = 'landing' AND js_confirmed = 1 AND environment = ?
                AND visitor_id IN ($placeholders)
@@ -291,19 +291,136 @@ function funnel_first_touch(array $visitor_ids): array
     while ($row = $stmt->fetch()) {
         $vid = $row['visitor_id'];
         if (!isset($out[$vid])) { // first row per visitor wins (earliest)
-            $out[$vid] = ['host' => $row['host']];
+            $out[$vid] = [
+                'host' => $row['host'],
+                'page' => funnel_normalize_page($row['page_url']),
+            ];
         }
     }
     return $out;
 }
 
 /**
+ * Normalises a stored page_url into a bare path, so first-touch pages key the
+ * same way the statistics-derived entry pages do.
+ *
+ * page_url is written from REQUEST_URI, so it already excludes the host but may
+ * carry a query string (?source=..., utm params). The statistics entry-page
+ * query strips the query string with SUBSTRING_INDEX, so this has to match or
+ * the two datasets would never join.
+ */
+function funnel_normalize_page(?string $url): string
+{
+    if ($url === null || $url === '') {
+        return '/';
+    }
+    $path = explode('?', $url, 2)[0];
+    return $path === '' ? '/' : $path;
+}
+
+/**
+ * First-touch entry pages, counted as distinct visitors, from the referral
+ * funnel rather than the site-wide page_view stream.
+ *
+ * The `statistics` table cannot be used for this. track_page_view() records a
+ * page *name* ("invgen_tool", "paid_lp_contractors"), not a URL, while
+ * referral_events.page_url holds REQUEST_URI. The two never join except by
+ * accident on the homepage, so attributing installs and payments to statistics
+ * rows silently produces zeroes. Sourcing visits from the same table as the
+ * attribution keeps all the columns on one definition of a visitor.
+ */
+function funnel_entry_page_visits(?string $period_start, ?string $source_filter): array
+{
+    global $pdo;
+
+    $inner_where = "event_type = 'landing' AND js_confirmed = 1 AND environment = ?
+                    AND visitor_id IS NOT NULL AND visitor_id <> ''";
+    $params = [current_environment()];
+
+    if ($period_start !== null) {
+        $inner_where .= ' AND created_at >= ?';
+        $params[] = $period_start;
+    }
+    if ($source_filter !== null && $source_filter !== '') {
+        $inner_where .= ' AND source_code = ?';
+        $params[] = $source_filter;
+    }
+
+    // MIN(id) picks each visitor's earliest landing, matching the first-touch
+    // rule used for revenue. Written as a join rather than a window function so
+    // it runs on MySQL 5.7 as well as 8.
+    $sql = "SELECT SUBSTRING_INDEX(r.page_url, '?', 1) AS page, COUNT(*) AS visitors
+              FROM referral_events r
+              JOIN (
+                    SELECT MIN(id) AS first_id
+                      FROM referral_events
+                     WHERE $inner_where
+                     GROUP BY visitor_id
+                   ) f ON f.first_id = r.id
+             GROUP BY page
+             ORDER BY visitors DESC, page ASC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    $out = [];
+    foreach ($stmt->fetchAll() as $r) {
+        $out[funnel_normalize_page($r['page'])] = (int)$r['visitors'];
+    }
+    return $out;
+}
+
+/**
+ * Distinct visitor ids that reached a given funnel event in the period.
+ *
+ * Used to attribute installs and payments back to the referrer and entry page
+ * that first brought the visitor in. app_first_run rows can carry a NULL
+ * visitor_id when the install could not be matched to a web visit, and those
+ * are excluded because there is nothing to attribute them to.
+ */
+function funnel_visitors_with_event(string $event_type, ?string $period_start, ?string $source_filter): array
+{
+    global $pdo;
+
+    $sql = "SELECT DISTINCT visitor_id
+              FROM referral_events
+             WHERE event_type = ?
+               AND environment = ?
+               AND visitor_id IS NOT NULL
+               AND visitor_id <> ''";
+    $params = [$event_type, current_environment()];
+
+    if ($period_start !== null) {
+        $sql .= ' AND created_at >= ?';
+        $params[] = $period_start;
+    }
+    if ($source_filter !== null && $source_filter !== '') {
+        $sql .= ' AND source_code = ?';
+        $params[] = $source_filter;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return array_column($stmt->fetchAll(), 'visitor_id');
+}
+
+/**
  * Merge a visits map and a revenue map keyed by the same dimension value into a
  * sorted list of ['label','key','visits','revenue'], visits desc then revenue.
  */
-function funnel_merge_breakdown(array $visits_map, array $revenue_map, callable $labeler): array
-{
-    $keys = array_unique(array_merge(array_keys($visits_map), array_keys($revenue_map)));
+function funnel_merge_breakdown(
+    array $visits_map,
+    array $revenue_map,
+    callable $labeler,
+    array $free_map = [],
+    array $paid_map = []
+): array {
+    $keys = array_unique(array_merge(
+        array_keys($visits_map),
+        array_keys($revenue_map),
+        array_keys($free_map),
+        array_keys($paid_map)
+    ));
     $rows = [];
     foreach ($keys as $k) {
         $rows[] = [
@@ -311,6 +428,8 @@ function funnel_merge_breakdown(array $visits_map, array $revenue_map, callable 
             'label'   => $labeler((string)$k),
             'visits'  => (int)($visits_map[$k] ?? 0),
             'revenue' => (float)($revenue_map[$k] ?? 0),
+            'free'    => (int)($free_map[$k] ?? 0),
+            'paid'    => (int)($paid_map[$k] ?? 0),
         ];
     }
     usort($rows, function ($a, $b) {
@@ -443,6 +562,38 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
 
     }
 
+    // ---- Free / paid user counts (first-touch) per referrer and entry page ----
+    // Revenue alone hides which pages bring people who convert: a page can pull
+    // plenty of visits and no installs, or few visits and several. Counting the
+    // installs and payments a page introduced answers "which pages earn", which
+    // visit counts on their own cannot.
+    $free_by_ref = $paid_by_ref = [];
+    $free_by_page = $paid_by_page = [];
+
+    $ref_label_of = fn(?string $h) =>
+        ($h === null || $h === '' || $h === 'null') ? FUNNEL_DIRECT_LABEL : $h;
+
+    $install_visitors = funnel_visitors_with_event('app_first_run', $period_start, $source_filter);
+    $install_touch    = funnel_first_touch($install_visitors);
+    foreach ($install_touch as $ft) {
+        $label = $ref_label_of($ft['host']);
+        $free_by_ref[$label] = ($free_by_ref[$label] ?? 0) + 1;
+        $page = $ft['page'];
+        $free_by_page[$page] = ($free_by_page[$page] ?? 0) + 1;
+    }
+
+    // Paying visitors reuse the first-touch map already built above.
+    foreach ($paying as $p) {
+        $ft = $first_touch[$p['visitor_id']] ?? null;
+        if ($ft === null) {
+            continue; // no landing event recorded, nothing to attribute to
+        }
+        $label = $ref_label_of($ft['host']);
+        $paid_by_ref[$label] = ($paid_by_ref[$label] ?? 0) + 1;
+        $page = $ft['page'];
+        $paid_by_page[$page] = ($paid_by_page[$page] ?? 0) + 1;
+    }
+
     // ---- Category rollup (matches referral-links "By category") ----
     // Bucket tracked-source visits by category; direct/untracked is excluded.
     $category_visits = [];
@@ -462,7 +613,7 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
 
     // ---- Merge into sorted breakdown lists ----
     $channels  = funnel_merge_breakdown($channel_visits,     $rev_by_channel, $identity);
-    $referrers = funnel_merge_breakdown($ref_visits_map,     $rev_by_ref,     $identity);
+    $referrers = funnel_merge_breakdown($ref_visits_map,     $rev_by_ref,     $identity, $free_by_ref, $paid_by_ref);
     $campaigns = funnel_merge_breakdown($category_visits,    $rev_by_category, $category_labeler);
     $countries = funnel_merge_breakdown($country_visits_map, $rev_by_country, $country_labeler);
     $regions   = funnel_merge_breakdown($region_visits_map,  [],              $identity);
@@ -479,6 +630,15 @@ function build_funnel_analytics(?string $period_start, ?string $source_filter, a
         'cities'          => $cities,
         'total_visits'    => $total_visits,
         'total_revenue'   => $total_revenue,
+        // Entry pages, fully funnel-sourced: visits, installs and payments all
+        // count distinct visitors whose first landing was on that path.
+        'entry_pages'     => funnel_merge_breakdown(
+            funnel_entry_page_visits($period_start, $source_filter),
+            [],
+            fn(string $k) => $k,
+            $free_by_page,
+            $paid_by_page
+        ),
         'stage_countries' => funnel_stage_dimension('country_code', $period_start, $source_filter),
         'stage_sources'   => funnel_stage_dimension('source_code',  $period_start, $source_filter),
     ];

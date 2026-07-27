@@ -1052,6 +1052,60 @@
 [data-theme="dark"] .bd-details-visits { color: var(--white); }
 [data-theme="dark"] .bd-details-revenue { color: var(--amber-400); }
 
+/* Referrer and entry-page modals carry two extra attribution columns, so their
+   rows need a wider grid than the name/visits/revenue default above. */
+.bd-details-list-users .bd-details-row { grid-template-columns: 1fr auto auto auto auto; }
+.bd-details-free,
+.bd-details-paid {
+    font-variant-numeric: tabular-nums;
+    min-width: 72px;
+    text-align: right;
+    color: var(--admin-text);
+}
+.bd-details-paid { font-weight: 600; }
+[data-theme="dark"] .bd-details-free,
+[data-theme="dark"] .bd-details-paid { color: var(--white); }
+
+/* Download button sits at the far right of a card's tab bar. */
+.bd-download-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--admin-text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.bd-download-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+[data-theme="dark"] .bd-download-btn { border-color: var(--gray-600); color: var(--white); }
+[data-theme="dark"] .bd-download-btn:hover { background: var(--gray-700); border-color: var(--gray-500); }
+
+/* One-line explanation of the active tab. Sits above the content rather than
+   below it: the card has a fixed height and these panels scroll, so anything
+   placed after the list is hidden below the fold until the user scrolls. */
+.bd-panel-desc {
+    flex: 0 0 auto;
+    margin: 0 0 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--gray-500);
+}
+[data-theme="dark"] .bd-panel-desc { color: var(--white); }
+
+/* Column headings, only rendered when the attribution columns are present. */
+.bd-details-head {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    border-bottom-width: 2px;
+}
+.bd-details-head span { font-weight: 600; }
+[data-theme="dark"] .bd-details-head { color: var(--white); }
+
 @media (max-width: 900px) {
     .analytics-row { grid-template-columns: 1fr; }
 }

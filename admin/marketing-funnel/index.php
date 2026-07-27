@@ -99,21 +99,54 @@ function funnel_render_bar_list(array $rows, array $opts = []): string
  * region / city). $rows are the same rows fed to funnel_render_bar_list. Returns
  * '' when there's nothing to show, so callers can echo unconditionally.
  */
-function funnel_render_details_modal(string $id, string $title, array $rows, bool $show_revenue = true): string
-{
+function funnel_render_details_modal(
+    string $id,
+    string $title,
+    array $rows,
+    bool $show_revenue = true,
+    string $name_heading = 'Source'
+): string {
     if (empty($rows)) {
         return '';
     }
+    // Only breakdowns that carry first-touch attribution (referrer, entry page)
+    // have the free/paid counts. Detecting them rather than taking another
+    // parameter keeps the country/region/city call sites unchanged.
+    $show_users = false;
+    foreach ($rows as $r) {
+        if (!empty($r['free']) || !empty($r['paid'])) {
+            $show_users = true;
+            break;
+        }
+    }
+
     $h  = '<div id="' . htmlspecialchars($id) . '" class="modal bd-details-modal" style="display:none;">';
     $h .= '<div class="modal-content">';
     $h .= '<span class="modal-close bd-details-close">&times;</span>';
     $h .= '<h2>' . htmlspecialchars($title) . '</h2>';
     $h .= '<input type="text" class="bd-details-search" placeholder="Search&hellip;" autocomplete="off" spellcheck="false">';
-    $h .= '<div class="bd-details-list">';
+    $h .= '<div class="bd-details-list' . ($show_users ? ' bd-details-list-users' : '') . '">';
+
+    if ($show_users) {
+        $h .= '<div class="bd-details-row bd-details-head">';
+        $h .= '<span class="bd-details-name">' . htmlspecialchars($name_heading) . '</span>';
+        $h .= '<span class="bd-details-visits">Visits</span>';
+        $h .= '<span class="bd-details-free">Free users</span>';
+        $h .= '<span class="bd-details-paid">Paid users</span>';
+        if ($show_revenue) {
+            $h .= '<span class="bd-details-revenue">Revenue</span>';
+        }
+        $h .= '</div>';
+    }
+
     foreach ($rows as $r) {
         $h .= '<div class="bd-details-row" data-name="' . htmlspecialchars(strtolower($r['label'])) . '">';
         $h .= '<span class="bd-details-name">' . htmlspecialchars($r['label']) . '</span>';
         $h .= '<span class="bd-details-visits">' . number_format((int)$r['visits']) . '</span>';
+        if ($show_users) {
+            $h .= '<span class="bd-details-free">' . number_format((int)($r['free'] ?? 0)) . '</span>';
+            $h .= '<span class="bd-details-paid">' . number_format((int)($r['paid'] ?? 0)) . '</span>';
+        }
         if ($show_revenue) {
             $h .= '<span class="bd-details-revenue">$' . number_format((float)$r['revenue'], 0) . '</span>';
         }
@@ -134,6 +167,52 @@ function funnel_render_details_btn(string $target_id, array $rows): string
     }
     return '<button type="button" class="bd-details-btn" data-details-target="'
         . htmlspecialchars($target_id) . '">See all details</button>';
+}
+
+/**
+ * Turns a breakdown row list into a labelled dataset for the CSV export.
+ */
+function funnel_export_dataset(string $title, array $rows, bool $revenue = false, bool $users = false): array
+{
+    $cols = ['Name', 'Visits'];
+    if ($users)   { $cols[] = 'Free users'; $cols[] = 'Paid users'; }
+    if ($revenue) { $cols[] = 'Revenue'; }
+
+    $out = [];
+    foreach ($rows as $r) {
+        $line = [(string)$r['label'], (int)$r['visits']];
+        if ($users) {
+            $line[] = (int)($r['free'] ?? 0);
+            $line[] = (int)($r['paid'] ?? 0);
+        }
+        if ($revenue) {
+            $line[] = round((float)($r['revenue'] ?? 0), 2);
+        }
+        $out[] = $line;
+    }
+    return ['title' => $title, 'columns' => $cols, 'rows' => $out];
+}
+
+/**
+ * "Download" button for an analytics card. Carries every tab's rows in a data
+ * attribute so the export runs client-side, with no extra endpoint to secure.
+ */
+function funnel_render_download_btn(string $filename, array $datasets): string
+{
+    $payload = json_encode(
+        ['filename' => $filename, 'datasets' => $datasets],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    );
+    return '<button type="button" class="bd-download-btn" title="Download every tab in this card as CSV"'
+        . ' data-download="' . htmlspecialchars($payload, ENT_QUOTES) . '">Download</button>';
+}
+
+/**
+ * Short explanatory line shown under a tab's content.
+ */
+function funnel_render_panel_desc(string $text): string
+{
+    return '<p class="bd-panel-desc">' . htmlspecialchars($text) . '</p>';
 }
 
 /**
@@ -1146,8 +1225,16 @@ include __DIR__ . '/../admin_header.php';
         // page_view stream, not the referral funnel, so they ignore the source
         // pill and only honor the period window.
         $pages       = funnel_page_breakdowns($funnel_period_start_dt);
+
+        // Entry pages come from the referral funnel, not the page_view stream.
+        // track_page_view() stores a page *name* ("invgen_tool"), so those rows
+        // cannot be joined to the funnel and would show zero installs against
+        // every page. Sourcing all three columns from referral_events keeps
+        // visits, installs and payments on one definition of a visitor.
+        $entry_rows = $analytics['entry_pages'] ?? [];
+
         $bd_popular  = funnel_render_bar_list($pages['popular'], ['revenue' => false, 'limit' => 9, 'empty' => 'No page views in this period yet.']);
-        $bd_entry    = funnel_render_bar_list($pages['entry'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No entry pages in this period yet.']);
+        $bd_entry    = funnel_render_bar_list($entry_rows,       ['revenue' => false, 'limit' => 9, 'empty' => 'No entry pages in this period yet.']);
         $bd_exit     = funnel_render_bar_list($pages['exit'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No exit pages in this period yet.']);
 
         $channel_total_visits = array_sum(array_map(fn($r) => (int)$r['visits'], $analytics['channels']));
@@ -1159,9 +1246,15 @@ include __DIR__ . '/../admin_header.php';
                 <button class="bd-tab active" data-bd="channel">Channel</button>
                 <button class="bd-tab" data-bd="referrer">Referrer</button>
                 <button class="bd-tab" data-bd="campaign">Category</button>
+                <?php echo funnel_render_download_btn('traffic-sources', [
+                    funnel_export_dataset('Channel',  $analytics['channels'],  true),
+                    funnel_export_dataset('Referrer', $analytics['referrers'], true, true),
+                    funnel_export_dataset('Category', $analytics['campaigns'], true),
+                ]); ?>
             </div>
 
             <div class="bd-panel active" data-bd-panel="channel">
+                <?php echo funnel_render_panel_desc('Visits grouped into broad acquisition channels, worked out from the referring site and the tracked source code.'); ?>
                 <?php if ($channel_total_visits > 0): ?>
                     <div class="donut-wrap">
                         <div class="donut-canvas">
@@ -1179,11 +1272,15 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <div class="bd-panel" data-bd-panel="referrer">
+                <?php echo funnel_render_panel_desc('The site each visitor arrived from, with the installs and payments they went on to produce. "Direct / None" means no referrer was sent, which includes bookmarks, typed URLs and most clicks from outside a browser.'); ?>
                 <?php echo $bd_ref; ?>
                 <?php echo funnel_render_details_btn('referrerDetailsModal', $analytics['referrers']); ?>
             </div>
 
-            <div class="bd-panel" data-bd-panel="campaign"><?php echo $bd_campaign; ?></div>
+            <div class="bd-panel" data-bd-panel="campaign">
+                <?php echo funnel_render_panel_desc('Visits grouped by the category of the tracked referral link they used. Untracked and direct traffic is excluded.'); ?>
+                <?php echo $bd_campaign; ?>
+            </div>
         </div>
 
         <!-- Geography: map / country / region / city -->
@@ -1193,9 +1290,15 @@ include __DIR__ . '/../admin_header.php';
                 <button class="bd-tab" data-bd="country">Country</button>
                 <button class="bd-tab" data-bd="region">Region</button>
                 <button class="bd-tab" data-bd="city">City</button>
+                <?php echo funnel_render_download_btn('geography', [
+                    funnel_export_dataset('Country', $analytics['countries'], true),
+                    funnel_export_dataset('Region',  $analytics['regions']),
+                    funnel_export_dataset('City',    $analytics['cities']),
+                ]); ?>
             </div>
 
             <div class="bd-panel active" data-bd-panel="map">
+                <?php echo funnel_render_panel_desc('Visitor counts by country, shaded darker for more visits. Hover a country for its total.'); ?>
                 <div class="world-map" id="worldMap"></div>
                 <div class="map-legend">
                     <span class="map-legend-label">Fewer</span>
@@ -1204,14 +1307,17 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             </div>
             <div class="bd-panel" data-bd-panel="country">
+                <?php echo funnel_render_panel_desc('Visitors and attributed revenue by country, resolved from IP address. Useful for spotting spend reaching places you do not sell to.'); ?>
                 <?php echo $bd_country; ?>
                 <?php echo funnel_render_details_btn('countryDetailsModal', $analytics['countries']); ?>
             </div>
             <div class="bd-panel" data-bd-panel="region">
+                <?php echo funnel_render_panel_desc('Province or state, resolved from IP address. Best-effort, and often unknown.'); ?>
                 <?php echo $bd_region; ?>
                 <?php echo funnel_render_details_btn('regionDetailsModal', $analytics['regions']); ?>
             </div>
             <div class="bd-panel" data-bd-panel="city">
+                <?php echo funnel_render_panel_desc('City, resolved from IP address. Best-effort, and often unknown.'); ?>
                 <?php echo $bd_city; ?>
                 <?php echo funnel_render_details_btn('cityDetailsModal', $analytics['cities']); ?>
             </div>
@@ -1225,17 +1331,25 @@ include __DIR__ . '/../admin_header.php';
                 <button class="bd-tab active" data-bd="popular">Popular pages</button>
                 <button class="bd-tab" data-bd="entry">Entry page</button>
                 <button class="bd-tab" data-bd="exit">Exit page</button>
+                <?php echo funnel_render_download_btn('pages', [
+                    funnel_export_dataset('Popular pages', $pages['popular']),
+                    funnel_export_dataset('Entry pages',   $entry_rows, false, true),
+                    funnel_export_dataset('Exit pages',    $pages['exit']),
+                ]); ?>
             </div>
 
             <div class="bd-panel active" data-bd-panel="popular">
+                <?php echo funnel_render_panel_desc('Every page view in the period, counted once per visitor per day. Shows what gets read, not what converts.'); ?>
                 <?php echo $bd_popular; ?>
                 <?php echo funnel_render_details_btn('popularPagesDetailsModal', $pages['popular']); ?>
             </div>
             <div class="bd-panel" data-bd-panel="entry">
+                <?php echo funnel_render_panel_desc('The first page each visitor landed on, with the installs and payments that visitor later produced. This is the tab that shows which pages earn, rather than which get read.'); ?>
                 <?php echo $bd_entry; ?>
-                <?php echo funnel_render_details_btn('entryPagesDetailsModal', $pages['entry']); ?>
+                <?php echo funnel_render_details_btn('entryPagesDetailsModal', $entry_rows); ?>
             </div>
             <div class="bd-panel" data-bd-panel="exit">
+                <?php echo funnel_render_panel_desc('The last page a visitor saw before leaving. A high count is normal for pages that end a journey, such as the downloads page.'); ?>
                 <?php echo $bd_exit; ?>
                 <?php echo funnel_render_details_btn('exitPagesDetailsModal', $pages['exit']); ?>
             </div>
@@ -1248,9 +1362,9 @@ include __DIR__ . '/../admin_header.php';
         echo funnel_render_details_modal('countryDetailsModal',  'Country',  $analytics['countries'], true);
         echo funnel_render_details_modal('regionDetailsModal',   'Region',   $analytics['regions'],   false);
         echo funnel_render_details_modal('cityDetailsModal',     'City',     $analytics['cities'],    false);
-        echo funnel_render_details_modal('popularPagesDetailsModal', 'Most popular pages', $pages['popular'], false);
-        echo funnel_render_details_modal('entryPagesDetailsModal',   'Entry pages',        $pages['entry'],   false);
-        echo funnel_render_details_modal('exitPagesDetailsModal',    'Exit pages',         $pages['exit'],    false);
+        echo funnel_render_details_modal('popularPagesDetailsModal', 'Most popular pages', $pages['popular'], false, 'Page');
+        echo funnel_render_details_modal('entryPagesDetailsModal',   'Entry pages',        $entry_rows,       false, 'Page');
+        echo funnel_render_details_modal('exitPagesDetailsModal',    'Exit pages',         $pages['exit'],    false, 'Page');
     ?>
 
         <?php
@@ -2312,6 +2426,48 @@ include __DIR__ . '/../admin_header.php';
                 if (e.key !== 'Escape') return;
                 document.querySelectorAll('.bd-details-modal').forEach(m => {
                     if (m.style.display === 'block') close(m);
+                });
+            });
+        })();
+
+        // Card "Download" buttons. Every tab in the card is written into one CSV,
+        // separated by a blank line and its own header row, which Excel and Sheets
+        // both open cleanly. Done client-side from the payload already in the DOM
+        // so there is no extra admin endpoint to authenticate.
+        (function () {
+            const escapeCell = value => {
+                const s = String(value ?? '');
+                return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+            };
+
+            document.querySelectorAll('.bd-download-btn[data-download]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    let payload;
+                    try {
+                        payload = JSON.parse(btn.getAttribute('data-download'));
+                    } catch (err) {
+                        return;
+                    }
+
+                    const lines = [];
+                    (payload.datasets || []).forEach((ds, i) => {
+                        if (i > 0) lines.push('');
+                        lines.push(escapeCell(ds.title));
+                        lines.push((ds.columns || []).map(escapeCell).join(','));
+                        (ds.rows || []).forEach(row => lines.push(row.map(escapeCell).join(',')));
+                    });
+
+                    // BOM so Excel reads UTF-8 rather than the system codepage.
+                    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const stamp = new Date().toISOString().slice(0, 10);
+                    a.href = url;
+                    a.download = (payload.filename || 'analytics') + '-' + stamp + '.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
                 });
             });
         })();

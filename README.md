@@ -111,3 +111,40 @@ You need to create a MySQL database and import the schema.
 1. Upload the new .exe and the language folder to this new directory
 2. Update the version number in `avalonia-update.xml`
 3. Add the new version to whats-new/index.php
+
+## Documentation
+
+Reference docs live in [read-me/](read-me/).
+
+### Operations
+
+| Document | Read it when |
+|---|---|
+| [Deployment](read-me/Deployment.md) | Shipping to production, or a push did not land on the server |
+| [Cron jobs](read-me/Cron%20jobs.md) | Adding a scheduled task, or one has stopped running |
+| [Admin guide](read-me/Admin%20guide.md) | Checking payment processor fees, switching between sandbox and production, rotating payment keys, or creating an admin account |
+| [Refund block response procedure](read-me/procedures/Refund%20block%20response%20procedure.md) | The refund system has hard-blocked someone and emailed you |
+
+### Setup
+
+| Document | Read it when |
+|---|---|
+| [Local email setup](read-me/setup/Local%20email%20setup.md) | Setting up MailHog so local mail does not try to reach a real server |
+| [Payment provider setup](read-me/setup/Payment%20provider%20setup.md) | Configuring Stripe, PayPal or Square, for the portal or subscriptions |
+| [Cloudflare Turnstile setup](read-me/setup/Cloudflare%20Turnstile%20setup.md) | Working on the free receipt scanner's bot protection |
+| [Google Ads campaign setup](read-me/setup/Google%20Ads%20campaign%20setup.md) | Building a new Google Ads campaign, step by step |
+
+### Testing
+
+| Document | Read it when |
+|---|---|
+| [Payment provider testing](read-me/testing/Payment%20provider%20testing.md) | Running sandbox payments through any provider |
+| [First-run install tracking](read-me/testing/First-run%20install%20tracking.md) | Checking that installs attribute back to the originating ad click |
+| [PHPUnit suite](tests/README.md) | Running or adding backend tests. Covers the financial and licensing flows |
+
+### Marketing
+
+| Document | Read it when |
+|---|---|
+| [Email outreach](read-me/Email%20outreach.md) | Running or changing the outreach pipeline |
+| [Google Ads economics](read-me/Google%20Ads%20economics.md) | Deciding whether to spend, and what a click is worth. Keep the figures current |

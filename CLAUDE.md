@@ -116,7 +116,7 @@ The `read-me/` directory has authoritative reference docs that are kept current.
 - `read-me/Cron jobs.md`: every scheduled cron and its frequency
 - `read-me/Deployment.md`: how `.github/workflows/deploy.yml` ships code to the server
 - `read-me/Email outreach.md`: outreach pipeline behavior
-- `read-me/Admin guide.md`: admin dashboard tour
+- `read-me/Admin guide.md`: payment processor fees, sandbox vs production modes, key rotation, admin-account scripts
 - `read-me/setup/Payment provider setup.md`: Stripe / PayPal / Square provider config
 - `read-me/testing/Payment provider testing.md`: sandbox testing procedures
 - `read-me/testing/First-run install tracking.md`: how the install funnel attributes back to the originating ad click, why your own machine deduplicates itself, and the end-to-end test procedure

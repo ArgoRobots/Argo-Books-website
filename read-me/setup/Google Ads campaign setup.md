@@ -378,7 +378,7 @@ Plus anything you see in the Search terms report that's irrelevant to your produ
 
 ## Related files
 
-- [main.js](../resources/scripts/main.js): UET and gtag installation
+- [main.js](../resources/scripts/main.js): gtag installation
 - [track_referral.php](../track_referral.php): referral source resolver
 - [statistics.php](../statistics.php): `track_referral_visit()` function
 - [admin/referral-links/index.php](../admin/referral-links/index.php): admin UI for referral source management

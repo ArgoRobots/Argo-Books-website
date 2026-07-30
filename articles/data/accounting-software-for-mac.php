@@ -177,7 +177,8 @@ HTML,
 
   'related_article_slugs' => [
     'quickbooks-desktop-discontinued',
+    'accounting-software-for-windows',
+    'accounting-software-for-linux',
     'offline-accounting-software',
-    'best-free-accounting-software-for-small-business',
   ],
 ];

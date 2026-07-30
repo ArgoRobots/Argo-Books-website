@@ -446,6 +446,8 @@ php_value upload_max_filesize 10M
     RewriteRule ^best-accounting-software-for-ecommerce/?$ articles/article-page.php?slug=best-accounting-software-for-ecommerce [L,QSA]
     RewriteRule ^offline-accounting-software/?$ articles/article-page.php?slug=offline-accounting-software [L,QSA]
     RewriteRule ^accounting-software-for-mac/?$ articles/article-page.php?slug=accounting-software-for-mac [L,QSA]
+    RewriteRule ^accounting-software-for-windows/?$ articles/article-page.php?slug=accounting-software-for-windows [L,QSA]
+    RewriteRule ^accounting-software-for-linux/?$ articles/article-page.php?slug=accounting-software-for-linux [L,QSA]
     RewriteRule ^wave-accounting-alternatives/?$ articles/article-page.php?slug=wave-accounting-alternatives [L,QSA]
     RewriteRule ^how-to-switch-from-quickbooks/?$ articles/article-page.php?slug=how-to-switch-from-quickbooks [L,QSA]
     RewriteRule ^quickbooks-self-employed-discontinued/?$ articles/article-page.php?slug=quickbooks-self-employed-discontinued [L,QSA]

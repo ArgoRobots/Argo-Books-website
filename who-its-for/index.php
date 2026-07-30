@@ -14,65 +14,72 @@ $niches = [
     [
         'slug'  => 'landscapers',
         'name'  => 'Landscapers',
-        'icon'  => 'home',
+        'icon'  => 'leaf',
         'tone'  => 'green',
         'blurb' => 'Deposits, materials, and seasonal cashflow, without the bookkeeping headache.',
     ],
     [
         'slug'  => 'contractors',
         'name'  => 'Contractors',
-        'icon'  => 'clipboard-check',
-        'tone'  => 'blue',
+        'icon'  => 'hard-hat',
+        'tone'  => 'amber',
         'blurb' => 'Progress billing across deposits, mid-job draws, change orders, and final balances.',
     ],
     [
         'slug'  => 'repair-shops',
         'name'  => 'Repair Shops',
-        'icon'  => 'document-lines',
-        'tone'  => 'amber',
+        'icon'  => 'wrench',
+        'tone'  => 'blue',
         'blurb' => 'Diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.',
     ],
     [
         'slug'  => 'rental-businesses',
         'name'  => 'Rental Businesses',
-        'icon'  => 'package-detail',
+        'icon'  => 'package-clock',
         'tone'  => 'purple',
         'blurb' => 'Track what is out, who has it, when it is coming back, and what they owe. Rental management built in.',
     ],
     [
         'slug'  => 'cleaning-companies',
         'name'  => 'Cleaning Companies',
-        'icon'  => 'refresh',
+        'icon'  => 'spray-bottle',
         'tone'  => 'blue',
         'blurb' => 'Recurring invoices, supply costs, and the difference between a profitable client and a busy one.',
     ],
     [
         'slug'  => 'local-wholesalers',
         'name'  => 'Local Wholesalers',
-        'icon'  => 'package',
+        'icon'  => 'truck',
         'tone'  => 'green',
         'blurb' => 'Net-30 invoicing, standing orders, and inventory built in for distributors serving small accounts.',
     ],
     [
         'slug'  => 'resellers',
         'name'  => 'Resellers',
-        'icon'  => 'shopping-bag',
+        'icon'  => 'tag',
         'tone'  => 'amber',
         'blurb' => 'Cost of goods, sourcing receipts, and real margins for thrift flippers and online resellers.',
     ],
     [
         'slug'  => 'auto-detailing',
         'name'  => 'Auto Detailing',
-        'icon'  => 'credit-card',
+        'icon'  => 'car',
         'tone'  => 'purple',
         'blurb' => 'Tiered packages, ceramic coating jobs, and the supply receipts that quietly add up.',
     ],
     [
         'slug'  => 'solo-operators',
         'name'  => 'Solo Operators with Inventory',
-        'icon'  => 'pie-chart',
+        'icon'  => 'user-package',
         'tone'  => 'blue',
         'blurb' => 'One person doing all the jobs: materials, finished goods, and the books, in one app.',
+    ],
+    [
+        'slug'  => 'software-companies',
+        'name'  => 'Software & SaaS Companies',
+        'icon'  => 'code-window',
+        'tone'  => 'green',
+        'blurb' => 'Connect Stripe with a read-only key and your charges, fees, and refunds land in the books for you.',
     ],
 ];
 ?>
@@ -86,13 +93,13 @@ $niches = [
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for small business owners who do their own bookkeeping. See how Argo Books fits landscapers, contractors, repair shops, rentals, and more.">
+        content="Accounting software for small business owners who do their own bookkeeping. See how Argo Books fits landscapers, contractors, repair shops, rentals, software companies, and more.">
     <meta name="keywords"
         content="who is argo books for, argo books industries, accounting software by industry, small business accounting software by trade">
 
     <meta property="og:title" content="Who Argo Books is For: Industries and Trades We Built It For">
     <meta property="og:description"
-        content="Landscapers, contractors, repair shops, rental businesses, cleaning companies, wholesalers, resellers, auto detailers, and solo operators with inventory.">
+        content="Landscapers, contractors, repair shops, rental businesses, cleaning companies, wholesalers, resellers, auto detailers, solo operators with inventory, and software companies.">
     <meta property="og:url" content="https://argorobots.com/who-its-for/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -104,7 +111,7 @@ $niches = [
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Who Argo Books is For: Industries and Trades We Built It For">
     <meta name="twitter:description"
-        content="Bookkeeping built for the way small businesses actually work, across nine industries.">
+        content="Bookkeeping built for the way small businesses actually work, across ten industries.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <meta name="geo.region" content="CA-SK">
@@ -173,7 +180,7 @@ $niches = [
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Industries</span>
-                <h2>Nine industries, one app</h2>
+                <h2>Ten industries, one app</h2>
                 <p class="section-desc">Each page below covers how Argo Books handles the billing patterns, supply costs, and reporting that matter for that line of work. If your industry is not listed, the core bookkeeping still works the same way: invoices, expenses, reports, and (where it applies) inventory or rentals.</p>
             </div>
 

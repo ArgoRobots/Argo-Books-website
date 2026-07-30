@@ -520,7 +520,7 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                         <span>Get Started Free</span>
                         <?= svg_icon('arrow-right', 18) ?>
                     </a>
-                    <a href="<?= $base ?>documentation/pages/features/stripe-integration.php" class="btn-cta btn-cta-outline">
+                    <a href="<?= $base ?>documentation/pages/integrations/stripe-integration.php" class="btn-cta btn-cta-outline">
                         <span>Read the setup guide</span>
                     </a>
                 </div>

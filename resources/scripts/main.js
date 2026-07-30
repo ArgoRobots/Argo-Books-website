@@ -29,6 +29,7 @@ function getBasePath() {
                    '/for-rental-businesses/', '/for-cleaning-companies/',
                    '/for-local-wholesalers/', '/for-resellers/',
                    '/for-auto-detailing/', '/for-solo-operators/',
+                   '/for-software-companies/',
                    '/who-its-for/'];
 
   var isRootPath = sitePaths.some(function(p) { return path.startsWith(p); }) || path === '/' || path === '/index.php';

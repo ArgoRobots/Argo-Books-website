@@ -419,5 +419,44 @@ function _svg_icon_definitions() {
         'info' => [
             'body' => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4" stroke-linecap="round"/><circle cx="12" cy="8" r="1.25" fill="currentColor" stroke="none"/>',
         ],
+
+        // ── Industries ─────────────────────────────────────────────────
+        // Trade-specific icons for the /who-its-for/ cards. Rounded joins are
+        // set on a wrapping <g> because the <svg> root doesn't apply them.
+        'leaf' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></g>',
+        ],
+        'hard-hat' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><path d="M14 6a6 6 0 0 1 6 6v3"/></g>',
+        ],
+        'wrench' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></g>',
+        ],
+        'package-clock' => [
+            // Isometric crate with a clock badge: rentals go out and come back.
+            // Drawn at final size rather than scaled, so the stroke stays even.
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10 7.75 6.5 14 10v7.5L7.75 21 1.5 17.5z"/><path d="M1.5 10 7.75 13.5 14 10"/><path d="M7.75 13.5V21"/><circle cx="18.5" cy="6" r="4.5"/><path d="M18.5 3.9V6l1.6 1.1"/></g>',
+        ],
+        'spray-bottle' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 8H16a3 3 0 0 1 3 3v8.5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V11a3 3 0 0 1 3-3z"/><path d="M11.5 8V5.5H16V8"/><path d="M11.5 6.5H7.5L5.8 4.8"/><path d="M4.6 3 3.3 1.7M3.6 6.2H2M4.6 9.4 3.3 10.7"/></g>',
+        ],
+        'truck' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="14" height="12" rx="1.5"/><path d="M15 8h4.5l3.5 3.5V16H15z"/><circle cx="6" cy="18.5" r="2.3"/><circle cx="18" cy="18.5" r="2.3"/></g>',
+        ],
+        'tag' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.1"/></g>',
+        ],
+        'car' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12.4V16c0 .6.4 1 1 1h2"/><path d="M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></g>',
+        ],
+        'user-package' => [
+            // One person plus a taped carton: solo operators carrying stock.
+            // The lid line stops short of a full cross so it reads as a box,
+            // not a 2x2 grid.
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11 21v-1.5A3.5 3.5 0 0 0 7.5 16h-3A3.5 3.5 0 0 0 1 19.5V21"/><circle cx="6" cy="8" r="3.5"/><rect x="13.5" y="11" width="9.5" height="10" rx="1.5"/><path d="M13.5 15h9.5"/><path d="M18.25 11v4"/></g>',
+        ],
+        'code-window' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 8h20"/><path d="M10.5 12.5 8 15l2.5 2.5"/><path d="M13.5 12.5 16 15l-2.5 2.5"/></g>',
+        ],
     ];
 }

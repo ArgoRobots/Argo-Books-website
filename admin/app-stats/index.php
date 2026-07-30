@@ -124,6 +124,9 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
         case 'Session':
             $normalized['action'] = $event['action'] ?? 'Unknown';
             $normalized['duration'] = $event['durationSeconds'] ?? 0;
+            // Null on SessionStart and on ends uploaded by builds before the flag
+            // existed, so only an explicit false counts as an unclean exit.
+            $normalized['clean'] = $event['clean'] ?? null;
             return ['category' => 'Session', 'data' => $normalized];
 
         case 'Export':
@@ -678,6 +681,38 @@ include __DIR__ . '/../admin_header.php';
                         <h3>Premium Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['premium']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['premium']['totalUsers']) ?> total · last 30 days</p>
+                    </div>
+                    <?php
+                    // Share of sessions the app didn't shut down normally: force-quit, OS
+                    // restart, power loss. Deliberately NOT counted as crashes (those have
+                    // their own tab and an actual stack trace); most of these are the user
+                    // or the OS, not a fault. The signal worth watching is the rate moving,
+                    // and short unclean sessions in particular, which read as a hang.
+                    //
+                    // Denominator is ends, not starts: only an end can carry the flag, and
+                    // ends from builds predating it have clean === null and so count as
+                    // clean rather than skewing the rate.
+                    $sessionEnds = array_filter(
+                        $aggregatedData['dataPoints']['Session'],
+                        fn($s) => ($s['action'] ?? '') === 'SessionEnd'
+                    );
+                    $uncleanEnds = array_filter($sessionEnds, fn($s) => ($s['clean'] ?? null) === false);
+                    $endCount = count($sessionEnds);
+                    $uncleanCount = count($uncleanEnds);
+                    $uncleanPct = $endCount > 0 ? ($uncleanCount / $endCount) * 100 : 0;
+                    // A hang or a broken install shows up as a kill within a couple of
+                    // minutes of launch, which the overall rate alone would hide.
+                    $uncleanShort = count(array_filter($uncleanEnds, fn($s) => (int)($s['duration'] ?? 0) < 120));
+                    ?>
+                    <div class="stat-card">
+                        <h3>Unclean Exits</h3>
+                        <div class="value"><?= $endCount > 0 ? number_format($uncleanPct, 1) . '%' : '—' ?></div>
+                        <p class="subtext">
+                            <?= number_format($uncleanCount) ?> of <?= number_format($endCount) ?> sessions
+                            <?php if ($uncleanShort > 0): ?>
+                                · <?= number_format($uncleanShort) ?> under 2 min
+                            <?php endif; ?>
+                        </p>
                     </div>
                 </div>
 

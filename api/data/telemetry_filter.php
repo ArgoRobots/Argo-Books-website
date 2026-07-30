@@ -116,6 +116,11 @@ function filter_telemetry_event(array $event): ?array
             return $base + [
                 'action' => telemetry_validate_enum($event['action'] ?? null, TELEMETRY_SESSION_ACTIONS),
                 'durationSeconds' => telemetry_clean_int($event['durationSeconds'] ?? null),
+                // Whether the app shut down normally. False marks a SessionEnd the app
+                // reconstructed on its next launch after a force-quit, OS restart, or
+                // power loss. Absent on SessionStart, and on ends from builds predating
+                // the flag, so readers must treat a missing value as clean.
+                'clean' => isset($event['clean']) ? (bool)$event['clean'] : null,
             ];
 
         case 'FeatureUsage':

@@ -74,6 +74,13 @@ function ua_describe_event(array $ev): array
             }
             $dur = (int)($ev['durationSeconds'] ?? 0);
             $human = $dur >= 60 ? round($dur / 60, 1) . ' min' : $dur . 's';
+            // Only an explicit false is unclean. Ends uploaded before the flag existed
+            // have no value at all and must not be shown as if they'd been force-quit.
+            // The duration on an unclean end is accurate to the app's heartbeat interval,
+            // not to the moment it died.
+            if (array_key_exists('clean', $ev) && $ev['clean'] === false) {
+                return ['unclean', "Session ended unexpectedly ({$human})"];
+            }
             return ['session', "Session ended ({$human})"];
 
         case 'FeatureUsage':
@@ -149,6 +156,7 @@ foreach ($ua_files as $name => $path) {
             'first'     => null,
             'last'      => null,
             'sessions'  => 0,
+            'unclean'   => 0,     // sessions that ended without a clean shutdown
             'events'    => 0,
             'features'  => [],   // featureName => count
             'exports'   => [],   // exportType  => count
@@ -185,7 +193,11 @@ foreach ($ua_files as $name => $path) {
 
         switch ($ev['dataType'] ?? '') {
             case 'Session':
-                if (($ev['action'] ?? '') === 'SessionStart') $u['sessions']++;
+                if (($ev['action'] ?? '') === 'SessionStart') {
+                    $u['sessions']++;
+                } elseif (array_key_exists('clean', $ev) && $ev['clean'] === false) {
+                    $u['unclean']++;
+                }
                 break;
             case 'FeatureUsage':
                 $f = $ev['featureName'] ?? 'Unknown';
@@ -275,6 +287,10 @@ if (!function_exists('ua_kv')) {
 .ua-evt.export .ua-evt-text { color:#0369a1; }
 .ua-evt.feature .ua-evt-text { color:#047857; }
 .ua-evt.session .ua-evt-text { color:var(--black); }
+/* Force-quit / OS restart / power loss. Red like an error because it's worth
+   noticing, but prose rather than the error rows' monospace: there's no code here. */
+.ua-evt.unclean .ua-evt-text { color:#b91c1c; font-weight:600; }
+.ua-unclean { color:#b91c1c; font-weight:700; }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
 [data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
@@ -285,6 +301,7 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt.export .ua-evt-text { color:#38bdf8; }
 [data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
+[data-theme="dark"] .ua-evt.unclean .ua-evt-text, [data-theme="dark"] .ua-unclean { color:#f87171; }
 
 /* Filter controls. Pagination itself is the shared admin TablePaginator. */
 .ua-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1rem; }
@@ -358,6 +375,9 @@ if (!function_exists('ua_kv')) {
             <span><b>First seen:</b> <?= ua_fmt($u['first']) ?></span>
             <span><b>Last seen:</b> <?= ua_fmt($u['last']) ?></span>
             <span><b>Sessions:</b> <?= $u['sessions'] ?></span>
+            <?php if ($u['unclean'] > 0): ?>
+                <span><b>Unclean exits:</b> <span class="ua-unclean"><?= $u['unclean'] ?></span></span>
+            <?php endif; ?>
             <span><b>Total events:</b> <?= $u['events'] ?></span>
             <span><b>Errors:</b> <?= $u['errors'] ?></span>
         </div>

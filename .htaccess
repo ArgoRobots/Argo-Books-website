@@ -437,6 +437,7 @@ php_value upload_max_filesize 10M
     RewriteRule ^predictive-analytics-for-small-business/?$ articles/article-page.php?slug=predictive-analytics-for-small-business [L,QSA]
     RewriteRule ^quickbooks-desktop-discontinued/?$ articles/article-page.php?slug=quickbooks-desktop-discontinued [L,QSA]
     RewriteRule ^quickbooks-price-increases/?$ articles/article-page.php?slug=quickbooks-price-increases [L,QSA]
+    RewriteRule ^how-much-does-quickbooks-cost/?$ articles/article-page.php?slug=how-much-does-quickbooks-cost [L,QSA]
     RewriteRule ^best-accounting-software-for-contractors/?$ articles/article-page.php?slug=best-accounting-software-for-contractors [L,QSA]
     RewriteRule ^best-accounting-software-for-freelancers/?$ articles/article-page.php?slug=best-accounting-software-for-freelancers [L,QSA]
     RewriteRule ^best-accounting-software-for-small-business/?$ articles/article-page.php?slug=best-accounting-software-for-small-business [L,QSA]

@@ -274,6 +274,31 @@ ob_start();
     </div>
   </header>
 
+  <?php
+    // Optional headline statistic. Articles whose whole point is a single
+    // number (what something costs, how long something takes) can lead with
+    // it here instead of burying it in the intro prose. Absent on most
+    // articles, in which case nothing renders. `footnote` is trusted author
+    // HTML so it can carry links; the rest is escaped plain text.
+    $hero = is_array($data['hero_stat'] ?? null) ? $data['hero_stat'] : null;
+  ?>
+  <?php if ($hero !== null && !empty($hero['value'])): ?>
+    <aside class="article-hero-stat" role="complementary">
+      <?php if (!empty($hero['label'])): ?>
+        <p class="article-hero-stat-label"><?= htmlspecialchars(pricing_substitute($hero['label'])) ?></p>
+      <?php endif; ?>
+      <p class="article-hero-stat-value">
+        <?= htmlspecialchars(pricing_substitute($hero['value'])) ?>
+        <?php if (!empty($hero['unit'])): ?>
+          <span class="article-hero-stat-unit"><?= htmlspecialchars(pricing_substitute($hero['unit'])) ?></span>
+        <?php endif; ?>
+      </p>
+      <?php if (!empty($hero['footnote'])): ?>
+        <p class="article-hero-stat-footnote"><?= article_tag_source(pricing_substitute($hero['footnote']), $invgen_ref) ?></p>
+      <?php endif; ?>
+    </aside>
+  <?php endif; ?>
+
   <section class="article-intro">
     <?= article_tag_source(pricing_substitute($data['intro_html'] ?? ''), $invgen_ref) ?>
   </section>

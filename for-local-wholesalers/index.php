@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -53,16 +55,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="canonical" href="https://argorobots.com/for-local-wholesalers/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Local Wholesalers", "item": "https://argorobots.com/for-local-wholesalers/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Local Wholesalers" => "/for-local-wholesalers/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -327,85 +320,50 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books actually track inventory and reorder points?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Does Argo Books actually track inventory and reorder points?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes. Inventory Management is a built-in feature, not an add-on.</p>
                             <p>Track stock levels, set reorder points for the SKUs that move, and see what's running low before the regulars call asking.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I set net-30 or net-60 payment terms?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I set net-30 or net-60 payment terms?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. Set the payment terms on the invoice when you send it.</p>
                             <p>The due date is calculated for you, the invoice carries the terms language, and your receivables report shows what's overdue versus what's still inside its window.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I set up a standing order for my recurring accounts?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I set up a standing order for my recurring accounts?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. Set the customer, the line items, the quantities, and the frequency once.</p>
                             <p>Argo Books generates the invoice on schedule, every week or every month, so the standing accounts never get skipped.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your computer and does not need an internet connection to log a sale, update stock, or build an invoice.</p>
                             <p>You only need internet when you actually send the invoice or take a payment.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books connect to EDI or my retail customers' purchase order systems?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books connect to EDI or my retail customers' purchase order systems?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>No. Argo Books does not do Electronic Data Interchange (EDI, the digital purchase-order format big chains require from their suppliers), retail-chain purchase order ingestion, or warehouse management with bin locations and pick paths.</p>
                             <p>If you sell into national chains that require EDI, NetSuite, Cin7, or Unleashed are built for that scale. For local wholesalers serving dozens of small accounts, Argo Books fits.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, forever. The free tier covers all core features including inventory management and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -447,15 +405,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

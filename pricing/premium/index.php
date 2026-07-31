@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../partials/faq.php';
 session_start();
 require_once __DIR__ . '/../../community/users/user_functions.php';
 require_once __DIR__ . '/../../config/pricing.php';
@@ -168,55 +169,24 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <section class="ai-faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I cancel my subscription?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes, you can cancel your subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
-                        </div>
-                    </div>
-                </div>
+            <?php $faqs = [];
+            ob_start(); ?>Can I cancel my subscription?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What happens to my data if I cancel?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                            <p>Yes, you can cancel your subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What happens to my data if I cancel?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Your data remains safe in Argo Books. You'll just lose access to Premium-specific features until you resubscribe.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            question.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                faqItems.forEach(otherItem => {
-                    otherItem.classList.remove('active');
-                });
-                if (!isActive) {
-                    item.classList.add('active');
-                }
-            });
-        });
-    });
-    </script>
+
 
     <footer class="footer">
         <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>

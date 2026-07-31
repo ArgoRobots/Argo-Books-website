@@ -48,6 +48,21 @@
     cursor: pointer;
     background: var(--white);
     transition: background 0.3s ease;
+
+    /* partials/faq.php renders this as a <button> so the accordion is reachable
+       by keyboard. These undo the user agent's button styling so it looks
+       exactly like the <div> it replaced. */
+    width: 100%;
+    border: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+}
+
+.faq-question:focus-visible {
+    outline: 2px solid var(--blue-500);
+    outline-offset: -2px;
 }
 
 .faq-question:hover {

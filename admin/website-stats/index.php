@@ -1112,11 +1112,7 @@ include __DIR__ . '/../admin_header.php';
         });
 
 
-        // Restore scroll position if it exists in sessionStorage
-        if (sessionStorage.getItem('scrollPosition')) {
-            window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-            sessionStorage.removeItem('scrollPosition');
-        }
+
 
         // Preserve scroll position across the date-range reload.
         const rangeForm = document.getElementById('rangeForm');
@@ -1149,3 +1145,4 @@ include __DIR__ . '/../admin_header.php';
         }
     }
 </script>
+<script src="../preserve-scroll.js" defer></script>

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
@@ -50,16 +52,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-odoo/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Odoo", "item": "https://argorobots.com/compare/argo-books-vs-odoo/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Odoo" => "/compare/argo-books-vs-odoo/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -502,82 +495,38 @@ $odoo_custom   = competitor_price('odoo', 'custom');
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is Argo Books really free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books work offline?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
                             <p>Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure to set up and maintain.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books have CRM or HR features?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books have CRM or HR features?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice.</p>
                             <p>Argo Books is designed to do fewer things really well: it's simple to learn and doesn't require a consultant to set up.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does Argo Books pricing compare to Odoo?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to Odoo?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $<?= $odoo_standard ?>+ CAD/user/month.</p>
                             <p>Costs escalate quickly as you add modules and users.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What platforms does Argo Books run on?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -629,20 +578,6 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                 observer.observe(el);
             });
 
-            // FAQ accordion
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                    });
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
         });
     </script>
     <script src="../../resources/scripts/feature-tour.js"></script>

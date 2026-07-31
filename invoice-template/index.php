@@ -5,6 +5,7 @@
 // SoftwareApplication is NOT the right schema here (the page is a directory,
 // not a tool); use CollectionPage instead.
 
+require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
@@ -24,14 +25,7 @@ $page_schema_json = json_encode([
     'description' => $page_description,
 ], JSON_UNESCAPED_SLASHES);
 
-$breadcrumb_schema_json = json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'BreadcrumbList',
-    'itemListElement' => [
-        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Invoice Templates', 'item' => $canonical_url],
-    ],
-], JSON_UNESCAPED_SLASHES);
+$breadcrumb_schema_json = argo_breadcrumb_schema(['Home' => '/', 'Invoice Templates' => $canonical_url]);
 
 $styles = ['classic', 'modern', 'formal', 'elegant', 'ribbon'];
 $formats = [

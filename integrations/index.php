@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
 ?>
@@ -44,16 +45,7 @@ require_once __DIR__ . '/../track_referral.php';
     <link rel="canonical" href="https://argorobots.com/integrations/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://argorobots.com/integrations/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Integrations" => "/integrations/"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Integrations | Argo Books</title>

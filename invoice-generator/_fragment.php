@@ -16,6 +16,7 @@
 //   reads on the destination (argorobots.com/) to attribute the visit.
 //   Falls back to 'invgen-tool' when callers forget to set it.
 require_once __DIR__ . '/../shared/_base.php';
+require_once __DIR__ . '/../shared/currencies.php';
 require_once __DIR__ . '/doc-config.php';
 // Document-type config drives copy, accessibility labels, conversion-CTA
 // attribution, and which invoice-only fields render. Defaults to 'invoice'
@@ -56,42 +57,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=' . html
       <label class="toolbar-field">
         <span class="toolbar-label">Currency</span>
         <select data-field="currency" aria-label="Currency">
-          <optgroup label="Common">
-            <option value="USD">USD - US Dollar ($)</option>
-            <option value="EUR">EUR - Euro (&euro;)</option>
-            <option value="CAD">CAD - Canadian Dollar ($)</option>
-            <option value="AUD">AUD - Australian Dollar ($)</option>
-          </optgroup>
-          <optgroup label="All currencies">
-            <option value="ALL">ALL - Albanian Lek (L)</option>
-            <option value="AUD">AUD - Australian Dollar ($)</option>
-            <option value="BAM">BAM - Bosnia-Herzegovina Mark (KM)</option>
-            <option value="BGN">BGN - Bulgarian Lev (&#1083;&#1074;)</option>
-            <option value="BRL">BRL - Brazilian Real (R$)</option>
-            <option value="BYN">BYN - Belarusian Ruble (Br)</option>
-            <option value="CAD">CAD - Canadian Dollar ($)</option>
-            <option value="CHF">CHF - Swiss Franc (CHF)</option>
-            <option value="CNY">CNY - Chinese Yuan (&yen;)</option>
-            <option value="CZK">CZK - Czech Koruna (K&#269;)</option>
-            <option value="DKK">DKK - Danish Krone (kr)</option>
-            <option value="EUR">EUR - Euro (&euro;)</option>
-            <option value="GBP">GBP - British Pound (&pound;)</option>
-            <option value="HUF">HUF - Hungarian Forint (Ft)</option>
-            <option value="ISK">ISK - Icelandic Kr&oacute;na (kr)</option>
-            <option value="JPY">JPY - Japanese Yen (&yen;)</option>
-            <option value="KRW">KRW - South Korean Won (&#8361;)</option>
-            <option value="MKD">MKD - Macedonian Denar (&#1076;&#1077;&#1085;)</option>
-            <option value="NOK">NOK - Norwegian Krone (kr)</option>
-            <option value="PLN">PLN - Polish Z&#322;oty (z&#322;)</option>
-            <option value="RON">RON - Romanian Leu (lei)</option>
-            <option value="RSD">RSD - Serbian Dinar (&#1076;&#1080;&#1085;)</option>
-            <option value="RUB">RUB - Russian Ruble (&#8381;)</option>
-            <option value="SEK">SEK - Swedish Krona (kr)</option>
-            <option value="TRY">TRY - Turkish Lira (&#8378;)</option>
-            <option value="TWD">TWD - Taiwan Dollar (NT$)</option>
-            <option value="UAH">UAH - Ukrainian Hryvnia (&#8372;)</option>
-            <option value="USD">USD - US Dollar ($)</option>
-          </optgroup>
+          <?= argo_currency_options() ?>
         </select>
       </label>
     </div>
@@ -357,3 +323,9 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=' . html
     </div>
   </dialog>
 </div>
+
+<?php /* Currency locales for Intl.NumberFormat, from shared/currencies.php so
+         main.js does not carry its own copy of the list. Emitted here rather
+         than in a page head because every caller of this fragment needs it and
+         main.js loads after the body. */ ?>
+<script>window.ARGO_CURRENCY_LOCALES = <?= json_encode(argo_currency_locales(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>

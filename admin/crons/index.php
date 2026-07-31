@@ -304,19 +304,14 @@ include __DIR__ . '/../admin_header.php';
 <?php endif; ?>
 
 <script>
-    // Preserve scroll position when clicking a range filter pill, so the
-    // page reload doesn't jump back to the top. Shared sessionStorage key
-    // 'scrollPosition', matches the pattern used in referral-links,
-    // website-stats, users, and license pages.
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
     document.querySelectorAll('a[href^="?range="]').forEach(link => {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });
     });
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['a[href^="?range="]'];</script>
+<script src="../preserve-scroll.js" defer></script>
 </body>
 </html>

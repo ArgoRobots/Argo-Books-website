@@ -113,6 +113,7 @@ If a response has no technical content (a quick yes/no, or a basic question), sk
 
 The `read-me/` directory has authoritative reference docs that are kept current. Don't duplicate their content here:
 
+- `read-me/Tool page standards.md`: conventions for the free tools under `/tools/`, including which currencies each tool offers and why
 - `read-me/Cron jobs.md`: every scheduled cron and its frequency
 - `read-me/Deployment.md`: how `.github/workflows/deploy.yml` ships code to the server
 - `read-me/Email outreach.md`: outreach pipeline behavior

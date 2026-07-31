@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
@@ -51,16 +53,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-wave/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Wave", "item": "https://argorobots.com/compare/argo-books-vs-wave/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Wave" => "/compare/argo-books-vs-wave/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -507,82 +500,38 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is Argo Books really free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro).</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books work offline?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
                             <p>Wave is cloud-only and requires a constant internet connection to access your data.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books support bank transaction imports?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books support bank transaction imports?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for matching transactions against your books. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now.</p>
                             <p>We're always adding new features based on user feedback.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does Argo Books pricing compare to Wave?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to Wave?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $<?= $wave_pro ?> CAD/month for auto bank imports. Receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on Wave's free Starter plan (it's included on Pro).</p>
                             <p>Argo Books Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong> with unlimited invoicing, AI receipt scanning included, and predictive analytics, less than half of Wave's Pro plan.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What platforms does Argo Books run on?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Wave is web-based and also has a mobile app for iOS and Android.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -634,20 +583,6 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                 observer.observe(el);
             });
 
-            // FAQ accordion
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                    });
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
         });
     </script>
     <script src="../../resources/scripts/feature-tour.js"></script>

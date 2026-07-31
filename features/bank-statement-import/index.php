@@ -1,5 +1,6 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
+require_once __DIR__ . '/../../partials/schema.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
@@ -50,17 +51,7 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     <link rel="canonical" href="https://argorobots.com/features/bank-statement-import/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "Bank Statement Import", "item": "https://argorobots.com/features/bank-statement-import/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Bank Statement Import" => "/features/bank-statement-import/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">

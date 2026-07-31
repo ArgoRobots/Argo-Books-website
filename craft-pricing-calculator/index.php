@@ -6,7 +6,10 @@
 // layout.php): header, "All tools" breadcrumb, OG/Twitter/canonical, schema.
 // Calculation is client-side (scripts/main.js + calc.js).
 
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../shared/_base.php';
+require_once __DIR__ . '/../shared/currencies.php';
 
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php';
@@ -59,13 +62,8 @@ $faqs = [
 ];
 
 // Schema: SoftwareApplication (the calculator) + FAQPage, as a @graph.
-$faq_schema_items = array_map(function ($f) {
-    return [
-        '@type' => 'Question',
-        'name' => $f['q'],
-        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
-    ];
-}, $faqs);
+// The FAQPage node is built from $faqs by partials/faq.php, the same array
+// the visible accordion renders from.
 
 $page_schema_json = json_encode([
     '@context' => 'https://schema.org',
@@ -79,29 +77,20 @@ $page_schema_json = json_encode([
             'creator' => ['@id' => 'https://argorobots.com/#organization'],
             'url' => $canonical_url,
         ],
-        [
-            '@type' => 'FAQPage',
-            'mainEntity' => $faq_schema_items,
-        ],
+        argo_faq_schema_node($faqs),
     ],
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-$breadcrumb_schema_json = json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'BreadcrumbList',
-    'itemListElement' => [
-        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Free Tools', 'item' => 'https://argorobots.com/tools/'],
-        ['@type' => 'ListItem', 'position' => 3, 'name' => 'Craft Pricing Calculator', 'item' => $canonical_url],
-    ],
-], JSON_UNESCAPED_SLASHES);
+$breadcrumb_schema_json = argo_breadcrumb_schema(['Home' => '/', 'Free Tools' => '/tools/', 'Craft Pricing Calculator' => $canonical_url]);
 
-$extra_head = '<link rel="stylesheet" href="' . INVGEN_BASE . '/craft-pricing-calculator/styles/craft-calculator.css">';
+$extra_head = '<link rel="stylesheet" href="' . INVGEN_BASE . '/shared/styles/calculator.css">'
+    . '<link rel="stylesheet" href="' . INVGEN_BASE . '/craft-pricing-calculator/styles/craft-calculator.css">'
+    . '<script>window.ARGO_CURRENCY_LOCALES = ' . json_encode(argo_currency_locales(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';</script>';
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/craft-pricing-calculator/scripts/main.js"></script>';
 
 ob_start();
 ?>
-<div class="craft-app">
+<div class="calc-app">
 
   <section class="site-hero">
     <h1 class="site-hero-title">Free Craft Pricing Calculator</h1>
@@ -113,55 +102,62 @@ ob_start();
     <a class="page-banner-link" data-pitch-placement="banner" href="<?= INVGEN_BASE ?>/features/expense-revenue-tracking/<?= $ref_qs ?>&amp;placement=banner">See how <span aria-hidden="true">&rarr;</span></a>
   </aside>
 
-  <div class="craft-grid">
-    <form class="craft-form" autocomplete="off" aria-label="Craft pricing inputs">
-      <div class="craft-field">
+  <div class="calc-grid">
+    <form class="calc-form" autocomplete="off" aria-label="Craft pricing inputs">
+      <div class="calc-field">
+        <label for="cc-currency">Currency</label>
+        <select id="cc-currency" data-cc="currency">
+          <?= argo_currency_options() ?>
+        </select>
+      </div>
+
+      <div class="calc-field">
         <label for="cc-material">Material cost (per item)</label>
-        <div class="craft-money">
-          <span class="craft-money-affix">$</span>
+        <div class="calc-money">
+          <span class="calc-money-affix">$</span>
           <input id="cc-material" data-cc="material" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
         </div>
-        <p class="craft-hint">Supplies for one item. Made in batches? Divide the batch cost by how many it makes.</p>
+        <p class="calc-hint">Supplies for one item. Made in batches? Divide the batch cost by how many it makes.</p>
       </div>
 
-      <div class="craft-field">
+      <div class="calc-field">
         <label for="cc-labor">Labour cost (per item)</label>
-        <div class="craft-money">
-          <span class="craft-money-affix">$</span>
+        <div class="calc-money">
+          <span class="calc-money-affix">$</span>
           <input id="cc-labor" data-cc="labor" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
         </div>
-        <p class="craft-hint">Your time for one item. For batches, divide the batch's time across all of them.</p>
+        <p class="calc-hint">Your time for one item. For batches, divide the batch's time across all of them.</p>
       </div>
 
-      <div class="craft-field">
+      <div class="calc-field">
         <label for="cc-markup">Markup</label>
-        <div class="craft-money craft-money-percent">
+        <div class="calc-money calc-money-percent">
           <input id="cc-markup" data-cc="markup" type="number" inputmode="decimal" min="0" step="1" placeholder="150">
-          <span class="craft-money-affix craft-money-affix-right">%</span>
+          <span class="calc-money-affix calc-money-affix-right">%</span>
         </div>
-        <div class="craft-channels" role="group" aria-label="Quick markup presets by where you sell">
+        <div class="calc-presets" role="group" aria-label="Quick markup presets by where you sell">
           <?php foreach ($channels as $c): ?>
-            <button type="button" class="craft-channel-btn" data-cc-preset="<?= (int)$c['preset'] ?>"><?= htmlspecialchars(strtok($c['name'], ' /')) ?> <span class="craft-channel-pct"><?= (int)$c['preset'] ?>%</span></button>
+            <button type="button" class="calc-preset-btn" data-cc-preset="<?= (int)$c['preset'] ?>"><?= htmlspecialchars(strtok($c['name'], ' /')) ?> <span class="calc-preset-pct"><?= (int)$c['preset'] ?>%</span></button>
           <?php endforeach; ?>
         </div>
       </div>
     </form>
 
-    <div class="craft-results" data-cc-results aria-live="polite">
-      <div class="craft-headline">
-        <span class="craft-headline-label">Suggested selling price</span>
-        <span class="craft-headline-amount" data-cc="price">$0.00</span>
+    <div class="calc-results" data-cc-results aria-live="polite">
+      <div class="calc-headline">
+        <span class="calc-headline-label">Suggested selling price</span>
+        <span class="calc-headline-amount" data-cc="price">$0.00</span>
       </div>
-      <dl class="craft-breakdown">
-        <div class="craft-breakdown-row">
+      <dl class="calc-breakdown">
+        <div class="calc-breakdown-row">
           <dt>Materials &amp; labour</dt>
           <dd data-cc="cost">$0.00</dd>
         </div>
-        <div class="craft-breakdown-row craft-breakdown-profit">
+        <div class="calc-breakdown-row calc-breakdown-profit">
           <dt>Your profit</dt>
           <dd data-cc="profit">$0.00</dd>
         </div>
-        <div class="craft-breakdown-row craft-breakdown-rate">
+        <div class="calc-breakdown-row calc-breakdown-rate">
           <dt>Profit margin</dt>
           <dd data-cc="margin">0%</dd>
         </div>
@@ -169,7 +165,7 @@ ob_start();
     </div>
   </div>
 
-  <article class="craft-content">
+  <article class="calc-content">
 
     <section>
       <h2>How to price your handmade products (quick answer)</h2>
@@ -197,7 +193,7 @@ ob_start();
     <section>
       <h2>Markup and margin by where you sell</h2>
       <p>Where you sell changes how much to mark up. Selling direct lets you keep more; selling wholesale means leaving room for the shop to mark the item up again.</p>
-      <table class="craft-table">
+      <table class="calc-table">
         <thead>
           <tr><th scope="col">Where you sell</th><th scope="col">Typical markup</th><th scope="col">Profit margin</th></tr>
         </thead>
@@ -216,14 +212,14 @@ ob_start();
     <section>
       <h2>The formula explained</h2>
       <p>Two quick calculations sit behind the result:</p>
-      <p class="craft-formula">Selling price = (material cost + labour cost) &times; (1 + markup %)</p>
-      <p class="craft-formula">Profit margin = (selling price &minus; total cost) &divide; selling price</p>
+      <p class="calc-formula">Selling price = (material cost + labour cost) &times; (1 + markup %)</p>
+      <p class="calc-formula">Profit margin = (selling price &minus; total cost) &divide; selling price</p>
       <p>Markup and margin are not the same number. A 100% markup (doubling your cost) is a 50% margin. That difference trips up a lot of sellers, so the calculator shows both.</p>
     </section>
 
     <section>
       <h2>A real example</h2>
-      <div class="craft-example">
+      <div class="calc-example">
         <p>Say you make soap in batches. A batch of <strong>20 bars</strong> uses <strong>$40</strong> of oils, lye, fragrance, and packaging, so materials are $40 &divide; 20 = <strong>$2.00 per bar</strong>. The batch takes about an hour and you value your time at $20/hour, so labour is $20 &divide; 20 = <strong>$1.00 per bar</strong>. Dividing the batch cost across every bar gives your true per-item cost. You sell on Etsy, so you pick a <strong>150% markup</strong>.</p>
         <ul>
           <li>Total cost: $2.00 + $1.00 = <strong>$3.00 per bar</strong></li>
@@ -236,7 +232,7 @@ ob_start();
 
     <section>
       <h2>Common pricing mistakes</h2>
-      <ol class="craft-mistakes">
+      <ol class="calc-list">
         <li><strong>Not paying yourself for labour.</strong> Your time is a real cost. Leave it out and your "profit" is really just unpaid wages.</li>
         <li><strong>Using the pack price instead of the per-item cost.</strong> Divide the cost of a pack by how many items it makes.</li>
         <li><strong>Copying a competitor's price.</strong> You do not know their costs. Price from your own numbers, then reality-check against the market.</li>
@@ -251,32 +247,14 @@ ob_start();
 
     <section>
       <h2>When to move beyond a calculator</h2>
-      <p>A calculator prices one product at a time. Once you are selling regularly, the bigger question is whether the whole business is profitable across every sale, every supply run, and every fee. That is where <a class="craft-link" href="<?= INVGEN_BASE ?>/features/expense-revenue-tracking/<?= $ref_qs ?>&amp;placement=content">Argo Books</a> comes in: it tracks your income and expenses, shows your real profit month to month, and helps you send invoices and stay ready for tax time. It is free to start.</p>
+      <p>A calculator prices one product at a time. Once you are selling regularly, the bigger question is whether the whole business is profitable across every sale, every supply run, and every fee. That is where <a class="calc-link" href="<?= INVGEN_BASE ?>/features/expense-revenue-tracking/<?= $ref_qs ?>&amp;placement=content">Argo Books</a> comes in: it tracks your income and expenses, shows your real profit month to month, and helps you send invoices and stay ready for tax time. It is free to start.</p>
     </section>
 
   </article>
 
-  <section class="craft-faqs">
+  <section class="calc-faqs">
     <h2>Frequently asked questions</h2>
-    <div class="faq-grid">
-      <?php foreach ($faqs as $f): ?>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false">
-            <h3><?= htmlspecialchars($f['q']) ?></h3>
-            <span class="faq-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6,9 12,15 18,9"/>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              <p><?= htmlspecialchars($f['a']) ?></p>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+    <?= argo_faq_grid($faqs) ?>
   </section>
 
 </div>

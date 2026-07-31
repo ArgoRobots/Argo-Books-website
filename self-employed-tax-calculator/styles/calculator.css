@@ -5,6 +5,12 @@
    from custom-colors.css. Only the calculator's form + results UI lives here. */
 
 .taxcalc-app {
+  /* Muted (#9ca3af) is roughly 2.6:1 on white and fails contrast for body text.
+     Every hint and label on a calculator is real content, so muted resolves to
+     the main text colour. Matches shared/styles/calculator.css. */
+  --tool-muted: var(--tool-text);
+  --invoice-muted: var(--tool-text);
+
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 20px 96px;

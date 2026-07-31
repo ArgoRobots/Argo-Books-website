@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
@@ -50,16 +52,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-zipbooks/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Argo Books vs ZipBooks", "item": "https://argorobots.com/compare/argo-books-vs-zipbooks/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs ZipBooks" => "/compare/argo-books-vs-zipbooks/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -507,82 +500,38 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is Argo Books really free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>ZipBooks also has a free tier, but it's more limited: no AI capabilities, no inventory management, and no offline access.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books work offline?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
                             <p>ZipBooks is cloud-only and requires a constant internet connection to access your data.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How is Argo Books different from ZipBooks?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How is Argo Books different from ZipBooks?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management, all at a lower premium price.</p>
                             <p>ZipBooks is cloud-based and focused more on invoicing and time tracking for freelancers.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does Argo Books pricing compare to ZipBooks?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to ZipBooks?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> vs ZipBooks Smarter at $<?= $zb_smarter ?> CAD/month.</p>
                             <p>You get more features for less with Argo Books.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What platforms does Argo Books run on?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>ZipBooks is web-based and accessible from any browser.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -634,20 +583,6 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                 observer.observe(el);
             });
 
-            // FAQ accordion
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                    });
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
         });
     </script>
     <script src="../../resources/scripts/feature-tour.js"></script>

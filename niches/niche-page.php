@@ -28,6 +28,8 @@
 // _base.php defines INVGEN_BASE and the shared invgen_render_404() helper
 // that niche_render_404() at the bottom of this file delegates to. Must be
 // required BEFORE the 404 fallbacks fire below.
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../shared/_base.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
@@ -110,23 +112,11 @@ if (!empty($faq_items)) {
 
 // BreadcrumbList: Home > Free Invoice Generator > [Niche Name]
 // For the generic page, only Home > Free Invoice Generator (two items).
-$breadcrumb_items = [
-    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Free Invoice Generator', 'item' => 'https://argorobots.com/free-invoice-generator/'],
-];
+$breadcrumb_crumbs = ['Home' => '/', 'Free Invoice Generator' => '/free-invoice-generator/'];
 if ($slug !== 'generic') {
-    $breadcrumb_items[] = [
-        '@type' => 'ListItem',
-        'position' => 3,
-        'name' => $data['h1'],
-        'item' => $canonical_url,
-    ];
+    $breadcrumb_crumbs[$data['h1']] = $canonical_url;
 }
-$breadcrumb_schema_json = json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'BreadcrumbList',
-    'itemListElement' => $breadcrumb_items,
-], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+$breadcrumb_schema_json = argo_breadcrumb_schema($breadcrumb_crumbs);
 
 // --- 4b. Hreflang alternates --------------------------------------------------
 // Country-specific niche pages reference each other via hreflang so the right
@@ -246,26 +236,7 @@ ob_start();
   <?php if (!empty($data['faqs'])): ?>
   <section class="niche-faqs">
     <h2>Frequently asked questions</h2>
-    <div class="faq-grid">
-      <?php foreach ($data['faqs'] as $faq): ?>
-        <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false">
-            <h3><?= htmlspecialchars($faq['q']) ?></h3>
-            <span class="faq-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6,9 12,15 18,9"/>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              <p><?= htmlspecialchars($faq['a']) ?></p>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+    <?= argo_faq_grid($data['faqs']) ?>
   </section>
   <?php endif; ?>
 

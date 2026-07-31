@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
@@ -55,16 +57,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-zoho-books/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Zoho Books", "item": "https://argorobots.com/compare/argo-books-vs-zoho-books/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Zoho Books" => "/compare/argo-books-vs-zoho-books/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -516,82 +509,38 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is Argo Books really free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no revenue cap. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Zoho Books also has a free plan, but it's limited to micro-businesses: it's capped by your annual revenue. Argo's free plan has no revenue cap.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books work offline?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
                             <p>Zoho Books is cloud-only, so it needs an internet connection and your books live on Zoho's servers.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is Argo Books as powerful as Zoho Books?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is Argo Books as powerful as Zoho Books?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Honestly, Zoho Books is broader and deeper, especially at its higher tiers, with multi-currency, projects and time tracking, cashflow forecasting, heavy customization, and a huge integration marketplace.</p>
                             <p>Argo Books is deliberately simpler. It's an offline desktop app, standalone rather than part of a 40-app suite, and it covers what most small businesses actually need: invoicing, expenses, AI receipt scanning, bank matching, inventory, and reports.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does Argo Books pricing compare to Zoho Books?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to Zoho Books?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>They're priced about the same, and both are free to start. Argo Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> (or $<?= $argo_yearly ?>/year), the same entry price as Zoho Books Standard at $<?= $zoho_standard ?> CAD/month.</p>
                             <p>Zoho's plans then rise to Professional at $<?= $zoho_professional ?> and Premium at $<?= $zoho_premium ?>, and up to $<?= $zoho_elite ?> and $<?= $zoho_ultimate ?> CAD/month for its Elite and Ultimate tiers. The real difference isn't the price, it's what kind of tool each one is.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What platforms does Argo Books run on?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Zoho Books is web-based and also has mobile apps for iOS and Android.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -643,20 +592,6 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                 observer.observe(el);
             });
 
-            // FAQ accordion
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                    });
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
         });
     </script>
     <script src="../../resources/scripts/feature-tour.js"></script>

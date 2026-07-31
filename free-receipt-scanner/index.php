@@ -69,6 +69,10 @@ $turnstileSiteKey = $_ENV['TURNSTILE_SITE_KEY'] ?? '';
       <img class="rs-logo-dark" src="<?= $base ?>/resources/images/argo-logo/argo-logo-white.png" alt="Argo Books" width="160" height="30">
     </a>
     <div class="rs-nav-right">
+      <?php /* Route back to the tools hub. This page predates shared/layout.php,
+               so it cannot use the standard "All tools" breadcrumb and puts the
+               link in its own nav instead. See read-me/Tool page standards.md. */ ?>
+      <a class="rs-nav-link" href="<?= $base ?>/tools/">All tools</a>
       <a class="rs-nav-link" href="#how">How it works</a>
       <a class="rs-nav-link" href="#privacy">Privacy</a>
     </div>

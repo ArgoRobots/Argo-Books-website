@@ -12,6 +12,7 @@
 //   no H2s on the index entries themselves (each list item is a link, not
 //   a section). Group dividers carry small-caps labels but no headings.
 
+require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
@@ -138,14 +139,7 @@ $page_schema_json = json_encode([
     ],
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-$breadcrumb_schema_json = json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'BreadcrumbList',
-    'itemListElement' => [
-        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guides', 'item' => $canonical_url],
-    ],
-], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+$breadcrumb_schema_json = argo_breadcrumb_schema(['Home' => '/', 'Guides' => $canonical_url]);
 
 // Fraunces serif is loaded for this page only. CSP already permits
 // fonts.googleapis.com (style-src) and fonts.gstatic.com (font-src) per

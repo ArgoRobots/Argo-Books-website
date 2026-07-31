@@ -744,11 +744,7 @@ include __DIR__ . '/../admin_header.php';
             });
         });
 
-        // Restore scroll position if it exists in sessionStorage
-        if (sessionStorage.getItem('scrollPosition')) {
-            window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-            sessionStorage.removeItem('scrollPosition');
-        }
+
 
         // Save scroll position when submitting forms
         const forms = document.querySelectorAll('form');
@@ -791,6 +787,8 @@ include __DIR__ . '/../admin_header.php';
 
         </main>
     </div>
+<script>window.ADMIN_PRESERVE_SCROLL = ['a[href^="index.php"]'];</script>
+<script src="../preserve-scroll.js" defer></script>
 </body>
 
 </html>

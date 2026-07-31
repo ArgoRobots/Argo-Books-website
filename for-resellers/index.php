@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -53,16 +55,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="canonical" href="https://argorobots.com/for-resellers/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Resellers", "item": "https://argorobots.com/for-resellers/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Resellers" => "/for-resellers/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -327,85 +320,50 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I track what I paid for each item versus what it sold for?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Can I track what I paid for each item versus what it sold for?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes. Add the item to inventory at the price you paid (the thrift price, the auction lot share, the wholesale unit cost), and when it sells, log the sale.</p>
                             <p>The cost-of-goods number for your taxes lines up with what you actually spent.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I record sales across eBay, Amazon, and Facebook Marketplace?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I record sales across eBay, Amazon, and Facebook Marketplace?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, by tagging each sale with the channel as the customer or category. Argo Books does not pull the sale in automatically from those platforms, so you enter them manually or import a CSV the marketplace gives you.</p>
                             <p>Many resellers do this weekly and treat it like an end-of-week routine.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I track mileage to sourcing trips as an expense?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I track mileage to sourcing trips as an expense?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. Log mileage as an expense line with the date and the trip distance, tag it Sourcing or Vehicle, and the totals show up on the expense report.</p>
                             <p>At tax time, the mileage deduction is sitting where you put it.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet at a garage sale or auction?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet at a garage sale or auction?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your laptop and does not need an internet connection to scan receipts, add inventory, or build a record.</p>
                             <p>Take photos at the auction, enter them later that night at the kitchen table.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books sync with my eBay or Amazon account automatically?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books sync with my eBay or Amazon account automatically?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>No. Argo Books does not connect directly to eBay, Amazon, Etsy, or Mercari APIs.</p>
                             <p>If you sell at high volume and need automated sync, A2X, Link My Books, or QuickBooks Commerce integrate. For a side hustle or solo reseller, a weekly manual or CSV-import workflow with Argo Books gives you clean cost-of-goods and tax-prep numbers without paying for an integration.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, forever. The free tier covers all core features including inventory management and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -447,15 +405,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

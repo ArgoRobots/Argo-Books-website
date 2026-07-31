@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <?php require_once __DIR__ . '/../resources/icons.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,16 +38,7 @@
     <link rel="canonical" href="https://argorobots.com/review/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Leave a Review", "item": "https://argorobots.com/review/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Leave a Review" => "/review/"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Leave a Review - Argo Books</title>

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -55,16 +57,7 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
 
     <link rel="canonical" href="https://argorobots.com/for-software-companies/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Software Companies", "item": "https://argorobots.com/for-software-companies/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Software Companies" => "/for-software-companies/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -349,98 +342,50 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does the Stripe connection work?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>How does the Stripe connection work?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>You create a restricted key in your Stripe dashboard with read access to balance transactions, charges, and payouts, then paste it into Settings, Integrations in Argo Books.</p>
                             <p>The key is read-only, so Argo can see your Stripe activity but can never move money, issue refunds, or change anything in your Stripe account.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What actually gets imported from Stripe?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What actually gets imported from Stripe?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Each Stripe charge becomes a revenue entry with the product name, the customer (created automatically if they are new), any sales tax, and any discount. Processing fees are recorded as expenses linked to the sale. Refunds mark the original sale as returned.</p>
                             <p>Revenue is recorded gross with the fee as a separate expense, so your books stay standard.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Will my Stripe payouts get double-counted when I import my bank statement?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Will my Stripe payouts get double-counted when I import my bank statement?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>No. Argo Books remembers every Stripe payout it has seen, so when you later import your bank statement the matching deposit is skipped instead of being added as a second piece of revenue.</p>
                             <p>This is the part people usually get wrong by hand.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is the sync automatic?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is the sync automatic?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>No, and that is deliberate. You click Sync now and Argo shows you a summary of the sales and fees it found before anything is written.</p>
                             <p>Nothing is imported until you confirm, and a sync can be undone in one step.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I see my MRR and ARR?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I see my MRR and ARR?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Indirectly, and for a lot of software businesses that is enough. You can report revenue over any window you like: This Month, Last 30 Days, This Year, Last 365 Days, or a custom start and end date. If you bill monthly only, your monthly revenue total is your MRR and your yearly total is your ARR, read straight off the dashboard.</p>
                             <p>The gap opens up if you sell annual plans or one-time charges. Argo records an annual charge in full on the day it clears rather than spreading it over twelve months, so a monthly total spikes whenever someone prepays, and a true MRR figure normalizes that away. Stripe's own dashboard already gives you the normalized run rate, and there is no churn or cohort retention reporting in Argo Books.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it handle deferred revenue on annual plans?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it handle deferred revenue on annual plans?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>No. An annual plan is recorded as revenue on the date the charge went through, not spread across twelve months.</p>
                             <p>If you are on cash-basis accounting, which most small software businesses are, that is exactly what you want. If your accountant needs accrual-basis deferred revenue schedules, Argo Books will not produce them.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
                             <p>Yes, forever. The Stripe integration is part of the core app, not a paid add-on, and the free tier includes <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -482,15 +427,6 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

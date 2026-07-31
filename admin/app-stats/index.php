@@ -1023,10 +1023,7 @@ window.dashboardData = <?= $jsonData ?>;
 <script>
 // Preserve scroll position when switching tier filter (shared admin pattern; see CLAUDE.md)
 document.addEventListener('DOMContentLoaded', function () {
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
     document.querySelectorAll('.control-bar a.control-pill').forEach(function (link) {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
@@ -1093,3 +1090,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+<script src="../preserve-scroll.js" defer></script>

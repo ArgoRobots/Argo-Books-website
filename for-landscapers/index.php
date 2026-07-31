@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -59,16 +61,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <link rel="canonical" href="https://argorobots.com/for-landscapers/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Landscapers", "item": "https://argorobots.com/for-landscapers/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Landscapers" => "/for-landscapers/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -341,97 +334,50 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Do I need Argo Books year-round, or just during the season?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Do I need Argo Books year-round, or just during the season?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Year-round. Winter is when you sort through receipts, set your next-season prices, and see where last year went.</p>
                             <p>The free tier covers winter use with no monthly fee.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I track equipment depreciation?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I track equipment depreciation?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>You can record equipment purchases and categorize them, and Argo Books will show you the spend in your reports.</p>
                             <p>It does not run a depreciation schedule the way a tax filing software would. Check with your accountant on the tax side.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your computer and does not need an internet connection to record expenses or build an invoice.</p>
                             <p>You only need internet when you actually send an invoice or take a payment.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I bill a deposit and final balance on the same invoice?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I bill a deposit and final balance on the same invoice?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Two ways: send a single invoice with the deposit listed at the top and a balance due, or send a deposit invoice now and a balance invoice when the job's done.</p>
                             <p>Both work. The second is what most landscapers use for multi-week installs.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is there a phone app?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is there a phone app?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Not yet. Argo Books is a desktop application for Windows, Mac, and Linux.</p>
                             <p>If you need to send an invoice in the field, you can take receipt photos on your phone and import them when you're back at the laptop.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, forever. The free tier covers all core features and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -487,20 +433,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 observer.observe(el);
             });
 
-            // FAQ accordion
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                    });
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

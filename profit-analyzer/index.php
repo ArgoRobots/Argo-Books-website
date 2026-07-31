@@ -57,6 +57,10 @@ $schema = json_encode([
   <div class="wrap">
     <a class="brand" href="<?= INVGEN_BASE ?>/profit-analyzer/"><img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-white.png" alt="Argo Books" width="160" height="30"></a>
     <div class="links">
+      <?php /* Route back to the tools hub. This page predates shared/layout.php,
+               so it cannot use the standard "All tools" breadcrumb and puts the
+               link in its own nav instead. See read-me/Tool page standards.md. */ ?>
+      <a href="<?= INVGEN_BASE ?>/tools/">All tools</a>
       <a href="#how">How it works</a>
       <a href="#trust">Privacy</a>
     </div>

@@ -1,5 +1,6 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
+require_once __DIR__ . '/../../partials/schema.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
@@ -47,17 +48,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <link rel="canonical" href="https://argorobots.com/features/inventory-management/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "Inventory Management", "item": "https://argorobots.com/features/inventory-management/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Inventory Management" => "/features/inventory-management/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">

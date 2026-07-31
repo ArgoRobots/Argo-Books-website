@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
 require_once __DIR__ . '/../statistics.php';
@@ -119,16 +120,7 @@ $niches = [
 
     <link rel="canonical" href="https://argorobots.com/who-its-for/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Who It's For", "item": "https://argorobots.com/who-its-for/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Who It's For" => "/who-its-for/"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Who Argo Books is For: Industries and Trades We Built It For</title>

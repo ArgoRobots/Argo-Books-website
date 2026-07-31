@@ -1936,20 +1936,6 @@ include __DIR__ . '/../admin_header.php';
         }
     });
 
-    // Restore scroll position
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
-
-    // Save scroll position when clicking funnel filter pills so the page
-    // reload doesn't jump back to the top.
-    document.querySelectorAll('.control-pill').forEach(link => {
-        link.addEventListener('click', function() {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
-        });
-    });
-
     // Searchable source filter (combobox). Type to filter the source list,
     // click or Enter to apply; applying reloads the funnel for that source and
     // preserves scroll the same way the pills do.
@@ -2473,3 +2459,5 @@ include __DIR__ . '/../admin_header.php';
         })();
     })();
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['.control-pill'];</script>
+<script src="../preserve-scroll.js" defer></script>

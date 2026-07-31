@@ -875,11 +875,7 @@ include __DIR__ . '/../admin_header.php';
         }
     });
 
-    // Restore scroll position
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
 
     // Save scroll position when clicking period or group-by links so the page
     // reload doesn't jump back to the top.
@@ -902,3 +898,5 @@ include __DIR__ . '/../admin_header.php';
         });
     });
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['a[href^="?period="]', 'a[href^="?group="]'];</script>
+<script src="../preserve-scroll.js" defer></script>

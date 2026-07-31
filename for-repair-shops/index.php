@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -53,16 +55,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="canonical" href="https://argorobots.com/for-repair-shops/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Repair Shops", "item": "https://argorobots.com/for-repair-shops/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Repair Shops" => "/for-repair-shops/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -327,85 +320,50 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I itemize the diagnostic fee, parts, and labor on one invoice?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Can I itemize the diagnostic fee, parts, and labor on one invoice?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes. Add each as its own line: a diagnostic fee, each part with quantity and unit price, and labor in hours at your shop rate.</p>
                             <p>Customers see exactly what they paid for, which cuts down on the "why is the bill this high" conversation at pickup.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I mark up parts on the invoice?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I mark up parts on the invoice?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, two ways. List parts at the price the customer pays (your cost plus markup) and keep the wholesale cost in the expense record. Or itemize parts at cost with a separate handling-and-stocking line.</p>
                             <p>Either approach works. Most shops keep the markup invisible and just show the customer-facing price.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I take a deposit on a big repair before ordering parts?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I take a deposit on a big repair before ordering parts?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. Send a deposit invoice with the parts-cost line, take the payment, and when the repair is done send the final invoice with the deposit already credited.</p>
                             <p>The remaining balance is what the customer pays at pickup.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet at the bench?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet at the bench?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your shop computer and does not need an internet connection to record expenses or build an invoice.</p>
                             <p>You only need internet when you actually send the invoice or take a card payment.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books have work orders or customer text messaging?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books have work orders or customer text messaging?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Not in the way Shopmonkey, Tekmetric, or RepairShopr do. Argo Books handles the books, the invoice, and the receipt of payment.</p>
                             <p>If you need a work-order queue, a customer-facing pickup notification, or a VIN-and-labor-guide library, a dedicated shop management tool is a better fit. Many shops run one of those alongside a simpler bookkeeping tool.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, forever. The free tier covers all core features and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -447,15 +405,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

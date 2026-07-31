@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,16 +31,7 @@
     <link rel="canonical" href="https://argorobots.com/legal/terms.php">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Terms of Service", "item": "https://argorobots.com/legal/terms.php"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Terms of Service" => "/legal/terms.php"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Terms of Service - Argo Books</title>

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -53,16 +55,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="canonical" href="https://argorobots.com/for-contractors/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Contractors", "item": "https://argorobots.com/for-contractors/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Contractors" => "/for-contractors/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -327,85 +320,50 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I bill a deposit, a mid-job draw, and a final balance?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Can I bill a deposit, a mid-job draw, and a final balance?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes. Most contractors send three invoices on a multi-week job: a deposit invoice before work begins, a draw invoice at a milestone like framing or rough-in, and a final invoice when the work is signed off.</p>
                             <p>Argo Books tracks what's been paid on each so the final balance lines up with what the customer still owes.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I bill change orders without re-issuing the original invoice?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I bill change orders without re-issuing the original invoice?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. Add each change order as its own line item on the next progress invoice, or send a separate change-order invoice.</p>
                             <p>Keeping changes on their own lines makes it easy for the customer to see exactly what they signed off on versus the original scope.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I track materials and labor separately?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I track materials and labor separately?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. List materials and labor on separate lines of the invoice, or roll materials into a single marked-up line if that's how you priced the bid.</p>
                             <p>On the expense side, scan the supply-house receipt and tag it Materials, Equipment, or Subcontractor so the report later actually means something.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet at the job site?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet at the job site?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your computer and does not need an internet connection to record expenses or build an invoice.</p>
                             <p>You only need internet when you actually send the invoice or take a payment.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books do job costing per project?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books do job costing per project?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Not the way QuickBooks Contractor or a dedicated job-costing tool does. Argo Books tracks expenses by category and revenue by customer and invoice, which covers most solo contractors and small crews.</p>
                             <p>If you need a true per-project P&L across labor, materials, subs, and overhead, a job-costing tool is a better fit. Many contractors run a simpler bookkeeping tool alongside their estimating or scheduling software.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes, forever. The free tier covers all core features and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -451,15 +409,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
 <?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>

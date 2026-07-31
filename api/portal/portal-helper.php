@@ -614,34 +614,16 @@ function send_invoice_notification(array $params): array
         $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
         $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
-        $mailer = create_smtp_mailer();
-        if ($mailer) {
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addAddress($customerEmail, $customerName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->Subject = $subject;
-            $mailer->Body = $html;
-            $mailer->send();
-            return ['success' => true, 'message' => 'Email sent'];
-        }
-
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $fromName . ' <' . $fromEmail . '>',
-            'Reply-To: ' . $fromEmail,
-            'X-Mailer: ArgoBooks/1.0'
-        ];
-
-        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
-        $result = mail($to, $subject, $html, implode("\r\n", $headers));
-
-        if ($result) {
-            return ['success' => true, 'message' => 'Email sent'];
-        } else {
-            error_log('Portal invoice notification: mail() returned false for ' . $customerEmail);
-            return ['success' => false, 'message' => 'mail() returned false'];
-        }
+        $sent = argo_send_html_email($customerEmail, $subject, $html, [
+            'toName' => $customerName,
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'replyTo' => $fromEmail,
+            'replyToName' => $fromName,
+        ]);
+        return $sent['success']
+            ? ['success' => true, 'message' => 'Email sent']
+            : ['success' => false, 'message' => $sent['error'] ?? 'Failed to send email'];
     } catch (\Throwable $e) {
         error_log('Portal invoice notification email failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
@@ -716,34 +698,16 @@ function send_payment_confirmation(array $params): array
         $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
         $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
-        $mailer = create_smtp_mailer();
-        if ($mailer) {
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addAddress($customerEmail, $customerName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->Subject = $subject;
-            $mailer->Body = $html;
-            $mailer->send();
-            return ['success' => true, 'message' => 'Confirmation email sent'];
-        }
-
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $fromName . ' <' . $fromEmail . '>',
-            'Reply-To: ' . $fromEmail,
-            'X-Mailer: ArgoBooks/1.0'
-        ];
-
-        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
-        $result = mail($to, $subject, $html, implode("\r\n", $headers));
-
-        if ($result) {
-            return ['success' => true, 'message' => 'Confirmation email sent'];
-        } else {
-            error_log('Portal payment confirmation: mail() returned false for ' . $customerEmail);
-            return ['success' => false, 'message' => 'mail() returned false'];
-        }
+        $sent = argo_send_html_email($customerEmail, $subject, $html, [
+            'toName' => $customerName,
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'replyTo' => $fromEmail,
+            'replyToName' => $fromName,
+        ]);
+        return $sent['success']
+            ? ['success' => true, 'message' => 'Email sent']
+            : ['success' => false, 'message' => $sent['error'] ?? 'Failed to send email'];
     } catch (\Throwable $e) {
         error_log('Portal payment confirmation email failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];

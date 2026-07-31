@@ -108,6 +108,32 @@ function sitemap_build_urls(): array
         sitemap_add_url($urls, $loc, $file, $urlSlug === 'generic' ? '0.9' : '0.8', 'monthly');
     }
 
+    // --- Free tools hub + the standalone calculators / generators it links to ---
+    // Curated rather than globbed: these live at the site root alongside
+    // non-tool directories, so there is no glob that catches them all.
+    $toolPages = [
+        ['/tools/',                          'tools/index.php',                          '0.9', 'monthly'],
+        ['/etsy-fee-calculator/',            'etsy-fee-calculator/index.php',            '0.9', 'monthly'],
+        ['/self-employed-tax-calculator/',   'self-employed-tax-calculator/index.php',   '0.9', 'monthly'],
+        ['/craft-pricing-calculator/',       'craft-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/estimate-generator/',             'estimate-generator/index.php',             '0.9', 'monthly'],
+        ['/purchase-order-generator/',       'purchase-order-generator/index.php',       '0.9', 'monthly'],
+        ['/free-receipt-scanner/',           'free-receipt-scanner/index.php',           '0.9', 'monthly'],
+        ['/candle-pricing-calculator/',     'candle-pricing-calculator/index.php',     '0.9', 'monthly'],
+        ['/soap-pricing-calculator/',       'soap-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/tumbler-pricing-calculator/',    'tumbler-pricing-calculator/index.php',    '0.9', 'monthly'],
+        ['/cake-pricing-calculator/',       'cake-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/craft-fair-calculator/',         'craft-fair-calculator/index.php',         '0.9', 'monthly'],
+        ['/hourly-rate-calculator/',        'hourly-rate-calculator/index.php',        '0.9', 'monthly'],
+        ['/mileage-deduction-calculator/',  'mileage-deduction-calculator/index.php',  '0.9', 'monthly'],
+        ['/late-fee-calculator/',           'late-fee-calculator/index.php',           '0.9', 'monthly'],
+        ['/markup-margin-calculator/',      'markup-margin-calculator/index.php',      '0.9', 'monthly'],
+        ['/break-even-calculator/',         'break-even-calculator/index.php',         '0.9', 'monthly'],
+    ];
+    foreach ($toolPages as [$path, $file, $priority, $changefreq]) {
+        sitemap_add_url($urls, site_url($path), $root . '/' . $file, $priority, $changefreq);
+    }
+
     // --- Free profit analyzer tool ---
     sitemap_add_url($urls, site_url('/profit-analyzer/'), $root . '/profit-analyzer/index.php', '0.9', 'monthly');
     sitemap_add_url($urls, site_url('/profit-analyzer/for-accountants/'), $root . '/profit-analyzer/for-accountants/index.php', '0.7', 'monthly');

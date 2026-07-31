@@ -8,17 +8,6 @@
 .features-section .section-description { font-size: 1.125rem; color: var(--black); line-height: 1.7; }
 
 /* Keyframes the mockups depend on (defined elsewhere in the landing CSS). */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes scanLine {
     0% { top: 0; }
     100% { top: 100%; }
@@ -152,11 +141,17 @@
 /* Tab Content */
 .features-tabs-content {
     height: 620px;
+    transition: opacity 0.4s ease;
+}
+
+/* Cross-tab switch: the whole panel fades out, swaps, then fades back in.
+   No vertical movement, the graphic stays put. */
+.features-tabs-content.tab-fading {
+    opacity: 0;
 }
 
 .tab-content {
     display: none;
-    animation: fadeInUp 0.5s ease-out;
 }
 
 .tab-content.active {

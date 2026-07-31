@@ -377,6 +377,23 @@ php_value upload_max_filesize 10M
     RewriteRule ^features/ai-spreadsheet-import/?$ /features/spreadsheet-import/ [R=301,L]
     RewriteRule ^upgrade(/index\.php)?/?$ /pricing/ [R=301,L]
 
+    # /pricing/premium/ is no longer a page. Anyone arriving there has already
+    # decided to buy, so it goes straight to checkout, which independently
+    # enforces the login gate and the existing-subscription check. The URL has
+    # to keep working: it is baked into already-sent transactional email, the
+    # docs version-comparison page, the portal subscription screens, and the
+    # PayPal plan home_url in setup-paypal-plans.php.
+    #
+    # Built from %{REQUEST_URI} rather than a root-absolute path (unlike the
+    # rules above) so it resolves under the local Laragon subfolder mount as
+    # well as the production web root. The pattern requires the trailing slash;
+    # /pricing/premium with no slash is handled by mod_dir's DirectorySlash 301
+    # first, which is why REQUEST_URI can be relied on to end in "/" here.
+    # QSA carries ?billing= through. 302 rather than 301 because the page is
+    # login-gated and has no index value to preserve, and a cached permanent
+    # redirect would be awkward to undo.
+    RewriteRule ^pricing/premium/$ %{REQUEST_URI}checkout/ [R=302,L,QSA]
+
     # --- Free invoice generator informational articles ---
 
     # Each article URL is an exact slug at root. Listed explicitly so we do

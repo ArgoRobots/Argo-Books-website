@@ -142,7 +142,7 @@ $page_title = 'Resend License Key';
                     <p>Your Premium license key is a unique identifier for your subscription. You may need it when contacting support.</p>
                     <form method="post">
                         <input type="hidden" name="resend_subscription" value="1">
-                        <button type="submit" class="btn btn-purple">Send License Key</button>
+                        <button type="submit" class="btn btn-premium">Send License Key</button>
                     </form>
                 <?php endif; ?>
             </div>

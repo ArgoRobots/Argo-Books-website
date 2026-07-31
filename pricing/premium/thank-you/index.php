@@ -73,8 +73,8 @@
         </div>
 
         <div class="cta-buttons">
-            <a href="../../../downloads" class="btn btn-purple">Download Argo Books</a>
-            <a href="../../../documentation/" class="btn btn-outline-purple">View Documentation</a>
+            <a href="../../../downloads" class="btn btn-premium">Download Argo Books</a>
+            <a href="../../../documentation/" class="btn btn-outline-premium">View Documentation</a>
         </div>
     </div>
 

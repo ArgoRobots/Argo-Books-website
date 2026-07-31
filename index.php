@@ -1511,6 +1511,19 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 document.querySelectorAll('[data-active-cycle]').forEach(c => {
                     c.dataset.activeCycle = cycle;
                 });
+                // Carry the chosen cycle through so /pricing/premium/ can hand it
+                // straight to checkout instead of asking a second time.
+                document.querySelectorAll('[data-premium-cta]').forEach(a => {
+                    a.href = a.dataset.baseUrl + '?billing=' + cycle;
+                });
+                // Slide the new price in from the side the toggle moved toward.
+                // Only the Premium card animates; the free card's $0 doesn't change.
+                const from = cycle === 'yearly' ? 'price-swap-right' : 'price-swap-left';
+                document.querySelectorAll('.pcard-premium .pcard-price').forEach(p => {
+                    p.classList.remove('price-swap-right', 'price-swap-left');
+                    void p.offsetWidth; // reflow, so the animation restarts on repeat switches
+                    p.classList.add(from);
+                });
             });
         });
 

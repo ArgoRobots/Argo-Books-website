@@ -19,8 +19,9 @@
 
     $pricing = get_pricing_config();
 
-    // Require login to checkout
-    require_login('pricing/premium/');
+    // Require login to checkout. No explicit target: require_login() falls back
+    // to REQUEST_URI, so ?billing= / ?method= survive the login round-trip.
+    require_login();
 
     $user_id = $_SESSION['user_id'];
     $user_email = $_SESSION['email'] ?? '';
@@ -74,6 +75,45 @@
     $billing = isset($_GET['billing']) && in_array($_GET['billing'], ['monthly', 'yearly'], true)
         ? $_GET['billing']
         : 'monthly';
+
+    // Payment method now gets chosen here rather than on /pricing/premium/.
+    // main.js swaps between providers in place, so the page is never reloaded
+    // for a method change and each provider's SDK initialises at most once.
+    $method = isset($_GET['method']) && in_array($_GET['method'], ['stripe', 'paypal', 'square'], true)
+        ? $_GET['method']
+        : '';
+
+    // The cycle-switch flow hides the method picker (see below), so a missing
+    // or malformed ?method= there would leave the page with nothing to act on.
+    // Only PayPal subscribers ever reach checkout for a cycle switch, so this
+    // has to resolve before the Stripe default below.
+    if ($is_cycle_switch && $method === '') {
+        $method = 'paypal';
+    }
+
+    // Card payment is what most buyers want, so Stripe is preselected and its
+    // form is ready to fill on arrival.
+    if ($method === '') {
+        $method = 'stripe';
+    }
+
+    // Rebuild the query string from whitelisted values only; never reflect raw $_GET.
+    $checkoutParams = [
+        'billing'       => $billing,
+        'method'        => $method,
+        'change_method' => $is_changing_method ? '1' : '',
+        'cycle_switch'  => $is_cycle_switch ? '1' : '',
+    ];
+    $checkout_url = static function (array $overrides) use ($checkoutParams): string {
+        $params = array_filter(array_merge($checkoutParams, $overrides), static fn($v) => $v !== '');
+        return '?' . http_build_query($params);
+    };
+
+    $paymentMethodLabels = [
+        'stripe' => 'Stripe',
+        'paypal' => 'PayPal',
+        'square' => 'Square',
+    ];
 
     // Calculate prices from centralized config
     $monthlyPrice = $pricing['premium_monthly_price'];
@@ -141,6 +181,7 @@
 
         window.AI_SUBSCRIPTION = {
             billing: <?php echo json_encode($billing, $je); ?>,
+            method: <?php echo json_encode($method, $je); ?>,
             basePrice: <?php echo $basePrice; ?>,
             finalPrice: <?php echo $finalPrice; ?>,
             processingFee: <?php echo $feeToday; ?>,
@@ -166,9 +207,9 @@
     /* Cycle-switch refund disclosure banner. Rendered only when the user
        arrives via switch-billing-cycle.php with cycle_switch=1. */
     .cycle-switch-banner {
-        background: var(--purple-50, #faf5ff);
-        border: 1px solid var(--purple-200, #e9d5ff);
-        border-left: 4px solid var(--purple-500, #8b5cf6);
+        background: var(--premium-50, #eef2fe);
+        border: 1px solid var(--premium-200, #c2cffb);
+        border-left: 4px solid var(--premium-500, #3f63e8);
         border-radius: 10px;
         padding: 14px 18px;
         margin-bottom: 20px;
@@ -188,7 +229,8 @@
         <h1>Complete Your Premium Subscription</h1>
 
         <div class="checkout-form">
-            <h2>Payment Details</h2>
+            <!-- main.js retitles this when the payment method changes. -->
+            <h2><?php echo htmlspecialchars($paymentMethodLabels[$method]); ?> Checkout</h2>
 
             <?php if ($is_cycle_switch && $cycleSwitchOldCycle && $cycleSwitchOldCycle !== $billing): ?>
                 <div class="cycle-switch-banner">
@@ -200,7 +242,23 @@
                 </div>
             <?php endif; ?>
 
-            <div class="order-summary ai-order-summary">
+            <?php
+            // Cycle switcher. Hidden for the payment-method-change and
+            // cycle-switch flows, where the cycle is already settled upstream
+            // and letting it change here would desync the order summary from
+            // what those flows are about to charge.
+            if (!$is_changing_method && !$is_cycle_switch): ?>
+                <div class="cycle-switcher" role="group" aria-label="Billing cycle">
+                    <a href="<?php echo htmlspecialchars($checkout_url(['billing' => 'monthly'])); ?>"
+                       class="cycle-switcher-btn<?php echo $billing === 'monthly' ? ' active' : ''; ?>"
+                       <?php echo $billing === 'monthly' ? 'aria-current="true"' : ''; ?>>Monthly</a>
+                    <a href="<?php echo htmlspecialchars($checkout_url(['billing' => 'yearly'])); ?>"
+                       class="cycle-switcher-btn<?php echo $billing === 'yearly' ? ' active' : ''; ?>"
+                       <?php echo $billing === 'yearly' ? 'aria-current="true"' : ''; ?>>Annual</a>
+                </div>
+            <?php endif; ?>
+
+            <div class="order-summary">
                 <h3>Order Summary</h3>
                 <div class="order-item">
                     <span>Argo Premium (<?php echo ucfirst($billing); ?>)</span>
@@ -222,6 +280,38 @@
                 <p>You will be charged $<?php echo number_format($totalToday, 2); ?> CAD today, then $<?php echo number_format($renewalTotal, 2); ?> CAD/<?php echo $billingPeriod; ?> on each renewal.</p>
                 <p>Cancel anytime from your account settings.</p>
             </div>
+
+            <?php
+            // Hidden for the cycle-switch flow. switch-billing-cycle.php only
+            // routes PayPal subscribers here (Stripe and Square switch via
+            // switch-billing-cycle-ajax.php), and the proration disclosure above
+            // is written for PayPal. Letting someone pick Stripe here would open
+            // a second subscription alongside the PayPal one they still hold.
+            if (!$is_cycle_switch): ?>
+            <div class="method-picker">
+                <h3>Payment method</h3>
+                <div class="payment-grid">
+                    <!-- Real hrefs so the picker still works without JS. main.js
+                         intercepts the click and swaps the form in place, so the
+                         page neither reloads nor jumps back to the top. -->
+                    <a class="payment-btn<?php echo $method === 'paypal' ? ' is-selected' : ''; ?>"
+                       data-method="paypal" aria-label="Pay with PayPal"
+                       href="<?php echo htmlspecialchars($checkout_url(['method' => 'paypal'])); ?>">
+                        <img src="../../../resources/images/PayPal-logo.svg" alt="PayPal">
+                    </a>
+                    <a class="payment-btn<?php echo $method === 'stripe' ? ' is-selected' : ''; ?>"
+                       data-method="stripe" aria-label="Pay with Stripe"
+                       href="<?php echo htmlspecialchars($checkout_url(['method' => 'stripe'])); ?>">
+                        <img class="Stripe" src="../../../resources/images/Stripe-logo.svg" alt="Stripe">
+                    </a>
+                    <a class="payment-btn<?php echo $method === 'square' ? ' is-selected' : ''; ?>"
+                       data-method="square" aria-label="Pay with Square"
+                       href="<?php echo htmlspecialchars($checkout_url(['method' => 'square'])); ?>">
+                        <img class="Square" src="../../../resources/images/Square-logo.svg" alt="Square">
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div id="stripe-container" style="display: none;">
                 <form id="stripe-payment-form">

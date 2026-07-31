@@ -30,7 +30,26 @@
   --gray-input-border: #d1d5db;
   --gray-bg-light: #f3f4f6;
 
-  /* Purple/Violet - Premium subscription theme */
+  /* Premium subscription theme.
+     Semantic alias over the blue brand ramp. Anywhere a color means
+     "this is the Premium plan" (pricing cards, subscribe buttons,
+     portal subscription screens, upgrade emails) should reference these,
+     NOT --blue-* or --purple-* directly, so the Premium color can be
+     retargeted in one place. The purple ramp below is now decorative only
+     (benefit-card icon tints, compare-page gradients, admin charts). */
+  --premium-50: #eef2fe;
+  --premium-100: #dde4fd;
+  --premium-200: #c2cffb;
+  --premium-300: #9bb0f7;
+  --premium-400: #6985f0;
+  --premium-500: #3f63e8;
+  --premium-600: #2f4fd6;
+  --premium-700: #2740b5;
+  --premium-alpha-15: rgba(63, 99, 232, 0.15);
+  --premium-alpha-20: rgba(63, 99, 232, 0.2);
+  --premium-alpha-40: rgba(63, 99, 232, 0.4);
+
+  /* Purple/Violet - decorative accents only (see --premium-* above) */
   --purple-50: #faf5ff;
   --purple-100: #f3e8ff;
   --purple-200: #e9d5ff;

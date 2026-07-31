@@ -85,16 +85,16 @@ table th {
     background: var(--gray-bg-light);
     color: var(--admin-text);
 }
-.btn-purple {
-    background: var(--purple-500);
+.btn-premium {
+    background: var(--premium-500);
     color: var(--white);
     border: none;
 }
-.btn-purple:hover {
-    background: var(--purple-600);
+.btn-premium:hover {
+    background: var(--premium-600);
 }
-.btn-purple:disabled {
-    background: var(--purple-300);
+.btn-premium:disabled {
+    background: var(--premium-300);
     cursor: not-allowed;
 }
 .btn-secondary {

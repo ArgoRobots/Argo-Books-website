@@ -89,21 +89,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
                     <?php echo htmlspecialchars($success_message); ?>
                 </div>
                 <div class="centered">
-                    <a href="subscription.php" class="btn btn-purple">Back to Subscription</a>
+                    <a href="subscription.php" class="btn btn-premium">Back to Subscription</a>
                 </div>
             <?php elseif ($error_message): ?>
                 <div class="error-message">
                     <?php echo $error_message; ?>
                 </div>
                 <div class="centered">
-                    <a href="subscription.php" class="btn btn-purple">Back to Subscription</a>
+                    <a href="subscription.php" class="btn btn-premium">Back to Subscription</a>
                 </div>
             <?php elseif (!$premium_subscription): ?>
                 <div class="error-message">
                     You don't have an active Premium subscription.
                 </div>
                 <div class="centered">
-                    <a href="../../pricing/premium/" class="btn btn-purple">Subscribe to Premium Features</a>
+                    <a href="../../pricing/premium/" class="btn btn-premium">Subscribe to Premium Features</a>
                 </div>
             <?php else: ?>
                 <p class="auth-subtitle">We'll send your Premium license key to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
 
                 <form method="post" class="auth-form">
                     <div class="form-actions centered">
-                        <button type="submit" class="btn btn-purple">Send License Key</button>
+                        <button type="submit" class="btn btn-premium">Send License Key</button>
                         <a href="subscription.php" class="btn btn-black">Cancel</a>
                     </div>
                 </form>

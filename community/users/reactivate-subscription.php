@@ -194,7 +194,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
                 <form method="post" id="reactivate-form">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="confirm_reactivate" value="1">
-                    <button type="submit" id="reactivate-btn" class="btn btn-purple">Reactivate with <?php echo $payment_method; ?> (<?php echo ucfirst($billing_cycle); ?>)</button>
+                    <button type="submit" id="reactivate-btn" class="btn btn-premium">Reactivate with <?php echo $payment_method; ?> (<?php echo ucfirst($billing_cycle); ?>)</button>
                 </form>
                 <a href="subscription.php" class="btn btn-outline">Go Back</a>
             </div>

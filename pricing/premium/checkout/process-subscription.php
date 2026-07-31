@@ -975,7 +975,7 @@ try {
                 admin_notification_email(),
                 "[Argo Books] New paying customer: $custEmail",
                 $newCustomerBody,
-                'purple',
+                'premium',
                 null,
                 null,
                 $email
@@ -1040,7 +1040,7 @@ try {
                         'contact@argorobots.com',
                         "[Argo Books] PayPal price mismatch: $subscriptionId",
                         $alertBody,
-                        'purple',
+                        'premium',
                         null,
                         null,
                         $email

@@ -115,7 +115,7 @@ function _premium_feature_list_items($prefix = '')
  * @param string      $to_email      Recipient email address
  * @param string      $subject       Email subject
  * @param string      $body_content  HTML content for the email body (will be wrapped in template). When $format === 'plain', this is used as-is as plain text and no template is applied.
- * @param string      $header_style  Optional header style ('blue', 'purple', '' for default, or a raw inline style string for backwards compatibility)
+ * @param string      $header_style  Optional header style ('blue', 'premium', 'purple', '' for default, or a raw inline style string for backwards compatibility)
  * @param string|null $from_email    Sender email address; falls back to noreply@argorobots.com when null
  * @param string|null $from_name     Sender display name; defaults to 'Argo Books' when null
  * @param string|null $reply_to      Reply-To address; defaults to support@argorobots.com when null
@@ -150,9 +150,14 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
         }
 
-        // Map style keywords to CSS classes. Only 'blue' (default) and 'purple'
-        // are in use across all callers.
-        $header_class = ($header_style === 'purple') ? 'header-purple' : 'header-blue';
+        // Map style keywords to CSS classes. 'premium' is the blue Argo Premium
+        // header used by subscription mail; 'purple' remains the generic second
+        // accent for affiliate, portal and refund mail; 'blue' is the default.
+        $header_class_map = [
+            'premium' => 'header-premium',
+            'purple'  => 'header-purple',
+        ];
+        $header_class = $header_class_map[$header_style] ?? 'header-blue';
 
         // Subjects can be admin-authored or AI-generated; escape for the
         // HTML <title> context. The raw subject still goes to SMTP/mail()
@@ -277,14 +282,14 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
         </table>
 
         <div class="button-container">
-            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">Manage Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-premium">Manage Subscription</a>
         </div>
 
         <p>Keep this key safe. You may need it when contacting support about your subscription.</p>
         <p>If you have any questions or need assistance, please don't hesitate to <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($to_email, 'Your Requested Argo Premium License Key', $body, 'purple');
+    return send_styled_email($to_email, 'Your Requested Argo Premium License Key', $body, 'premium');
 }
 
 /**
@@ -848,7 +853,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
         </div>
         HTML;
 
-    return send_styled_email($email, 'Payment Receipt - Argo Premium Subscription', $body, 'purple');
+    return send_styled_email($email, 'Payment Receipt - Argo Premium Subscription', $body, 'premium');
 }
 
 /**
@@ -885,7 +890,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
         <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
         <div class="button-container">
-            <a href="{$site_url}/pricing/premium/" class="button button-purple">Resubscribe</a>
+            <a href="{$site_url}/pricing/premium/" class="button button-premium">Resubscribe</a>
         </div>
 
         <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
@@ -897,7 +902,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
         </div>
         HTML;
 
-    return send_styled_email($email, 'Subscription Cancelled - Argo Premium', $body, 'purple');
+    return send_styled_email($email, 'Subscription Cancelled - Argo Premium', $body, 'premium');
 }
 
 /**
@@ -941,7 +946,7 @@ function send_premium_subscription_cancelled_admin_notification($email, $subscri
         admin_notification_email(),
         "[Argo Books] Premium subscription cancelled: $custEmail",
         $body,
-        'purple',
+        'premium',
         null,
         null,
         $email
@@ -998,7 +1003,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
         </ul>
 
         <div class="button-container">
-            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-premium">View Subscription</a>
         </div>
 
         <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
@@ -1009,7 +1014,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
         </div>
         HTML;
 
-    return send_styled_email($email, 'Subscription Reactivated - Argo Premium', $body, 'purple');
+    return send_styled_email($email, 'Subscription Reactivated - Argo Premium', $body, 'premium');
 }
 
 /**
@@ -1103,7 +1108,7 @@ function send_premium_subscription_cycle_changed_email(
         </table>
 
         <div class="button-container">
-            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-premium">View Subscription</a>
         </div>
 
         <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
@@ -1114,7 +1119,7 @@ function send_premium_subscription_cycle_changed_email(
         </div>
         HTML;
 
-    return send_styled_email($email, $subject, $body, 'purple');
+    return send_styled_email($email, $subject, $body, 'premium');
 }
 
 /**
@@ -1167,7 +1172,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
         <p>Thank you for being part of the Argo community!</p>
         HTML;
 
-    return send_styled_email($email, 'Your Free Argo Premium Subscription Key', $body, 'purple');
+    return send_styled_email($email, 'Your Free Argo Premium Subscription Key', $body, 'premium');
 }
 
 /**
@@ -1206,13 +1211,13 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
         <p>If the payment continues to fail, your subscription may be suspended. Please update your payment method to avoid interruption of service.</p>
 
         <div class="button-container">
-            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">Update Payment Method</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-premium">Update Payment Method</a>
         </div>
 
         <p>If you need assistance, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'purple');
+    return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'premium');
 }
 
 /**
@@ -1258,7 +1263,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         </ul>
 
         <div class="button-container">
-            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-premium">View Your Subscription</a>
         </div>
 
         <p>If you have any questions about your credit or subscription, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
@@ -1269,7 +1274,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         </div>
         HTML;
 
-    return send_styled_email($email, "You've Received Free Credit - Argo Premium", $body, 'purple');
+    return send_styled_email($email, "You've Received Free Credit - Argo Premium", $body, 'premium');
 }
 
 /**

@@ -338,25 +338,6 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         </div>
     </section>
 
-    <!-- Inline CTA -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Ready to unlock Premium?</h3>
-                <p>Cancel anytime. No lock-in.</p>
-                <div class="inline-cta-buttons">
-                    <a href="premium/" class="btn-cta btn-cta-primary">
-                        <span>Get Premium</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../downloads/" class="btn-cta btn-cta-outline">
-                        <span>Download Free</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
@@ -450,6 +431,19 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 });
                 document.querySelectorAll('[data-active-cycle]').forEach(c => {
                     c.dataset.activeCycle = cycle;
+                });
+                // Carry the chosen cycle through so /pricing/premium/ can hand it
+                // straight to checkout instead of asking a second time.
+                document.querySelectorAll('[data-premium-cta]').forEach(a => {
+                    a.href = a.dataset.baseUrl + '?billing=' + cycle;
+                });
+                // Slide the new price in from the side the toggle moved toward.
+                // Only the Premium card animates; the free card's $0 doesn't change.
+                const from = cycle === 'yearly' ? 'price-swap-right' : 'price-swap-left';
+                document.querySelectorAll('.pcard-premium .pcard-price').forEach(p => {
+                    p.classList.remove('price-swap-right', 'price-swap-left');
+                    void p.offsetWidth; // reflow, so the animation restarts on repeat switches
+                    p.classList.add(from);
                 });
             });
         });

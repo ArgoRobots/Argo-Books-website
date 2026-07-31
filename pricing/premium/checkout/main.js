@@ -1,32 +1,100 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Get payment method from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const paymentMethod = urlParams.get("method");
-
-  // Get subscription details from PHP
+  // Get subscription details from PHP. The method is whitelisted server-side;
+  // an empty string means the buyer has not picked one yet.
   const subscription = window.AI_SUBSCRIPTION;
 
   // Update the form based on payment method
   const formTitle = document.querySelector(".checkout-form h2");
 
-  // Customize checkout form based on payment method
-  switch (paymentMethod) {
-    case "paypal":
-      formTitle.textContent = "PayPal Checkout";
-      setupPayPalCheckout();
-      break;
-    case "stripe":
-      formTitle.textContent = "Stripe Checkout";
-      setupStripeCheckout();
-      break;
-    case "square":
-      formTitle.textContent = "Square Checkout";
-      setupSquareCheckout();
-      break;
-    default:
-      formTitle.textContent = "PayPal Checkout";
-      setupPayPalCheckout();
+  const METHOD_LABELS = { paypal: "PayPal", stripe: "Stripe", square: "Square" };
+  const METHOD_SETUP = {
+    paypal: setupPayPalCheckout,
+    stripe: setupStripeCheckout,
+    square: setupSquareCheckout,
+  };
+  const METHOD_CONTAINER_IDS = {
+    paypal: "paypal-button-container",
+    stripe: "stripe-container",
+    square: "square-container",
+  };
+
+  // Each setup function injects its provider's SDK <script> and mounts a card
+  // element, so calling one twice would load the script twice and double-mount.
+  // Initialise each at most once; after that, switching is only show/hide, which
+  // is what lets the picker work without a page reload.
+  const initialised = {};
+
+  function hideAllPaymentForms() {
+    Object.values(METHOD_CONTAINER_IDS).forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = "none";
+      }
+    });
   }
+
+  // Show a payment form. Pass updateUrl on user-driven switches so a manual
+  // refresh (or a copied link) lands back on the same method.
+  function activateMethod(method, updateUrl) {
+    if (!METHOD_SETUP[method]) {
+      return;
+    }
+
+    formTitle.textContent = METHOD_LABELS[method] + " Checkout";
+
+    document.querySelectorAll(".payment-btn").forEach((btn) => {
+      btn.classList.toggle("is-selected", btn.dataset.method === method);
+    });
+
+    hideAllPaymentForms();
+
+    if (initialised[method]) {
+      // The setup functions reveal their own container on first run; on a
+      // repeat visit we just undo hideAllPaymentForms().
+      const el = document.getElementById(METHOD_CONTAINER_IDS[method]);
+      if (el) {
+        el.style.display = "block";
+      }
+    } else {
+      initialised[method] = true;
+      METHOD_SETUP[method]();
+    }
+
+    subscription.method = method;
+
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("method", method);
+      history.replaceState(null, "", url);
+    }
+  }
+
+  document.querySelectorAll(".payment-btn").forEach((btn) => {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      activateMethod(this.dataset.method, true);
+    });
+  });
+
+  // The billing cycle switcher has to reload: the price, processing fee and
+  // totals are all computed server-side. Preserve scroll across it the same way
+  // the admin filter pills do, so it doesn't jump to the top either.
+  document.querySelectorAll(".cycle-switcher-btn").forEach((link) => {
+    link.addEventListener("click", function () {
+      sessionStorage.setItem("checkoutScrollPosition", String(window.scrollY));
+    });
+  });
+  const savedScroll = sessionStorage.getItem("checkoutScrollPosition");
+  if (savedScroll !== null) {
+    sessionStorage.removeItem("checkoutScrollPosition");
+    window.scrollTo(0, parseInt(savedScroll, 10) || 0);
+  }
+
+  // PHP always resolves a method (Stripe unless the URL or the cycle-switch
+  // flow says otherwise), so this normally mounts the preselected form on load.
+  // Guarded anyway so an unexpected value initialises nothing rather than
+  // throwing.
+  activateMethod(subscription.method, false);
 
   function setupPayPalCheckout() {
     // Create or clear PayPal button container

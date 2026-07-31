@@ -202,7 +202,7 @@ if ($premium_subscription) {
                         ?>
                         <div class="subscription-actions">
                             <?php if ($canSwitchCycle): ?>
-                                <a href="switch-billing-cycle.php" class="btn btn-purple">Switch to <?= htmlspecialchars($switchTargetCycle) ?></a>
+                                <a href="switch-billing-cycle.php" class="btn btn-premium">Switch to <?= htmlspecialchars($switchTargetCycle) ?></a>
                             <?php endif; ?>
                             <a href="cancel-subscription.php" class="btn btn-outline-red btn-cancel">Cancel Subscription</a>
                         </div>
@@ -216,9 +216,9 @@ if ($premium_subscription) {
                         </div>
                         <div class="subscription-actions">
                             <?php if (strtotime($premium_subscription['end_date']) > time()): ?>
-                                <a href="reactivate-subscription.php" class="btn btn-purple btn-reactivate">Reactivate Subscription</a>
+                                <a href="reactivate-subscription.php" class="btn btn-premium btn-reactivate">Reactivate Subscription</a>
                             <?php else: ?>
-                                <a href="reactivate-subscription.php" class="btn btn-purple">Resubscribe</a>
+                                <a href="reactivate-subscription.php" class="btn btn-premium">Resubscribe</a>
                             <?php endif; ?>
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'payment_failed'): ?>
@@ -230,7 +230,7 @@ if ($premium_subscription) {
                             </div>
                         </div>
                         <div class="subscription-actions payment-failed-actions">
-                            <a href="reactivate-subscription.php" class="btn btn-purple">Update Payment Method</a>
+                            <a href="reactivate-subscription.php" class="btn btn-premium">Update Payment Method</a>
                             <button type="button" class="btn btn-outline" id="retry-payment-btn">Retry with Existing Method</button>
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'expired'): ?>
@@ -274,7 +274,7 @@ if ($premium_subscription) {
                         <span class="price">$<?php echo number_format($yearlyPrice, 0); ?></span>
                         <span class="period">CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</span>
                     </div>
-                    <a href="../../pricing/premium/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
+                    <a href="../../pricing/premium/" class="btn btn-premium btn-subscribe">Subscribe to Premium</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -389,7 +389,7 @@ if ($premium_subscription) {
                     <span class="billing-info"><?php echo ucfirst($premium_subscription['billing_cycle'] ?? 'Monthly'); ?> billing</span>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-purple" id="confirm-retry-btn">
+                    <button type="button" class="btn btn-premium" id="confirm-retry-btn">
                         <span class="btn-text">Retry Payment</span>
                     </button>
                     <button type="button" class="btn btn-outline" id="cancel-retry-btn">Cancel</button>
@@ -413,7 +413,7 @@ if ($premium_subscription) {
                 <h2>Payment Successful!</h2>
                 <p class="modal-description" id="success-message">Your subscription has been reactivated.</p>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-purple" id="success-close-btn">Done</button>
+                    <button type="button" class="btn btn-premium" id="success-close-btn">Done</button>
                 </div>
             </div>
 
@@ -425,7 +425,7 @@ if ($premium_subscription) {
                 <h2>Payment Failed</h2>
                 <p class="modal-description" id="error-message">Unable to process your payment.</p>
                 <div class="modal-actions">
-                    <a href="reactivate-subscription.php" class="btn btn-purple" id="error-update-btn">Update Payment Method</a>
+                    <a href="reactivate-subscription.php" class="btn btn-premium" id="error-update-btn">Update Payment Method</a>
                     <button type="button" class="btn btn-outline" id="error-close-btn">Close</button>
                 </div>
             </div>

@@ -49,7 +49,7 @@ body {
 .hero .hero-orb-2 {
   width: 350px;
   height: 350px;
-  background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
+  background: linear-gradient(135deg, var(--premium-500), var(--indigo-500));
   bottom: -80px;
   right: -80px;
 }
@@ -110,9 +110,9 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: linear-gradient(135deg, var(--purple-50), var(--purple-100));
-    color: var(--purple-600);
-    border: 1px solid var(--purple-200);
+    background: linear-gradient(135deg, var(--premium-50), var(--premium-100));
+    color: var(--premium-600);
+    border: 1px solid var(--premium-200);
     border-radius: 50px;
     font-size: 0.875rem;
     font-weight: 600;
@@ -120,7 +120,7 @@ body {
 }
 
 .premium-intro-badge svg {
-    color: var(--purple-500);
+    color: var(--premium-500);
 }
 
 .premium-intro h2 {
@@ -143,58 +143,9 @@ body {
     }
 }
 
-.payment-grid {
-  display: grid;
-  gap: 16px;
-  max-width: 900px;
-  margin: 0 auto;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 768px) {
-  .payment-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-}
-
-.payment-btn {
-  width: 100%;
-  background: var(--white);
-  padding: clamp(16px, 4vw, 24px);
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 4px 6px var(--shadow-default);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.payment-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px var(--shadow-xl);
-}
-
-.payment-btn img {
-  max-width: min(120px, 100%);
-  height: auto;
-}
-
-.payment-btn .Square {
-  height: 25px;
-}
-
-.payment-btn .Stripe {
-  height: 35px;
-}
-
-.payment-btn span {
-  font-size: clamp(14px, 2.5vw, 18px);
-  font-weight: 600;
-}
+/* The .payment-grid / .payment-btn rules that used to live here moved to
+   pricing/premium/checkout/style.css along with the payment method picker
+   itself. Nothing that loads this file renders payment buttons any more. */
 
 /* ========================================
    Scroll Animations
@@ -227,7 +178,7 @@ body {
   display: inline-block;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--purple-500);
+  color: var(--premium-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 12px;
@@ -274,10 +225,6 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 12px;
-}
-
-.feature-detail-text .section-label.purple {
-  color: var(--purple-500);
 }
 
 .feature-detail-text h2 {

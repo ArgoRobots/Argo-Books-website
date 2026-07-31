@@ -60,7 +60,7 @@ include __DIR__ . '/../../docs-header.php';
                         </li>
                         <?php endforeach; ?>
                     </ul>
-                    <a href="../../../pricing/premium/" class="btn btn-purple">Subscribe to Premium</a>
+                    <a href="../../../pricing/premium/" class="btn btn-premium">Subscribe to Premium</a>
                 </div>
             </div>
 

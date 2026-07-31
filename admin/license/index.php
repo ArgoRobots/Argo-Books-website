@@ -641,7 +641,7 @@ include __DIR__ . '/../admin_header.php';
                     <span id="subscription-selected-count">0</span> selected
                 </div>
                 <div class="bulk-buttons">
-                    <button type="button" class="btn btn-bulk btn-purple" id="open-credit-modal" disabled>
+                    <button type="button" class="btn btn-bulk btn-premium" id="open-credit-modal" disabled>
                         Give Credit
                     </button>
                     <button type="button" class="btn btn-bulk btn-blue" id="subscription-bulk-resend" disabled>
@@ -761,7 +761,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="cancel-credit-modal">Cancel</button>
-                <button type="button" class="btn btn-purple" id="confirm-give-credit">Give Credit</button>
+                <button type="button" class="btn btn-premium" id="confirm-give-credit">Give Credit</button>
             </div>
         </div>
     </div>
@@ -826,7 +826,7 @@ include __DIR__ . '/../admin_header.php';
                          <p style="position: absolute; margin: 5px 0 20px; color: var(--admin-text);">This will also appear in the recipient's email.</p>
                     </div>
                     <div class="form-group">
-                        <button type="submit" name="generate_sub_key" class="btn btn-purple" style="margin-top: 24px;">Generate Key</button>
+                        <button type="submit" name="generate_sub_key" class="btn btn-premium" style="margin-top: 24px;">Generate Key</button>
                     </div>
                 </div>
             </form>
@@ -845,7 +845,7 @@ include __DIR__ . '/../admin_header.php';
                     <span id="sub-key-selected-count">0</span> selected
                 </div>
                 <div class="bulk-buttons">
-                    <button type="button" class="btn btn-bulk btn-purple" id="sub-key-bulk-resend" disabled>Resend Email</button>
+                    <button type="button" class="btn btn-bulk btn-premium" id="sub-key-bulk-resend" disabled>Resend Email</button>
                     <button type="button" class="btn btn-bulk btn-reset-usage" id="sub-key-bulk-reset-usage" disabled>Reset Usage</button>
                     <button type="button" class="btn btn-bulk btn-delete" id="sub-key-bulk-delete" data-action="delete" disabled>Delete Selected</button>
                 </div>

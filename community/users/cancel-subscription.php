@@ -212,9 +212,9 @@ $premium_features = get_plan_features()['premium']['features'];
 
 .access-end-card {
     position: relative;
-    background: linear-gradient(135deg, var(--purple-50) 0%, var(--white) 100%);
-    border: 1px solid var(--purple-200);
-    border-left: 4px solid var(--purple-500);
+    background: linear-gradient(135deg, var(--premium-50) 0%, var(--white) 100%);
+    border: 1px solid var(--premium-200);
+    border-left: 4px solid var(--premium-500);
     border-radius: 12px;
     padding: 20px 24px;
     margin-bottom: 28px;
@@ -225,7 +225,7 @@ $premium_features = get_plan_features()['premium']['features'];
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: var(--purple-600);
+    color: var(--premium-600);
     font-weight: 700;
     margin-bottom: 6px;
 }
@@ -386,7 +386,7 @@ $premium_features = get_plan_features()['premium']['features'];
                     <input type="hidden" name="confirm_cancel" value="1">
                     <button type="submit" class="btn btn-outline-red">Yes, Cancel</button>
                 </form>
-                <a href="subscription.php" class="btn btn-purple">Keep My Subscription</a>
+                <a href="subscription.php" class="btn btn-premium">Keep My Subscription</a>
             </div>
 
             <p class="cancel-footnote">Need help instead? <a class="link" href="../../contact-us/">Contact support</a>. We'd love to hear what's not working.</p>

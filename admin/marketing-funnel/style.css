@@ -197,10 +197,10 @@
     box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
 }
 
-.funnel-bar-landing       { background: linear-gradient(90deg, var(--blue-500),    var(--blue-400)); }
-.funnel-bar-downloads_page{ background: linear-gradient(90deg, var(--indigo-500),  var(--indigo-400)); }
-.funnel-bar-download_click{ background: linear-gradient(90deg, var(--purple-500),  var(--purple-400)); }
-.funnel-bar-app_first_run { background: linear-gradient(90deg, var(--purple-400),  var(--purple-300)); }
+.funnel-bar-landing       { background: linear-gradient(90deg, var(--blue-700),    var(--blue-500)); }
+.funnel-bar-downloads_page{ background: linear-gradient(90deg, var(--blue-500),    var(--blue-400)); }
+.funnel-bar-download_click{ background: linear-gradient(90deg, var(--sky-600),     var(--sky-500)); }
+.funnel-bar-app_first_run { background: linear-gradient(90deg, var(--sky-500),     var(--sky-400)); }
 .funnel-bar-premium_signup{ background: linear-gradient(90deg, var(--emerald-500), var(--emerald-400)); }
 .funnel-bar-premium_paid  { background: linear-gradient(90deg, var(--emerald-700), var(--emerald-500)); }
 .funnel-bar-still_paying  { background: linear-gradient(90deg, var(--emerald-800), var(--emerald-600)); }

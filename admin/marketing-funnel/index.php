@@ -2024,12 +2024,12 @@ include __DIR__ . '/../admin_header.php';
         // Unanswered always lands on the gray slot (last in the palette).
         const palette = [
             'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
+            'rgba(30, 64, 175, 0.85)',    // navy
             'rgba(16, 185, 129, 0.85)',   // emerald
             'rgba(245, 158, 11, 0.85)',   // amber
             'rgba(239, 68, 68, 0.85)',    // red
             'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
+            'rgba(147, 197, 253, 0.85)',  // light blue
             'rgba(107, 114, 128, 0.85)',  // gray
         ];
         const GRAY = palette[palette.length - 1];

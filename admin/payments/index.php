@@ -1236,19 +1236,19 @@ function toggleCompanyDetail(companyId) {
 // ============================================================
 const chartColors = {
     blue: 'rgba(59, 130, 246, 0.8)',
-    purple: 'rgba(139, 92, 246, 0.8)',
+    navy: 'rgba(30, 64, 175, 0.8)',
     green: 'rgba(16, 185, 129, 0.8)',
     red: 'rgba(239, 68, 68, 0.8)',
     amber: 'rgba(245, 158, 11, 0.8)',
     sky: 'rgba(14, 165, 233, 0.8)',
     pink: 'rgba(236, 72, 153, 0.8)',
-    indigo: 'rgba(99, 102, 241, 0.8)',
+    lightBlue: 'rgba(96, 165, 250, 0.8)',
     emerald: 'rgba(52, 211, 153, 0.8)',
     cyan: 'rgba(6, 182, 212, 0.8)'
 };
 
 const methodColors = {
-    stripe: chartColors.purple,
+    stripe: chartColors.navy,
     paypal: chartColors.blue,
     square: chartColors.green
 };
@@ -1290,7 +1290,7 @@ new Chart(document.getElementById('methodChart'), {
         datasets: [{
             data: <?php echo json_encode(array_map('floatval', array_column($method_distribution, 'total'))); ?>,
             backgroundColor: <?php echo json_encode(array_map(function($m) {
-                $colors = ['stripe' => 'rgba(139, 92, 246, 0.8)', 'paypal' => 'rgba(59, 130, 246, 0.8)', 'square' => 'rgba(16, 185, 129, 0.8)'];
+                $colors = ['stripe' => 'rgba(30, 64, 175, 0.8)', 'paypal' => 'rgba(59, 130, 246, 0.8)', 'square' => 'rgba(16, 185, 129, 0.8)'];
                 return $colors[$m['payment_method']] ?? 'rgba(107, 114, 128, 0.8)';
             }, $method_distribution)); ?>
         }]
@@ -1321,7 +1321,7 @@ new Chart(document.getElementById('invoiceStatusChart'), {
                     'sent' => 'rgba(59, 130, 246, 0.7)',
                     'viewed' => 'rgba(14, 165, 233, 0.7)',
                     'pending' => 'rgba(245, 158, 11, 0.7)',
-                    'partial' => 'rgba(139, 92, 246, 0.7)',
+                    'partial' => 'rgba(30, 64, 175, 0.7)',
                     'paid' => 'rgba(16, 185, 129, 0.7)',
                     'overdue' => 'rgba(239, 68, 68, 0.7)',
                     'cancelled' => 'rgba(107, 114, 128, 0.4)'
@@ -1378,8 +1378,8 @@ new Chart(document.getElementById('companyRevenueChart'), {
         return {
             label: method.charAt(0).toUpperCase() + method.slice(1),
             data: data,
-            backgroundColor: methodColors[method] || chartColors.indigo,
-            borderColor: methodColors[method] || chartColors.indigo,
+            backgroundColor: methodColors[method] || chartColors.lightBlue,
+            borderColor: methodColors[method] || chartColors.lightBlue,
             fill: true,
             tension: 0.3
         };

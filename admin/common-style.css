@@ -1626,8 +1626,8 @@ th.col-nowrap {
 
 [data-theme="dark"] .status-pending,
 [data-theme="dark"] .badge-refunded {
-  background: var(--indigo-alpha-20);
-  color: var(--indigo-400);
+  background: var(--sky-alpha-20);
+  color: var(--sky-400);
 }
 
 /* Dark theme - Invoice badges */
@@ -1653,8 +1653,8 @@ th.col-nowrap {
 }
 
 [data-theme="dark"] .badge-invoice-partial {
-  background: var(--purple-alpha-20);
-  color: var(--purple-400);
+  background: var(--blue-600-alpha-20);
+  color: var(--blue-300);
 }
 
 [data-theme="dark"] .badge-invoice-paid {
@@ -1754,8 +1754,8 @@ th.col-nowrap {
 
 /* Dark theme - Badge method */
 [data-theme="dark"] .badge-method {
-  background-color: var(--indigo-alpha-20);
-  color: var(--indigo-400);
+  background-color: var(--sky-alpha-20);
+  color: var(--sky-400);
 }
 
 /* Dark theme - License page */
@@ -1786,8 +1786,8 @@ th.col-nowrap {
 }
 
 [data-theme="dark"] .badge-free {
-  background: var(--purple-alpha-20);
-  color: var(--purple-400);
+  background: var(--blue-600-alpha-20);
+  color: var(--blue-300);
 }
 
 [data-theme="dark"] .badge-redeemed {
@@ -1993,15 +1993,15 @@ th.col-nowrap {
 /* Dark theme - Checkboxes */
 [data-theme="dark"] .checkbox input[type="checkbox"] {
   background-color: var(--black);
-  border-color: var(--indigo-500);
+  border-color: var(--blue-500);
 }
 
 [data-theme="dark"] .checkbox input[type="checkbox"]:checked {
-  background-color: var(--indigo-500);
+  background-color: var(--blue-500);
 }
 
 [data-theme="dark"] .checkbox input[type="checkbox"]:hover {
-  border-color: var(--indigo-400);
+  border-color: var(--blue-400);
 }
 
 /* Dark theme - Dashboard hero */

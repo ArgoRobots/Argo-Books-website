@@ -283,7 +283,7 @@ if (!function_exists('ua_kv')) {
 .ua-evt-ts { color:var(--black); font-family:monospace; white-space:nowrap; }
 .ua-evt-text { color:var(--black); }
 .ua-evt.error  .ua-evt-text { color:#b91c1c; font-family:monospace; }
-.ua-evt.api    .ua-evt-text { color:#7c3aed; }
+.ua-evt.api    .ua-evt-text { color:#1d4ed8; }
 .ua-evt.export .ua-evt-text { color:#0369a1; }
 .ua-evt.feature .ua-evt-text { color:#047857; }
 .ua-evt.session .ua-evt-text { color:var(--black); }
@@ -297,7 +297,7 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt { border-bottom-color:var(--gray-700); }
 [data-theme="dark"] .ua-evt-ts { color:var(--gray-400); }
 [data-theme="dark"] .ua-evt.error  .ua-evt-text { color:#f87171; }
-[data-theme="dark"] .ua-evt.api    .ua-evt-text { color:#a78bfa; }
+[data-theme="dark"] .ua-evt.api    .ua-evt-text { color:#93c5fd; }
 [data-theme="dark"] .ua-evt.export .ua-evt-text { color:#38bdf8; }
 [data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }

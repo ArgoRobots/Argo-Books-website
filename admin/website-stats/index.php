@@ -882,13 +882,13 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.8)',
                         'rgba(245, 158, 11, 0.8)',
                         'rgba(16, 185, 129, 0.8)',
-                        'rgba(99, 102, 241, 0.8)'
+                        'rgba(14, 165, 233, 0.8)'
                     ],
                     borderColor: [
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)'
+                        'rgba(14, 165, 233, 1)'
                     ],
                     borderWidth: 1
                 }]
@@ -928,13 +928,13 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.7)',
                         'rgba(245, 158, 11, 0.7)',
                         'rgba(16, 185, 129, 0.7)',
-                        'rgba(99, 102, 241, 0.7)'
+                        'rgba(14, 165, 233, 0.7)'
                     ],
                     borderColor: [
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)'
+                        'rgba(14, 165, 233, 1)'
                     ],
                     borderWidth: 1,
                     borderRadius: 5
@@ -979,8 +979,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Page Views',
                     data: countryCounts,
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
@@ -1074,7 +1074,7 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.7)',
                         'rgba(245, 158, 11, 0.7)',
                         'rgba(16, 185, 129, 0.7)',
-                        'rgba(99, 102, 241, 0.7)',
+                        'rgba(14, 165, 233, 0.7)',
                         'rgba(239, 68, 68, 0.7)',
                         'rgba(107, 114, 128, 0.7)'
                     ],
@@ -1082,7 +1082,7 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)',
+                        'rgba(14, 165, 233, 1)',
                         'rgba(239, 68, 68, 1)',
                         'rgba(107, 114, 128, 1)'
                     ],

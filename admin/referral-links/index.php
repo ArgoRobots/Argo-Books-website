@@ -733,8 +733,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Visits',
                     data: countryVisitCounts,
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
@@ -774,8 +774,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Conversion Rate (%)',
                     data: conversionRates,
-                    backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                    borderColor: 'rgba(139, 92, 246, 1)',
+                    backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                    borderColor: 'rgba(14, 165, 233, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]

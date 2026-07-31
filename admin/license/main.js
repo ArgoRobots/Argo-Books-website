@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 {
                     label: 'Total Subscriptions',
                     data: subTotals,
-                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
-                    borderColor: 'rgba(139, 92, 246, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 2,
                     tension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: 'rgba(139, 92, 246, 1)'
+                    pointBackgroundColor: 'rgba(59, 130, 246, 1)'
                 },
                 {
                     label: 'Active Subscriptions',

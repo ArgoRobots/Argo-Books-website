@@ -58,8 +58,8 @@ table th {
     color: var(--green-800);
 }
 .badge-free {
-    background: var(--violet-100);
-    color: var(--purple-600);
+    background: var(--sky-100);
+    color: var(--sky-700);
 }
 .badge-redeemed {
     background: var(--blue-100);

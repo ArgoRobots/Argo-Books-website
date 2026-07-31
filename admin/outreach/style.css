@@ -3,7 +3,7 @@
    colors are page-specific. */
 .stat-new { color: var(--blue-500); }
 .stat-pending { color: var(--amber-500); }
-.stat-contacted { color: var(--purple-500); }
+.stat-contacted { color: var(--sky-500); }
 .stat-replied { color: var(--green-600); }
 .stat-interested { color: var(--emerald-700); }
 
@@ -268,8 +268,8 @@
 
 /* Status badges */
 .badge-status-new { background: var(--blue-100); color: var(--blue-700); }
-.badge-status-draft_generated { background: var(--purple-100); color: var(--purple-700); }
-.badge-status-contacted { background: var(--purple-100); color: var(--purple-600); }
+.badge-status-draft_generated { background: var(--sky-100); color: var(--sky-700); }
+.badge-status-contacted { background: var(--cyan-100); color: var(--sky-700); }
 .badge-status-replied { background: var(--green-100); color: var(--green-700); }
 .badge-status-interested { background: var(--emerald-100); color: var(--emerald-800); }
 .badge-status-not_interested { background: var(--red-100); color: var(--red-700); }
@@ -281,7 +281,7 @@
 /* Company size badges */
 .badge-size-small { background: var(--green-100); color: var(--green-700); }
 .badge-size-medium { background: var(--amber-100); color: var(--amber-700); }
-.badge-size-large { background: var(--purple-100); color: var(--purple-700); }
+.badge-size-large { background: var(--blue-100); color: var(--blue-800); }
 
 
 /* ─── Modals ─── */

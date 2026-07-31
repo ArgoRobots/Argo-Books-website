@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     GoogleSheetsChart: "#10b981",
     Backup: "#f59e0b",
     XLSX: "#ef4444",
-    Receipts: "#8b5cf6",
+    Receipts: "#1e40af",
   };
 
   const countryColors = {
@@ -20,12 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
     Canada: "#ef4444",
     "United Kingdom": "#10b981",
     Germany: "#f59e0b",
-    Australia: "#8b5cf6",
+    Australia: "#1e40af",
     France: "#06b6d4",
     Netherlands: "#84cc16",
     Japan: "#f97316",
     Brazil: "#ec4899",
-    India: "#6366f1",
+    India: "#60a5fa",
   };
 
   if (!rawData.dataPoints) {
@@ -273,12 +273,12 @@ document.addEventListener("DOMContentLoaded", function () {
               "#10b981",
               "#f59e0b",
               "#ef4444",
-              "#8b5cf6",
+              "#1e40af",
               "#06b6d4",
               "#84cc16",
               "#f97316",
               "#ec4899",
-              "#6366f1",
+              "#60a5fa",
             ],
           },
         ],
@@ -582,8 +582,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Operations",
             data: sortedTimezones.map(([, count]) => count),
-            backgroundColor: "#6366f1",
-            borderColor: "#4f46e5",
+            backgroundColor: "#3b82f6",
+            borderColor: "#2563eb",
             borderWidth: 1,
           },
         ],
@@ -659,12 +659,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#8b5cf6",
+      "#1e40af",
       "#06b6d4",
       "#84cc16",
       "#f97316",
       "#ec4899",
-      "#6366f1",
+      "#60a5fa",
     ];
 
     new Chart(document.getElementById("versionDistributionChart"), {
@@ -749,7 +749,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const datasets = topVersions.map((version, index) => ({
       label: `v${version}`,
       data: recentDates.map((date) => versionByDate[date]?.[version] || 0),
-      borderColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"][
+      borderColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#1e40af"][
         index
       ],
       backgroundColor: [
@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "rgba(16, 185, 129, 0.1)",
         "rgba(245, 158, 11, 0.1)",
         "rgba(239, 68, 68, 0.1)",
-        "rgba(139, 92, 246, 0.1)",
+        "rgba(30, 64, 175, 0.1)",
       ][index],
       fill: true,
       tension: 0.4,
@@ -844,7 +844,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "#3b82f6",
           "#f59e0b",
           "#ef4444",
-          "#8b5cf6",
+          "#1e40af",
           "#06b6d4",
           "#84cc16",
           "#f97316",
@@ -1096,8 +1096,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "#84cc16",
       "#22c55e",
       "#06b6d4",
-      "#6366f1",
-      "#8b5cf6",
+      "#3b82f6",
+      "#1e40af",
     ];
 
     new Chart(document.getElementById("errorCategoryChart"), {
@@ -1159,8 +1159,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "#84cc16",
       "#22c55e",
       "#06b6d4",
-      "#6366f1",
-      "#8b5cf6",
+      "#3b82f6",
+      "#1e40af",
       "#ec4899",
       "#14b8a6",
     ];
@@ -1629,8 +1629,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Response Time (ms)",
             data: durations,
-            borderColor: "#8b5cf6",
-            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14, 165, 233, 0.1)",
             fill: true,
             tension: 0.4,
           },
@@ -1889,7 +1889,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const platformLabels = Object.keys(platformCounts);
     const platformData = platformLabels.map((l) => platformCounts[l]);
-    const platformColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+    const platformColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#1e40af", "#ec4899"];
 
     new Chart(document.getElementById("platformBreakdownChart"), {
       type: "doughnut",
@@ -1990,7 +1990,7 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Unique Users",
             data: hourData,
-            backgroundColor: "#8b5cf6",
+            backgroundColor: "#0ea5e9",
           },
         ],
       },
@@ -2105,14 +2105,14 @@ document.addEventListener("DOMContentLoaded", function () {
       "#f59e0b",
       "#3b82f6",
       "#10b981",
-      "#8b5cf6",
+      "#1e40af",
       "#ec4899",
       "#14b8a6",
       "#f97316",
-      "#6366f1",
+      "#60a5fa",
       "#06b6d4",
       "#84cc16",
-      "#a855f7",
+      "#93c5fd",
     ];
 
     // Rank categories by their total count over the shown window, so the most
@@ -2213,12 +2213,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#8b5cf6",
+      "#1e40af",
       "#06b6d4",
       "#84cc16",
       "#f97316",
       "#ec4899",
-      "#6366f1",
+      "#60a5fa",
     ];
 
     new Chart(document.getElementById("featureUsageChart"), {
@@ -2671,7 +2671,7 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [
           {
             data: [aiXlsx, aiCsv],
-            backgroundColor: ["#3b82f6", "#8b5cf6"],
+            backgroundColor: ["#3b82f6", "#0ea5e9"],
             borderWidth: 2,
           },
         ],
@@ -2794,11 +2794,11 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Avg Duration (ms)",
             data: avgDurations,
-            borderColor: "#8b5cf6",
-            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14, 165, 233, 0.1)",
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: "#8b5cf6",
+            pointBackgroundColor: "#0ea5e9",
           },
         ],
       },
@@ -2870,7 +2870,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const avgData = [];
     const minData = [];
     const maxData = [];
-    const colors = { "ai-xlsx": "#3b82f6", "ai-csv": "#8b5cf6" };
+    const colors = { "ai-xlsx": "#3b82f6", "ai-csv": "#0ea5e9" };
     const bgColors = [];
 
     for (const [type, durations] of Object.entries(byType)) {
@@ -2984,8 +2984,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "AI CSV",
             data: dates.map((d) => dailyByType[d]["ai-csv"]),
-            backgroundColor: "#8b5cf6",
-            borderColor: "#7c3aed",
+            backgroundColor: "#0ea5e9",
+            borderColor: "#0284c7",
             borderWidth: 1,
           },
         ],

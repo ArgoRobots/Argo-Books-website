@@ -1,0 +1,1122 @@
+/* ============================================================
+   Feature pages, shared.
+
+   One stylesheet for every page under /features/. It deliberately does NOT
+   build on features/style.css: that file still serves nothing now, and mixing
+   the two produced specificity fights over section padding.
+
+   Pages that show an animated product demo in the hero also load
+   resources/styles/feature-tour.css (the mockups) and
+   resources/scripts/feature-tour.js (the animations), and wrap the markup
+   from partials/feature-demo.php in .fp-hero-demo, which re-sizes the
+   landing page's full-width mockup to fit beside a headline.
+   ============================================================ */
+
+:root {
+  /* Body copy is black or white, never a mid grey. The three-step ink ramp
+     that used to live here (#0f172a / #475569 / #64748b) put secondary text
+     around 4.8:1 on white and the hero's supporting line near 3:1 on navy,
+     which is where "harder to read" comes from. Hierarchy is carried by size
+     and weight instead. The tokens are kept so the rules below still read as
+     primary / secondary / tertiary. */
+  --fp-ink: #0f172a;
+  --fp-ink-2: #0f172a;
+  --fp-ink-3: #0f172a;
+  --fp-line: #e6eaf0;
+  --fp-line-soft: #eef1f6;
+  --fp-paper: #fdfbf5;
+  --fp-paper-edge: #e8e1d2;
+  --fp-paper-ink: #46403a;
+  --fp-navy: #0b1220;
+  --fp-navy-2: #16233a;
+  --fp-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+body {
+  line-height: 1.6;
+  color: var(--fp-ink);
+  background: var(--white);
+}
+
+/* typography.css sets Fraunces on h1 through h6. A display serif at card
+   size reads as muddy, so it is kept for the two large levels only. */
+h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  letter-spacing: -0.005em;
+}
+
+.fp-wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Receipt-tape eyebrow: mono, letterspaced, with a leader rule that runs
+   to the right the way a receipt's header rule does. */
+.fp-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--fp-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fp-ink-3);
+  margin-bottom: 18px;
+}
+
+.fp-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--fp-line) 0 4px, transparent 4px 8px);
+}
+
+.fp-eyebrow-c {
+  justify-content: center;
+}
+
+.fp-eyebrow-c::after {
+  display: none;
+}
+
+.fp-h2 {
+  font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--fp-ink);
+  margin: 0 0 14px;
+}
+
+.fp-lede {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--fp-ink-2);
+  margin: 0 0 22px;
+}
+
+.fp-section {
+  padding: 84px 0;
+}
+
+.fp-section-tight {
+  padding: 72px 0;
+}
+
+.fp-head-c {
+  max-width: 660px;
+  margin: 0 auto 56px;
+  text-align: center;
+}
+
+.fp-head-c .fp-lede {
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.fp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.fp-btn:hover {
+  transform: translateY(-1px);
+}
+
+.fp-btn-primary {
+  background: var(--primary-blue);
+  color: var(--white);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.14);
+}
+
+.fp-btn-primary:hover {
+  background: var(--blue-700);
+}
+
+.fp-btn-quiet {
+  background: transparent;
+  color: var(--fp-ink);
+  border-color: var(--fp-line);
+}
+
+.fp-btn-quiet:hover {
+  border-color: var(--fp-ink-3);
+}
+
+.fp-btn-onnavy {
+  background: var(--white-alpha-10);
+  color: var(--white);
+  border-color: var(--white-alpha-25);
+}
+
+.fp-btn-onnavy:hover {
+  background: var(--white-alpha-15);
+  border-color: var(--white-alpha-40);
+}
+
+.fp-btn svg {
+  flex-shrink: 0;
+}
+
+.fp-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   Hero.
+
+   Not a gradient banner with a floating product screenshot: that shape
+   is on every SaaS page shipped in the last two years. This one is a
+   desk after a week of trading. Six thermal slips lie on a dark surface,
+   five of them blurred and dim, one of them crisp and upright. The
+   contrast is the whole pitch, so there are no callout chips, no accent
+   phrase, and no row of big numbers under it.
+   ============================================================ */
+.fp-hero {
+  position: relative;
+  background: linear-gradient(150deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+  color: var(--white);
+  padding: 150px 0 52px;
+  overflow: hidden;
+}
+
+/* A light source above the desk, motivated by the scene rather than a
+   decorative blur. */
+.fp-hero::before {
+  content: "";
+  position: absolute;
+  top: -18%;
+  right: -6%;
+  width: 62%;
+  height: 118%;
+  background: radial-gradient(closest-side, rgba(120, 150, 220, 0.20), transparent 72%);
+  pointer-events: none;
+}
+
+/* Host for the shared cursor orb. It clips to the hero and stays behind
+   .fp-hero-grid, which is positioned and comes later in the DOM. */
+.fp-hero .hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fp-hero-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+  gap: 44px;
+  align-items: center;
+}
+
+.fp-hero h1 {
+  font-size: clamp(2.35rem, 4.1vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  margin: 0 0 22px;
+}
+
+.fp-hero-sub {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--white);
+  max-width: 33em;
+  margin: 0 0 32px;
+}
+
+.fp-hero-act {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.fp-textlink {
+  color: var(--white);
+  font-size: 0.97rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  padding-bottom: 2px;
+}
+
+.fp-textlink:hover {
+  color: var(--white);
+  border-bottom-color: var(--white);
+}
+
+/* The facts run as a sentence. A three-column rail of oversized numerals
+   is the stock answer and it says nothing this line does not. */
+.fp-hero-facts {
+  margin: 30px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--white);
+  max-width: 32em;
+  /* Reads as a footnote through scale, not through a dimmer colour. */
+  opacity: 0.92;
+}
+
+/* Hero still. Three features have no animated mockup on the landing page,
+   so their heroes show the product illustration in the same card the demos
+   use. Matching the frame keeps the set consistent even though the contents
+   differ. */
+.fp-hero-still {
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background: linear-gradient(150deg, var(--gray-800) 0%, var(--gray-700) 100%);
+  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.5);
+}
+
+.fp-hero-still img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* ------------------------------------------------------------
+   Hero demo.
+
+   feature-tour.css sizes the mockups for the landing page, where they run
+   full width in a 620px card. Beside a headline they need to be shorter and
+   tighter, so everything here is an override on that file rather than a
+   second copy of it. Applies to all seven demos.
+   ------------------------------------------------------------ */
+.fp-hero-demo .tab-content,
+.fp-hero-demo .tab-content-inner,
+.fp-hero-demo .tab-content-visual {
+  display: block;
+  opacity: 1;
+  height: auto;
+  grid-template-columns: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fp-hero-demo .feature-visual-card,
+.fp-hero-demo .invoice-studio-card {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  /* Same slate family as the hero, one step lighter. The landing page's indigo
+     sits in a different hue family and fights this background. */
+  background: linear-gradient(150deg, var(--gray-800) 0%, var(--gray-700) 100%);
+  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.5);
+}
+
+.fp-hero-demo .invoice-studio {
+  max-width: none;
+}
+
+.fp-hero-demo .invoice-window {
+  border-radius: 12px;
+}
+
+.fp-hero-demo .app-body {
+  height: 404px;
+}
+
+/* The invoice document runs past 404px and was being cut off just above its
+   total, which is the one line that has to be visible. */
+.fp-hero-demo[data-feature-demo="invoices"] .app-body {
+  height: 470px;
+}
+
+.fp-hero-demo .app-topbar {
+  padding: 10px 14px;
+}
+
+.fp-hero-demo .app-brand {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.fp-hero-demo .app-brand-img {
+  width: 22px;
+  height: 22px;
+}
+
+.fp-hero-demo .app-nav {
+  width: 46px;
+  gap: 7px;
+  padding: 12px 0;
+}
+
+.fp-hero-demo .app-nav-btn {
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+}
+
+.fp-hero-demo .app-nav-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.fp-hero-demo .app-content {
+  padding: 0 16px 16px;
+}
+
+.fp-hero-demo .app-page-title {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 14px 2px 10px;
+}
+
+/* Receipt scan: the two-pane stage shrinks, and the paper with it. */
+.fp-hero-demo .scan-stage {
+  grid-template-columns: minmax(0, 162px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.fp-hero-demo .rcpt-paper {
+  width: 100%;
+  max-width: 162px;
+  font-size: 0.55rem;
+  line-height: 1.9;
+  padding: 18px 13px 22px;
+}
+
+.fp-hero-demo .rcpt-store { font-size: 0.66rem; }
+.fp-hero-demo .rcpt-meta { font-size: 0.48rem; white-space: nowrap; }
+.fp-hero-demo .rcpt-total { font-size: 0.63rem; }
+.fp-hero-demo .rcpt-barcode { height: 20px; }
+
+.fp-hero-demo .scan-form {
+  max-width: none;
+  padding: 13px 15px;
+}
+
+.fp-hero-demo .ef-title { font-size: 0.85rem; }
+.fp-hero-demo .ef-status { font-size: 0.6rem; padding: 3px 9px; }
+.fp-hero-demo .ef-field { grid-template-columns: 72px minmax(0, 1fr) auto; padding: 6px 0; }
+.fp-hero-demo .ef-label { font-size: 0.56rem; }
+.fp-hero-demo .ef-value { font-size: 0.74rem; }
+.fp-hero-demo .ef-line { font-size: 0.68rem; }
+.fp-hero-demo .ef-trow { font-size: 0.72rem; }
+.fp-hero-demo .ef-grand { font-size: 0.86rem; }
+
+/* Three of the demos float a panel on top of a table, positioned for the
+   landing page's full-width card. Beside a headline there is no room to the
+   right, so those stack instead and the window grows to fit. Scoped by demo
+   key so the receipt scan keeps its fixed height. */
+.fp-hero-demo[data-feature-demo="expenses"] .app-body,
+.fp-hero-demo[data-feature-demo="customers"] .app-body,
+.fp-hero-demo[data-feature-demo="rental"] .app-body {
+  height: auto;
+}
+
+/* Stacking costs vertical space that the landing page spends horizontally, so
+   the stacked demos show fewer rows and shorter charts. Without this the
+   expenses window ran past 900px and towered over the headline beside it.
+   The content is trimmed to fit rather than clipped, so nothing is cut off
+   mid-chart. */
+
+.fp-hero-demo[data-feature-demo="expenses"] .txn-row:nth-of-type(n + 7),
+.fp-hero-demo[data-feature-demo="customers"] .cust-row:nth-of-type(n + 5) {
+  display: none;
+}
+
+/* One chart, not two. Stacked in a narrow column the pair read as the same
+   picture twice, and together they cost more height than the table above. */
+.fp-hero-demo .exp-chart-bars {
+  display: none;
+}
+
+.fp-hero-demo .exp-chart-line {
+  padding: 10px 12px;
+}
+
+.fp-hero-demo .exp-chart-line svg {
+  height: 72px;
+}
+
+.fp-hero-demo .exp-stage,
+.fp-hero-demo .cust-stage {
+  align-items: stretch;
+}
+
+.fp-hero-demo .exp-inner,
+.fp-hero-demo .cust-inner,
+.fp-hero-demo .rent-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fp-hero-demo .exp-chart-line,
+.fp-hero-demo .exp-chart-bars,
+.fp-hero-demo .cust-profile,
+.fp-hero-demo .rent-booking {
+  position: static;
+  inset: auto;
+  width: 100%;
+  margin-top: 0;
+}
+
+.fp-hero-demo .cust-profile,
+.fp-hero-demo .rent-booking {
+  transform: translateY(10px) scale(0.97);
+}
+
+.fp-hero-demo .cust-profile.in,
+.fp-hero-demo .rent-booking.in {
+  transform: none;
+}
+
+.fp-hero-demo .rent-cal {
+  max-width: none;
+}
+
+/* The invoicing demo ships interactive controls for the landing page. In a
+   hero they are decoration nobody can reach past the fold, so they go. */
+.fp-hero-demo .color-panel,
+.fp-hero-demo .template-panel {
+  display: none;
+}
+
+/* Motion is the point of these, but not at the cost of ignoring the setting. */
+@media (prefers-reduced-motion: reduce) {
+  .fp-hero-demo .scan-beam {
+    display: none;
+  }
+
+  .fp-hero-demo .ef-field,
+  .fp-hero-demo .ef-line,
+  .fp-hero-demo .ef-trow,
+  .fp-hero-demo .ef-status,
+  .fp-hero-demo .txn-row,
+  .fp-hero-demo .inv-card,
+  .fp-hero-demo .cust-row,
+  .fp-hero-demo .fc-kpi {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ============================================================
+   Mid-page CTA. One only, deliberately thin.
+   ============================================================ */
+.fp-midcta {
+  border-top: 1px solid var(--fp-line);
+  border-bottom: 1px solid var(--fp-line);
+  background: var(--gray-50);
+  padding: 34px 0;
+}
+
+.fp-midcta-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.fp-midcta h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+
+.fp-midcta p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--fp-ink-2);
+}
+
+/* ============================================================
+   Split product blocks
+   ============================================================ */
+.fp-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 72px;
+  align-items: center;
+}
+
+.fp-split-flip .fp-split-text {
+  order: 2;
+}
+
+.fp-split-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
+.fp-list {
+  list-style: none;
+  padding: 0;
+  margin: 26px 0 0;
+  border-top: 1px solid var(--fp-line-soft);
+}
+
+.fp-list li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 11px 0;
+  font-size: 0.96rem;
+  color: var(--fp-ink-2);
+  border-bottom: 1px solid var(--fp-line-soft);
+}
+
+.fp-list li svg {
+  color: var(--emerald-500);
+  margin-top: 3px;
+}
+
+/* ============================================================
+   Steps. A rail, not three floating cards. The dashed run between
+   them is the receipt's own rule, and it reads as sequence.
+   ============================================================ */
+.fp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--fp-line);
+}
+
+.fp-step {
+  padding: 34px 34px 8px 0;
+  position: relative;
+}
+
+.fp-step + .fp-step {
+  padding-left: 34px;
+}
+
+.fp-step + .fp-step::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 34px;
+  bottom: 8px;
+  width: 1px;
+  background: repeating-linear-gradient(180deg, var(--fp-line) 0 5px, transparent 5px 10px);
+}
+
+.fp-step-n {
+  font-family: var(--fp-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--primary-blue);
+  margin-bottom: 14px;
+}
+
+.fp-step h3 {
+  font-size: 1.08rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--fp-ink);
+}
+
+.fp-step p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--fp-ink-2);
+}
+
+/* ============================================================
+   Benefits: two columns of hairline rows.
+   ============================================================ */
+.fp-benefits {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 60px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.fp-benefit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 18px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--fp-line-soft);
+}
+
+.fp-benefit:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.fp-benefit-ic {
+  grid-row: 1 / span 2;
+  align-self: start;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--blue-50);
+  color: var(--primary-blue);
+}
+
+.fp-benefit h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin: 2px 0 6px;
+  color: var(--fp-ink);
+}
+
+.fp-benefit p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--fp-ink-3);
+}
+
+/* ============================================================
+   Who it's for: a compact labelled run, not four more cards.
+   ============================================================ */
+.fp-who {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--fp-line);
+}
+
+.fp-who-item {
+  padding: 30px 26px 6px 0;
+}
+
+.fp-who-item + .fp-who-item {
+  padding-left: 26px;
+  border-left: 1px solid var(--fp-line-soft);
+}
+
+.fp-who-item h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--fp-ink);
+}
+
+.fp-who-item h3 svg {
+  color: var(--primary-blue);
+  flex-shrink: 0;
+}
+
+.fp-who-item p {
+  margin: 0;
+  font-size: 0.89rem;
+  line-height: 1.65;
+  color: var(--fp-ink-3);
+}
+
+/* ============================================================
+   Related links
+   ============================================================ */
+.fp-related {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.fp-rel-card {
+  display: block;
+  padding: 22px;
+  border: 1px solid var(--fp-line);
+  border-radius: 12px;
+  text-decoration: none;
+  background: var(--white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fp-rel-card:hover {
+  border-color: var(--blue-300);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.fp-rel-card .fp-rel-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--blue-50);
+  color: var(--primary-blue);
+  margin-bottom: 14px;
+}
+
+.fp-rel-card h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin: 0 0 5px;
+  color: var(--fp-ink);
+}
+
+.fp-rel-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--fp-ink-3);
+}
+
+.fp-readnext {
+  margin: 34px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--fp-line-soft);
+  font-family: var(--fp-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--fp-ink-3);
+}
+
+.fp-readnext a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  border-bottom: 1px solid var(--blue-200);
+}
+
+.fp-readnext a:hover {
+  border-bottom-color: var(--primary-blue);
+}
+
+.fp-readnext span {
+  padding: 0 10px;
+  color: var(--fp-ink);
+}
+
+/* ============================================================
+   FAQ. faq.css owns the accordion; this only sets the wrapper.
+   ============================================================ */
+.fp-faq {
+  padding: 84px 0 76px;
+  background: var(--gray-50);
+}
+
+.fp-faq .faq-grid {
+  max-width: 760px;
+}
+
+.fp-faq .faq-item {
+  border-color: var(--fp-line);
+  border-radius: 12px;
+}
+
+/* ============================================================
+   Outro: final CTA and footer share one dark block.
+   ============================================================ */
+/* Copied from /about-us/: the wrapper owns the gradient, the footer goes
+   transparent, and footer/style.css lets the footer's orbs overflow upward
+   once .dark-section-wrapper is on the parent. Without that last part the
+   orbs stay clipped to the footer box and a hard seam appears where the
+   glow starts. */
+.fp-outro {
+  position: relative;
+  background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+  overflow: hidden;
+}
+
+.fp-outro .footer {
+  background: transparent;
+}
+
+.fp-outro-cta {
+  position: relative;
+  padding: 96px 0 76px;
+  text-align: center;
+}
+
+/* The orb is appended straight to .cta-section, so the copy needs its own
+   stacking context to stay above it. */
+.fp-outro-cta > .fp-wrap {
+  position: relative;
+  z-index: 2;
+}
+
+.fp-outro-cta h2 {
+  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  color: var(--white);
+  margin: 0 0 14px;
+}
+
+.fp-outro-cta p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--white);
+  max-width: 46em;
+  margin: 0 auto 30px;
+}
+
+.fp-outro-cta .fp-btns {
+  justify-content: center;
+}
+
+/* ============================================================
+   Keyboard focus
+   ============================================================ */
+.fp-btn:focus-visible,
+.fp-rel-card:focus-visible,
+.fp-textlink:focus-visible,
+.fp-readnext a:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.fp-hero .fp-btn:focus-visible,
+.fp-hero .fp-textlink:focus-visible,
+.fp-outro .fp-btn:focus-visible {
+  outline-color: var(--white);
+}
+
+/* ============================================================
+   Reveal on scroll
+   ============================================================ */
+.fp-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+}
+
+.fp-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 1080px) {
+  .fp-hero-demo .feature-visual-card,
+  .fp-hero-demo .invoice-studio-card,
+  .fp-hero-still {
+    padding: 20px;
+  }
+
+  .fp-hero-demo .app-body {
+    height: 380px;
+  }
+
+  .fp-split {
+    gap: 48px;
+  }
+}
+
+@media (max-width: 900px) {
+  .fp-hero {
+    padding: 126px 0 72px;
+  }
+
+  .fp-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 52px;
+  }
+
+  .fp-hero-demo,
+  .fp-hero-still {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .fp-hero-demo .feature-visual-card,
+  .fp-hero-demo .invoice-studio-card {
+    padding: 26px;
+  }
+
+  .fp-hero-demo .app-body {
+    height: 404px;
+  }
+
+  .fp-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+
+  .fp-split-flip .fp-split-text,
+  .fp-split-media {
+    order: 0;
+  }
+
+  .fp-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fp-step,
+  .fp-step + .fp-step {
+    padding: 26px 0;
+    border-bottom: 1px solid var(--fp-line-soft);
+  }
+
+  .fp-step + .fp-step::before {
+    display: none;
+  }
+
+  .fp-step:last-child {
+    border-bottom: none;
+  }
+
+  .fp-benefits {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+  }
+
+  .fp-benefit:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--fp-line-soft);
+  }
+
+  .fp-benefit:last-child {
+    border-bottom: none;
+  }
+
+  .fp-who {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fp-who-item {
+    padding: 26px 20px 26px 0;
+  }
+
+  .fp-who-item:nth-child(odd) {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .fp-who-item:nth-child(even) {
+    padding-left: 24px;
+  }
+
+  .fp-related {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .fp-section {
+    padding: 64px 0;
+  }
+
+  .fp-section-tight {
+    padding: 52px 0;
+  }
+
+  .fp-faq {
+    padding: 64px 0 56px;
+  }
+
+  .fp-outro-cta {
+    padding: 64px 0 52px;
+  }
+
+  .fp-head-c {
+    margin-bottom: 40px;
+  }
+
+  .fp-midcta-in {
+    justify-content: flex-start;
+  }
+
+  .fp-who {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fp-who-item,
+  .fp-who-item + .fp-who-item {
+    padding: 24px 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--fp-line-soft);
+  }
+
+  .fp-who-item:last-child {
+    border-bottom: none;
+  }
+
+  .fp-related {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fp-btns .fp-btn {
+    flex: 1 1 100%;
+  }
+
+  .fp-hero-act {
+    gap: 20px;
+  }
+
+  /* Two-pane stages cannot sit side by side on a phone. */
+  .fp-hero-demo .feature-visual-card,
+  .fp-hero-demo .invoice-studio-card {
+    padding: 14px;
+  }
+
+  .fp-hero-demo .app-body {
+    height: auto;
+  }
+
+  .fp-hero-demo .app-nav {
+    width: 40px;
+  }
+
+  .fp-hero-demo .app-nav-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .fp-hero-demo .app-content {
+    padding: 0 11px 14px;
+  }
+
+  .fp-hero-demo .scan-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    justify-items: center;
+    padding-bottom: 4px;
+  }
+
+  .fp-hero-demo .scan-form {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .fp-btn:hover {
+    transform: none;
+  }
+}

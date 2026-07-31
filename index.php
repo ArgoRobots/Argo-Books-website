@@ -1530,7 +1530,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         // Feature tabs
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
+        const tabsContent = document.querySelector('.features-tabs-content');
+        const TAB_FADE_MS = 400;
         let activeTabAnimation = null;
+        let tabFadeTimer = null;
 
         function clearTabAnimation() {
             if (activeTabAnimation) {
@@ -1539,22 +1542,40 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             }
         }
 
+        function swapTabContent(tabId) {
+            tabContents.forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Reset animation classes on all mockups
+            document.querySelectorAll('.animating').forEach(el => el.classList.remove('animating'));
+
+            startTabAnimation(tabId);
+        }
+
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tabId = btn.dataset.tab;
+                if (btn.classList.contains('active')) return;
 
                 clearTabAnimation();
+                if (tabFadeTimer) clearTimeout(tabFadeTimer);
 
+                // The button highlight moves right away; only the graphic waits
+                // for the fade so the click still feels instant.
                 tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
                 btn.classList.add('active');
-                document.getElementById('tab-' + tabId).classList.add('active');
 
-                // Reset animation classes on all mockups
-                document.querySelectorAll('.animating').forEach(el => el.classList.remove('animating'));
+                if (!tabsContent) {
+                    swapTabContent(tabId);
+                    return;
+                }
 
-                startTabAnimation(tabId);
+                tabsContent.classList.add('tab-fading');
+                tabFadeTimer = setTimeout(() => {
+                    tabFadeTimer = null;
+                    swapTabContent(tabId);
+                    tabsContent.classList.remove('tab-fading');
+                }, TAB_FADE_MS);
             });
         });
 
@@ -1595,7 +1616,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function countUp(el, target, duration) {
                 const start = performance.now();
                 function step(now) {
-                    const p = Math.min((now - start) / duration, 1);
+                    // Clamp low as well as high: the first rAF timestamp can
+                    // precede the performance.now() captured just above, and a
+                    // negative p sends the cubic ease to a large negative number.
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
                     const eased = 1 - Math.pow(1 - p, 3);
                     el.textContent = '$' + (target * eased).toLocaleString('en-US', {
                         minimumFractionDigits: 2, maximumFractionDigits: 2
@@ -1686,7 +1710,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function countUp(el, target, duration) {
                 const start = performance.now();
                 function step(now) {
-                    const p = Math.min((now - start) / duration, 1);
+                    // Clamp low as well as high: the first rAF timestamp can
+                    // precede the performance.now() captured just above, and a
+                    // negative p sends the cubic ease to a large negative number.
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
                     const eased = 1 - Math.pow(1 - p, 3);
                     el.textContent = Math.round(target * eased).toLocaleString('en-US');
                     if (p < 1) requestAnimationFrame(step);
@@ -1727,7 +1754,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function countUp(el, target, duration) {
                 const start = performance.now();
                 function step(now) {
-                    const p = Math.min((now - start) / duration, 1);
+                    // Clamp low as well as high: the first rAF timestamp can
+                    // precede the performance.now() captured just above, and a
+                    // negative p sends the cubic ease to a large negative number.
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
                     const eased = 1 - Math.pow(1 - p, 3);
                     el.textContent = Math.round(target * eased).toLocaleString('en-US');
                     if (p < 1) requestAnimationFrame(step);
@@ -1763,7 +1793,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function countUp(el, target, duration) {
                 const start = performance.now();
                 function step(now) {
-                    const p = Math.min((now - start) / duration, 1);
+                    // Clamp low as well as high: the first rAF timestamp can
+                    // precede the performance.now() captured just above, and a
+                    // negative p sends the cubic ease to a large negative number.
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
                     const eased = 1 - Math.pow(1 - p, 3);
                     el.textContent = Math.round(target * eased).toLocaleString('en-US');
                     if (p < 1) requestAnimationFrame(step);
@@ -1824,7 +1857,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function countUp(el, target, duration) {
                 const start = performance.now();
                 function step(now) {
-                    const p = Math.min((now - start) / duration, 1);
+                    // Clamp low as well as high: the first rAF timestamp can
+                    // precede the performance.now() captured just above, and a
+                    // negative p sends the cubic ease to a large negative number.
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
                     const eased = 1 - Math.pow(1 - p, 3);
                     el.textContent = Math.round(target * eased).toLocaleString('en-US');
                     if (p < 1) requestAnimationFrame(step);
@@ -1865,7 +1901,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             function animateCounter(el, target, duration) {
                 const startTime = performance.now();
                 function update(now) {
-                    const progress = Math.min((now - startTime) / duration, 1);
+                    // Same low clamp as countUp: the first rAF timestamp can
+                    // precede startTime, and a negative progress sends the cubic
+                    // ease to a large negative total.
+                    const progress = Math.max(0, Math.min((now - startTime) / duration, 1));
                     const eased = 1 - Math.pow(1 - progress, 3);
                     el.textContent = '$' + (target * eased).toLocaleString('en-US', {
                         minimumFractionDigits: 2,

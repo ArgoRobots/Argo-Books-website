@@ -156,7 +156,6 @@ AddDefaultCharset UTF-8
         frame-src \
             https://challenges.cloudflare.com \
             https://www.youtube.com \
-            https://www.youtube-nocookie.com \
             https://www.paypal.com \
             https://*.paypal.com \
             https://www.sandbox.paypal.com \

@@ -459,7 +459,7 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
+                    <img src="../../resources/images/privacy-local-storage.svg" alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer" loading="lazy">
                 </div>
             </div>
         </div>

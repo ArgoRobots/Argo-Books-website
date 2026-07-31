@@ -1,11 +1,31 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
-$argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'What file formats does spreadsheet import support?',
+        'a' => 'Argo Books supports Excel (.xlsx) and CSV files. Drag and drop your file and Argo Books detects your columns, maps them to the right fields, and imports everything. No manual formatting or templates needed.',
+    ],
+    [
+        'q' => 'What types of data can I import?',
+        'a' => 'You can import customers, products, expenses, revenue, invoices, and more. Argo Books reads your column headers and figures out what each spreadsheet contains, whether you\'re moving from another tool or cleaning up old spreadsheets.',
+    ],
+    [
+        'q' => 'Do I need to manually map columns?',
+        'a' => 'Usually not. Argo Books reads your column headers and maps them to the right fields for you. You can review and adjust the mapping before importing, but most imports go through with a quick confirmation.',
+    ],
+    [
+        'q' => 'How many records can I import per month?',
+        'a' => 'The Free plan includes <?= $argo_import_limit ?> spreadsheet imports per month, which is plenty for getting started or migrating in batches. Premium users have no limit. Each file counts as one import, no matter how many rows it contains.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,15 +37,12 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Drop an Excel or CSV file into Argo Books and your customers, products, invoices, and expenses are mapped and imported for you, with no manual setup.">
-    <meta name="keywords"
-        content="spreadsheet import, CSV import software, Excel import tool, automatic column mapping, data migration tool, bulk data import, spreadsheet to accounting, business data import, Excel to bookkeeping">
+    <meta name="description" content="Drop an Excel or CSV file into Argo Books and your customers, products, invoices, and expenses are mapped and imported for you, with no manual setup.">
+    <meta name="keywords" content="spreadsheet import, CSV import software, Excel import tool, automatic column mapping, data migration tool, bulk data import, spreadsheet to accounting, business data import, Excel to bookkeeping">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Spreadsheet Import | Argo Books">
-    <meta property="og:description"
-        content="Drop a spreadsheet, get clean records. Argo Books imports your customers, products, invoices, and expenses from Excel or CSV files automatically.">
+    <meta property="og:description" content="Drop a spreadsheet, get clean records. Argo Books imports your customers, products, invoices, and expenses from Excel or CSV files automatically.">
     <meta property="og:url" content="https://argorobots.com/features/spreadsheet-import/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -37,8 +54,7 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Spreadsheet Import | Argo Books">
-    <meta name="twitter:description"
-        content="Drop a spreadsheet, get clean records. Argo Books imports your customers, products, invoices, and expenses from Excel or CSV files automatically.">
+    <meta name="twitter:description" content="Drop a spreadsheet, get clean records. Argo Books imports your customers, products, invoices, and expenses from Excel or CSV files automatically.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -51,47 +67,8 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Spreadsheet Import" => "/features/spreadsheet-import/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "What file formats does spreadsheet import support?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books supports Excel (.xlsx) and CSV files. Drag and drop your file and Argo Books detects your columns, maps them to the right fields, and imports everything. No manual formatting or templates needed."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "What types of data can I import?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "You can import customers, products, expenses, revenue, invoices, and more. Argo Books reads your column headers and figures out what each spreadsheet contains, whether you're moving from another tool or cleaning up old spreadsheets."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Do I need to manually map columns?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Usually not. Argo Books reads your column headers and maps them to the right fields for you. You can review and adjust the mapping before importing, but most imports go through with a quick confirmation."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How many records can I import per month?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "The Free plan includes <?= $argo_import_limit ?> spreadsheet imports per month, which is plenty for getting started or migrating in batches. Premium users have no limit. Each file counts as one import, no matter how many rows it contains."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -107,8 +84,8 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Import spreadsheets into Argo Books with automatic column mapping. Supports Excel and CSV files with clean, validated imports.",
-            "featureList": "Automatic column mapping, Excel and CSV support, Data validation before import, One-click undo for every import"
+            "description": "Drop an Excel or CSV file into Argo Books and your customers, products, invoices, and expenses are mapped and imported for you, with no manual setup.",
+            "featureList": "Spreadsheet import, AI column mapping, Data validation, Excel and CSV support"
         }
     </script>
 
@@ -117,16 +94,16 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
 
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -136,426 +113,236 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Drop a spreadsheet, get clean records</h1>
-            <p class="hero-subtitle animate-fade-in">Import customers, products, transactions, and more from any spreadsheet file. Argo Books handles the rest, with no manual setup.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Bring your<br>spreadsheet with you.</h1>
+                    <p class="fp-hero-sub">Drop in the Excel or CSV file you already keep and Argo Books works out which column is which, checks the data, and shows you exactly what it will create before anything is saved.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and the file is read on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-still">
+                    <img src="../../resources/images/features/ai-column-mapping.svg"
+                         alt="Argo Books reading a spreadsheet and mapping its columns to the right fields automatically"
+                         width="600" height="500" fetchpriority="high">
+                </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
+         HOW IT WORKS
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Moving your data shouldn't take days</h2>
-                    <p>Switching software or tidying up old spreadsheets usually means hours of copying and pasting. Argo Books reads your file, figures out what each column is, and imports everything for you. Days of work, done in minutes.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Handles customers, products, invoices, expenses, suppliers, and more</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Reads your column headers, even unusual ones, and maps them for you</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Excel files with multiple sheets import in one go</span>
-                        </li>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, whatever your columns are called</h2>
+                <p class="fp-lede">Most import tools make you describe your own spreadsheet to them first. This one reads it.</p>
+            </div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
+                    <h3>Drop the file in</h3>
+                    <p>Excel or CSV, however you have laid it out. There is no template to match first.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>It maps the columns</h3>
+                    <p>AI works out which column holds the date, the amount, the supplier and the rest, whatever you happened to call them.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Check and import</h3>
+                    <p>You see what will be created, with anything questionable flagged, and nothing is saved until you say so.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         PRODUCT BLOCK
+         ============================================= -->
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Real files, not tidy ones</div>
+                    <h2 class="fp-h2">It copes with how spreadsheets actually look</h2>
+                    <p class="fp-lede">Merged cells, a title row above the headings, inconsistent date formats, blank rows in the middle. The files people really keep are messy, and the import is built for those rather than for a clean example.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Merged cells and stray header rows handled</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Mixed date and number formats normalised</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Everything validated and previewed before import</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/ai-column-mapping.svg" alt="Column mapping showing source columns matched to target fields with confidence scores" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Try it free</h3>
-                <p>Download Argo Books and import your first spreadsheet in under five minutes. No credit card needed.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/ai-import-validation.svg"
+                         alt="Argo Books validating imported spreadsheet rows and flagging the ones that need attention"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>Any format</h3>
-                    <p>Excel or CSV, one sheet or many</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Move your records across in minutes</h2>
+                <p>No account, no credit card, and no template to fill in first.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when switching is easy</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('clock', 20) ?></div>
+                    <h3>Years of history in one go</h3>
+                    <p>The reason people stay on a spreadsheet is the cost of moving off it. That cost is a file drop.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Minutes</h3>
-                    <p>From dropping the file to finished import</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>Nothing saves until you approve it</h3>
+                    <p>The preview shows exactly what will be created, so a bad import is caught before it becomes a cleanup job.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Full undo</h3>
-                    <p>Roll back any import with one click</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('search', 20) ?></div>
+                    <h3>Bad rows get flagged, not swallowed</h3>
+                    <p>Missing amounts and impossible dates are surfaced for you to fix rather than imported quietly.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('bolt', 20) ?></div>
+                    <h3>No mapping screen to fight</h3>
+                    <p>The columns are worked out from the file itself, which is the step that usually makes people give up.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: Handles any file
-         Image left, text right (reversed)
+         PRIVACY
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Any File Works</span>
-                    <h2>Clean files or messy files, both import</h2>
-                    <p>Real-world spreadsheets come in all shapes. Tidy files with clear headers import quickly. Messy files, with merged cells, odd formatting, or pivot-table layouts, still work, because Argo Books reads them row by row until everything makes sense.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Quick mapping for well-organized files</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Careful row-by-row reading for messy files</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Confidence scores show how sure each mapping is</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/ai-import-analysis.svg" alt="Import analysis showing 13 sheets detected with 1,882 rows and mapping results" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS, 3 Steps
+         WHO IT'S FOR
          ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps from spreadsheet to clean data</h2>
-                <p class="section-desc">Go from a messy Excel file to organized records in minutes. The mapping is handled for you, just review and confirm.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <h3>Drop in your file</h3>
-                    <p>Upload an Excel (.xlsx) or CSV file. Multi-sheet workbooks work too.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('document', 19) ?> Anyone switching over</h3>
+                    <p>Move off a spreadsheet without retyping the last three years.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Columns get mapped</h3>
-                    <p>Your columns are matched to the right fields and your data is checked, with confidence scores you can review.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>One file, and your whole history is in the app.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Review and import</h3>
-                    <p>Confirm the mapping, fix any issues, and import. A summary shows what was added, updated, or skipped.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and e-commerce</h3>
+                    <p>Product lists and sales exports brought in as they are.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop re-typing your spreadsheets</h3>
-                <p>Every row imported, mapped, and checked, ready to use.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Businesses leaving another tool</h3>
+                    <p>Export from the old system, import here, keep the history.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Validation + Smart Handling
-         Text left, image right
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Checked Before Import</span>
-                    <h2>Catch problems before they hit your books</h2>
-                    <p>Before anything is imported, Argo Books checks your file for problems. A missing supplier on an expense? A customer name that doesn't exist yet? You'll see it, and you can create all the missing records with one click.</p>
-                    <p>Next, a summary shows what was added, updated, or skipped, and why. Every import creates an undo point, so you can roll back anytime.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Spots problems before anything is imported</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Create missing customers, suppliers, and categories in one click</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Skips duplicates so records don't double up</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/ai-import-validation.svg" alt="Import validation showing auto-fixable issues with missing references" loading="lazy">
-                </div>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
+         RELATED
          ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just a file importer</h2>
-                <p class="section-desc">Import isn't just about moving data. It changes how you migrate, consolidate, and keep track of your records.</p>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">Other ways to get data in</h2>
             </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('clock', 22) ?>
-                    </div>
-                    <h3>Migrate in minutes, not days</h3>
-                    <p>Switching systems? Import years of data in minutes, not weeks.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>No setup knowledge needed</h3>
-                    <p>You don't need to know field names or formats. Argo Books figures it out.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Safe imports with undo</h3>
-                    <p>Every import saves a snapshot first. If something looks off, roll back to exactly where you were.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Handles messy data</h3>
-                    <p>Merged cells, uneven formatting, pivot tables: real-world files work just fine.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('table', 22) ?>
-                    </div>
-                    <h3>Multi-sheet in one import</h3>
-                    <p>Customers on one tab, products on another? Both come in at once.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Products get categorized</h3>
-                    <p>Imported products are sorted into categories automatically, with no tidying up afterward.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Import your existing data today</h3>
-                <p>Move your records into Argo Books in a few minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         USE CASES SECTION
-         ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for real-world use</h2>
-                <p class="section-desc">Whether you're switching software, cleaning up spreadsheets, or starting fresh, import handles it.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Switching from other software
-                    </h3>
-                    <p>Export your data from QuickBooks, Wave, or anything else as a spreadsheet. Argo Books imports everything.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Bulk product setup
-                    </h3>
-                    <p>Got a supplier price list in Excel? Import hundreds of products, with prices, descriptions, and categories, in one go.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Consolidating scattered records
-                    </h3>
-                    <p>Years of customer lists and expense logs spread across multiple spreadsheets? Combine them into one organized system.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('document', 22) ?>
-                        Accountant handoffs
-                    </h3>
-                    <p>Accountants send spreadsheets. Import their reports directly, no reformatting needed.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 4: Privacy & Security
-         Image left, text right (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your spreadsheets stay on your computer</h2>
-                    <p>Argo Books is a desktop app, not a cloud service. Your spreadsheets are read on your own computer. Only a small sample is sent out for analysis, never the whole file.</p>
-                    <p>Just the column headers and a handful of sample rows leave your machine. Your full dataset stays with you.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Desktop app: files are read on your computer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Only a small sample leaves your machine, never the full file</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>All imported records stay on your device</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Spreadsheet import works even better alongside these.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense & Revenue Tracking</h3>
-                    <p>Imported transactions flow straight into your expense and revenue records, categorized and ready for reports.</p>
+            <div class="fp-related fp-reveal">
+                <a href="../bank-statement-import/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('bank', 20) ?></div>
+                    <h3>Bank statement import</h3>
+                    <p>A month of banking in one file, matched against what you already have.</p>
                 </a>
-                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('receipt-scan-detail', 22) ?>
-                    </div>
-                    <h3>Receipt Scanning</h3>
-                    <p>Import your historical data as spreadsheets, then scan new receipts going forward: past and present covered.</p>
+                <a href="../receipt-scanning/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('receipt-scan', 20) ?></div>
+                    <h3>AI receipt scanning</h3>
+                    <p>Photograph a receipt and the expense record writes itself.</p>
                 </a>
-                <a href="../predictive-analytics/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>More data means better forecasts. Importing your full history helps predictions stay accurate from day one.</p>
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>Where your imported records land.</p>
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Guides</span>
-                <h2 class="section-title">Related guides</h2>
-                <p class="section-desc">Go deeper with these step-by-step guides.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../../how-to-convert-excel-spreadsheet-to-accounting-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Convert Excel to accounting software</h3>
-                    <p>Move your spreadsheet into real software without losing history.</p>
-                </a>
-                <a href="../../how-to-move-from-spreadsheets-to-bookkeeping-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Move from spreadsheets to software</h3>
-                    <p>When and how to make the switch cleanly.</p>
-                </a>
-                <a href="../../import-bank-transactions-from-csv-into-accounting-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Import bank transactions from CSV</h3>
-                    <p>Pull your bank history in with automatic column mapping.</p>
+                <a href="../inventory-management/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('package', 20) ?></div>
+                    <h3>Inventory management</h3>
+                    <p>Import a product list and start tracking stock from it.</p>
                 </a>
             </div>
         </div>
@@ -563,23 +350,21 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to import your data?</h2>
-                    <p>Download Argo Books and get your records imported in minutes. Free to start, with no credit card and no trial.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Bring your history with you</h2>
+                <p>Download Argo Books and import your spreadsheet today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -590,23 +375,22 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

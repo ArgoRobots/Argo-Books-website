@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../../resources/components/feature-video.php';
 $pricing = get_pricing_config();
 $pageTitle = 'Invoicing & Payments';
 $pageDescription = 'Create professional invoices, track payments, and accept online payments with Argo Books invoicing and payment features.';
@@ -18,8 +17,6 @@ include __DIR__ . '/../../docs-header.php';
             <div class="info-box">
                 <p><strong>Note:</strong> The free version includes up to <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
             </div>
-
-            <?php docs_video_embed('cTQaejF6Gh0', 'Argo Books Invoicing'); ?>
 
             <h2>Setting Up Payment Integration</h2>
             <p>This is a one-time setup and should be your first step: it's what enables customers to pay your invoices online. Argo Books supports <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>, covering credit/debit cards, Apple Pay, Google Pay, PayPal balance, and more.</p>

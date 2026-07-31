@@ -1,10 +1,32 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
+require_once __DIR__ . '/../../partials/feature-demo.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'Do I need accounting experience to track expenses?',
+        'a' => "Not at all. Argo Books uses guided forms with smart defaults and built-in validation to make recording expenses and revenue simple for anyone. You don't need to know debits from credits. Just fill in the amount, category, and date, and Argo Books handles the rest.",
+    ],
+    [
+        'q' => 'Can I track both expenses and revenue in one place?',
+        'a' => 'Yes. Argo Books has dedicated expense and revenue pages with real-time summary cards showing monthly totals, transaction counts, and net profit. You get a complete picture of your business finances without switching between apps or spreadsheets.',
+    ],
+    [
+        'q' => 'How does receipt management work?',
+        'a' => "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos. It extracts the supplier name, line items, taxes, and total with 99.9% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time.",
+    ],
+    [
+        'q' => 'Can I import existing expense data into Argo Books?',
+        'a' => "Yes. If you have expense or revenue records in a spreadsheet, you can import them using the AI Spreadsheet Import feature. Just drop your Excel or CSV file and the AI maps your columns to the right fields automatically. It's the fastest way to get up and running with your existing financial data.",
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,12 +41,12 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="description"
         content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, receipt archiving, and real-time profit monitoring make bookkeeping simple for any small business.">
     <meta name="keywords"
-        content="expense tracking software, revenue tracking, bookkeeping software, small business expense tracker, income tracking, profit monitoring, receipt management, expense categorization, cash flow tracking, business expense app">
+        content="expense tracking software, revenue tracking, business expense tracker, income and expense tracking, small business bookkeeping, profit tracking software, transaction management, expense management app">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Expense &amp; Revenue Tracking | Argo Books">
     <meta property="og:description"
-        content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, and automatic categorization make bookkeeping simple for any small business.">
+        content="Track every expense and revenue transaction in one place. Guided forms, smart validation, and real-time profit monitoring keep your books accurate.">
     <meta property="og:url" content="https://argorobots.com/features/expense-revenue-tracking/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -37,7 +59,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Expense &amp; Revenue Tracking | Argo Books">
     <meta name="twitter:description"
-        content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, and automatic categorization make bookkeeping simple.">
+        content="Track every expense and revenue transaction in one place, with real-time profit monitoring.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -50,47 +72,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Expense & Revenue Tracking" => "/features/expense-revenue-tracking/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "Do I need accounting experience to track expenses?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Not at all. Argo Books uses guided forms with smart defaults and built-in validation to make recording expenses and revenue simple for anyone. You don't need to know debits from credits. Just fill in the amount, category, and date, and Argo Books handles the rest."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I track both expenses and revenue in one place?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Argo Books has dedicated expense and revenue pages with real-time summary cards showing monthly totals, transaction counts, and net profit. You get a complete picture of your business finances without switching between apps or spreadsheets."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How does receipt management work?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos. It extracts the supplier name, line items, taxes, and total with 99.9% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I import existing expense data into Argo Books?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. If you have expense or revenue records in a spreadsheet, you can import them using the AI Spreadsheet Import feature. Just drop your Excel or CSV file and the AI maps your columns to the right fields automatically. It's the fastest way to get up and running with your existing financial data."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -106,8 +89,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Track business expenses and revenue with Argo Books. Guided forms, smart validation, receipt archiving, and real-time profit monitoring make bookkeeping simple.",
-            "featureList": "Guided expense and revenue entry forms, Real-time profit and cash flow monitoring, Receipt archive with AI scanning, Tax-ready categorized records"
+            "description": "Track business expenses and revenue with guided forms, smart validation, receipt archiving, and real-time profit monitoring.",
+            "featureList": "Expense and revenue tracking, Guided transaction forms, Receipt archive with search, Real-time profit summary"
         }
     </script>
 
@@ -115,18 +98,20 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <title>Expense &amp; Revenue Tracking | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
+    <!-- Mockup animations, shared with the landing and comparison pages. -->
+    <script src="../../resources/scripts/feature-tour.js" defer></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -136,437 +121,236 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO. Live demo beside the headline. The panel markup comes from
+         partials/feature-demo.php and the loop from feature-tour.js, both
+         shared with the landing and comparison pages.
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Know exactly where every dollar goes, and where it comes from</h1>
-            <p class="hero-subtitle animate-fade-in">Track every expense and revenue transaction in one place. Guided forms, smart validation, and real-time profit monitoring keep your books accurate without accounting experience.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
-         ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Spreadsheets weren't built for tracking your money</h2>
-                    <p>Most small businesses start with spreadsheets or shoebox receipts. Formulas break, transactions get missed, and you never know if you're actually profitable until it's too late. Argo Books gives you a purpose-built system for recording every purchase and sale, with guided forms that make it impossible to miss a field.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Guided forms in a simple interface that anyone can use</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Automatic validation catches missing fields before you save</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Real-time summary cards show totals, transaction counts, and returns at a glance</span>
-                        </li>
-                    </ul>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Every dollar in.<br>Every dollar out.</h1>
+                    <p class="fp-hero-sub">Record an expense or a sale in about ten seconds, and watch the monthly totals and net profit move as you type. No debits, no credits, no accounting course.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and your books stay on your own computer.</p>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/expenses-table.svg" alt="Argo Books expenses page showing organized expense records with supplier details, dates, totals, and status" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Start tracking your transactions today</h3>
-                <p>Download Argo Books and record your first transaction in under a minute. No credit card required.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-hero-demo" data-feature-demo="expenses">
+                    <?= argo_feature_demo('expenses') ?>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         HOW IT WORKS
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>10 seconds</h3>
-                    <p>To record a new transaction</p>
-                </div>
-                <div class="highlight-item">
-                    <h3>Real-time</h3>
-                    <p>Revenue, expense &amp; profit summaries</p>
-                </div>
-                <div class="highlight-item">
-                    <h3>Zero</h3>
-                    <p>Accounting experience required</p>
-                </div>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, about ten seconds</h2>
+                <p class="fp-lede">A spreadsheet lets you type anything into any cell. A guided form does not, which is why the numbers still add up a year later.</p>
             </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 2: Revenue Tracking
-         Image left, text right (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Revenue Tracking</span>
-                    <h2>See every dollar coming into your business</h2>
-                    <p>The revenue page gives you a complete view of every sale and payment you've received, all in a clean, sortable table. Summary cards at the top show your monthly revenue, total transactions, unique customers, and returns at a glance.</p>
-                    <p>Need to add a sale? Click "Add Revenue" and fill in a guided form. Argo Books auto-populates customers and products from your records, validates amounts, and links the transaction to the right customer profile, so your books stay accurate without extra effort.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Customer-linked transactions with full purchase history</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Monthly revenue, transaction count, and unique customer summaries</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Return tracking built in, every refund is accounted for</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/revenue-table.svg" alt="Argo Books revenue page showing customer transactions with names, products, dates, totals, and completion status" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         HOW IT WORKS, 3 Steps
-         ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to organized finances</h2>
-                <p class="section-desc">From scattered records to a clear financial picture in minutes. No accounting background needed. Argo Books guides you through every step.</p>
-            </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
                     <h3>Record the transaction</h3>
-                    <p>Click 'Add Expense' or 'Add Revenue' and fill in a guided form. Costs auto-populate from your product records.</p>
+                    <p>Pick expense or revenue, then fill in the amount, the category and who it was with. Smart defaults fill most of it for you.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Argo Books validates and saves</h3>
-                    <p>Smart validation catches missing fields, verifies amounts, and links the transaction to the right supplier or customer profile automatically.</p>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>It checks before it saves</h3>
+                    <p>Required fields are enforced and amounts are verified, so nothing lands in your books half finished or in the wrong column.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>See your financial picture</h3>
-                    <p>Summary cards update in real time. See monthly totals, profit margins, transaction counts, and trends, all without exporting to a spreadsheet.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop guessing whether you're profitable</h3>
-                <p>Real-time expense and revenue summaries mean you always know where you stand. Get started in minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>See the picture change</h3>
+                    <p>Monthly revenue, expenses and net profit update the moment you save. No waiting for month end to find out where you stand.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Expense Tracking
-         Text left, image right
+         PRODUCT BLOCK
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Expense Tracking</span>
-                    <h2>Track every purchase, subscription, and cost</h2>
-                    <p>The expenses page mirrors the revenue layout: a clean, filterable table with every purchase your business has made. Summary cards show monthly spending, total transactions, receipts on file, and returns.</p>
-                    <p>Filter by supplier, date range, or amount to find any transaction instantly. Need to attach a receipt? Link it directly to the expense record, or use <a href="../receipt-scanning/index.php" class="link">AI receipt scanning</a> to auto-create the expense from a photo.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Supplier-linked expenses with full purchase history per vendor</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Receipt attachment tracking, see which expenses have receipts on file</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>AI receipt scanning creates expense records from receipt photos automatically</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Return and refund tracking keeps your net spending accurate</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Both sides of the ledger</div>
+                    <h2 class="fp-h2">Money in and money out, in one list</h2>
+                    <p class="fp-lede">Revenue and expenses live in the same place, with matching forms and the same search. Sort by supplier, customer, date, amount or status, and edit a row without opening a separate page. Every change is kept, so you can see what moved and when.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Summary cards for monthly revenue, expenses and net profit</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Search and filter by supplier, customer, date, amount or status</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Edit straight from the row, with full history and undo</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/expense-revenue-stats.svg" alt="Argo Books financial overview showing monthly revenue vs expenses bar chart with profit tracking" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/expense-revenue-stats.svg"
+                         alt="Argo Books expense and revenue summary cards showing monthly totals, transaction counts and net profit"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 4: Receipt Archive
-         Image left, text right (reversed)
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Receipt Archive</span>
-                    <h2>Every receipt stored, organized, and searchable</h2>
-                    <p>Argo Books includes a dedicated receipt archive where all your receipts, both expense and revenue, are stored in one place. Search by any field, and filter by type (expense or revenue). It's a complete paper trail without the paper.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Color-coded badges: green for revenue, red for expenses</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Search by receipt ID, vendor, customer, date, or amount</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>AI scan button creates new receipts from photos in seconds</span>
-                        </li>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Get your finances organized in minutes</h2>
+                <p>No account, no credit card, and no accounting experience needed.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when it is all in one place</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('trending-up', 20) ?></div>
+                    <h3>You know if you are profitable today</h3>
+                    <p>Summary cards move as you add transactions, so the answer is on screen instead of waiting until the end of the month.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>Guided forms catch the mistakes</h3>
+                    <p>Smart defaults and validation mean nothing saves with a missing category, a blank date, or an amount in the wrong column.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('search', 20) ?></div>
+                    <h3>Any transaction, in seconds</h3>
+                    <p>Everything is indexed. Search by supplier, customer, amount or date and find it years later without scrolling a spreadsheet.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('shield', 20) ?></div>
+                    <h3>Tax-ready all year</h3>
+                    <p>Every entry is timestamped and categorized, with a receipt attached where it matters, so January is not a rebuilding job.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         PRIVACY
+         ============================================= -->
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Transactions, receipts and reports are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Transactions and receipts stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial records</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/receipt-archive.svg" alt="Argo Books receipt archive showing receipt cards in grid view with expense and revenue badges" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
+         WHO IT'S FOR
          ============================================= -->
-    <section class="benefits-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just a ledger</h2>
-                <p class="section-desc">Expense and revenue tracking in Argo Books isn't just about recording numbers. It gives you the financial clarity to make better business decisions.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Real-time profit visibility</h3>
-                    <p>Summary cards update as you add transactions. See your monthly revenue, expenses, and net profit at any moment, with no end-of-month surprises.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>Keep project income and business costs separate, and see profit per client when it is time to bill.</p>
                 </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>Guided forms prevent mistakes</h3>
-                    <p>Every transaction goes through a guided form with smart defaults and validation. Required fields are enforced, amounts are verified, and nothing gets saved with missing data.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and e-commerce</h3>
+                    <p>Record every sale and supplier purchase, track cost of goods, and see which suppliers cost you the most.</p>
                 </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('search', 22) ?>
-                    </div>
-                    <h3>Find any transaction instantly</h3>
-                    <p>Search, filter, and sort by supplier, customer, date, amount, or status. Every transaction is indexed and findable in seconds, even years later.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Service businesses</h3>
+                    <p>Log revenue by customer and costs by job, then compare profitability across service types and periods.</p>
                 </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Edit on the fly</h3>
-                    <p>Update any transaction straight from the row: change status, mark items as lost or returned, or jump to its receipt without opening a separate page.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Tax-ready records all year</h3>
-                    <p>Every transaction is timestamped and categorized, with the option to attach a receipt for proof. When tax season arrives, your records are already organized and audit-ready.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('clock', 22) ?>
-                    </div>
-                    <h3>Complete transaction history</h3>
-                    <p>Every edit, status change, and update is tracked. View the full history of any transaction to see what changed, when, and why, with undo/redo support.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Get your finances organized in minutes</h3>
-                <p>Join small business owners who stopped guessing and started tracking with Argo Books.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('document', 19) ?> Side hustles</h3>
+                    <p>Start with a few transactions a week and scale to hundreds without the interface getting in the way.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         USE CASES SECTION
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for the way you actually run your business</h2>
-                <p class="section-desc">Whether you sell products, provide services, or run a side hustle, expense and revenue tracking adapts to your workflow.</p>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Freelancers &amp; consultants
-                    </h3>
-                    <p>Track project-based income and business expenses separately. See profitability per client and keep business costs organized for tax deductions.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Retail &amp; e-commerce
-                    </h3>
-                    <p>Record every sale and supplier purchase. Track cost of goods, monitor margins per product, and see which suppliers cost you the most over time.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Service businesses
-                    </h3>
-                    <p>Log service revenue by customer, track material and equipment costs, and monitor profitability across different service types and time periods.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('document', 22) ?>
-                        Side hustles &amp; startups
-                    </h3>
-                    <p>Starting small? Argo Books grows with you. Start by tracking a few transactions a week and scale to hundreds, with an interface that stays simple and fast.</p>
-                </div>
-            </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 5: Privacy & Security
-         Image left, text right (reversed)
+         RELATED
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your financial data stays on your computer</h2>
-                    <p>Unlike cloud-based bookkeeping tools that upload your revenue and expense data to third-party servers, Argo Books is a desktop application. Your transactions, receipts, and financial records are stored locally on your device, not on someone else's cloud.</p>
-                    <p>No vendor lock-in, no worrying about what happens if the service shuts down. Your data is yours, and it stays on your machine. Export anytime to CSV, Excel, PNG, or PDF for your accountant.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Desktop app: your financial data stays on your computer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Export to CSV, Excel, PNG, or PDF anytime, with no vendor lock-in</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Works offline, record transactions without internet access</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
-                </div>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">Where your transactions come from</h2>
             </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Expense and revenue tracking is even more powerful when combined with these features.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('receipt-scan-detail', 22) ?>
-                    </div>
-                    <h3>Receipt Scanning</h3>
-                    <p>Snap a photo of a receipt and let AI create the expense record for you. Every scanned receipt flows directly into your expense tracking.</p>
+            <div class="fp-related fp-reveal">
+                <a href="../receipt-scanning/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('receipt-scan', 20) ?></div>
+                    <h3>AI receipt scanning</h3>
+                    <p>Photograph a receipt and the expense record writes itself, line items and all.</p>
                 </a>
-                <a href="../predictive-analytics/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>Your expense and revenue data powers ML forecasting. See predicted cash flow, seasonal trends, and spending patterns before they impact your bottom line.</p>
+                <a href="../bank-statement-import/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('bank', 20) ?></div>
+                    <h3>Bank statement import</h3>
+                    <p>Bring a month of transactions in at once instead of typing them one by one.</p>
                 </a>
-                <a href="../invoicing/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document', 22) ?>
-                    </div>
-                    <h3>Invoicing</h3>
-                    <p>Create professional invoices in seconds, and let customers pay online. Track yout customer's payment status and get paid faster.</p>
+                <a href="../spreadsheet-import/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document-upload', 20) ?></div>
+                    <h3>Spreadsheet import</h3>
+                    <p>Move the history you already keep in Excel or CSV across in one go.</p>
+                </a>
+                <a href="../predictive-analytics/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('analytics', 20) ?></div>
+                    <h3>Predictive analytics</h3>
+                    <p>Enough history turns into a forecast of what next month is likely to cost.</p>
                 </a>
             </div>
         </div>
@@ -574,23 +358,21 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to take control of your finances?</h2>
-                    <p>Download Argo Books and start tracking expenses and revenue today. Free to get started, with no credit card and no trial period.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Stop guessing whether you are profitable</h2>
+                <p>Download Argo Books and record your first transaction today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -601,23 +383,22 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

@@ -1,13 +1,35 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
-$argo_cfg = get_pricing_config();
-$argo_monthly = (int) $argo_cfg['premium_monthly_price'];
-$argo_bank_limit = (int) $argo_cfg['bank_import_monthly_limit'];
-$argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'What bank statement formats can I import?',
+        'a' => 'Argo Books imports bank statements as CSV, Excel (.xlsx and .xls), or PDF. Export a statement from your online banking, drop the file in, and each transaction line is read and pre-filled for you.',
+    ],
+    [
+        'q' => 'Do I need to connect my bank account?',
+        'a' => 'No. There is no bank login, no connection, and no third-party aggregator. Argo Books works entirely from the statement file you export yourself, so nothing is ever linked to your bank.',
+    ],
+    [
+        'q' => 'Does it record transactions automatically?',
+        'a' => 'Every line is pre-filled for you with a type, category, and supplier or customer, but nothing is saved until you review and confirm. You stay in control of what goes into your books.',
+    ],
+    [
+        'q' => 'How is importing different from matching?',
+        'a' => 'Import turns each bank line into a new categorized expense or revenue. Matching compares your statement against records you have already entered, confirms the ones that line up, and shows anything missing from your books. You can use either, or both.',
+    ],
+    [
+        'q' => 'How many bank statements can I import per month?',
+        'a' => 'The Free plan includes <?= $argo_bank_limit ?> AI bank imports per month and Premium includes <?= $argo_premium_bank_limit ?>. Reading a CSV or Excel file without AI categorization doesn\'t count against your limit, and even at the limit you can still import and fill lines in by hand.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,15 +41,12 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Import a bank statement (CSV, Excel, or PDF) into Argo Books and every line becomes a categorized expense or revenue, ready to review. Match against your books too. No bank login required.">
-    <meta name="keywords"
-        content="bank statement import, import bank statement CSV, bank statement to accounting software, bank reconciliation software, categorize bank transactions, PDF bank statement import, bank matching, no bank connection bookkeeping">
+    <meta name="description" content="Import a bank statement (CSV, Excel, or PDF) into Argo Books and every line becomes a categorized expense or revenue, ready to review. Match against your books too. No bank login required.">
+    <meta name="keywords" content="bank statement import, import bank statement CSV, bank statement to accounting software, bank reconciliation software, categorize bank transactions, PDF bank statement import, bank matching, no bank connection bookkeeping">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Bank Statement Import | Argo Books">
-    <meta property="og:description"
-        content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
+    <meta property="og:description" content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
     <meta property="og:url" content="https://argorobots.com/features/bank-statement-import/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -39,8 +58,7 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Bank Statement Import | Argo Books">
-    <meta name="twitter:description"
-        content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
+    <meta name="twitter:description" content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -53,55 +71,8 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Bank Statement Import" => "/features/bank-statement-import/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "What bank statement formats can I import?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books imports bank statements as CSV, Excel (.xlsx and .xls), or PDF. Export a statement from your online banking, drop the file in, and each transaction line is read and pre-filled for you."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Do I need to connect my bank account?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "No. There is no bank login, no connection, and no third-party aggregator. Argo Books works entirely from the statement file you export yourself, so nothing is ever linked to your bank."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Does it record transactions automatically?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Every line is pre-filled for you with a type, category, and supplier or customer, but nothing is saved until you review and confirm. You stay in control of what goes into your books."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How is importing different from matching?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Import turns each bank line into a new categorized expense or revenue. Matching compares your statement against records you have already entered, confirms the ones that line up, and shows anything missing from your books. You can use either, or both."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How many bank statements can I import per month?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "The Free plan includes <?= $argo_bank_limit ?> AI bank imports per month and Premium includes <?= $argo_premium_bank_limit ?>. Reading a CSV or Excel file without AI categorization doesn't count against your limit, and even at the limit you can still import and fill lines in by hand."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -117,8 +88,8 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Import bank statements into Argo Books from CSV, Excel, or PDF. Each line becomes a categorized expense or revenue, with a separate matching mode to reconcile against your existing records. No bank connection required.",
-            "featureList": "CSV, Excel and PDF bank statements, Automatic categorization, Bank matching with month calendar, No bank login, Full undo for every import"
+            "description": "Import a bank statement (CSV, Excel, or PDF) into Argo Books and every line becomes a categorized expense or revenue, ready to review. Match against your books too. No bank login required.",
+            "featureList": "Bank statement import, Automatic transaction matching, Duplicate detection, Multi-format support"
         }
     </script>
 
@@ -127,16 +98,16 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
 
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -146,423 +117,236 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Turn your bank statement into clean books</h1>
-            <p class="hero-subtitle animate-fade-in">Drop in a CSV, Excel, or PDF statement in any format and every line comes back as a categorized expense or revenue, ready to review. No template to match, no bank login, no copying and pasting.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 1: Problem + Solution
-         ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Stop typing your statement line by line</h2>
-                    <p>Catching up on a month of banking usually means squinting at a PDF and retyping every row. Argo Books reads the whole statement for you and turns each line into a categorized expense or revenue, with the type, category, and supplier or customer already filled in.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Reads any bank's format, in CSV, Excel, or PDF, with no template to set up</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Each line comes back categorized and ready to review</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No bank login, no connection, no aggregator</span>
-                        </li>
-                    </ul>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>A month of banking,<br>in one go.</h1>
+                    <p class="fp-hero-sub">Drop in the statement your bank gives you and Argo Books reads the transactions, matches the ones you have already recorded, and leaves you only the genuinely new entries to confirm.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and the file never leaves your own computer.</p>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/bank-statement-import.svg" alt="Bank statement import review showing each transaction categorized as an expense or revenue with a category and amount" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Catch up on your books in minutes</h3>
-                <p>Download Argo Books and import your first statement in a few minutes. No credit card needed.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-hero-still">
+                    <img src="../../resources/images/features/bank-statement-import.svg"
+                         alt="Argo Books importing a bank statement, with transactions matched against existing records"
+                         width="600" height="500" fetchpriority="high">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         HOW IT WORKS
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>CSV, Excel, PDF</h3>
-                    <p>Whatever your bank exports</p>
-                </div>
-                <div class="highlight-item">
-                    <h3>No bank login</h3>
-                    <p>Nothing is ever connected to your bank</p>
-                </div>
-                <div class="highlight-item">
-                    <h3><?= $argo_bank_limit ?> free</h3>
-                    <p>AI bank imports every month on the free plan</p>
-                </div>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, one file</h2>
+                <p class="fp-lede">Typing a statement in by hand is where an afternoon goes. Importing it is where ten minutes goes.</p>
             </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 2: Matching (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Bank Matching</span>
-                    <h2>Check your statement against your books</h2>
-                    <p>Already recording as you go? Use matching instead. Argo Books lines up each bank transaction with the expense or revenue you already entered, confirms the ones that agree, and flags anything that's missing, so you can be sure your books and your bank tell the same story.</p>
-                    <p>A month calendar view shows matched and unmatched activity at a glance, and a separate list surfaces records in your books that never showed up on the statement.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Matches bank lines to your recorded expenses and revenue</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Month calendar view of matched and unmatched days</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Runs on your computer, with no data sent out to match</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/bank-statement-matching.svg" alt="Bank matching page with a month calendar showing matched, suggested, and unmatched transactions" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         HOW IT WORKS, 3 Steps
-         ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps from statement to sorted</h2>
-                <p class="section-desc">Export, drop, review. Argo Books does the reading and the categorizing so you don't have to.</p>
-            </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
                     <h3>Export from your bank</h3>
-                    <p>Download a statement from your online banking as a CSV, Excel, or PDF file. Any bank works.</p>
+                    <p>Whatever format they offer. CSV, Excel and the common statement layouts are all read.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Drop in the file</h3>
-                    <p>Argo Books reads every line, even statements with header notes or unusual columns, and pre-fills each one.</p>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>Drop the file in</h3>
+                    <p>Columns are worked out for you, so there is no mapping screen to fight with before anything happens.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Review and import</h3>
-                    <p>Check the categorized lines, adjust anything you like, and import. Or switch to matching to reconcile against your books.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Never re-type a bank statement again</h3>
-                <p>Every transaction read, categorized, and ready to confirm.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Confirm what is new</h3>
+                    <p>Anything already in your books is matched and set aside. You review the rest and save.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Smart pre-fill
+         PRODUCT BLOCK
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Filled In For You</span>
-                    <h2>Every line pre-filled before you review</h2>
-                    <p>Argo Books fills each line in two passes. First, it applies rules it has learned from your past imports and matches obvious names against your existing products, suppliers, and customers. Then AI fills in whatever is left, choosing a product and category and a supplier or customer for each transaction.</p>
-                    <p>Nothing is written to your books until you confirm, and every import you approve teaches Argo Books your merchants, so the next statement fills in even faster.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Picks the product, category, and supplier or customer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Learns each merchant so repeat statements pre-fill themselves</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>You review and confirm before anything is saved</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">The part that saves the time</div>
+                    <h2 class="fp-h2">It knows what you have already recorded</h2>
+                    <p class="fp-lede">The slow part of importing a statement is not reading the file, it is working out which lines you already entered. Argo Books matches on amount, date and description, so scanned receipts and manual entries are not duplicated when the statement arrives.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Existing transactions matched, not duplicated</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Columns detected without a mapping step</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Review everything before a single record is saved</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/bank-statement-prefill.svg" alt="A single bank line pre-filled with a type, product and category, and supplier, with a learned-rule badge" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/bank-statement-matching.svg"
+                         alt="Argo Books matching imported bank transactions against records that already exist in the books"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than a statement reader</h2>
-                <p class="section-desc">It changes how you catch up, how you check your books, and how much of it you have to do by hand.</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Import a month of transactions in minutes</h2>
+                <p>No account, no credit card, and no bank login handed over.</p>
             </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('clock', 22) ?>
-                    </div>
-                    <h3>Catch up in minutes</h3>
-                    <p>A whole month of transactions, read and categorized, in the time it used to take to do a handful by hand.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>No bank connection</h3>
-                    <p>No login, no linked account, no aggregator. You export the file, and that's the only thing Argo Books ever sees.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Handles messy statements</h3>
-                    <p>Header notes, odd column names, separate debit and credit columns: Argo Books finds the real data and reads it.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('bank', 22) ?>
-                    </div>
-                    <h3>Learns your merchants</h3>
-                    <p>Confirm an import once and Argo Books remembers it, so the same merchant fills in automatically next time.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('calendar', 22) ?>
-                    </div>
-                    <h3>Spot what's missing</h3>
-                    <p>Matching mode shows any records in your books that never appeared on the statement, so nothing slips through.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('refresh', 22) ?>
-                    </div>
-                    <h3>Fully undoable</h3>
-                    <p>Every import and every match is a single undo step. If something looks off, roll it back and try again.</p>
-                </div>
-            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
         </div>
     </section>
 
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Import your first statement today</h3>
-                <p>Get a month of banking into Argo Books in a few minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when the statement does the typing</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('clock', 20) ?></div>
+                    <h3>Catch-up stops taking a weekend</h3>
+                    <p>A backlog of statements becomes a job you finish in one sitting rather than one you keep putting off.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>The numbers match the bank</h3>
+                    <p>Working from the statement itself means your books agree with your account instead of drifting apart.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('shield', 20) ?></div>
+                    <h3>No bank credentials involved</h3>
+                    <p>You export a file and import it. Argo Books never asks for your online banking login.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('search', 20) ?></div>
+                    <h3>Nothing gets counted twice</h3>
+                    <p>Duplicate detection means a receipt you scanned last week does not reappear when the statement lands.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         USE CASES SECTION
+         PRIVACY
          ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for real-world bookkeeping</h2>
-                <p class="section-desc">Whether you're catching up, switching over, or double-checking, bank import handles it.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Monthly catch-up
-                    </h3>
-                    <p>Fell behind? Import last month's statement and turn a whole page of transactions into sorted records in one sitting.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('bank', 22) ?>
-                        Bringing in your history
-                    </h3>
-                    <p>New to Argo Books? Import past statements to build up your records instead of starting from an empty slate.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('refresh', 22) ?>
-                        Reconciling your books
-                    </h3>
-                    <p>Match your statement against what you've recorded to confirm everything agrees and catch anything you missed.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('document', 22) ?>
-                        Accountant handoffs
-                    </h3>
-                    <p>Keep clean, categorized records that line up with your bank, so tax time and accountant reviews go smoothly.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 4: Privacy (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your banking stays yours</h2>
-                    <p>Argo Books is a desktop app, not a cloud service, and it never connects to your bank. CSV and Excel statements are read right on your computer, and matching runs entirely on your machine.</p>
-                    <p>Only reading a PDF statement and the optional AI categorization send transaction lines out for analysis. There's never a bank login involved, because there's no bank connection to begin with.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No bank login, connection, or third-party aggregator</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>CSV and Excel are read on your own computer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Matching happens locally, with nothing sent out</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         RELATED FEATURES
+         WHO IT'S FOR
          ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Bank import works even better alongside these.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="related-grid">
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense & Revenue Tracking</h3>
-                    <p>Imported transactions land straight in your expense and revenue records, categorized and ready for reports.</p>
-                </a>
-                <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document-upload', 22) ?>
-                    </div>
-                    <h3>Spreadsheet Import</h3>
-                    <p>Bring in customers, products, and more from any spreadsheet, with columns mapped for you automatically.</p>
-                </a>
-                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('receipt-scan-detail', 22) ?>
-                    </div>
-                    <h3>Receipt Scanning</h3>
-                    <p>Scan receipts for new purchases as they happen, and import your statement to catch anything that slipped by.</p>
-                </a>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>One import a month is often the whole of your bookkeeping.</p>
+                </div>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and e-commerce</h3>
+                    <p>High transaction volumes that would be unreasonable to type in.</p>
+                </div>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Trades and services</h3>
+                    <p>Fuel, materials and supplier payments brought in together.</p>
+                </div>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('document', 19) ?> Anyone catching up</h3>
+                    <p>Months of backlog cleared file by file rather than line by line.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Guides</span>
-                <h2 class="section-title">Related guides</h2>
-                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+    <!-- =============================================
+         FAQ. Accordion and schema both come from $faqs.
+         ============================================= -->
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
-            <div class="related-grid">
-                <a href="../../import-bank-transactions-from-csv-into-accounting-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Import bank transactions from CSV</h3>
-                    <p>Pull your bank history in with automatic column mapping and categorization.</p>
+            <?= argo_faq_grid($faqs) ?>
+        </div>
+    </section>
+
+    <!-- =============================================
+         RELATED
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">Other ways to get data in</h2>
+            </div>
+            <div class="fp-related fp-reveal">
+                <a href="../receipt-scanning/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('receipt-scan', 20) ?></div>
+                    <h3>AI receipt scanning</h3>
+                    <p>Photograph a receipt and the expense writes itself, line items and all.</p>
                 </a>
-                <a href="../../how-to-move-from-spreadsheets-to-bookkeeping-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Move from spreadsheets to software</h3>
-                    <p>When and how to make the switch to real bookkeeping software cleanly.</p>
+                <a href="../spreadsheet-import/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document-upload', 20) ?></div>
+                    <h3>Spreadsheet import</h3>
+                    <p>Bring across records you already keep in Excel or CSV.</p>
                 </a>
-                <a href="../../how-to-convert-excel-spreadsheet-to-accounting-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Convert Excel to accounting software</h3>
-                    <p>Move your existing spreadsheets into real software without losing history.</p>
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>Where every imported transaction lands.</p>
+                </a>
+                <a href="../predictive-analytics/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('analytics', 20) ?></div>
+                    <h3>Predictive analytics</h3>
+                    <p>More history in means a sharper forecast out.</p>
                 </a>
             </div>
         </div>
@@ -570,23 +354,21 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to import your statement?</h2>
-                    <p>Download Argo Books and turn your next bank statement into clean, categorized records in minutes. Free to start, with no credit card and no trial.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Stop typing your bank statement in</h2>
+                <p>Download Argo Books and import your first statement today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -597,23 +379,22 @@ $argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

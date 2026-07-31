@@ -1,11 +1,35 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
-$argo_cfg = get_pricing_config();
-$argo_monthly = (int) $argo_cfg['premium_monthly_price'];
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'What reports can I create in Argo Books?',
+        'a' => 'Argo Books includes the core financial statements: Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, Tax Summary, and Sales by Product, plus analytics-style overview templates. You can also start from a blank report and build your own.',
+    ],
+    [
+        'q' => 'Can I customize how a report looks?',
+        'a' => 'Yes. A three-step designer lets you drag, resize, align, and arrange charts, tables, labels, and images on the page, with snapping, undo and redo, and multi-page layouts. You control the page size, orientation, margins, colors, and your branded header and footer.',
+    ],
+    [
+        'q' => 'What can I export a report to?',
+        'a' => 'Finished reports export as a PDF for printing and sharing, or as a high-quality PNG or JPEG image. The PDF is a true multi-page document with your branding on every page.',
+    ],
+    [
+        'q' => 'Is the report builder a paid feature?',
+        'a' => 'No. The full report builder, including every accounting statement and the designer, is part of Argo Books at no cost, with no premium plan required and no usage limit.',
+    ],
+    [
+        'q' => 'Does it use the right tax terms for my country?',
+        'a' => 'Yes. Argo Books labels tax lines with the right terminology for your country, such as GST/HST in Canada, VAT in the UK and EU, or Sales Tax in the US, and it adjusts statement wording to match common accounting conventions.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,15 +41,12 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Build professional accounting reports in Argo Books: Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary. A drag-and-drop designer, your branding, and clean PDF export. Free to use.">
-    <meta name="keywords"
-        content="accounting report software, income statement software, balance sheet software, general ledger software, financial report builder, tax summary report, report designer, free accounting reports, cash flow statement software">
+    <meta name="description" content="Build professional accounting reports in Argo Books: Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary. A drag-and-drop designer, your branding, and clean PDF export. Free to use.">
+    <meta name="keywords" content="accounting report software, income statement software, balance sheet software, general ledger software, financial report builder, tax summary report, report designer, free accounting reports, cash flow statement software">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Report Builder | Argo Books">
-    <meta property="og:description"
-        content="Build Income Statements, Balance Sheets, and more from your own data, design them your way, and export a clean PDF. Free to use.">
+    <meta property="og:description" content="Build Income Statements, Balance Sheets, and more from your own data, design them your way, and export a clean PDF. Free to use.">
     <meta property="og:url" content="https://argorobots.com/features/report-builder/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -37,8 +58,7 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Report Builder | Argo Books">
-    <meta name="twitter:description"
-        content="Build Income Statements, Balance Sheets, and more from your own data, design them your way, and export a clean PDF. Free to use.">
+    <meta name="twitter:description" content="Build Income Statements, Balance Sheets, and more from your own data, design them your way, and export a clean PDF. Free to use.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -51,55 +71,8 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Report Builder" => "/features/report-builder/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "What reports can I create in Argo Books?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books includes the core financial statements: Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, Tax Summary, and Sales by Product, plus analytics-style overview templates. You can also start from a blank report and build your own."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I customize how a report looks?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. A three-step designer lets you drag, resize, align, and arrange charts, tables, labels, and images on the page, with snapping, undo and redo, and multi-page layouts. You control the page size, orientation, margins, colors, and your branded header and footer."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "What can I export a report to?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Finished reports export as a PDF for printing and sharing, or as a high-quality PNG or JPEG image. The PDF is a true multi-page document with your branding on every page."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is the report builder a paid feature?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "No. The full report builder, including every accounting statement and the designer, is part of Argo Books at no cost, with no premium plan required and no usage limit."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Does it use the right tax terms for my country?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Argo Books labels tax lines with the right terminology for your country, such as GST/HST in Canada, VAT in the UK and EU, or Sales Tax in the US, and it adjusts statement wording to match common accounting conventions."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -115,8 +88,8 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Build professional accounting reports in Argo Books, including Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary, with a drag-and-drop designer, branded headers, per-country tax terms, and PDF export.",
-            "featureList": "Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, Tax Summary, Drag-and-drop report designer, Branded headers and footers, Per-country tax terminology, PDF, PNG and JPEG export"
+            "description": "Build professional accounting reports in Argo Books: Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary. A drag-and-drop designer, your branding, and clean PDF export. Free to use.",
+            "featureList": "Custom report builder, Profit and loss statements, Balance sheets, Export to PDF and spreadsheet"
         }
     </script>
 
@@ -125,16 +98,16 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
 
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -144,396 +117,236 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Build professional financial reports, your way</h1>
-            <p class="hero-subtitle animate-fade-in">Pick a template and your Income Statement, Balance Sheet, or tax summary is built from your own data in a couple of clicks. Fine-tune the layout only if you want to, then export a clean, branded PDF, free to use.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>The statement<br>your accountant asked for.</h1>
+                    <p class="fp-hero-sub">Profit and loss, balance sheet, and whatever else you need, built from the records already in your books and exported in a format anyone can open.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and your reports are generated on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-still">
+                    <img src="../../resources/images/features/report-designer.svg"
+                         alt="The Argo Books report designer, with report types and a balance sheet preview"
+                         width="600" height="500" fetchpriority="high">
+                </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 1: Problem + Solution
+         HOW IT WORKS
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Real accounting reports, without the accountant</h2>
-                    <p>Getting a proper Income Statement or Balance Sheet usually means wrestling with a spreadsheet or paying someone to make one. In Argo Books you just pick the report you want and it's ready in a couple of clicks, built straight from your own records with no formulas and no setup, so the numbers are always current and add up.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Built automatically from your own expenses, revenue, and invoices</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Or start from a blank report and build your own</span>
-                        </li>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps to a finished report</h2>
+                <p class="fp-lede">A report is only worth having if producing it does not take longer than reading it.</p>
+            </div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
+                    <h3>Pick the report</h3>
+                    <p>Profit and loss, balance sheet, expense summary, or a layout you build yourself.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>Set the period</h3>
+                    <p>A month, a quarter, a financial year, or any range you choose.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Export and send it</h3>
+                    <p>PDF for reading, spreadsheet for working with. Both come out ready to hand over.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         PRODUCT BLOCK
+         ============================================= -->
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Not just the standard set</div>
+                    <h2 class="fp-h2">Build the report you actually need</h2>
+                    <p class="fp-lede">The standard statements cover what an accountant asks for. The builder covers everything else: group by customer, by category or by period, filter to the part you care about, and save the layout so next quarter takes one click.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Profit and loss and balance sheet out of the box</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Custom layouts you can save and reuse</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Export to PDF or spreadsheet</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/report-types.svg" alt="Report template picker showing Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, and Tax Summary" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Run your first report free</h3>
-                <p>Download Argo Books and generate an Income Statement or Balance Sheet in minutes. No credit card needed.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/report-types.svg"
+                         alt="The report types available in Argo Books, including profit and loss, balance sheet and expense summaries"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>Every statement</h3>
-                    <p>From Income Statement to Tax Summary</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Produce your first statement in minutes</h2>
+                <p>No account, no credit card, and no accounting knowledge needed.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when reports are one click</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('clock', 20) ?></div>
+                    <h3>Year end stops being a project</h3>
+                    <p>When the statement takes a minute to produce, handing something over to an accountant is not a week of preparation.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Drag-and-drop</h3>
-                    <p>Design each report exactly your way</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>The figures come from the records</h3>
+                    <p>Reports are generated from your actual transactions, so there is no re-keying step to get wrong.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Free</h3>
-                    <p>No premium plan, no usage limits</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('search', 20) ?></div>
+                    <h3>You can answer your own questions</h3>
+                    <p>Group and filter the way you think about the business rather than the way a fixed template does.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('trending-up', 20) ?></div>
+                    <h3>Periods are comparable</h3>
+                    <p>Run the same report across quarters and the change is visible instead of inferred.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: The Designer (reversed)
+         PRIVACY
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Designer</span>
-                    <h2>Design each report exactly how you want</h2>
-                    <p>Every template is ready to export the moment you pick it, but when you do want to change how a report looks, the designer gives you full control. Drop in charts, tables, labels, and images, then drag, resize, align, and arrange everything on the page. Grid snapping, undo and redo, and multi-page layouts are all built in.</p>
-                    <p>Set the page size, orientation, margins, and colors, and switch your branded header and footer on or off, all with a live preview of the finished page.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Drag, resize, align, and snap elements to a grid</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Add charts, tables, labels, images, and summaries</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Full undo and redo, with layouts that span multiple pages</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/report-designer.svg" alt="Report designer with an elements panel, a live report canvas, and a page settings properties panel" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS, 3 Steps
+         WHO IT'S FOR
          ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps from data to finished report</h2>
-                <p class="section-desc">Pick a template and it's ready to export. Step two is only there for when you want to change how the report looks.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <h3>Pick a template</h3>
-                    <p>Choose a statement or a blank report, name it, and set the date range you want to cover.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>A profit and loss for the year without paying someone to assemble it.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Design the layout</h3>
-                    <p>Arrange charts, tables, and text on the page, then set your branding, page size, and margins.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and e-commerce</h3>
+                    <p>Margin and category reporting across a lot of transactions.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Preview and export</h3>
-                    <p>Preview every page, then export a clean PDF, PNG, or JPEG, ready to print or send.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Service businesses</h3>
+                    <p>Profitability by job or customer, not just overall.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Reports that look like a pro made them</h3>
-                <p>Your branding, your layout, your numbers, in a clean PDF.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('document', 19) ?> Anyone with an accountant</h3>
+                    <p>Hand over a statement in a format they can work with immediately.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Professional + accurate
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Looks Professional</span>
-                    <h2>Professional reports, ready for tax time</h2>
-                    <p>Every report carries your company header, with your logo, name, address, and contact details, plus a footer and page numbers. The result looks like something an accountant handed you, not a spreadsheet printout.</p>
-                    <p>Argo Books uses the right tax terms for your country, from GST/HST to VAT to Sales Tax, and converts figures to your display currency with an "Amounts in" note so it's always clear which currency you're reading.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Your logo, company details, and page numbers on every page</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>The right tax terms for your country, from GST/HST to VAT</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Figures shown in your display currency, clearly labeled</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/report-balance-sheet.svg" alt="A finished Balance Sheet with a branded company header, GST/HST line, and an Amounts in CAD note" loading="lazy">
-                </div>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID
+         RELATED
          ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than a report generator</h2>
-                <p class="section-desc">The reports competitors lock behind a subscription, ready to design and export for free.</p>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">What reports are built from</h2>
             </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('report', 22) ?>
-                    </div>
-                    <h3>Every core statement</h3>
-                    <p>Income Statement, Balance Sheet, Cash Flow, General Ledger, AR Aging, Tax Summary, and Sales by Product.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Design it your way</h3>
-                    <p>A drag-and-drop designer with charts, tables, alignment tools, snapping, and multi-page layouts.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('document', 22) ?>
-                    </div>
-                    <h3>Your branding</h3>
-                    <p>Your logo, company details, and page numbers on a clean, professional header and footer.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>The right tax terms</h3>
-                    <p>GST/HST, VAT, or Sales Tax, chosen automatically for your country, with matching statement wording.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('refresh', 22) ?>
-                    </div>
-                    <h3>Multi-currency</h3>
-                    <p>Figures convert to your display currency and are clearly labeled, so mixed-currency books still read cleanly.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>Free, with no limits</h3>
-                    <p>The full report builder is part of Argo Books. No premium plan, no per-report cost, no cap.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Generate your reports today</h3>
-                <p>Turn your records into professional statements in a few minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         USE CASES SECTION
-         ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Reports for every moment that matters</h2>
-                <p class="section-desc">Tax time, funding, or just knowing where you stand, there's a statement for it.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Tax time
-                    </h3>
-                    <p>Hand your accountant a Tax Summary and Income Statement that are already done, with the right tax labels for your country.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('trending-up', 22) ?>
-                        Loans and investors
-                    </h3>
-                    <p>Show a lender or investor a clean, branded Balance Sheet and Income Statement that make your business look the part.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('analytics', 22) ?>
-                        Knowing your numbers
-                    </h3>
-                    <p>Run an Income Statement any time to see whether you're actually making money, not just guessing from your bank balance.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('clock', 22) ?>
-                        Chasing receivables
-                    </h3>
-                    <p>Use AR Aging to see exactly who owes you and for how long, so nothing slips past the point of collecting.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 4: Privacy (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your reports never leave your computer</h2>
-                    <p>Argo Books is a desktop app, not a cloud service. Your reports are built and rendered right on your own machine, from data that stays on your device. Nothing is uploaded to generate a statement.</p>
-                    <p>The finished PDF or image is saved wherever you choose, and stays entirely under your control.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Desktop app: reports are generated on your computer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Your financial data never leaves your device to build a report</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Exported files are saved locally, wherever you want them</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Your reports are only as good as the data behind them.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense & Revenue Tracking</h3>
-                    <p>Every expense and revenue you record flows straight into your Income Statement, Balance Sheet, and tax reports.</p>
+            <div class="fp-related fp-reveal">
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>The transaction records every report is generated from.</p>
                 </a>
-                <a href="../predictive-analytics/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>Drop forecast and trend charts straight onto a report to pair your statements with a look at what's ahead.</p>
-                </a>
-                <a href="../invoicing/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document', 22) ?>
-                    </div>
+                <a href="../invoicing/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document', 20) ?></div>
                     <h3>Invoicing</h3>
-                    <p>Unpaid invoices feed your AR Aging report, so you always know who still owes you and for how long.</p>
+                    <p>Billed and paid figures flow straight into your statements.</p>
+                </a>
+                <a href="../inventory-management/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('package', 20) ?></div>
+                    <h3>Inventory management</h3>
+                    <p>Stock value and cost of goods feed the balance sheet.</p>
+                </a>
+                <a href="../predictive-analytics/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('analytics', 20) ?></div>
+                    <h3>Predictive analytics</h3>
+                    <p>Look forward as well as back, from the same records.</p>
                 </a>
             </div>
         </div>
@@ -541,23 +354,21 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to build your reports?</h2>
-                    <p>Download Argo Books and turn your records into professional financial statements in minutes. Free to start, with no credit card and no trial.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Stop assembling statements by hand</h2>
+                <p>Download Argo Books and produce your first report today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -568,23 +379,22 @@ $argo_monthly = (int) $argo_cfg['premium_monthly_price'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

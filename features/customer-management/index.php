@@ -1,10 +1,32 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
+require_once __DIR__ . '/../../partials/feature-demo.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'Does Argo Books include a built-in customer database?',
+        'a' => 'Yes. Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes for every client. It integrates directly with invoicing, revenue tracking, and rental management, so when you create an invoice or rental, your customer details auto-populate without re-entering anything.',
+    ],
+    [
+        'q' => 'How do I find customers in Argo Books?',
+        'a' => 'You can instantly search customers by name, email, or ID, and filter by country, status, or date added. Whether you have 10 customers or 10,000, finding the right record takes seconds.',
+    ],
+    [
+        'q' => 'Is my customer data private and secure?',
+        'a' => 'Absolutely. Argo Books is a desktop application, so all customer data is stored locally on your computer. Nothing is uploaded to cloud servers. Your data is encrypted with AES-256-GCM, the same standard used by banks and government agencies. You have full control over your customer information at all times.',
+    ],
+    [
+        'q' => 'Can I import my existing customer list?',
+        'a' => 'Yes. You can import customers from Excel or CSV files using the AI Spreadsheet Import feature. The AI automatically detects your columns and maps them to the right fields, so you can migrate your existing customer data into Argo Books in minutes, with no manual data entry required.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,15 +38,12 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses, organizing contacts, addresses, and notes without a full CRM.">
-    <meta name="keywords"
-        content="customer management, CRM, customer tracking, customer database, small business CRM, customer profiles, contact management, customer address book, customer notes, customer purchase history">
+    <meta name="description" content="Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses, organizing contacts, addresses, and notes without a full CRM.">
+    <meta name="keywords" content="customer management, CRM, customer tracking, customer database, small business CRM, customer profiles, contact management, customer address book, customer notes, customer purchase history">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Customer Management | Argo Books">
-    <meta property="og:description"
-        content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
+    <meta property="og:description" content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
     <meta property="og:url" content="https://argorobots.com/features/customer-management/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -36,8 +55,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Customer Management | Argo Books">
-    <meta name="twitter:description"
-        content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
+    <meta name="twitter:description" content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -50,47 +68,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Customer Management" => "/features/customer-management/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "Does Argo Books include a built-in customer database?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes for every client. It integrates directly with invoicing, revenue tracking, and rental management, so when you create an invoice or rental, your customer details auto-populate without re-entering anything."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How do I find customers in Argo Books?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "You can instantly search customers by name, email, or ID, and filter by country, status, or date added. Whether you have 10 customers or 10,000, finding the right record takes seconds."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is my customer data private and secure?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Absolutely. Argo Books is a desktop application, so all customer data is stored locally on your computer. Nothing is uploaded to cloud servers. Your data is encrypted with AES-256-GCM, the same standard used by banks and government agencies. You have full control over your customer information at all times."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I import my existing customer list?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. You can import customers from Excel or CSV files using the AI Spreadsheet Import feature. The AI automatically detects your columns and maps them to the right fields, so you can migrate your existing customer data into Argo Books in minutes, with no manual data entry required."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -106,8 +85,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses.",
-            "featureList": "Customer profiles with contact details, Searchable and sortable customer table, Integration with invoicing and rentals, Local data storage with no cloud dependency"
+            "description": "Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses, organizing contacts, addresses, and notes without a full CRM.",
+            "featureList": "Customer directory, Purchase history, Outstanding balances, Contact management"
         }
     </script>
 
@@ -115,17 +94,20 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <title>Customer Management | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
+    <!-- Mockup animations, shared with the landing and comparison pages. -->
+    <script src="../../resources/scripts/feature-tour.js" defer></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -135,369 +117,234 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Know your customers, grow your business</h1>
-            <p class="hero-subtitle animate-fade-in">Keep a complete record of every customer: names, contact details, addresses, and notes, in one organized place. Build stronger relationships with the people who matter most to your business.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Every customer.<br>Every balance.</h1>
+                    <p class="fp-hero-sub">One record per customer holding their contact details, everything they have ever bought, and exactly what they still owe you.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and your customer list stays on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="customers">
+                    <?= argo_feature_demo('customers') ?>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
+         HOW IT WORKS
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Scattered contacts cost you customers and credibility</h2>
-                    <p>Most small businesses track customers across spreadsheets, email inboxes, sticky notes, and phone contacts. When a customer calls, you scramble to find their details. When it's time to send an invoice, you're guessing at addresses. And when a customer hasn't ordered in months, you don't even notice. Argo Books gives you a single, searchable customer database with every detail you need, so you always know who your customers are and how to reach them.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Complete customer profiles</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Searchable, sortable customer table</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Summary cards show key metrics at a glance</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Customer data flows into invoices, revenue tracking, and rentals automatically</span>
-                        </li>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, and the record fills itself</h2>
+                <p class="fp-lede">Most customer lists rot because keeping them current is a separate job. This one updates as a side effect of billing.</p>
+            </div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
+                    <h3>Add them once</h3>
+                    <p>Name, contact details, and any terms you have agreed. That is the last time you type any of it.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>Sell and invoice as normal</h3>
+                    <p>Every invoice, payment and sale attaches itself to the customer it belongs to, with no filing on your part.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Open the record when you need it</h3>
+                    <p>Their full history, their balance, and when they last paid you, on one screen.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         PRODUCT BLOCK
+         ============================================= -->
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">The whole picture</div>
+                    <h2 class="fp-h2">What they bought, and what they owe</h2>
+                    <p class="fp-lede">A customer record is not just an address book entry. It carries every invoice raised, every payment received, and the balance between the two, so you can answer "are we square?" without opening three other screens.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Outstanding balance per customer, kept current automatically</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Full purchase and payment history on one record</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Search and filter by name, balance or last activity</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/customer-dashboard.svg" alt="Argo Books customer management dashboard showing a sortable customer table with names, emails, phone numbers, addresses, and action buttons" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Start organizing your customers today</h3>
-                <p>Download Argo Books and add your first customer in under a minute. No credit card required.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/customer-dashboard.svg"
+                         alt="The Argo Books customer directory showing contact details, outstanding balances and recent activity"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>10 seconds</h3>
-                    <p>To add a new customer profile</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Get your customer list in order</h2>
+                <p>No account, no credit card, and no import needed to start.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when the history is in one place</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('search', 20) ?></div>
+                    <h3>You can answer questions immediately</h3>
+                    <p>When a customer calls about an invoice from March, the answer is one search away instead of a scroll through email.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Instant</h3>
-                    <p>Search across all customer records</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>You know who owes you</h3>
+                    <p>Balances are calculated from real invoices and payments, so the number is current rather than remembered.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Zero</h3>
-                    <p>Duplicate entries or lost contacts</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>Invoices start half written</h3>
+                    <p>Billing an existing customer pulls their details in automatically, which is where most invoicing time actually goes.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('trending-up', 20) ?></div>
+                    <h3>You can see who is worth keeping</h3>
+                    <p>Purchase history over time shows which customers grow, which shrink, and which quietly cost you money.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: Adding Customers
-         Image left, text right (reversed)
+         PRIVACY
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Add Customers</span>
-                    <h2>Build complete customer profiles in seconds</h2>
-                    <p>Click "Add Customer" and fill in a clean, guided form. Each customer is uniquely identifiable from the start. Add notes to any customer profile for anything you want to remember</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Full address fields: street, city, state, postal code, and country</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>International phone numbers with country code selector</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Notes field for anything extra you need to remember</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/customer-add-form.svg" alt="Argo Books add customer form showing fields for name, company, email, phone with country code, full address, and notes" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS, 3 Steps
+         WHO IT'S FOR
          ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to an organized customer base</h2>
-                <p class="section-desc">From scattered contacts to a complete customer database. No CRM experience needed. Argo Books keeps it simple.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <h3>Add your customers</h3>
-                    <p>Click "Add Customer" and fill in names, contact details, and addresses. Start with just a name and add details over time.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>Keep repeat clients and their rates straight without a spreadsheet on the side.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Search, filter, and manage</h3>
-                    <p>Find any customer instantly with the search bar. Sort by name, email, or country. Edit details, add notes, or view a customer's complete profile.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and wholesale</h3>
+                    <p>Trade accounts with running balances alongside one-off retail sales.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Use everywhere in Argo Books</h3>
-                    <p>Customer profiles flow into invoicing, revenue tracking, and rental management, with no retyping.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Trades and services</h3>
+                    <p>Job history per customer, so a return visit starts from what happened last time.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop losing track of your customers</h3>
-                <p>A complete customer database means faster invoicing, better follow-ups, and stronger relationships. Get started with Argo Books in minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('calendar', 19) ?> Anyone on repeat business</h3>
+                    <p>See at a glance who has not bought in a while and is worth a call.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Customer Dashboard
-         Text left, image right
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Customer Dashboard</span>
-                    <h2>See your entire customer base at a glance</h2>
-                    <p>The customers page shows every customer in a clean, sortable table. Summary cards at the top show your total customers and other key metrics.</p>
-                    <p>Use the search bar to find any customer. Click the filter button to narrow results by country, status, or date added. Edit their details, or remove them, all in an easy-to-use interface.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Summary cards: total customers, active, banned, and new this month</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Customer avatars for quick visual scanning</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Edit, view, and delete actions on every row</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/customer-dashboard.svg" alt="Argo Books customer dashboard showing summary cards, search bar, filter button, and a paginated customer table with action buttons" loading="lazy">
-                </div>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
+         RELATED
          ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just a contact list</h2>
-                <p class="section-desc">Customer management in Argo Books isn't a full CRM. It's the organized, searchable customer database your business actually needs.</p>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">What customer records connect to</h2>
             </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Faster invoicing</h3>
-                    <p>Select a customer when creating an invoice and their name, email, and billing address auto-populate. No retyping, no copy-pasting from a spreadsheet.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('search', 22) ?>
-                    </div>
-                    <h3>Find anyone instantly</h3>
-                    <p>Search across names, emails, phone numbers, and addresses. Every customer is findable in seconds, even if you have hundreds of records.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('document', 22) ?>
-                    </div>
-                    <h3>One source of truth</h3>
-                    <p>No more outdated spreadsheets or duplicate contacts. Every feature in Argo Books pulls from the same customer database, so details are always consistent.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('globe', 22) ?>
-                    </div>
-                    <h3>International support</h3>
-                    <p>Full mailing addresses with country fields, international phone numbers with country codes, and multi-currency support. Built for businesses that serve customers anywhere.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Data stays on your computer</h3>
-                    <p>Customer names, emails, phone numbers, and addresses are stored locally on your device. No cloud uploads, no third-party access. Your customer data is yours.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Grow without complexity</h3>
-                    <p>Start with 5 customers, scale to 500. The interface stays clean and fast. No CRM training, no complex pipelines, just the customer info your business needs.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Build your customer database today</h3>
-                <p>Join small business owners who stopped losing track of customers and started building real relationships with Argo Books.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         USE CASES SECTION
-         ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for every business that has customers</h2>
-                <p class="section-desc">Whether you have 10 or 10,000 clients, customer management scales with your business.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Freelancers &amp; consultants
-                    </h3>
-                    <p>Keep track of every client's contact details, billing address, and project notes. When it's time to invoice, their profile is one click away, with no digging through old emails.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Retail &amp; e-commerce
-                    </h3>
-                    <p>Maintain a database of wholesale buyers, repeat customers, and suppliers. Track shipping addresses, company names, and purchase patterns across every transaction.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Service businesses
-                    </h3>
-                    <p>Store customer addresses for on-site work, phone numbers for appointment reminders, and notes about service preferences. Everything your team needs in one place.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('house', 22) ?>
-                        Property &amp; rental management
-                    </h3>
-                    <p>Keep tenant and renter profiles with full contact details and mailing addresses. Link customers to rental records and invoices for a complete history per person.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Customer management is even more powerful when combined with these features.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../invoicing/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document', 22) ?>
-                    </div>
+            <div class="fp-related fp-reveal">
+                <a href="../invoicing/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document', 20) ?></div>
                     <h3>Invoicing</h3>
-                    <p>Create an invoice and select a customer. Their name, email, and billing address auto-populate. No retyping, no errors, no wasted time.</p>
+                    <p>Bill a saved customer in a couple of clicks with their details already filled in.</p>
                 </a>
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense &amp; Revenue Tracking</h3>
-                    <p>Revenue transactions are linked to customer profiles. See which customers generate the most revenue and track purchase patterns over time.</p>
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>Payments received land against both the customer and your revenue.</p>
                 </a>
-                <a href="../rental-management/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('calendar', 22) ?>
-                    </div>
-                    <h3>Rental Management</h3>
-                    <p>Assign rentals to customer profiles. Track who rented what, when it's due back, and see a customer's complete rental history from their profile.</p>
+                <a href="../rental-management/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('calendar', 20) ?></div>
+                    <h3>Rental management</h3>
+                    <p>Bookings and returns tracked against the customer who took the item.</p>
+                </a>
+                <a href="../report-builder/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('report', 20) ?></div>
+                    <h3>Report builder</h3>
+                    <p>Turn customer activity into statements and summaries.</p>
                 </a>
             </div>
         </div>
@@ -505,23 +352,21 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to organize your customers?</h2>
-                    <p>Download Argo Books and build your customer database in minutes. Free to get started, with no credit card and no trial period.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Know your customers, not just their names</h2>
+                <p>Download Argo Books and build your customer list today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -532,23 +377,22 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

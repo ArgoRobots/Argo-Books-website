@@ -678,21 +678,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--gray-500);
 }
 
-/* Sticky header, QuickBooks rework only (needs the wrapper/table to drop
-   their clipping, so it stays scoped rather than global). */
-.compare-page .table-wrapper {
-  overflow: visible;
-}
-
-.compare-page .comparison-table {
-  overflow: visible;
-}
-
-.compare-page .comparison-table thead th {
-  position: sticky;
-  top: 50px; /* clears the 50px fixed site header once it becomes sticky */
-  z-index: 3;
-}
+/* The comparison table header used to stick under the site header while
+   scrolling. Two problems: the plan and price followed you down the page,
+   and making it work meant overriding .table-wrapper's overflow-x: auto,
+   which took the table's sideways scroll away on narrow screens. Both go;
+   the corner radii below stay because they are still what rounds the table. */
 
 .compare-page .comparison-table thead th:first-child {
   border-top-left-radius: 16px;

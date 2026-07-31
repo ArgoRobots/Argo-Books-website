@@ -33,7 +33,18 @@ function argo_feature_demo_base(): string
 /** True when the key names a demo this file can render. */
 function argo_feature_demo_exists(string $key): bool
 {
-    return in_array($key, argo_feature_demo_keys(), true);
+    return in_array($key, argo_feature_demo_keys(), true)
+        || in_array($key, argo_feature_demo_hero_keys(), true);
+}
+
+/**
+ * Demos built for a feature-page hero only. Deliberately separate from
+ * argo_feature_demo_keys(), which drives the landing page's tab strip: adding
+ * them there would put four new tabs on the home and comparison pages.
+ */
+function argo_feature_demo_hero_keys(): array
+{
+    return ['bank-import', 'sheet-import', 'report', 'stripe'];
 }
 
 /** Every demo key, in the order the landing page tabs use. */
@@ -60,6 +71,10 @@ function argo_feature_demo(string $key): string
         case 'predictive': argo_feature_demo_predictive(); break;
         case 'inventory': argo_feature_demo_inventory(); break;
         case 'rental': argo_feature_demo_rental(); break;
+        case 'bank-import': argo_feature_demo_bank_import(); break;
+        case 'sheet-import': argo_feature_demo_sheet_import(); break;
+        case 'report': argo_feature_demo_report(); break;
+        case 'stripe': argo_feature_demo_stripe(); break;
     }
     return (string) ob_get_clean();
 }
@@ -649,5 +664,212 @@ function argo_feature_demo_rental(): void
         </div>
     </div>
 </div>
+    <?php
+}
+
+function argo_feature_demo_bank_import(): void
+{
+    ?>
+    <div class="tab-content-inner tab-content-inner--solo">
+        <div class="tab-content-visual">
+            <div class="feature-visual-card invoice-studio-card">
+                <div class="invoice-studio">
+                    <div class="invoice-window">
+                        <div class="app-topbar">
+                            <span class="app-brand"><img src="<?= argo_feature_demo_base() ?>resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-nav" aria-hidden="true">
+                                <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('receipt', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                            </div>
+                            <div class="app-content">
+                                <div class="app-page-title">Import Bank Statement</div>
+                                <div class="bk-stage" id="bankStage">
+                                    <div class="bk-file">
+                                        <span class="bk-file-ic"><?= svg_icon('bank', 15) ?></span>
+                                        <span class="bk-file-name">statement_july.csv</span>
+                                        <span class="bk-file-meta">42 transactions</span>
+                                    </div>
+                                    <div class="bk-rows">
+                                        <div class="bk-row" data-i="0"><span class="bk-desc">SQ *BLUE BOTTLE COFFEE</span><span class="bk-date">Jul 2</span><span class="bk-badge bk-new">New</span><span class="bk-amt exp">−$18.40</span></div>
+                                        <div class="bk-row" data-i="1"><span class="bk-desc">ACH DEPOSIT — CLIENT LTD</span><span class="bk-date">Jul 3</span><span class="bk-badge bk-matched">Matched</span><span class="bk-amt rev">+$1,250.00</span></div>
+                                        <div class="bk-row" data-i="2"><span class="bk-desc">STAPLES #1123</span><span class="bk-date">Jul 5</span><span class="bk-badge bk-matched">Matched</span><span class="bk-amt exp">−$64.20</span></div>
+                                        <div class="bk-row" data-i="3"><span class="bk-desc">VISA — ADOBE</span><span class="bk-date">Jul 6</span><span class="bk-badge bk-new">New</span><span class="bk-amt exp">−$29.99</span></div>
+                                        <div class="bk-row" data-i="4"><span class="bk-desc">E-TRANSFER — M. REYES</span><span class="bk-date">Jul 8</span><span class="bk-badge bk-new">New</span><span class="bk-amt rev">+$480.00</span></div>
+                                    </div>
+                                    <div class="bk-foot">
+                                        <span class="bk-count"><b id="bkNew">0</b> new, <b id="bkMatched">0</b> already recorded</span>
+                                        <span class="bk-go">Import</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+function argo_feature_demo_sheet_import(): void
+{
+    ?>
+    <div class="tab-content-inner tab-content-inner--solo">
+        <div class="tab-content-visual">
+            <div class="feature-visual-card invoice-studio-card">
+                <div class="invoice-studio">
+                    <div class="invoice-window">
+                        <div class="app-topbar">
+                            <span class="app-brand"><img src="<?= argo_feature_demo_base() ?>resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-nav" aria-hidden="true">
+                                <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('document', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                            </div>
+                            <div class="app-content">
+                                <div class="app-page-title">Import Spreadsheet</div>
+                                <div class="sh-stage" id="sheetStage">
+                                    <div class="sh-file">
+                                        <span class="sh-file-ic"><?= svg_icon('table', 15) ?></span>
+                                        <span class="sh-file-name">expenses_2026.xlsx</span>
+                                        <span class="sh-file-meta">Sheet 1</span>
+                                    </div>
+                                    <div class="sh-grid">
+                                        <div class="sh-head">
+                                            <div class="sh-col" data-i="0"><span class="sh-letter">A</span><span class="sh-name">Date</span><span class="sh-map">→ Date</span></div>
+                                            <div class="sh-col" data-i="1"><span class="sh-letter">B</span><span class="sh-name">Supplier</span><span class="sh-map">→ Vendor</span></div>
+                                            <div class="sh-col" data-i="2"><span class="sh-letter">C</span><span class="sh-name">Amount</span><span class="sh-map">→ Total</span></div>
+                                            <div class="sh-col" data-i="3"><span class="sh-letter">D</span><span class="sh-name">Notes</span><span class="sh-map">→ Category</span></div>
+                                        </div>
+                                            <div class="sh-row"><span class="sh-cell" data-i="0">03/11/2026</span><span class="sh-cell" data-i="1">Northside Hardware</span><span class="sh-cell" data-i="2">139.37</span><span class="sh-cell" data-i="3">materials</span></div>
+                                            <div class="sh-row"><span class="sh-cell" data-i="0">05/11/2026</span><span class="sh-cell" data-i="1">City Fuel</span><span class="sh-cell" data-i="2">82.10</span><span class="sh-cell" data-i="3">fuel</span></div>
+                                            <div class="sh-row"><span class="sh-cell" data-i="0">09/11/2026</span><span class="sh-cell" data-i="1">Paper Co</span><span class="sh-cell" data-i="2">41.55</span><span class="sh-cell" data-i="3">office</span></div>
+                                            <div class="sh-row"><span class="sh-cell" data-i="0">14/11/2026</span><span class="sh-cell" data-i="1">Northside Hardware</span><span class="sh-cell" data-i="2">206.80</span><span class="sh-cell" data-i="3">materials</span></div>
+                                    </div>
+                                    <div class="sh-foot"><span class="sh-status" id="shStatus">Reading columns…</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+function argo_feature_demo_report(): void
+{
+    ?>
+    <div class="tab-content-inner tab-content-inner--solo">
+        <div class="tab-content-visual">
+            <div class="feature-visual-card invoice-studio-card">
+                <div class="invoice-studio">
+                    <div class="invoice-window">
+                        <div class="app-topbar">
+                            <span class="app-brand"><img src="<?= argo_feature_demo_base() ?>resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-nav" aria-hidden="true">
+                                <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('credit-card', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                            </div>
+                            <div class="app-content">
+                                <div class="app-page-title">Reports</div>
+                                <div class="rp-stage" id="reportStage">
+                                    <div class="rp-types">
+                                        <span class="rp-type rp-type--on">Profit &amp; loss</span>
+                                        <span class="rp-type">Balance sheet</span>
+                                        <span class="rp-type">Expenses</span>
+                                    </div>
+                                    <div class="rp-sheet">
+                                        <div class="rp-head"><span>Jan – Jun 2026</span><span class="rp-head-note">All accounts</span></div>
+                                        <div class="rp-line " data-i="0"><span>Revenue</span><span class="rp-val">48,210.00</span></div>
+                                        <div class="rp-line " data-i="1"><span>Cost of goods</span><span class="rp-val">−19,884.00</span></div>
+                                        <div class="rp-line sub" data-i="2"><span>Gross profit</span><span class="rp-val">28,326.00</span></div>
+                                        <div class="rp-line " data-i="3"><span>Operating costs</span><span class="rp-val">−9,140.00</span></div>
+                                        <div class="rp-line total" data-i="4"><span>Net profit</span><span class="rp-val rp-net">0.00</span></div>
+                                    </div>
+                                    <div class="rp-foot"><span class="rp-exp" id="rpExport">Export PDF</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+function argo_feature_demo_stripe(): void
+{
+    ?>
+    <div class="tab-content-inner tab-content-inner--solo">
+        <div class="tab-content-visual">
+            <div class="feature-visual-card invoice-studio-card">
+                <div class="invoice-studio">
+                    <div class="invoice-window">
+                        <div class="app-topbar">
+                            <span class="app-brand"><img src="<?= argo_feature_demo_base() ?>resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-nav" aria-hidden="true">
+                                <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('credit-card', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                            </div>
+                            <div class="app-content">
+                                <div class="app-page-title">Payments</div>
+                                <div class="st-stage" id="stripeStage">
+                                    <div class="st-rows">
+                                        <div class="st-row" data-i="0"><span class="st-ic"><?= svg_icon('credit-card', 13) ?></span><span class="st-who"><b>Card payment</b><i>Sarah Miller · #INV-0042</i></span><span class="st-amt">+$1,234.00</span><span class="st-tick"><?= svg_icon('check', 13) ?></span></div>
+                                        <div class="st-row" data-i="1"><span class="st-ic"><?= svg_icon('credit-card', 13) ?></span><span class="st-who"><b>Card payment</b><i>Maple &amp; Co. · #INV-0043</i></span><span class="st-amt">+$480.00</span><span class="st-tick"><?= svg_icon('check', 13) ?></span></div>
+                                        <div class="st-row" data-i="2"><span class="st-ic"><?= svg_icon('credit-card', 13) ?></span><span class="st-who"><b>Card payment</b><i>J. Okafor · #INV-0044</i></span><span class="st-amt">+$612.50</span><span class="st-tick"><?= svg_icon('check', 13) ?></span></div>
+                                    </div>
+                                    <div class="st-payout">
+                                        <div class="st-payout-head"><span>Payout to your bank</span><span class="st-payout-badge">3 invoices</span></div>
+                                        <div class="st-payout-row"><span>Gross</span><span class="st-gross">$0.00</span></div>
+                                        <div class="st-payout-row"><span>Processing fees</span><span class="st-fee">−$0.00</span></div>
+                                        <div class="st-payout-row st-payout-net"><span>Net</span><span class="st-net">$0.00</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php
 }

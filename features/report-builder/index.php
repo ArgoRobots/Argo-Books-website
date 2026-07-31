@@ -2,6 +2,7 @@
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../partials/schema.php';
 require_once __DIR__ . '/../../partials/faq.php';
+require_once __DIR__ . '/../../partials/feature-demo.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
@@ -97,6 +98,8 @@ $faqs = [
     <title>Report Builder | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
+    <!-- Mockup animations, shared with the landing and comparison pages. -->
+    <script src="../../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
@@ -107,6 +110,7 @@ $faqs = [
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
     <link rel="stylesheet" href="../feature-page.css">
 </head>
 
@@ -136,12 +140,9 @@ $faqs = [
                     <p class="fp-hero-facts">Free plan, no credit card, and your reports are generated on your own computer.</p>
                 </div>
 
-                <div class="fp-hero-still">
-                    <img src="../../resources/images/features/report-designer.svg"
-                         alt="The Argo Books report designer, with report types and a balance sheet preview"
-                         width="600" height="500" fetchpriority="high">
+                <div class="fp-hero-demo" data-feature-demo="report">
+                    <?= argo_feature_demo('report') ?>
                 </div>
-            </div>
         </div>
     </section>
 

@@ -492,8 +492,18 @@ h3, h4, h5, h6 {
   transform: none;
 }
 
+/* The calendar is centred at 386px on the landing page. Clearing max-width is
+   not enough on its own: `margin: 0 auto` overrides the flex stretch and pins
+   it back to content width, so the auto margins have to go too. Day cells drop
+   their 1:1 ratio, which at full width would make the grid 460px tall. */
 .fp-hero-demo .rent-cal {
   max-width: none;
+  margin: 0;
+}
+
+.fp-hero-demo .rent-day {
+  aspect-ratio: auto;
+  height: 30px;
 }
 
 /* The invoicing demo ships interactive controls for the landing page. In a

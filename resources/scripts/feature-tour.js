@@ -143,6 +143,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'rental': animateRental(t); break;
                 case 'customers': animateCustomers(t); break;
                 case 'invoices': animateInvoices(t); break;
+                case 'bank-import': animateBankImport(t); break;
+                case 'sheet-import': animateSheetImport(t); break;
+                case 'report': animateReport(t); break;
+                case 'stripe': animateStripe(t); break;
             }
 
             activeTabAnimation = timeouts;
@@ -494,6 +498,152 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             apply();
         }
+
+        // --- Bank statement import -------------------------------------
+        function animateBankImport(t) {
+            const stage = document.getElementById('bankStage');
+            if (!stage) return;
+            const rows = stage.querySelectorAll('.bk-row');
+            const newEl = document.getElementById('bkNew');
+            const matEl = document.getElementById('bkMatched');
+
+            function run() {
+                stage.classList.remove('shown', 'done');
+                rows.forEach(r => r.classList.remove('in', 'tagged'));
+                if (newEl) newEl.textContent = '0';
+                if (matEl) matEl.textContent = '0';
+
+                t(() => stage.classList.add('shown'), 200);
+                rows.forEach((r, i) => {
+                    t(() => r.classList.add('in'), 600 + i * 190);
+                    // The badge lands after the row, so you see it being decided
+                    // rather than arriving pre-labelled.
+                    t(() => {
+                        r.classList.add('tagged');
+                        const isNew = r.querySelector('.bk-new');
+                        const el = isNew ? newEl : matEl;
+                        if (el) el.textContent = String(parseInt(el.textContent, 10) + 1);
+                    }, 900 + i * 190);
+                });
+                const end = 900 + rows.length * 190;
+                t(() => stage.classList.add('done'), end + 200);
+                t(run, end + 4600);
+            }
+            run();
+        }
+
+        // --- Spreadsheet import ---------------------------------------
+        function animateSheetImport(t) {
+            const stage = document.getElementById('sheetStage');
+            if (!stage) return;
+            const cols = stage.querySelectorAll('.sh-col');
+            const status = document.getElementById('shStatus');
+
+            function run() {
+                stage.classList.remove('shown', 'done');
+                cols.forEach(c => c.classList.remove('mapped'));
+                stage.querySelectorAll('.sh-cell').forEach(c => c.classList.remove('lit'));
+                if (status) status.textContent = 'Reading columns\u2026';
+
+                t(() => stage.classList.add('shown'), 200);
+                cols.forEach((col, i) => {
+                    t(() => {
+                        col.classList.add('mapped');
+                        // light the column body so the mapping reads as a column,
+                        // not just a header label
+                        stage.querySelectorAll('.sh-cell[data-i="' + i + '"]')
+                            .forEach(cell => cell.classList.add('lit'));
+                    }, 700 + i * 320);
+                });
+                const end = 700 + cols.length * 320;
+                t(() => {
+                    stage.classList.add('done');
+                    if (status) status.textContent = '4 columns matched \u00b7 128 rows ready to import';
+                }, end + 200);
+                t(run, end + 4400);
+            }
+            run();
+        }
+
+        // --- Report builder -------------------------------------------
+        function animateReport(t) {
+            const stage = document.getElementById('reportStage');
+            if (!stage) return;
+            const lines = stage.querySelectorAll('.rp-line');
+            const net = stage.querySelector('.rp-net');
+
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = (target * eased).toLocaleString('en-US', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    });
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
+            }
+
+            function run() {
+                stage.classList.remove('done');
+                lines.forEach(l => l.classList.remove('in'));
+                if (net) net.textContent = '0.00';
+
+                lines.forEach((l, i) => t(() => l.classList.add('in'), 350 + i * 260));
+                const end = 350 + lines.length * 260;
+                t(() => { if (net) countUp(net, 19186, 900); }, end);
+                t(() => stage.classList.add('done'), end + 700);
+                t(run, end + 4800);
+            }
+            run();
+        }
+
+        // --- Stripe payments ------------------------------------------
+        function animateStripe(t) {
+            const stage = document.getElementById('stripeStage');
+            if (!stage) return;
+            const rows = stage.querySelectorAll('.st-row');
+            const gross = stage.querySelector('.st-gross');
+            const fee = stage.querySelector('.st-fee');
+            const net = stage.querySelector('.st-net');
+
+            function money(el, target, duration, prefix) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.max(0, Math.min((now - start) / duration, 1));
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = prefix + (target * eased).toLocaleString('en-US', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    });
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
+            }
+
+            function run() {
+                stage.classList.remove('done');
+                rows.forEach(r => r.classList.remove('in', 'paid'));
+                if (gross) gross.textContent = '$0.00';
+                if (fee) fee.textContent = '\u2212$0.00';
+                if (net) net.textContent = '$0.00';
+
+                rows.forEach((r, i) => {
+                    t(() => r.classList.add('in'), 300 + i * 340);
+                    t(() => r.classList.add('paid'), 700 + i * 340);
+                });
+                const end = 700 + rows.length * 340;
+                t(() => {
+                    stage.classList.add('done');
+                    if (gross) money(gross, 2326.50, 800, '$');
+                    if (fee) money(fee, 70.77, 800, '\u2212$');
+                    if (net) money(net, 2255.73, 900, '$');
+                }, end + 250);
+                t(run, end + 5000);
+            }
+            run();
+        }
+
         initInvoiceStudio();
 
         // Standalone hero demo (feature pages): one panel, no tab bar, so kick

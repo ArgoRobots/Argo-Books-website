@@ -138,6 +138,29 @@
     $renewalFee = calculate_processing_fee($renewalBase);
     $renewalTotal = $renewalBase + $renewalFee;
 
+    // Both cycles' figures, computed here and handed to the page so the cycle
+    // switcher can update the summary without a reload. Every amount is
+    // server-computed: the browser only swaps pre-rendered strings, it never
+    // does money math, and process-subscription.php recomputes the charge from
+    // the posted billing cycle regardless ("never trust client amount").
+    $cycleFigures = [];
+    foreach (['monthly', 'yearly'] as $cyc) {
+        $cycBase  = ($cyc === 'yearly') ? $yearlyPrice : $monthlyPrice;
+        $cycFee   = calculate_processing_fee($cycBase);
+        $cycTotal = $cycBase + $cycFee;
+        $cycleFigures[$cyc] = [
+            'label'        => ucfirst($cyc),
+            'period'       => ($cyc === 'yearly') ? 'year' : 'month',
+            'base'         => $cycBase,
+            'fee'          => $cycFee,
+            'total'        => $cycTotal,
+            'baseDisplay'  => number_format($cycBase, 2),
+            'feeDisplay'   => number_format($cycFee, 2),
+            'totalDisplay' => number_format($cycTotal, 2),
+            'url'          => $checkout_url(['billing' => $cyc]),
+        ];
+    }
+
     // Cycle-switch refund disclosure banner: PayPal only. Stripe and
     // Square cycle switches are handled entirely by switch-billing-cycle-
     // ajax.php and never reach this checkout page; the banner below is
@@ -178,6 +201,9 @@
                 locationId: <?php echo json_encode($square_location_id, $je); ?>
             }
         };
+
+        // Pre-rendered figures for both cycles, so switching is a text swap.
+        window.CHECKOUT_CYCLES = <?php echo json_encode($cycleFigures, $je); ?>;
 
         window.AI_SUBSCRIPTION = {
             billing: <?php echo json_encode($billing, $je); ?>,
@@ -248,11 +274,15 @@
             // and letting it change here would desync the order summary from
             // what those flows are about to charge.
             if (!$is_changing_method && !$is_cycle_switch): ?>
+                <!-- Real hrefs so this works without JS; main.js intercepts and
+                     swaps the figures in place, same as the method picker. -->
                 <div class="cycle-switcher" role="group" aria-label="Billing cycle">
                     <a href="<?php echo htmlspecialchars($checkout_url(['billing' => 'monthly'])); ?>"
+                       data-cycle="monthly"
                        class="cycle-switcher-btn<?php echo $billing === 'monthly' ? ' active' : ''; ?>"
                        <?php echo $billing === 'monthly' ? 'aria-current="true"' : ''; ?>>Monthly</a>
                     <a href="<?php echo htmlspecialchars($checkout_url(['billing' => 'yearly'])); ?>"
+                       data-cycle="yearly"
                        class="cycle-switcher-btn<?php echo $billing === 'yearly' ? ' active' : ''; ?>"
                        <?php echo $billing === 'yearly' ? 'aria-current="true"' : ''; ?>>Annual</a>
                 </div>
@@ -261,23 +291,21 @@
             <div class="order-summary">
                 <h3>Order Summary</h3>
                 <div class="order-item">
-                    <span>Argo Premium (<?php echo ucfirst($billing); ?>)</span>
-                    <span>$<?php echo number_format($basePrice, 2); ?> CAD</span>
+                    <span>Argo Premium (<span data-cycle-label><?php echo ucfirst($billing); ?></span>)</span>
+                    <span>$<span data-cycle-base><?php echo number_format($basePrice, 2); ?></span> CAD</span>
                 </div>
-                <?php if ($feeToday > 0): ?>
-                <div class="order-item">
+                <div class="order-item" data-cycle-fee-row<?php echo $feeToday > 0 ? '' : ' style="display:none"'; ?>>
                     <span>Payment Processor Fee</span>
-                    <span>$<?php echo number_format($feeToday, 2); ?> CAD</span>
+                    <span>$<span data-cycle-fee><?php echo number_format($feeToday, 2); ?></span> CAD</span>
                 </div>
-                <?php endif; ?>
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$<?php echo number_format($totalToday, 2); ?> CAD/<?php echo $billingPeriod; ?></span>
+                    <span>$<span data-cycle-total><?php echo number_format($totalToday, 2); ?></span> CAD/<span data-cycle-period><?php echo $billingPeriod; ?></span></span>
                 </div>
             </div>
 
             <div class="subscription-notice">
-                <p>You will be charged $<?php echo number_format($totalToday, 2); ?> CAD today, then $<?php echo number_format($renewalTotal, 2); ?> CAD/<?php echo $billingPeriod; ?> on each renewal.</p>
+                <p>You will be charged $<span data-cycle-total><?php echo number_format($totalToday, 2); ?></span> CAD today, then $<span data-cycle-renewal><?php echo number_format($renewalTotal, 2); ?></span> CAD/<span data-cycle-period><?php echo $billingPeriod; ?></span> on each renewal.</p>
                 <p>Cancel anytime from your account settings.</p>
             </div>
 
@@ -333,6 +361,9 @@
                         <input type="email" id="email" name="email" class="form-control" required>
                     </div>
 
+                    <!-- No data-cycle spans here: main.js already rewrites this
+                         label's textContent on submit and on error, so the
+                         cycle switcher updates it the same way. -->
                     <button type="submit" id="stripe-submit-btn" class="checkout-btn ai-checkout-btn">
                         Subscribe - $<?php echo number_format($totalToday, 2); ?> CAD/<?php echo $billingPeriod; ?>
                     </button>

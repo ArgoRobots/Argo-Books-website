@@ -28,17 +28,13 @@
     padding: 10px 16px;
     border: none;
     background: transparent;
-    color: var(--gray-700);
+    color: var(--black);
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
     border-radius: 7px;
     transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
     white-space: nowrap;
-}
-
-.pcards-cycle-btn:hover:not(.active) {
-    color: var(--gray-900);
 }
 
 .pcards-cycle-btn.active {
@@ -59,14 +55,19 @@
 
 .pcards-cycle-btn:not(.active) .pcards-save {
     background: var(--gray-200);
-    color: var(--gray-700);
+    color: var(--black);
 }
 
 /* Card grid */
 .pcards-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    column-gap: 24px;
+    /* No row gap: with subgrid below, the card's internal rows ARE this grid's
+       rows, so any row-gap here would open a 24px hole between every row inside
+       the cards. Spacing between rows is set by margins on the card children.
+       The mobile breakpoint puts the row gap back for stacked cards. */
+    row-gap: 0;
     max-width: 800px;
     margin: 0 auto;
     /* Default `stretch` alignment: both cards match the taller one's height,
@@ -79,6 +80,7 @@
 @media (max-width: 768px) {
     .pcards-grid {
         grid-template-columns: 1fr;
+        row-gap: 24px;
         max-width: 450px;
     }
 }
@@ -107,6 +109,32 @@
     padding: 31px;
 }
 
+/* Row alignment across the two cards.
+   Each card exposes the same six children (name, pitch, price, CTA, list
+   lead-in, features) and adopts the grid's rows via subgrid, so a pitch that
+   wraps to three lines in one card lifts the matching row in the other and the
+   CTAs stay level. This replaces a hand-tuned min-height on .pcard-pitch, which
+   silently broke whenever the copy changed length.
+   Must come AFTER the .pcard flex rule above: @supports adds no specificity, so
+   a later `display: flex` would simply win. The flex layout remains the
+   fallback for browsers without subgrid, where the cards are still equal height
+   and only the CTAs can drift. */
+@supports (grid-template-rows: subgrid) {
+    @media (min-width: 769px) {
+        .pcards-grid {
+            /* name, pitch, price, CTA, lead-in, features */
+            grid-template-rows: auto auto auto auto auto 1fr;
+        }
+
+        .pcard {
+            display: grid;
+            grid-template-rows: subgrid;
+            grid-row: span 6;
+            row-gap: 0;
+        }
+    }
+}
+
 /* "Recommended" flag riding the top edge of the Premium card */
 .pcard-badge {
     position: absolute;
@@ -123,7 +151,7 @@
     white-space: nowrap;
 }
 
-.pcard-head {
+.pcard-price-block {
     margin-bottom: 24px;
 }
 
@@ -135,7 +163,7 @@
     margin: 0 0 16px;
     font-size: 1.15rem;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--black);
 }
 
 .pcard-chip {
@@ -143,7 +171,7 @@
     padding: 5px 10px;
     border-radius: 6px;
     background: var(--gray-200);
-    color: var(--gray-900);
+    color: var(--black);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -159,7 +187,7 @@
     margin: 0 0 24px;
     font-size: 0.95rem;
     line-height: 1.5;
-    color: var(--gray-700);
+    color: var(--black);
     min-height: 3em;
 }
 
@@ -209,14 +237,14 @@
 .pcard-currency {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--gray-900);
+    color: var(--black);
 }
 
 .pcard-number {
     font-size: 3rem;
     font-weight: 700;
     line-height: 1;
-    color: var(--gray-900);
+    color: var(--black);
 }
 
 .pcard-premium .pcard-currency,
@@ -227,7 +255,7 @@
 .pcard-period {
     font-size: 1.05rem;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--black);
 }
 
 .pcard-premium .pcard-period {
@@ -235,7 +263,7 @@
 }
 
 .pcard-strike {
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 0.95rem;
     font-weight: 500;
     text-decoration: line-through;
@@ -252,7 +280,7 @@
 
 .pcard-alt {
     font-size: 0.9rem;
-    color: var(--gray-600);
+    color: var(--black);
     font-weight: 500;
     margin: 6px 0 0;
 }
@@ -309,21 +337,21 @@
     color: var(--premium-600);
 }
 
+/* The Free card's counterpart to .pcard-plus. It has no lead-in text to show,
+   but it occupies the same grid row so both feature lists start level, and it
+   carries the divider the Free card would otherwise draw itself. Transparent
+   text rather than visibility:hidden, which would take the border with it. */
+.pcard-plus-spacer {
+    color: transparent;
+    border-top-color: var(--gray-200);
+}
+
 /* Features list */
 .pcard-features {
     list-style: none;
     padding: 0;
-    margin: 24px 0 0;
+    margin: 8px 0 0;
     flex: 1;
-}
-
-.pcard-free .pcard-features {
-    padding-top: 24px;
-    border-top: 1px solid var(--gray-200);
-}
-
-.pcard-premium .pcard-features {
-    margin-top: 8px;
 }
 
 .pcard-features li {
@@ -336,7 +364,7 @@
 }
 
 .pcard-features li svg {
-    color: var(--gray-500);
+    color: var(--black);
     flex-shrink: 0;
     margin-top: 1px;
 }
@@ -346,5 +374,5 @@
 }
 
 .pcard-features li span {
-    color: var(--gray-900);
+    color: var(--black);
 }

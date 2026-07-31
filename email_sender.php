@@ -869,13 +869,11 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
     $accessUntil = date('F j, Y', strtotime($endDate));
     $site_url = site_url();
 
-    $featureLabels = array_column(get_plan_features()['premium']['features'], 'label');
-    if (count($featureLabels) > 1) {
-        $lastFeature = array_pop($featureLabels);
-        $featureSentence = implode(', ', $featureLabels) . ', and ' . $lastFeature;
-    } else {
-        $featureSentence = $featureLabels[0];
-    }
+    // Rendered as a list, not a comma-joined sentence: the feature labels are
+    // written as short benefit phrases and several contain commas of their own,
+    // which turned the old run-on sentence into an unreadable string. This also
+    // matches the other Premium emails, which already use this helper.
+    $featureList = _premium_feature_list_items();
 
     $body = <<<HTML
         <h1>Subscription Cancelled</h1>
@@ -885,7 +883,8 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
             <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
         </div>
 
-        <p>After this date, Premium features including {$featureSentence} will no longer be available.</p>
+        <p>After this date, these Premium features will no longer be available:</p>
+        <ul>{$featureList}</ul>
 
         <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 

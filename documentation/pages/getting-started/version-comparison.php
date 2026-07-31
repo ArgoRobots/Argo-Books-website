@@ -5,10 +5,8 @@ $currentPage = 'version-comparison';
 $pageCategory = 'getting-started';
 
 require_once __DIR__ . '/../../../config/pricing.php';
-require_once __DIR__ . '/../../../resources/icons.php';
 
 $pricing = get_pricing_config();
-$plans = get_plan_features();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
@@ -25,46 +23,14 @@ include __DIR__ . '/../../docs-header.php';
                 version first</a> – you can always <a href="../../../pricing/" class="link">upgrade
                 later</a> when you need more features.</p>
 
-            <div class="version-cards">
-                <!-- Free Version -->
-                <div class="version-card">
-                    <div class="card-header">
-                        <h3 class="version-title">Free</h3>
-                        <p class="version-subtitle">Perfect for getting started</p>
-                        <div class="version-price">$0</div>
-                    </div>
-                    <ul class="feature-list">
-                        <?php foreach ($plans['free']['features'] as $feature): ?>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="../../../downloads/" class="btn btn-gray">Get Started for Free</a>
-                </div>
+            <p>The free version costs nothing and never expires. Premium is
+                $<?php echo number_format($monthlyPrice, 0); ?> CAD/month, or
+                $<?php echo number_format($yearlyPrice, 0); ?> CAD/year which saves you
+                $<?php echo number_format($yearlySavings, 0); ?>. See the
+                <a href="../../../pricing/" class="link">pricing page</a> for payment options and
+                billing questions.</p>
 
-                <!-- Premium Version -->
-                <div class="version-card premium">
-                    <div class="card-header">
-                        <h3 class="version-title">Premium</h3>
-                        <p class="version-subtitle">Unlock the full power of Argo Books</p>
-                        <div class="version-price">$<?php echo number_format($monthlyPrice, 0); ?> <span class="price-period">CAD/month</span></div>
-                        <p class="price-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
-                    </div>
-                    <ul class="feature-list">
-                        <?php foreach ($plans['premium']['features'] as $feature): ?>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="../../../pricing/premium/" class="btn btn-premium">Subscribe to Premium</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 3rem;">Feature Comparison</h2>
+            <h2>Feature Comparison</h2>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>

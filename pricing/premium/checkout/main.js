@@ -76,19 +76,100 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // The billing cycle switcher has to reload: the price, processing fee and
-  // totals are all computed server-side. Preserve scroll across it the same way
-  // the admin filter pills do, so it doesn't jump to the top either.
+  // Billing cycle switching, also without a reload. Every figure below was
+  // computed server-side into window.CHECKOUT_CYCLES; nothing here does money
+  // math, and process-subscription.php recomputes the real charge from the
+  // posted billing cycle anyway ("never trust client amount").
+  const CYCLES = window.CHECKOUT_CYCLES || {};
+
+  // The PayPal SDK is loaded with intent=subscription only when a plan ID
+  // exists for the cycle in play. If the two cycles disagree (one plan ID
+  // configured, the other not) the loaded SDK is wrong for the target cycle and
+  // the buttons cannot simply be re-rendered, so fall back to a reload.
+  function paypalSubscriptionMode(cycle) {
+    const cfg = window.PAYMENT_CONFIG.paypal;
+    const planId = cycle === "yearly" ? cfg.yearlyPlanId : cfg.monthlyPlanId;
+    return !!(planId && planId.length > 0);
+  }
+
+  function applyCycle(cycle, href) {
+    const figures = CYCLES[cycle];
+    if (!figures || cycle === subscription.billing) {
+      return false;
+    }
+
+    // PayPal binds its plan ID at render time, so its buttons must be rebuilt
+    // for the new cycle. setupPayPalCheckout() re-renders in place once the SDK
+    // is loaded (it early-returns past the script injection), but it cannot
+    // change the SDK's intent, hence the mode check.
+    const paypalActive = subscription.method === "paypal";
+    if (paypalActive && paypalSubscriptionMode(cycle) !== paypalSubscriptionMode(subscription.billing)) {
+      window.location.href = href;
+      return true;
+    }
+
+    subscription.billing = cycle;
+    subscription.basePrice = figures.base;
+    subscription.finalPrice = figures.base;
+    subscription.processingFee = figures.fee;
+    subscription.totalCharge = figures.total;
+
+    const setAll = (attr, value) => {
+      document.querySelectorAll("[" + attr + "]").forEach((el) => {
+        el.textContent = value;
+      });
+    };
+    setAll("data-cycle-label", figures.label);
+    setAll("data-cycle-base", figures.baseDisplay);
+    setAll("data-cycle-fee", figures.feeDisplay);
+    setAll("data-cycle-total", figures.totalDisplay);
+    setAll("data-cycle-renewal", figures.totalDisplay);
+    setAll("data-cycle-period", figures.period);
+
+    document.querySelectorAll("[data-cycle-fee-row]").forEach((row) => {
+      row.style.display = figures.fee > 0 ? "" : "none";
+    });
+
+    // Submit button labels are owned by JS (it rewrites them on submit and on
+    // error), so they get set here rather than via data-cycle spans. Square's
+    // button is built by setupSquareCheckout and would otherwise keep the
+    // amount it was rendered with.
+    const submitLabel = subscription.isMonthlyWithCredit
+      ? "Subscribe - $0.00 Today (Credit Applied)"
+      : "Subscribe - $" + figures.totalDisplay + " CAD/" + figures.period;
+    ["stripe-submit-btn", "square-submit-btn"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.textContent = submitLabel;
+      }
+    });
+
+    document.querySelectorAll(".cycle-switcher-btn").forEach((btn) => {
+      const isActive = btn.dataset.cycle === cycle;
+      btn.classList.toggle("active", isActive);
+      if (isActive) {
+        btn.setAttribute("aria-current", "true");
+      } else {
+        btn.removeAttribute("aria-current");
+      }
+    });
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("billing", cycle);
+    history.replaceState(null, "", url);
+
+    if (paypalActive) {
+      setupPayPalCheckout();
+    }
+    return false;
+  }
+
   document.querySelectorAll(".cycle-switcher-btn").forEach((link) => {
-    link.addEventListener("click", function () {
-      sessionStorage.setItem("checkoutScrollPosition", String(window.scrollY));
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      applyCycle(this.dataset.cycle, this.href);
     });
   });
-  const savedScroll = sessionStorage.getItem("checkoutScrollPosition");
-  if (savedScroll !== null) {
-    sessionStorage.removeItem("checkoutScrollPosition");
-    window.scrollTo(0, parseInt(savedScroll, 10) || 0);
-  }
 
   // PHP always resolves a method (Stripe unless the URL or the cycle-switch
   // flow says otherwise), so this normally mounts the preselected form on load.

@@ -1,24 +1,41 @@
 {
+    "_comment": [
+        "Feature labels shown on the pricing cards, the home page, the compare and",
+        "industry pages, Premium email, and the desktop app's upgrade modal.",
+        "",
+        "Keep each label under ~45 characters. The desktop app renders them in a",
+        "fixed 340px plan card whose TextBlock has no TextWrapping set, so longer",
+        "strings are clipped there even though the website wraps them fine.",
+        "",
+        "{placeholder} tokens are substituted from config/pricing.php in",
+        "get_plan_features(), and work in 'label' as well as the optional 'detail'.",
+        "Numbers are written into the sentence rather than tacked on as a detail so",
+        "the lines read as benefits instead of a spec sheet.",
+        "",
+        "Labels are translation keys in the desktop app (PlanFeature.DisplayText",
+        "calls .Translate()), so changing one means re-running the translation",
+        "generator, which pulls these strings from /api/pricing/plans.php."
+    ],
     "free": {
         "features": [
-            {"label": "All core features"},
-            {"label": "Real-time analytics"},
-            {"label": "Receipt management"},
-            {"label": "Invoices & payments", "detail": "{free_invoice_monthly_limit}/month"},
-            {"label": "AI receipt scanning", "detail": "{free_receipt_scan_monthly_limit}/month"},
-            {"label": "AI spreadsheet import", "detail": "{ai_import_monthly_limit}/month"},
-            {"label": "AI bank statement import", "detail": "{bank_import_monthly_limit}/month"}
+            {"label": "Unlimited products, customers, and sales"},
+            {"label": "See your numbers update in real time"},
+            {"label": "Keep every receipt in one place"},
+            {"label": "Send {free_invoice_monthly_limit} invoices a month"},
+            {"label": "Scan {free_receipt_scan_monthly_limit} receipts a month, no typing"},
+            {"label": "Import {ai_import_monthly_limit} spreadsheets a month"},
+            {"label": "Import {bank_import_monthly_limit} bank statements a month"}
         ]
     },
     "premium": {
         "features": [
-            {"label": "Invoices & payments", "detail": "Unlimited"},
-            {"label": "AI receipt scanning", "detail": "{receipt_scan_monthly_limit}/month"},
-            {"label": "AI spreadsheet import", "detail": "{premium_ai_import_monthly_limit}/month"},
-            {"label": "AI bank statement import", "detail": "{premium_bank_import_monthly_limit}/month"},
-            {"label": "Predictive analytics"},
-            {"label": "Biometric login security"},
-            {"label": "Priority support"}
+            {"label": "Unlimited invoices and online payments"},
+            {"label": "Scan {receipt_scan_monthly_limit} receipts a month, no typing"},
+            {"label": "Import {premium_ai_import_monthly_limit} spreadsheets a month"},
+            {"label": "Import {premium_bank_import_monthly_limit} bank statements a month"},
+            {"label": "Forecast revenue and spot trends early"},
+            {"label": "Sign in with your fingerprint or face"},
+            {"label": "Priority support when you need it"}
         ]
     }
 }

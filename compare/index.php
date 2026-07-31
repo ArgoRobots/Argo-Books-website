@@ -13,6 +13,12 @@ $comparisons = [
     ['slug' => 'honeybook',  'name' => 'HoneyBook',  'hook' => 'Argo keeps your actual books; HoneyBook just books clients and invoices.'],
     ['slug' => 'sage',       'name' => 'Sage',       'hook' => 'A fraction of Sage 50\'s price, modern and cross-platform, minus the complexity.'],
     ['slug' => 'zoho-books', 'name' => 'Zoho Books', 'hook' => 'Desktop, offline, and standalone, without getting pulled into Zoho\'s cloud suite.'],
+    ['slug' => 'invoice2go', 'name' => 'Invoice2Go', 'hook' => 'No invoice caps, and the whole books rather than just the billing.'],
+    ['slug' => 'square-invoices', 'name' => 'Square Invoices', 'hook' => 'Both free to start; Argo also tracks expenses, stock and reports.'],
+    ['slug' => 'manager', 'name' => 'Manager.io', 'hook' => 'Local data on both sides, without needing to know double-entry.'],
+    ['slug' => 'bonsai', 'name' => 'Bonsai', 'hook' => "One flat price instead of Bonsai's per-user billing."],
+    ['slug' => 'gnucash', 'name' => 'GnuCash', 'hook' => 'Local data on both sides, without needing an accounting background.'],
+    ['slug' => 'spreadsheet', 'name' => 'Spreadsheets', 'hook' => 'For when Excel stops being enough. Import your file and keep the history.'],
 ];
 ?>
 <!DOCTYPE html>

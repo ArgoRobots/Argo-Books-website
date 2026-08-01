@@ -95,7 +95,7 @@ $pricing = get_pricing_config();
         <div class="version-grid">
 
             <!-- Version 2.0.11 -->
-            <div class="version-card">
+            <!-- <div class="version-card">
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.11</span>
@@ -120,15 +120,19 @@ $pricing = get_pricing_config();
                                 <li><strong>Setup starts with a receipt scan:</strong> The getting-started guide now begins by scanning a sample receipt, so you can see what Argo Books does within seconds of opening it for the first time.</li>
                                 <li><strong>Better with long receipts:</strong> Receipt scanning now handles longer, more detailed receipts with many line items.</li>
                                 <li><strong>Clearer settings layout:</strong> Settings tabs have moved to the side, so all the sections are visible at once.</li>
+                                <li><strong>Text in dark theme</strong> The text in dark theme is now white instead of gray, improving contrast and making it easier to read.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
-                            <h4 class="section-label fix">Fixes &amp; Improvements</h4>
-                            <p class="changelog-intro">Working in several company files side by side is smoother, dark theme is easier to read throughout, and there is the usual round of polish and performance work across the app.</p>
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Multiple company workflows:</strong> Working in several company files side by side in different instances of the app is smoother.</li>
+                                <li>The usual round of polish and performance work across the app.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Version 2.0.10 -->
             <div class="version-card">

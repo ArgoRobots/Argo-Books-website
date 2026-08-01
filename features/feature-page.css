@@ -190,6 +190,10 @@ h3, h4, h5, h6 {
    phrase, and no row of big numbers under it.
    ============================================================ */
 .fp-hero {
+  /* The for- pages also load for/style.css, whose .hero centres its text. This
+     hero is a split layout, so it sets its own alignment rather than inheriting
+     whichever stylesheet happens to load last. */
+  text-align: left;
   position: relative;
   background: linear-gradient(150deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
   color: var(--white);

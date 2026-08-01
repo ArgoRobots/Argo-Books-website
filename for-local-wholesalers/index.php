@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../partials/faq.php';
+require_once __DIR__ . '/../partials/feature-demo.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -118,9 +119,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <title>Argo Books for Local Wholesalers: Inventory, Net-30, and Standing Orders</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <!-- Drives the mockup in the hero. -->
+    <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
+    <link rel="stylesheet" href="../features/feature-page.css">
     <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
@@ -141,24 +147,29 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     </header>
     <main>
 
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Accounting software for local wholesalers</h1>
-            <p class="hero-subtitle animate-fade-in">Built for net-30 invoicing, standing orders, and the inventory that has to be on the truck Tuesday morning. Inventory management is included, not an upsell.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
-                    <span>Download Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="#features" class="btn-cta btn-cta-outline">
-                    <span>See What's Included</span>
-                </a>
+    <!-- Hero. Split, with the live mockup beside the copy rather than centred
+         text on a gradient. Same demo markup and loop the landing page uses. -->
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Accounting software for local wholesalers</h1>
+                    <p class="fp-hero-sub">Built for net-30 invoicing, standing orders, and the inventory that has to be on the truck Tuesday morning. Inventory management is included, not an upsell.</p>
+                    <div class="fp-hero-act">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="fp-btn fp-btn-primary js-direct-download">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="#features" class="fp-textlink">See What's Included</a>
+                    </div>
+                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="inventory">
+                    <?= argo_feature_demo('inventory') ?>
+                </div>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
 
@@ -168,46 +179,41 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
     </div>
 
-    <section class="made-for-intro">
+    <section id="features" class="feature-blocks">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Made for Local Wholesalers</span>
                 <h2>Stock on the truck, money in the bank</h2>
                 <p class="section-desc">A wholesale business is the case of stock on the truck, the customer who promised to pay next week, and the receivables report that tells you whether they actually did. Whether you supply restaurants, retail shops, salons, or specialty stores, the work that pays the bills is the standing order delivered on time and the invoice that gets paid by the due date.</p>
             </div>
-        </div>
-    </section>
-
-    <section id="features" class="feature-blocks">
-        <div class="container">
-            <div class="feature-block-grid">
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon">
-                        <?= svg_icon('package', 28, '', 1.5) ?>
+            <div class="fp-benefits">
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('package', 20) ?>
                     </div>
                     <h3>Inventory and reorder points, built in</h3>
                     <p>Track stock levels for every SKU, set a reorder point on the items that move, and Argo Books flags what's running low before the standing customer calls asking. Receive new stock, log it against the supplier, and the inventory and the books update together.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon green">
-                        <?= svg_icon('calendar', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('calendar', 20) ?>
                     </div>
                     <h3>Net-30, net-60, and standing orders</h3>
                     <p>Set payment terms when you send the invoice. The due date is calculated, the receivables report shows what's overdue versus what's still inside its window, and standing orders generate themselves on schedule so nothing slips because a regular customer was off your radar this week.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon purple">
-                        <?= svg_icon('receipt-scan-detail', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('receipt-scan-detail', 20) ?>
                     </div>
                     <h3>Snap a receipt from the manufacturer or the freight bill</h3>
                     <p>Take a photo of the supplier invoice or the freight bill when stock comes in. Argo Books pulls the vendor, date, and amount automatically. Tag it Inventory Purchase, Freight, or Returns so the cost-of-goods picture lines up with what you actually paid.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon amber">
-                        <?= svg_icon('shield-check', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works offline, free tier covers small distributors</h3>
                     <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed in the warehouse or on the route, no monthly subscription climbing every year, no website to load when you're packing a truck. The free tier covers most small distributors forever.</p>
@@ -216,45 +222,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </div>
     </section>
 
-    <section class="screenshot-strip">
+    <section class="honest-take">
         <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">In the App</span>
-                <h2>What it actually looks like</h2>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of inventory dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/inventory-dashboard.svg" alt="The Argo Books inventory dashboard showing stock levels, reorder points, and movement">
+            <div class="honest-card animate-on-scroll">
+                <div class="honest-icon">
+                    <?= svg_icon('info', 28) ?>
                 </div>
-                <p class="screenshot-caption">Inventory dashboard with stock levels and reorder points.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of net-30 invoice. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/invoice-preview.svg" alt="A net-30 wholesale invoice in Argo Books with line items and terms">
-                </div>
-                <p class="screenshot-caption">A net-30 wholesale invoice with the line items priced per case.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of main dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/dashboard.webp" alt="The Argo Books dashboard showing revenue, expenses, and outstanding receivables">
-                </div>
-                <p class="screenshot-caption">Your dashboard with revenue, expenses, and what's overdue.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="honest-take-alt">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">An Honest Take</span>
-                <h2>What Argo Books isn't</h2>
-                <p class="section-desc">Argo Books handles inventory, customer accounts, net-30 invoicing, and standing orders for local-scale wholesale. It is not a warehouse management system, it does not do Electronic Data Interchange with national retail chains, and it does not optimize delivery routes. If you sell into Walmart, Loblaws, or Sysco-scale customers, NetSuite, Cin7, or Unleashed are built for that and Argo Books is not the right fit. It also doesn't do payroll yet. For local distributors with dozens of small accounts, Argo Books is the right size. Free desktop app, inventory built in, books stay simple.</p>
+                <h3>What Argo Books isn't</h3>
+                <p>Argo Books handles inventory, customer accounts, net-30 invoicing, and standing orders for local-scale wholesale. It is not a warehouse management system, it does not do Electronic Data Interchange with national retail chains, and it does not optimize delivery routes. If you sell into Walmart, Loblaws, or Sysco-scale customers, NetSuite, Cin7, or Unleashed are built for that and Argo Books is not the right fit. It also doesn't do payroll yet. For local distributors with dozens of small accounts, Argo Books is the right size. Free desktop app, inventory built in, books stay simple.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -270,49 +245,42 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <h2>Start free, upgrade only if you need more</h2>
                 <p class="pricing-strip-intro">Most local distributors stay on the free tier. Premium adds predictive analytics for stock and cashflow planning, unlimited invoicing for larger account loads, and priority support.</p>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Free</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Premium</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD / month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <?php
+            // The real cards, the same ones the landing and pricing pages use.
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
+        </div>
+    </section>
+
+    <!-- The for- pages did not link to each other, which wastes the internal
+         linking they exist to earn. -->
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c animate-on-scroll">
+                <div class="fp-eyebrow fp-eyebrow-c">More trades</div>
+                <h2 class="fp-h2">Argo Books for your line of work</h2>
+            </div>
+            <div class="fp-related animate-on-scroll">
+                <a href="../for-resellers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('tag', 20) ?></div>
+                    <h3>Resellers</h3>
+                    <p>Cost, margin and stock across everything you list.</p>
+                </a>
+                <a href="../for-repair-shops/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('wrench', 20) ?></div>
+                    <h3>Repair shops</h3>
+                    <p>Parts, labour and job history against the customer who booked it.</p>
+                </a>
+                <a href="../for-rental-businesses/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('calendar', 20) ?></div>
+                    <h3>Rental businesses</h3>
+                    <p>Bookings, availability and returns on one calendar.</p>
+                </a>
+                <a href="../for-software-companies/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('code-window', 20) ?></div>
+                    <h3>Software companies</h3>
+                    <p>Subscriptions, contractor costs and runway.</p>
+                </a>
             </div>
         </div>
     </section>

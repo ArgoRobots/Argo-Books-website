@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../partials/faq.php';
+require_once __DIR__ . '/../partials/feature-demo.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -118,9 +119,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <title>Argo Books for Repair Shops: Parts, Labor, and the Books, Together</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <!-- Drives the mockup in the hero. -->
+    <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
+    <link rel="stylesheet" href="../features/feature-page.css">
     <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
@@ -141,24 +147,29 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     </header>
     <main>
 
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Accounting software for repair shops</h1>
-            <p class="hero-subtitle animate-fade-in">Built for the way you actually bill: the diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
-                    <span>Download Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="#features" class="btn-cta btn-cta-outline">
-                    <span>See What's Included</span>
-                </a>
+    <!-- Hero. Split, with the live mockup beside the copy rather than centred
+         text on a gradient. Same demo markup and loop the landing page uses. -->
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Accounting software for repair shops</h1>
+                    <p class="fp-hero-sub">Built for the way you actually bill: the diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.</p>
+                    <div class="fp-hero-act">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="fp-btn fp-btn-primary js-direct-download">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="#features" class="fp-textlink">See What's Included</a>
+                    </div>
+                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="customers">
+                    <?= argo_feature_demo('customers') ?>
+                </div>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
 
@@ -168,46 +179,41 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
     </div>
 
-    <section class="made-for-intro">
+    <section id="features" class="feature-blocks">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Made for Repair Shops</span>
                 <h2>Diagnostic fee, parts, labor, paid</h2>
                 <p class="section-desc">A repair invoice is the diagnostic fee, the labor at your shop rate, the parts at your markup, and sometimes a deposit before the part even leaves the supplier. Whether you fix cars, appliances, small engines, or electronics, Argo Books handles the books so you can stay at the bench.</p>
             </div>
-        </div>
-    </section>
-
-    <section id="features" class="feature-blocks">
-        <div class="container">
-            <div class="feature-block-grid">
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon">
-                        <?= svg_icon('document-lines', 28, '', 1.5) ?>
+            <div class="fp-benefits">
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('document-lines', 20) ?>
                     </div>
                     <h3>Diagnostic fee, parts, and labor on one clean invoice</h3>
                     <p>Itemize the diagnostic fee, each part at the price the customer pays, and labor in hours at your shop rate. The customer sees exactly what they paid for, which cuts the awkward conversation at pickup down to a thank-you and a card swipe.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon green">
-                        <?= svg_icon('receipt-scan-detail', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('receipt-scan-detail', 20) ?>
                     </div>
                     <h3>Snap a receipt from the parts supplier or hardware store</h3>
                     <p>Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Parts, Shop Supplies, Tools, or Fluids so when you actually look at margins next quarter, the numbers are sitting where you put them.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon purple">
-                        <?= svg_icon('shield-check', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works offline at the bench, your data stays on your computer</h3>
                     <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed to log a repair or build an invoice, no monthly subscription climbing every year, no website timing out when the shop wifi flakes. The free tier covers most one- and two-person shops forever.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon amber">
-                        <?= svg_icon('credit-card', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('credit-card', 20) ?>
                     </div>
                     <h3>Get paid before the customer drives off</h3>
                     <p>Hand over the keys, swipe the card through Stripe or Square, and the invoice is marked paid. Or email the invoice on the spot and the customer can pay from the parking lot. Either way, you don't carry the balance home.</p>
@@ -216,45 +222,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </div>
     </section>
 
-    <section class="screenshot-strip">
+    <section class="honest-take">
         <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">In the App</span>
-                <h2>What it actually looks like</h2>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of repair invoice showing diagnostic fee + parts + labor lines. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/invoice-preview.svg" alt="A repair shop invoice showing diagnostic fee, parts, and labor on separate lines">
+            <div class="honest-card animate-on-scroll">
+                <div class="honest-icon">
+                    <?= svg_icon('info', 28) ?>
                 </div>
-                <p class="screenshot-caption">A repair invoice with the diagnostic fee, parts, and labor itemized.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of receipt-scan UI on a parts-supplier receipt. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/ai-receipt-scanner.webp" alt="The Argo Books receipt scanner extracting fields from a parts-supplier receipt">
-                </div>
-                <p class="screenshot-caption">A receipt from the parts supplier scanned and tagged.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of main dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/dashboard.webp" alt="The Argo Books dashboard showing revenue, expenses, and outstanding invoices">
-                </div>
-                <p class="screenshot-caption">Your dashboard with revenue, expenses, and what's still owed.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="honest-take-alt">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">An Honest Take</span>
-                <h2>What Argo Books isn't</h2>
-                <p class="section-desc">Argo Books is bookkeeping software, not shop management software. It does not run a work-order queue, send pickup-ready texts to customers, or look up labor times from a VIN. If you need Shopmonkey, Tekmetric, or RepairShopr for the front-of-shop workflow, run them side by side: those for the queue, Argo Books for your books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
+                <h3>What Argo Books isn't</h3>
+                <p>Argo Books is bookkeeping software, not shop management software. It does not run a work-order queue, send pickup-ready texts to customers, or look up labor times from a VIN. If you need Shopmonkey, Tekmetric, or RepairShopr for the front-of-shop workflow, run them side by side: those for the queue, Argo Books for your books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -270,49 +245,42 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <h2>Start free, upgrade only if you need more</h2>
                 <p class="pricing-strip-intro">Most one- and two-person shops stay on the free tier. Premium adds predictive analytics for slow-season planning, unlimited invoicing, and priority support.</p>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Free</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Premium</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD / month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <?php
+            // The real cards, the same ones the landing and pricing pages use.
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
+        </div>
+    </section>
+
+    <!-- The for- pages did not link to each other, which wastes the internal
+         linking they exist to earn. -->
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c animate-on-scroll">
+                <div class="fp-eyebrow fp-eyebrow-c">More trades</div>
+                <h2 class="fp-h2">Argo Books for your line of work</h2>
+            </div>
+            <div class="fp-related animate-on-scroll">
+                <a href="../for-auto-detailing/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('car', 20) ?></div>
+                    <h3>Auto detailing</h3>
+                    <p>Per-vehicle jobs, products used, and repeat customers.</p>
+                </a>
+                <a href="../for-contractors/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('hard-hat', 20) ?></div>
+                    <h3>Contractors</h3>
+                    <p>Deposits, mid-job draws, materials and change orders.</p>
+                </a>
+                <a href="../for-local-wholesalers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('truck', 20) ?></div>
+                    <h3>Local wholesalers</h3>
+                    <p>Stock, supplier orders and trade accounts on terms.</p>
+                </a>
+                <a href="../for-solo-operators/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('user', 20) ?></div>
+                    <h3>Solo operators</h3>
+                    <p>One person, one price, books that need no bookkeeper.</p>
+                </a>
             </div>
         </div>
     </section>

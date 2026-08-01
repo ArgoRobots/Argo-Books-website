@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../partials/faq.php';
+require_once __DIR__ . '/../partials/feature-demo.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -118,9 +119,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <title>Argo Books for Contractors: Bookkeeping Built for Progress Billing</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <!-- Drives the invoicing mockup in the hero. -->
+    <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
+    <link rel="stylesheet" href="../features/feature-page.css">
     <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
@@ -141,24 +147,30 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     </header>
     <main>
 
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Accounting software for contractors</h1>
-            <p class="hero-subtitle animate-fade-in">Built for progress billing: deposits, mid-job draws, materials, and change orders, without the bookkeeping headache.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
-                    <span>Download Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="#features" class="btn-cta btn-cta-outline">
-                    <span>See What's Included</span>
-                </a>
+    <!-- Hero. Split, with the live invoicing mockup beside the copy rather
+         than centred text on a gradient. The demo markup and its loop are the
+         same ones the landing page and feature pages use. -->
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Accounting software<br>for contractors</h1>
+                    <p class="fp-hero-sub">Built for progress billing: deposits, mid-job draws, materials, and change orders, without the bookkeeping headache.</p>
+                    <div class="fp-hero-act">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="fp-btn fp-btn-primary js-direct-download">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="#features" class="fp-textlink">See what's included</a>
+                    </div>
+                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card, and your books stay on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="invoices">
+                    <?= argo_feature_demo('invoices') ?>
+                </div>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
 
@@ -168,46 +180,41 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
     </div>
 
-    <section class="made-for-intro">
+    <section id="features" class="feature-blocks">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Made for Contractors</span>
                 <h2>Built for the way contractors actually get paid</h2>
                 <p class="section-desc">A contractor invoice isn't one number on one piece of paper. It's a deposit before any work starts, a draw when the framing is up or the rough-in is done, change orders the homeowner asked for after the bid, materials at cost or with a markup, and a final balance with the deposit and draws already credited. Argo Books handles the books so you can stay on the tools.</p>
             </div>
-        </div>
-    </section>
-
-    <section id="features" class="feature-blocks">
-        <div class="container">
-            <div class="feature-block-grid">
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon">
-                        <?= svg_icon('clipboard-check', 28, '', 1.5) ?>
+            <div class="fp-benefits">
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('clipboard-check', 20) ?>
                     </div>
                     <h3>Bill a deposit, a mid-job draw, and a final balance</h3>
                     <p>Send a deposit invoice before the first day, a draw invoice when framing or rough-in is signed off, and a final balance with the deposit and draws already credited. Argo Books tracks what's been paid on each, so the closing balance is exactly what's still owed.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon green">
-                        <?= svg_icon('receipt-scan-detail', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('receipt-scan-detail', 20) ?>
                     </div>
                     <h3>Snap a receipt from Home Depot, the lumber yard, or the supply house</h3>
                     <p>Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Materials, Subcontractor, Equipment Rental, or Permit so when the customer asks for an itemized statement, you can answer in two minutes instead of two hours.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon purple">
-                        <?= svg_icon('shield-check', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works without internet, your data stays on your computer</h3>
                     <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed at the job trailer, no monthly subscription climbing every year, no website to log into when the cell signal cuts out. The free tier covers most solo contractors and small crews forever.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon amber">
-                        <?= svg_icon('bolt', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('bolt', 20) ?>
                     </div>
                     <h3>Send the final invoice the day you wrap</h3>
                     <p>Walk through with the customer, open Argo Books, and send the final invoice before you pack the truck. Customers can pay through Stripe or Square, so the balance can clear before the deposit on the next job needs to land.</p>
@@ -216,45 +223,15 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </div>
     </section>
 
-    <section class="screenshot-strip">
+    <section class="honest-take">
         <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">In the App</span>
-                <h2>What it actually looks like</h2>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of progress-billing invoice showing deposit + draws + final balance. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/invoice-preview.svg" alt="A contractor invoice showing a deposit, mid-job draw, and final balance">
+            <div class="honest-card animate-on-scroll">
+                <div class="honest-icon">
+                    <?= svg_icon('info', 28) ?>
                 </div>
-                <p class="screenshot-caption">A contractor invoice with the deposit and draw already credited.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of receipt-scan UI on a supply-house receipt. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/ai-receipt-scanner.webp" alt="The Argo Books receipt scanner extracting fields from a supply-house receipt">
-                </div>
-                <p class="screenshot-caption">A receipt from the supply house scanned and tagged in seconds.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of main dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/dashboard.webp" alt="The Argo Books dashboard showing revenue, expenses, and outstanding invoices">
-                </div>
-                <p class="screenshot-caption">Your dashboard with revenue, expenses, and what's outstanding.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="honest-take-alt">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">An Honest Take</span>
-                <h2>What Argo Books isn't</h2>
-                <p class="section-desc">Argo Books is bookkeeping software, not construction-management software. It does not do job costing per project, crew scheduling, or bid and estimating. If you're trying to replace Buildertrend, CoConstruct, or QuickBooks Contractor for those, run them side by side: those for the project, Argo Books for your books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
+                <h3>What Argo Books isn't</h3>
+                <p>Argo Books is bookkeeping software, not construction-management software. It does not do job costing per project, crew scheduling, or bid and estimating. If you're trying to replace Buildertrend, CoConstruct, or QuickBooks Contractor for those, run them side by side: those for the project, Argo Books for your books.</p>
+                <p>It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -270,49 +247,43 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <h2>Start free, upgrade only if you need more</h2>
                 <p class="pricing-strip-intro">Most solo contractors and small crews stay on the free tier. Premium adds predictive analytics for cashflow planning between jobs, unlimited invoicing, and priority support.</p>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Free</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Premium</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD / month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <?php
+            // The real cards, the same ones the landing and pricing pages use,
+            // so a retheme there carries here instead of drifting.
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
+        </div>
+    </section>
+
+    <!-- The ten for- pages did not link to each other at all, which wastes the
+         internal linking these pages exist to earn. -->
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c animate-on-scroll">
+                <div class="fp-eyebrow fp-eyebrow-c">Other trades</div>
+                <h2 class="fp-h2">Argo Books for your line of work</h2>
+            </div>
+            <div class="fp-related animate-on-scroll">
+                <a href="../for-landscapers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('leaf', 20) ?></div>
+                    <h3>Landscapers</h3>
+                    <p>Seasonal cash flow, materials at cost, and recurring maintenance billing.</p>
+                </a>
+                <a href="../for-repair-shops/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('wrench', 20) ?></div>
+                    <h3>Repair shops</h3>
+                    <p>Parts, labour and job history tracked against the customer who booked it.</p>
+                </a>
+                <a href="../for-cleaning-companies/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('spray-bottle', 20) ?></div>
+                    <h3>Cleaning companies</h3>
+                    <p>Recurring invoices, supplies, and staff costs per contract.</p>
+                </a>
+                <a href="../for-solo-operators/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('user', 20) ?></div>
+                    <h3>Solo operators</h3>
+                    <p>One person, one price, and books that do not need a bookkeeper.</p>
+                </a>
             </div>
         </div>
     </section>

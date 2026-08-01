@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../partials/faq.php';
+require_once __DIR__ . '/../partials/feature-demo.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -128,9 +129,14 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
     <title>Argo Books for Software and SaaS Companies: Stripe Revenue Straight Into Your Books</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <!-- Drives the mockup in the hero. -->
+    <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
     <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
+    <link rel="stylesheet" href="../features/feature-page.css">
     <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
@@ -151,24 +157,29 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
     </header>
     <main>
 
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Accounting software for software and SaaS companies</h1>
-            <p class="hero-subtitle animate-fade-in">Your revenue already lives in Stripe. Connect it with a read-only key and Argo Books turns every charge into a proper book entry: sales, processing fees, tax, discounts, customers, and refunds.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
-                    <span>Download Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="#stripe" class="btn-cta btn-cta-outline">
-                    <span>See the Stripe Integration</span>
-                </a>
+    <!-- Hero. Split, with the live mockup beside the copy rather than centred
+         text on a gradient. Same demo markup and loop the landing page uses. -->
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Accounting software for software and SaaS companies</h1>
+                    <p class="fp-hero-sub">Your revenue already lives in Stripe. Connect it with a read-only key and Argo Books turns every charge into a proper book entry: sales, processing fees, tax, discounts, customers, and refunds.</p>
+                    <div class="fp-hero-act">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="fp-btn fp-btn-primary js-direct-download">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="#stripe" class="fp-textlink">See the Stripe Integration</a>
+                    </div>
+                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="expenses">
+                    <?= argo_feature_demo('expenses') ?>
+                </div>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
 
@@ -178,52 +189,47 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
         <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
     </div>
 
-    <section class="made-for-intro">
+    <section id="stripe" class="feature-blocks">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Made for Software Companies</span>
                 <h2>You built the product. The bookkeeping should not be the hard part</h2>
                 <p class="section-desc">Running a software business means your entire income statement is sitting in one place: Stripe. Hundreds of small charges, a processing fee on every one of them, refunds, tax on some of it, and a payout every few days that lands in your bank as a single lump sum. Most founders end up exporting a CSV every month and cleaning it up by hand. Argo Books reads it straight from Stripe instead, and it is the only free desktop accounting app that does.</p>
             </div>
-        </div>
-    </section>
-
-    <section id="stripe" class="feature-blocks">
-        <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The Stripe Integration</span>
                 <h2>Connect once with a read-only key</h2>
                 <p class="section-desc">Create a restricted key in your Stripe dashboard with read access to balance transactions, charges, and payouts. Paste it into Settings, Integrations. That is the whole setup. Argo can see your Stripe activity and can never move a dollar of it.</p>
             </div>
 
-            <div class="feature-block-grid">
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon">
-                        <?= svg_icon('code-window', 28, '', 1.5) ?>
+            <div class="fp-benefits">
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('code-window', 20) ?>
                     </div>
                     <h3>Every charge becomes a real book entry</h3>
                     <p>Not a lump sum. Each Stripe charge imports with the product name, the customer (created for you if they are new), the sales tax, and any discount you applied. Processing fees are recorded as expenses linked to the sale, so revenue stays gross and your margin is honest.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon green">
-                        <?= svg_icon('bank', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('bank', 20) ?>
                     </div>
                     <h3>Payouts that don't get counted twice</h3>
                     <p>Argo Books remembers every Stripe payout it has seen. When you import your bank statement later, the matching deposit is skipped instead of landing as a second copy of the same revenue. This is the mistake that quietly inflates a founder's numbers every year, and here it just doesn't happen.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon purple">
-                        <?= svg_icon('shield-check', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Read-only, reviewed, and undoable</h3>
                     <p>The key can only read. The sync is on demand, never automatic. Argo shows you a summary of the sales and fees it found and imports nothing until you confirm, and any sync can be undone in one step. You are never one wrong click away from a messy ledger.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon amber">
-                        <?= svg_icon('receipt-scan-detail', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('receipt-scan-detail', 20) ?>
                     </div>
                     <h3>The cost side of a software business</h3>
                     <p>Hosting, domains, API credits, error monitoring, design contractors, ad spend. Snap or drop in the receipt and Argo pulls the vendor, date, and amount automatically. Tag it once and your real cost base is sitting next to your Stripe revenue instead of scattered across a dozen inboxes.</p>
@@ -236,47 +242,14 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
         </div>
     </section>
 
-    <section class="screenshot-strip">
+    <section class="honest-take">
         <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">In the App</span>
-                <h2>What it actually looks like</h2>
-            </div>
-
-            <!-- Illustration, not a capture. Strings match the real flow: the Revenue-page
-                 banner text, the "Import from Stripe" dialog title, and its sales/fees
-                 message all come from RevenuePageViewModel / SettingsModalViewModel. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/stripe-sync-confirm.svg" alt="Argo Books showing new Stripe charges as revenue entries, with the Import from Stripe confirmation dialog listing total sales and fees">
+            <div class="honest-card animate-on-scroll">
+                <div class="honest-icon">
+                    <?= svg_icon('info', 28) ?>
                 </div>
-                <p class="screenshot-caption">Argo shows you the sales and fees it found. Nothing is imported until you confirm.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of a Stripe payout skipped during bank import. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/bank-statement-matching.svg" alt="Argo Books matching a bank deposit against a remembered Stripe payout">
-                </div>
-                <p class="screenshot-caption">Bank import recognizes the Stripe payout and skips the duplicate deposit.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of main dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/dashboard.webp" alt="The Argo Books dashboard showing revenue, expenses, and profit">
-                </div>
-                <p class="screenshot-caption">Revenue, expenses, and profit, updated as the sync lands.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="honest-take-alt">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">An Honest Take</span>
-                <h2>What Argo Books isn't</h2>
-                <p class="section-desc">Argo Books does the books, not the billing. Filter revenue to any date range for your monthly or yearly total, which is your MRR and ARR if you bill monthly only. It won't split a yearly prepayment over twelve months, so a month where someone pays up front looks unusually big, and it won't report churn. Stripe's dashboard covers both. Stripe also keeps handling plans, upgrades, and failed payments, and you click sync when you want new activity pulled in. What Argo does is turn a pile of Stripe charges into books you can hand to an accountant, free, on your own computer.</p>
+                <h3>What Argo Books isn't</h3>
+                <p>Argo Books does the books, not the billing. Filter revenue to any date range for your monthly or yearly total, which is your MRR and ARR if you bill monthly only. It won't split a yearly prepayment over twelve months, so a month where someone pays up front looks unusually big, and it won't report churn. Stripe's dashboard covers both. Stripe also keeps handling plans, upgrades, and failed payments, and you click sync when you want new activity pulled in. What Argo does is turn a pile of Stripe charges into books you can hand to an accountant, free, on your own computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -292,49 +265,42 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
                 <h2>Start free, upgrade only if you need more</h2>
                 <p class="pricing-strip-intro">The Stripe integration is part of the core app, not a paid tier. Premium adds predictive analytics for forecasting where revenue is heading, unlimited invoicing for the enterprise deals you bill directly, and priority support.</p>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Free</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Premium</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD / month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <?php
+            // The real cards, the same ones the landing and pricing pages use.
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
+        </div>
+    </section>
+
+    <!-- The for- pages did not link to each other, which wastes the internal
+         linking they exist to earn. -->
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c animate-on-scroll">
+                <div class="fp-eyebrow fp-eyebrow-c">More trades</div>
+                <h2 class="fp-h2">Argo Books for your line of work</h2>
+            </div>
+            <div class="fp-related animate-on-scroll">
+                <a href="../for-solo-operators/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('user', 20) ?></div>
+                    <h3>Solo operators</h3>
+                    <p>One person, one price, books that need no bookkeeper.</p>
+                </a>
+                <a href="../for-resellers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('tag', 20) ?></div>
+                    <h3>Resellers</h3>
+                    <p>Cost, margin and stock across everything you list.</p>
+                </a>
+                <a href="../for-rental-businesses/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('calendar', 20) ?></div>
+                    <h3>Rental businesses</h3>
+                    <p>Bookings, availability and returns on one calendar.</p>
+                </a>
+                <a href="../for-local-wholesalers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('truck', 20) ?></div>
+                    <h3>Local wholesalers</h3>
+                    <p>Stock, supplier orders and trade accounts on terms.</p>
+                </a>
             </div>
         </div>
     </section>

@@ -265,7 +265,6 @@ $users = get_all_users($search, $date_from, $date_to, $ban_status);
 
 // Get user statistics for dashboard
 
-// Total users
 $total_users = count($users);
 
 // Admin users count

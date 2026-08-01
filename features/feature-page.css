@@ -1,9 +1,7 @@
 /* ============================================================
    Feature pages, shared.
 
-   One stylesheet for every page under /features/. It deliberately does NOT
-   build on features/style.css: that file still serves nothing now, and mixing
-   the two produced specificity fights over section padding.
+   One stylesheet for every page under /features/.
 
    Pages that show an animated product demo in the hero also load
    resources/styles/feature-tour.css (the mockups) and
@@ -13,12 +11,10 @@
    ============================================================ */
 
 :root {
-  /* Body copy is black or white, never a mid grey. The three-step ink ramp
-     that used to live here (#0f172a / #475569 / #64748b) put secondary text
-     around 4.8:1 on white and the hero's supporting line near 3:1 on navy,
-     which is where "harder to read" comes from. Hierarchy is carried by size
-     and weight instead. The tokens are kept so the rules below still read as
-     primary / secondary / tertiary. */
+  /* Body copy is black or white, never a mid grey: mid greys land around
+     4.8:1 on white and near 3:1 on the navy hero. Hierarchy is carried by
+     size and weight instead. The three tokens stay distinct so the rules
+     below still read as primary / secondary / tertiary. */
   --fp-ink: #0f172a;
   --fp-ink-2: #0f172a;
   --fp-ink-3: #0f172a;
@@ -190,9 +186,9 @@ h3, h4, h5, h6 {
    phrase, and no row of big numbers under it.
    ============================================================ */
 .fp-hero {
-  /* The for- pages also load for/style.css, whose .hero centres its text. This
-     hero is a split layout, so it sets its own alignment rather than inheriting
-     whichever stylesheet happens to load last. */
+  /* The for- pages also load resources/styles/for-pages.css, whose .hero
+     centres its text. This hero is a split layout, so it sets its own
+     alignment rather than inheriting whichever stylesheet loads last. */
   text-align: left;
   position: relative;
   background: linear-gradient(150deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);

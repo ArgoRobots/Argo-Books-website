@@ -21,9 +21,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
 // Tier and date range come from the page-level control bar, so this tab shows
-// the same slice as the charts. It used to carry its own tier and period
-// dropdowns; those were a second, conflicting set of filters. Defaulted here so
-// the partial still renders if it's ever included without them.
+// the same slice as the charts. Defaulted here so the partial still renders if
+// it's ever included without them.
 $ua_tierFilter   = $tierFilter ?? 'all';
 $ua_rangeStartTs = $rangeStartTs ?? null;
 $ua_rangeEndTs   = $rangeEndTs ?? PHP_INT_MAX;

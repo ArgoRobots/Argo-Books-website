@@ -1067,15 +1067,6 @@ body.docs-page .account-avatar {
   margin-bottom: 12px;
 }
 
-/* The Free/Premium pricing cards that used to live on version-comparison.php
-   were removed: the Feature Comparison table on that same page already listed
-   everything they showed, and pricing belongs on /pricing/. Their styles
-   (.version-cards, .version-card, .card-header, .version-title,
-   .version-subtitle, .feature-list, .feature-item, .check-icon, .feature-text,
-   .version-price, .price-alt) went with them. Note that /whats-new/ and
-   /older-versions/ also use a .version-card class, but define it in their own
-   stylesheets and never load this file. */
-
 /* ==========================================
    SYSTEM REQUIREMENTS GRID
    ========================================== */

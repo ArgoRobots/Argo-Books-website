@@ -65,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Delete the comment
     $stmt = $pdo->prepare('DELETE FROM community_comments WHERE id = ?');
 
     try {

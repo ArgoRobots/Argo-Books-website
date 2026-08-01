@@ -183,7 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)');
             $stmt->execute([$post_id, $user_id, $post['title'], $post['content'], $previous_metadata]);
 
-            // Update the post
             $stmt = $pdo->prepare('UPDATE community_posts 
                                 SET title = ?, content = ?, post_type = ?, updated_at = CURRENT_TIMESTAMP 
                                 WHERE id = ?');

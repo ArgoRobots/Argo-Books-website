@@ -106,7 +106,6 @@ function get_reports($status = 'pending', $content_type = 'all')
     return $reports;
 }
 
-// Get reports count by status
 function get_reports_count_by_status()
 {
     global $pdo;
@@ -123,7 +122,6 @@ function get_reports_count_by_status()
 $reports = get_reports($status_filter, $content_type_filter);
 $status_counts = get_reports_count_by_status();
 
-// Include the admin header
 include __DIR__ . '/../admin_header.php';
 ?>
 

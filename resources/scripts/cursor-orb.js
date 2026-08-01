@@ -47,7 +47,6 @@
             // Check if section already has a cursor orb
             if (section.querySelector('.cursor-orb')) return;
 
-            // Create the orb element
             const orb = document.createElement('div');
             orb.className = 'cursor-orb';
 

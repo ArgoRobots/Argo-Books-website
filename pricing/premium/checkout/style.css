@@ -218,10 +218,8 @@ h1 {
   box-shadow: 0 2px 8px var(--shadow-default);
 }
 
-/* Payment method picker. Moved here from /pricing/premium/, which used to be
-   a whole page load just for this choice. Options are links rather than
-   in-place form swaps so that only one provider SDK is ever initialised per
-   document. */
+/* Payment method picker. Options are links rather than in-place form swaps
+   so that only one provider SDK is ever initialised per document. */
 .method-picker {
   margin-bottom: 24px;
 }

@@ -19,7 +19,6 @@ require_once __DIR__ . '/portal-helper.php';
 set_portal_headers();
 require_method(['POST', 'DELETE']);
 
-// Authenticate the request
 $company = authenticate_portal_request();
 if (!$company) {
     send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');

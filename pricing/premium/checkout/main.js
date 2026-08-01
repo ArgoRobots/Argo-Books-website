@@ -437,7 +437,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const email = document.getElementById("email").value;
 
         try {
-          // Create payment method
           const { paymentMethod, error } = await stripe.createPaymentMethod({
             type: "card",
             card: cardElement,

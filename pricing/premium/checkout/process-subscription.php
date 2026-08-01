@@ -30,7 +30,6 @@ if (empty($_SESSION['user_id'])) {
     exit();
 }
 
-// Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (!$input) {
@@ -146,7 +145,6 @@ function generateSubscriptionId() {
 try {
     $pdo->beginTransaction();
 
-    // Generate subscription ID
     $subscriptionId = generateSubscriptionId();
 
     // Calculate subscription dates

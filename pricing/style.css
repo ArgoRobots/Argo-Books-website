@@ -143,10 +143,6 @@ body {
     }
 }
 
-/* The .payment-grid / .payment-btn rules that used to live here moved to
-   pricing/premium/checkout/style.css along with the payment method picker
-   itself. Nothing that loads this file renders payment buttons any more. */
-
 /* ========================================
    Scroll Animations
    ======================================== */

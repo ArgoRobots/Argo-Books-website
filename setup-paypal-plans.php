@@ -60,7 +60,6 @@ if (empty($clientId) || empty($clientSecret)) {
     die("ERROR: PayPal credentials not configured in .env file\n");
 }
 
-// Get access token
 echo "Getting access token...\n";
 $accessToken = getAccessToken($baseUrl, $clientId, $clientSecret);
 if (!$accessToken) {

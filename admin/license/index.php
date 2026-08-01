@@ -11,7 +11,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -27,7 +26,6 @@ function verify_csrf_token() {
 $page_title = "Subscription Administration";
 $page_description = "Manage Premium subscriptions and free subscription keys";
 
-// Function to get Premium subscriptions
 function get_premium_subscriptions($search_filter = '')
 {
     global $pdo;
@@ -148,7 +146,6 @@ function get_subscription_key_status(array $key)
     return $end !== false && $end <= time() ? 'expired' : 'redeemed';
 }
 
-// Function to generate Premium subscription key
 function generate_premium_subscription_key($email = null, $duration_months = 1, $notes = '')
 {
     global $pdo;
@@ -1127,7 +1124,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Confirm give credit
     if (confirmGiveCreditBtn) {
         confirmGiveCreditBtn.addEventListener('click', function() {
             const amount = parseFloat(modalCreditAmount.value);

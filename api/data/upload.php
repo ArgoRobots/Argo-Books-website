@@ -178,7 +178,6 @@ function authenticate_telemetry_request(): ?array
     return null;
 }
 
-// Validate JSON content
 function validateJsonContent($content)
 {
     // Attempt to decode the content to ensure it's valid JSON
@@ -327,7 +326,6 @@ try {
         exit;
     }
 
-    // Validate JSON content
     if (!validateJsonContent($content)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid or malicious content']);

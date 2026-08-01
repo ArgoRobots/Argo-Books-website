@@ -11,7 +11,7 @@ $argo_free_scan_limit = (int) get_pricing_config()['free_receipt_scan_monthly_li
 $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
 
 // One array drives both the visible accordion and the FAQPage schema, so the
-// two can no longer drift apart the way the hand-written pair did.
+// two cannot drift apart.
 $faqs = [
     [
         'q' => 'How does AI receipt scanning work?',

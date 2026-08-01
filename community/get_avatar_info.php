@@ -31,7 +31,6 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
     $user = get_user($_SESSION['user_id']);
 
     if ($user) {
-        // Set profile link
         $response['profile_link'] = 'users/profile.php';
 
         // Check if user has an avatar

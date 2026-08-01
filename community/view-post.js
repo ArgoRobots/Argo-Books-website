@@ -534,7 +534,6 @@ document.addEventListener("DOMContentLoaded", function () {
       newEditBtn.addEventListener("click", function (e) {
         e.preventDefault();
 
-        // Get the comment ID and element
         const commentElement = this.closest(".comment");
         const commentId = commentElement.getAttribute("data-comment-id");
 
@@ -601,7 +600,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const form = commentContent.querySelector("form");
         const cancelButton = document.getElementById("cancel-edit");
 
-        // Cancel button event
         cancelButton.addEventListener("click", function () {
           // Restore original content
           commentContent.innerHTML = commentElement.getAttribute(

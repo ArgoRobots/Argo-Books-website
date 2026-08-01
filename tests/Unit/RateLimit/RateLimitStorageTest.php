@@ -30,12 +30,23 @@ final class RateLimitStorageTest extends TestCase
 
     private function uniqueIp(string $tag): string
     {
-        // 192.0.2.0/24 is reserved for documentation (RFC 5737). $tag is for
-        // human-readability in failures; uniqueness comes from random_int.
-        // crc32 can produce signed-negative values on 32-bit PHP builds,
-        // which would make the modulo calculation give an invalid IP.
+        // 192.0.2.0/24 is reserved for documentation (RFC 5737), so these can
+        // never collide with real traffic in the shared storage file.
+        //
+        // The /24 only holds 254 hosts, so drawing each address at random
+        // collides roughly 1 run in 254 for any test that needs two distinct
+        // IPs. A per-process counter makes distinctness exact for the first
+        // 254 calls; the random starting offset keeps two PHPUnit processes
+        // running at once from walking the same addresses in step.
+        //
+        // $tag is unused, kept because it documents intent at the call site.
+        static $base = null;
+        static $next = 0;
+        if ($base === null) {
+            $base = random_int(0, 253);
+        }
         unset($tag);
-        $ip = '192.0.2.' . random_int(1, 254);
+        $ip = '192.0.2.' . (1 + (($base + $next++) % 254));
         $this->touchedIps[] = $ip;
         return $ip;
     }

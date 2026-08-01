@@ -118,7 +118,6 @@ function redeem_premium_key($key, $device_id) {
     try {
         $pdo->beginTransaction();
 
-        // Generate a subscription ID for the new subscription
         $subscriptionId = generate_license_key('premium');
 
         // Calculate subscription dates
@@ -362,7 +361,6 @@ function _recreate_subscription_for_key($key, $device_id) {
 
         $pdo->beginTransaction();
 
-        // Generate a new subscription ID
         $newSubscriptionId = generate_license_key('premium');
 
         // Create the premium subscription

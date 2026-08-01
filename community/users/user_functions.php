@@ -95,7 +95,6 @@ namespace {
             return false;
         }
 
-        // Verify password
         if (password_verify($password, $user['password_hash'])) {
             // Check if email is verified before allowing login
             if (!$user['email_verified']) {

@@ -1465,7 +1465,7 @@ function _scrape_email_from_website_uncached($url)
  *
  * Uses Places API (New) at places.googleapis.com/v1/places:searchText with a
  * FieldMask header so website + phone come back in the search response, with no
- * separate Place Details fan-out, which used to dominate the per-lead cost.
+ * separate Place Details fan-out (which would dominate the per-lead cost).
  */
 function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [], $maxRounds = 5)
 {

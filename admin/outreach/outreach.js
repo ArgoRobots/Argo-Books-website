@@ -605,7 +605,6 @@ async function openLeadDetail(id) {
         // Reset to info tab (scope to the modal, since the page now has its own .tab bar)
         switchTab('tabInfo', document.querySelector('#leadDetailModal .tab'));
 
-        // Load activity
         loadActivity(id);
 
         showModal('leadDetailModal');

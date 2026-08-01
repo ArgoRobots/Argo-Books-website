@@ -204,7 +204,6 @@ function handle_avatar_change()
         }
     }
 
-    // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
         // Set permissions for the file
         chmod($filepath, 0644);
@@ -233,7 +232,6 @@ function handle_avatar_change()
     }
 }
 
-// Function to handle avatar removal
 function handle_avatar_removal()
 {
     global $user_id, $user;

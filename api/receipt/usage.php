@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
 // Accept either license_key (premium) or device_id (free)
@@ -194,7 +193,6 @@ try {
     $monthly_limit = $tierInfo['limit'];
     $identifier = $tierInfo['identifier'];
 
-    // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $scan_count = $usage['scan_count'];
     // Use the limit from the tier info (in case it changed)

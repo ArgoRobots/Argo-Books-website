@@ -19,7 +19,6 @@ handle_publish_invoice();
  */
 function handle_publish_invoice(): void
 {
-    // Authenticate the request
     $company = authenticate_portal_request();
     if (!$company) {
         send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');

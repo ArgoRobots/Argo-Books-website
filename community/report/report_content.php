@@ -116,7 +116,6 @@ try {
         exit;
     }
 
-    // Insert report
     $stmt = $pdo->prepare('INSERT INTO content_reports (reporter_user_id, reporter_email, content_type, content_id, violation_type, additional_info) VALUES (?, ?, ?, ?, ?, ?)');
 
     if ($stmt->execute([$reporter_user_id, $reporter_email, $content_type, $content_id, $violation_type, $additional_info])) {

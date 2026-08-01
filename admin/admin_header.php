@@ -236,7 +236,6 @@ $base_path = $in_subdir ? '../' : '';
                         // Opening the menu
                         menu.classList.add('active');
 
-                        // Get the current scroll height
                         const currentMenuHeight = menu.scrollHeight;
                         menu.style.height = currentMenuHeight + 'px';
 

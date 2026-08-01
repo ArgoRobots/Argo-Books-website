@@ -133,7 +133,7 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
     <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
-    <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/for-pages.css">
     <link rel="stylesheet" href="../resources/styles/feature-tour.css">
     <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
     <link rel="stylesheet" href="../features/feature-page.css">

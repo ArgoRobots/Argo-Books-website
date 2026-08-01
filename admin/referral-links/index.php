@@ -65,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Function to get all referral links
 function get_referral_links()
 {
     global $pdo;
@@ -116,7 +115,6 @@ function get_visits_by_source($limit = 10)
     return $data;
 }
 
-// Function to get visits over time by source
 function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
 {
     global $pdo;

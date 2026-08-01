@@ -121,7 +121,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?>">
+    <link rel="stylesheet" href="resources/styles/home.css?v=<?= @filemtime(__DIR__ . '/resources/styles/home.css') ?>">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
     <link rel="stylesheet" href="resources/styles/pricing-cards.css">
@@ -257,8 +257,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                     <!-- AI Receipt Scanning -->
                     <?php
                     // Panel markup comes from partials/feature-demo.php, the same source the
-                    // comparison pages and the feature-page heroes render. It used to be
-                    // duplicated here, which meant two copies that could drift apart.
+                    // comparison pages and the feature-page heroes render.
                     foreach (argo_feature_demo_keys() as $ftIndex => $ftKey): ?>
                         <div class="tab-content<?= $ftIndex === 0 ? ' active' : '' ?>" id="tab-<?= $ftKey ?>">
                             <?= argo_feature_demo($ftKey) ?>

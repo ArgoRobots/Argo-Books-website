@@ -7,6 +7,11 @@
    to the body and headings only, so component-level fonts (set via classes)
    are never overridden. Deliberately NOT added to custom-colors.css, because
    that file is also loaded on the community/app pages.
+
+   Two pages do not load this: the landing page (resources/styles/home.css)
+   and the comparison pages (compare/style.css). Both carry their own copy of
+   the tokens below so they need one stylesheet request rather than two. If
+   you change a token here, change it in those two files as well.
    ============================================================ */
 :root {
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;

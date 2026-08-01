@@ -128,7 +128,7 @@ $niches = [
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="../compare/style.css">
-    <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/for-pages.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">

@@ -45,7 +45,6 @@ if (!in_array($activeTab, $allowedTabs, true)) {
 $page_title = "Business Outreach";
 $page_description = "Find local businesses, generate outreach emails, and track leads";
 
-// Include the admin header
 include __DIR__ . '/../admin_header.php';
 ?>
 

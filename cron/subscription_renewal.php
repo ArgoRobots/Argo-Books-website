@@ -448,7 +448,6 @@ function processStripeRenewal($paymentMethodId, $amount, $subscriptionId, $email
             $params['customer'] = $customerId;
         }
 
-        // Create payment intent
         $paymentIntent = \Stripe\PaymentIntent::create($params);
 
         if ($paymentIntent->status === 'succeeded') {

@@ -1,14 +1,8 @@
 /* ============================================================
    Shared marketing sections.
 
-   Was features/style.css, which stopped being accurate: every page under
-   /features/ moved to features/feature-page.css, and the only consumers left
-   are the pricing, review and integrations pages. A stylesheet named after a
-   directory it no longer serves is a trap for whoever edits it next.
-
-   Rules whose selectors no class in those three pages uses have been dropped.
-   Element-level and at-rules are kept, since matching those from markup alone
-   is not reliable.
+   Loaded by the pricing, review and integrations pages. Pages under
+   /features/ use features/feature-page.css instead.
    ============================================================ */
 
 body {

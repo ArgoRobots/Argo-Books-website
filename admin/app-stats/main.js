@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   if (!rawData.dataPoints) {
-    console.log("No data points available");
     return;
   }
 
@@ -1745,7 +1744,6 @@ document.addEventListener("DOMContentLoaded", function () {
       events.forEach((e) => allEvents.push({ ...e, _category: category }));
     }
 
-    // Filter to events with a hashedIP
     const eventsWithUser = allEvents.filter((e) => e.hashedIP);
 
     // The KPI cards are fixed-window and range-independent, so they're filled from

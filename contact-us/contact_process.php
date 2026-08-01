@@ -39,7 +39,6 @@ function check_rate_limit()
 
 function process_contact_form()
 {
-    // Rate limit check
     if (!check_rate_limit()) {
         return ['success' => false, 'message' => 'Too many submissions. Please wait a few minutes before trying again.', 'form_data' => []];
     }

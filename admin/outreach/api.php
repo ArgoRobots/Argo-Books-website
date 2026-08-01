@@ -479,7 +479,6 @@ function delete_lead($pdo)
         $stmt = $pdo->prepare("DELETE FROM outreach_activity_log WHERE lead_id = ?");
         $stmt->execute([$id]);
 
-        // Delete the lead
         $stmt = $pdo->prepare("DELETE FROM outreach_leads WHERE id = ?");
         $stmt->execute([$id]);
 

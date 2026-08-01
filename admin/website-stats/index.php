@@ -290,7 +290,6 @@ function bounce_by_bucket(DateTime $start, DateTime $end, $bucket)
     return $map;
 }
 
-// Function to get community post views
 function get_community_post_views()
 {
     global $pdo;
@@ -354,7 +353,6 @@ function get_user_countries($limit = 10)
     return $data;
 }
 
-// Function to get downloads by country
 function get_downloads_by_country($limit = 10)
 {
     global $pdo;

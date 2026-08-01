@@ -45,7 +45,7 @@
 
     <script src="../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="../features/style.css">
+    <link rel="stylesheet" href="../resources/styles/marketing-sections.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">

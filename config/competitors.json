@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. All prices are in CAD per month unless otherwise noted. Update a price here and every comparison page, FAQ schema, article paragraph, etc. that references it via {placeholder} will update on the next page load.",
+  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load.",
   "quickbooks": {
     "name": "QuickBooks",
     "currency": "CAD",
@@ -192,30 +192,36 @@
   },
   "invoice2go": {
     "name": "Invoice2Go",
-    "currency": "USD",
-    "_note": "USD: invoice.2go.com prices in USD, not CAD. Starter and Professional cap invoices, so Premium is the only like-for-like tier.",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD: invoice.2go.com prices in USD, not CAD. Starter and Professional cap invoices, so Premium is the only like-for-like tier.",
     "plans": {
       "starter": {
         "label": "Starter",
-        "monthly": 7.99,
+        "monthly": 11,
         "yearly": 79.99,
         "invoice_limit": 2,
-        "card_fee": "3.5%"
+        "card_fee": "3.5%",
+        "usd_monthly": 7.99
       },
       "professional": {
         "label": "Professional",
-        "monthly": 11.99,
+        "monthly": 17,
         "yearly": 119.99,
         "invoice_limit": 5,
-        "card_fee": "3%"
+        "card_fee": "3%",
+        "usd_monthly": 11.99
       },
       "premium": {
         "label": "Premium",
-        "monthly": 44.99,
+        "monthly": 63,
         "yearly": 449.99,
-        "card_fee": "2.9%"
+        "card_fee": "2.9%",
+        "usd_monthly": 44.99
       }
-    }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
   },
   "square-invoices": {
     "name": "Square Invoices",
@@ -234,8 +240,8 @@
   },
   "manager": {
     "name": "Manager.io",
-    "currency": "USD",
-    "_note": "USD. Desktop edition is free; only the cloud edition is paid.",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD. Desktop edition is free; only the cloud edition is paid.",
     "plans": {
       "desktop": {
         "label": "Desktop Edition",
@@ -243,40 +249,55 @@
       },
       "cloud": {
         "label": "Cloud Edition",
-        "monthly": 59
+        "monthly": 83,
+        "usd_monthly": 59
       }
-    }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
   },
   "bonsai": {
     "name": "Bonsai",
-    "currency": "USD",
-    "_note": "USD assumed: no currency selector on the pricing page. Per user. Invoicing starts at Essentials, so Basic is not comparable.",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD assumed: no currency selector on the pricing page. Per user. Invoicing starts at Essentials, so Basic is not comparable.",
     "plans": {
       "basic": {
         "label": "Basic",
-        "monthly": 15,
-        "yearly": 9,
-        "per_user": true
+        "monthly": 21,
+        "yearly": 13,
+        "per_user": true,
+        "usd_monthly": 15,
+        "usd_yearly": 9
       },
       "essentials": {
         "label": "Essentials",
-        "monthly": 25,
-        "yearly": 19,
-        "per_user": true
+        "monthly": 35,
+        "yearly": 27,
+        "per_user": true,
+        "usd_monthly": 25,
+        "usd_yearly": 19
       },
       "premium": {
         "label": "Premium",
-        "monthly": 39,
-        "yearly": 29,
-        "per_user": true
+        "monthly": 55,
+        "yearly": 41,
+        "per_user": true,
+        "usd_monthly": 39,
+        "usd_yearly": 29
       },
       "elite": {
         "label": "Elite",
-        "monthly": 59,
-        "yearly": 49,
-        "per_user": true
+        "monthly": 83,
+        "yearly": 69,
+        "per_user": true,
+        "usd_monthly": 59,
+        "usd_yearly": 49
       }
-    }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
   },
   "gnucash": {
     "name": "GnuCash",

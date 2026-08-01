@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../track_referral.php';
 $plans        = get_plan_features();
 $pricing      = get_pricing_config();
 $argo_monthly = (int) $pricing['premium_monthly_price'];
-$mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is free
+$mgr_cloud = competitor_price('manager', 'cloud'); // 83 CAD (59 USD converted), desktop edition is free
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +64,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
                     "name": "Is Manager.io free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> USD/month for remote and multi-user access. Argo Books also has a free tier, with Premium at $<?= $argo_monthly ?> CAD/month."
+                        "text": "Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> CAD/month for remote and multi-user access. Argo Books also has a free tier, with Premium at $<?= $argo_monthly ?> CAD/month."
                     }
                 },
                 {
@@ -183,7 +183,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Cloud access without $<?= $mgr_cloud ?> USD a month.</strong> Manager.io's cloud edition is $<?= $mgr_cloud ?> USD/month. Argo Premium is $<?= $argo_monthly ?> CAD/month.</span>
+                                <span><strong>Cloud access without $<?= $mgr_cloud ?> CAD a month.</strong> Manager.io's cloud edition is $<?= $mgr_cloud ?> CAD/month. Argo Premium is $<?= $argo_monthly ?> CAD/month.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -205,8 +205,8 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
                             </defs>
                             <?php
                                 // Bars are scaled against a 60 top of scale. Manager.io
-                                // publishes in USD, so the labels carry the currency
-                                // and the bars are only a relative visual, not a conversion.
+                                // publishes in USD; competitors.json holds
+                                // the CAD conversion, so these bars and labels are all CAD.
                                 $barX0  = 205;
                                 $barMax = 340;
                                 $scaleTop = 60;
@@ -239,7 +239,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
                                 <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Manager Cloud</text>
                                 <rect x="205" y="313" width="<?= $cloudW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $cloudW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $mgr_cloud ?> USD</text>
+                                <text x="<?= 205 + $cloudW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $mgr_cloud ?> CAD</text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
@@ -387,7 +387,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Steep learning curve</strong>, built around double-entry accounting and journal entries</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No AI</strong> receipt scanning, spreadsheet import or forecasting</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Dated interface</strong> that reads as an admin panel rather than an app</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud edition is $<?= $mgr_cloud ?> USD/month</strong>, well above Argo Premium</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud edition is $<?= $mgr_cloud ?> CAD/month</strong>, well above Argo Premium</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
@@ -492,7 +492,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 59 USD, desktop edition is
             <?php $faqs = [];
             ob_start(); ?>Is Manager.io free?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> USD/month for remote and multi-user access.</p>
+                            <p>Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> CAD/month for remote and multi-user access.</p>
                             <p>Argo Books also has a free tier, with Premium at $<?= $argo_monthly ?> CAD/month.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

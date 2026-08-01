@@ -518,88 +518,6 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
 }
 
 /**
- * Paying customers grouped by the source they were attributed to, for the
- * "where paying customers came from" pie. A subscription counts as paying once
- * it has any completed payment. Its source is the source_code captured on its
- * premium_signup referral event; subscriptions with no such event fall into the
- * "Direct / untracked" bucket (organic, or a returning visitor we couldn't tie
- * back to a campaign). The inner GROUP BY collapses each subscription to a
- * single row so a customer is only counted once.
- */
-function get_paying_customers_by_source(?string $period_start, string $environment): array
-{
-    global $pdo;
-
-    $pay_period_clause = $period_start !== null ? ' AND p.created_at >= ?' : '';
-
-    $sql = "
-        SELECT lbl AS label, COUNT(*) AS payers
-        FROM (
-            SELECT ps.subscription_id,
-                   COALESCE(MAX(rl.name), MAX(re.source_code), 'Direct / untracked') AS lbl
-              FROM premium_subscriptions ps
-              JOIN premium_subscription_payments p
-                ON p.subscription_id = ps.subscription_id
-               AND p.status = 'completed'
-               $pay_period_clause
-              LEFT JOIN referral_events re
-                ON re.subscription_id = ps.subscription_id
-               AND re.event_type = 'premium_signup'
-               AND re.environment = ?
-              LEFT JOIN referral_links rl ON rl.source_code = re.source_code
-             WHERE ps.environment = ?
-               AND ps.payment_method != 'free_key'
-             GROUP BY ps.subscription_id
-        ) t
-        GROUP BY lbl
-        ORDER BY payers DESC, lbl ASC";
-
-    // Bind order matches placeholder order: [period?], re.environment, ps.environment
-    $bind = [];
-    if ($period_start !== null) {
-        $bind[] = $period_start;
-    }
-    $bind[] = $environment;
-    $bind[] = $environment;
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($bind);
-    return $stmt->fetchAll();
-}
-
-/**
- * Top landing pages by distinct-visitor count, for the All-traffic funnel
- * breakdown. Trailing query/hash strings are stripped server-side via a
- * SUBSTRING_INDEX so `/?ref=foo` and `/` collapse into the same bucket.
- */
-function get_landing_page_breakdown(?string $period_start, string $environment): array
-{
-    global $pdo;
-
-    $where = ['environment = ?', "event_type = 'landing'"];
-    $params = [$environment];
-    if ($period_start !== null) {
-        $where[] = 'created_at >= ?';
-        $params[] = $period_start;
-    }
-    $where_sql = implode(' AND ', $where);
-
-    $sql = "
-        SELECT
-            SUBSTRING_INDEX(SUBSTRING_INDEX(page_url, '?', 1), '#', 1) AS clean_path,
-            COUNT(DISTINCT visitor_id) AS visitors
-        FROM referral_events
-        WHERE $where_sql
-        GROUP BY clean_path
-        ORDER BY visitors DESC
-        LIMIT 20";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll();
-}
-
-/**
  * Counts of survey answers among unattributed (visitor_id IS NULL) app_first_run
  * rows. Returns ordered list of [answer => count] plus an "unanswered" count for
  * the same period. Used by the source-survey breakdown section on the funnel tab.
@@ -667,21 +585,6 @@ function get_unattributed_survey_breakdown(?string $period_start, string $enviro
         'unanswered'  => $unanswered,
         'other_texts' => $other_texts,
     ];
-}
-
-/**
- * Map a request path to a human-readable label for the landing-pages chart.
- */
-function friendly_landing_label(?string $path): string
-{
-    $p = strtolower(trim((string)$path));
-    if ($p === '' || $p === '/' || $p === '/index.php') return 'Home';
-    if ($p === '/downloads/' || $p === '/downloads') return 'Downloads page';
-
-    if (preg_match('#^/compare/argo-books-vs-([a-z0-9-]+)/?$#', $p, $m)) {
-        return ucwords(str_replace('-', ' ', $m[1])) . ' comparison';
-    }
-    return $path;
 }
 
 function get_campaign_spend_rows(): array

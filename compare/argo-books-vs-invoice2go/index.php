@@ -7,9 +7,9 @@ require_once __DIR__ . '/../../track_referral.php';
 $plans        = get_plan_features();
 $pricing      = get_pricing_config();
 $argo_monthly = (int) $pricing['premium_monthly_price'];
-$i2g_starter      = competitor_price('invoice2go', 'starter');      // 7.99 USD, 2 invoices/mo
-$i2g_professional = competitor_price('invoice2go', 'professional'); // 11.99 USD, 5 invoices/mo
-$i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD, unlimited
+$i2g_starter      = competitor_price('invoice2go', 'starter');      // 11 CAD (7.99 USD converted), 2 invoices/mo
+$i2g_professional = competitor_price('invoice2go', 'professional'); // 17 CAD (11.99 USD converted), 5 invoices/mo
+$i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (44.99 USD converted), unlimited
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,7 +74,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                     "name": "Is Argo Books cheaper than Invoice2Go?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books Premium is $<?= $argo_monthly ?> CAD/month. Invoice2Go Premium, the only tier without an invoice cap, is $<?= $i2g_premium ?> USD/month. Invoice2Go also publishes in US dollars, so a Canadian buyer pays the exchange rate on top of the listed price."
+                        "text": "Argo Books Premium is $<?= $argo_monthly ?> CAD/month. Invoice2Go Premium, the only tier without an invoice cap, is $<?= $i2g_premium ?> CAD/month. Invoice2Go publishes in US dollars, so the CAD figure here is converted at the current rate and moves with it."
                     }
                 },
                 {
@@ -193,7 +193,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>One predictable price in CAD.</strong> Invoice2Go publishes in USD, so a Canadian buyer pays the exchange rate on top of the sticker price.</span>
+                                <span><strong>One predictable price in CAD.</strong> Invoice2Go publishes in USD. The figures here are converted to CAD so the comparison is like for like.</span>
                             </li>
                     </ul>
                 </div>
@@ -207,8 +207,8 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                             </defs>
                             <?php
                                 // Bars are scaled against a 50 top of scale. Invoice2Go
-                                // publishes in USD, so the labels carry the currency
-                                // and the bars are only a relative visual, not a conversion.
+                                // publishes in USD; competitors.json holds
+                                // the CAD conversion, so these bars and labels are all CAD.
                                 $barX0  = 205;
                                 $barMax = 340;
                                 $scaleTop = 50;
@@ -220,7 +220,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                                 <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
 
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">Invoice2Go prices in USD. Argo prices in CAD.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Both shown in CAD. Invoice2Go publishes in USD.</text>
 
                                 <rect x="40" y="99" width="12" height="12" rx="3" fill="#3f63e8"/>
                                 <text x="58" y="109" font-size="13" fill="#0f172a">Argo Books</text>
@@ -238,11 +238,11 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="274" font-size="13" font-weight="600" fill="#0f172a">Invoice2Go Starter</text>
                                 <rect x="205" y="257" width="<?= $startW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $startW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#ef4444">$<?= $i2g_starter ?> USD</text>
+                                <text x="<?= 205 + $startW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#ef4444">$<?= $i2g_starter ?> CAD</text>
                                 <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Invoice2Go Premium</text>
                                 <rect x="205" y="313" width="<?= $premiumW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $premiumW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $i2g_premium ?> USD</text>
+                                <text x="<?= 205 + $premiumW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $i2g_premium ?> CAD</text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
@@ -273,7 +273,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
-                            <th class="brand-col">Invoice2Go<span class="th-sub">Premium: $<?= $i2g_premium ?> USD/month</span></th>
+                            <th class="brand-col">Invoice2Go<span class="th-sub">Premium: $<?= $i2g_premium ?> CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -371,7 +371,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No invoice caps</strong> on Premium, so billing volume never forces an upgrade</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, not just invoices</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, with no exchange rate on top</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, so the amount never moves with the exchange rate</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
@@ -389,7 +389,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Invoice caps on cheaper plans</strong>: 2 a month on Starter, 5 on Professional</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Invoicing only</strong>, with no inventory, no forecasting, and limited bookkeeping</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, so no internet means no access to your invoices</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Priced in USD</strong>, so Canadian buyers pay the exchange rate as well</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Priced in USD</strong>, so what you actually pay moves with the exchange rate</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
@@ -419,7 +419,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>No caps, lower price</h3>
-                    <p>Invoice2Go's unlimited tier is $<?= $i2g_premium ?> USD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month with no invoice cap, plus receipt scanning, inventory and forecasting.</p>
+                    <p>Invoice2Go's unlimited tier is $<?= $i2g_premium ?> CAD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month with no invoice cap, plus receipt scanning, inventory and forecasting.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -499,8 +499,8 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 44.99 USD
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Is Argo Books cheaper than Invoice2Go?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books Premium is $<?= $argo_monthly ?> CAD/month. Invoice2Go Premium, the only tier without an invoice cap, is $<?= $i2g_premium ?> USD/month.</p>
-                            <p>Invoice2Go also publishes in US dollars, so a Canadian buyer pays the exchange rate on top of the listed price.</p>
+                            <p>Argo Books Premium is $<?= $argo_monthly ?> CAD/month. Invoice2Go Premium, the only tier without an invoice cap, is $<?= $i2g_premium ?> CAD/month.</p>
+                            <p>Invoice2Go publishes in US dollars, so the CAD figure here is converted at the current rate and moves with it.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Does Argo Books do more than invoicing?<?php $q = ob_get_clean();

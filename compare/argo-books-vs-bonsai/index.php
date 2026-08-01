@@ -7,8 +7,8 @@ require_once __DIR__ . '/../../track_referral.php';
 $plans        = get_plan_features();
 $pricing      = get_pricing_config();
 $argo_monthly = (int) $pricing['premium_monthly_price'];
-$bonsai_essentials = competitor_price('bonsai', 'essentials'); // 25 USD per user
-$bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per user
+$bonsai_essentials = competitor_price('bonsai', 'essentials'); // 25 CAD per user
+$bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per user
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +65,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                     "name": "How much does Bonsai cost?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> USD, Premium at $<?= $bonsai_premium ?> USD, and Elite. Invoicing starts at the Essentials tier. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the whole business, regardless of how many people use it."
+                        "text": "Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> CAD, Premium at $<?= $bonsai_premium ?> CAD, and Elite. Invoicing starts at the Essentials tier. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the whole business, regardless of how many people use it."
                     }
                 },
                 {
@@ -192,7 +192,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Priced in CAD.</strong> Bonsai publishes in US dollars, so a Canadian buyer pays the exchange rate on top.</span>
+                                <span><strong>Priced in CAD.</strong> Bonsai publishes in US dollars, so what a Canadian actually pays moves with the exchange rate.</span>
                             </li>
                     </ul>
                 </div>
@@ -206,8 +206,8 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                             </defs>
                             <?php
                                 // Bars are scaled against a 30 top of scale. Bonsai
-                                // publishes in USD, so the labels carry the currency
-                                // and the bars are only a relative visual, not a conversion.
+                                // publishes in USD; competitors.json holds
+                                // the CAD conversion, so these bars and labels are all CAD.
                                 $barX0  = 205;
                                 $barMax = 340;
                                 $scaleTop = 30;
@@ -219,7 +219,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                                 <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
 
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">Bonsai prices per user, in USD. Argo is flat, in CAD.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Both shown in CAD. Bonsai prices per user and publishes in USD.</text>
 
                                 <rect x="40" y="99" width="12" height="12" rx="3" fill="#3f63e8"/>
                                 <text x="58" y="109" font-size="13" fill="#0f172a">Argo Books</text>
@@ -237,11 +237,11 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="274" font-size="13" font-weight="600" fill="#0f172a">Bonsai Essentials</text>
                                 <rect x="205" y="257" width="<?= $essW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $essW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_essentials ?> USD / user</text>
+                                <text x="<?= 205 + $essW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_essentials ?> CAD / user</text>
                                 <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Bonsai Premium</text>
                                 <rect x="205" y="313" width="<?= $bpremW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $bpremW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_premium ?> USD / user</text>
+                                <text x="<?= 205 + $bpremW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_premium ?> CAD / user</text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
@@ -272,7 +272,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
-                            <th class="brand-col">Bonsai<span class="th-sub">Essentials: $<?= $bonsai_essentials ?> USD/user</span></th>
+                            <th class="brand-col">Bonsai<span class="th-sub">Essentials: $<?= $bonsai_essentials ?> CAD/user</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -370,7 +370,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong> per business rather than per user, so adding people costs nothing</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, plus AI receipt scanning</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, with no exchange rate on top</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, so the amount never moves with the exchange rate</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
@@ -420,7 +420,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>Flat pricing, in CAD</h3>
-                    <p>Bonsai Essentials is $<?= $bonsai_essentials ?> USD per user per month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the business, however many people use it.</p>
+                    <p>Bonsai Essentials is $<?= $bonsai_essentials ?> CAD per user per month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the business, however many people use it.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -494,7 +494,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 USD per use
             <?php $faqs = [];
             ob_start(); ?>How much does Bonsai cost?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> USD, Premium at $<?= $bonsai_premium ?> USD, and Elite. Invoicing starts at the Essentials tier.</p>
+                            <p>Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> CAD, Premium at $<?= $bonsai_premium ?> CAD, and Elite. Invoicing starts at the Essentials tier.</p>
                             <p>Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the whole business, regardless of how many people use it.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

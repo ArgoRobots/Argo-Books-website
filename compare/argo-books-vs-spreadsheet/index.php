@@ -462,15 +462,15 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks' => 'QuickBooks',
-                    'argo-books-vs-wave' => 'Wave',
-                    'argo-books-vs-freshbooks' => 'FreshBooks',
-                    'argo-books-vs-manager' => 'Manager.io',
-                    'argo-books-vs-xero' => 'Xero',
+                    'argo-books-vs-quickbooks' => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'       => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks' => 'Argo Books vs. FreshBooks',
+                    'manager-io-alternatives'  => 'Manager.io alternatives',
+                    'argo-books-vs-xero'       => 'Argo Books vs. Xero',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>

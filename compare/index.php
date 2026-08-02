@@ -2,23 +2,29 @@
 require_once __DIR__ . '/../resources/icons.php';
 
 // Single source for the comparison hub grid. Add a competitor here (and create
-// its compare/argo-books-vs-<slug>/ page) and it shows up automatically.
+// the matching compare/<slug>/ page) and it shows up automatically.
+//
+// 'slug' is the directory name verbatim, and 'title' is the card's anchor text.
+// The two shapes are deliberate: pages targeting a "{brand} alternatives" query
+// are named and labelled that way, while the head-to-head pages keep the
+// "Argo Books vs X" form. Anchor text and page target have to agree, so don't
+// re-add a hardcoded "Argo Books vs" prefix to the template below.
 $comparisons = [
-    ['slug' => 'quickbooks', 'name' => 'QuickBooks', 'hook' => 'Simpler and far more affordable, with none of the price creep.'],
-    ['slug' => 'freshbooks', 'name' => 'FreshBooks', 'hook' => 'Your actual books, not just invoicing, and no per-client limits.'],
-    ['slug' => 'wave',       'name' => 'Wave',       'hook' => 'Both free to start, but Argo does more, including inventory and offline.'],
-    ['slug' => 'xero',       'name' => 'Xero',       'hook' => 'Less complexity, a lower price, and no invoice caps.'],
-    ['slug' => 'zipbooks',   'name' => 'ZipBooks',   'hook' => 'A more capable free plan, and a cheaper upgrade.'],
-    ['slug' => 'odoo',       'name' => 'Odoo',       'hook' => 'One flat price instead of Odoo\'s per-user ERP billing.'],
-    ['slug' => 'honeybook',  'name' => 'HoneyBook',  'hook' => 'Argo keeps your actual books; HoneyBook just books clients and invoices.'],
-    ['slug' => 'sage',       'name' => 'Sage',       'hook' => 'A fraction of Sage 50\'s price, modern and cross-platform, minus the complexity.'],
-    ['slug' => 'zoho-books', 'name' => 'Zoho Books', 'hook' => 'Desktop, offline, and standalone, without getting pulled into Zoho\'s cloud suite.'],
-    ['slug' => 'invoice2go', 'name' => 'Invoice2Go', 'hook' => 'No invoice caps, and the whole books rather than just the billing.'],
-    ['slug' => 'square-invoices', 'name' => 'Square Invoices', 'hook' => 'Both free to start; Argo also tracks expenses, stock and reports.'],
-    ['slug' => 'manager', 'name' => 'Manager.io', 'hook' => 'Local data on both sides, without needing to know double-entry.'],
-    ['slug' => 'bonsai', 'name' => 'Bonsai', 'hook' => "One flat price instead of Bonsai's per-user billing."],
-    ['slug' => 'gnucash', 'name' => 'GnuCash', 'hook' => 'Local data on both sides, without needing an accounting background.'],
-    ['slug' => 'spreadsheet', 'name' => 'Spreadsheets', 'hook' => 'For when Excel stops being enough. Import your file and keep the history.'],
+    ['slug' => 'argo-books-vs-quickbooks',        'title' => 'QuickBooks alternative',           'hook' => 'Simpler and far more affordable, with none of the price creep.'],
+    ['slug' => 'argo-books-vs-freshbooks',        'title' => 'Argo Books vs FreshBooks',         'hook' => 'Your actual books, not just invoicing, and no per-client limits.'],
+    ['slug' => 'argo-books-vs-wave',              'title' => 'Argo Books vs Wave',               'hook' => 'Both free to start, but Argo does more, including inventory and offline.'],
+    ['slug' => 'argo-books-vs-xero',              'title' => 'Argo Books vs Xero',               'hook' => 'Less complexity, a lower price, and no invoice caps.'],
+    ['slug' => 'zipbooks-alternatives',           'title' => 'ZipBooks alternatives',            'hook' => 'A more capable free plan, and a cheaper upgrade.'],
+    ['slug' => 'odoo-accounting-alternatives',    'title' => 'Odoo accounting alternatives',     'hook' => 'One flat price instead of Odoo\'s per-user ERP billing.'],
+    ['slug' => 'honeybook-alternatives',          'title' => 'HoneyBook alternatives',           'hook' => 'Argo keeps your actual books; HoneyBook just books clients and invoices.'],
+    ['slug' => 'sage-50-alternatives',            'title' => 'Sage 50 alternatives',             'hook' => 'A fraction of Sage 50\'s price, modern and cross-platform, minus the complexity.'],
+    ['slug' => 'zoho-books-alternatives',         'title' => 'Zoho Books alternatives',          'hook' => 'Desktop, offline, and standalone, without getting pulled into Zoho\'s cloud suite.'],
+    ['slug' => 'invoice2go-alternatives',         'title' => 'Invoice2Go alternatives',          'hook' => 'No invoice caps, and the whole books rather than just the billing.'],
+    ['slug' => 'square-invoices-alternatives',    'title' => 'Square Invoices alternatives',     'hook' => 'Both free to start; Argo also tracks expenses, stock and reports.'],
+    ['slug' => 'manager-io-alternatives',         'title' => 'Manager.io alternatives',          'hook' => 'Local data on both sides, without needing to know double-entry.'],
+    ['slug' => 'bonsai-alternatives',             'title' => 'Bonsai alternatives',              'hook' => "One flat price instead of Bonsai's per-user billing."],
+    ['slug' => 'gnucash-alternatives',            'title' => 'GnuCash alternatives',             'hook' => 'Local data on both sides, without needing an accounting background.'],
+    ['slug' => 'argo-books-vs-spreadsheet',       'title' => 'Argo Books vs Spreadsheets',       'hook' => 'For when Excel stops being enough. Import your file and keep the history.'],
 ];
 ?>
 <!DOCTYPE html>
@@ -93,8 +99,8 @@ $comparisons = [
         <div class="container">
             <div class="hub-grid">
                 <?php foreach ($comparisons as $c): ?>
-                <a class="hub-card animate-on-scroll" href="argo-books-vs-<?= $c['slug'] ?>/">
-                    <span class="hub-card-title">Argo Books vs <?= $c['name'] ?></span>
+                <a class="hub-card animate-on-scroll" href="<?= $c['slug'] ?>/">
+                    <span class="hub-card-title"><?= $c['title'] ?></span>
                     <span class="hub-card-hook"><?= $c['hook'] ?></span>
                     <span class="hub-card-cta">Compare <?= svg_icon('arrow-right', 16) ?></span>
                 </a>

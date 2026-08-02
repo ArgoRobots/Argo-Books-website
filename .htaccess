@@ -376,6 +376,22 @@ php_value upload_max_filesize 10M
     RewriteRule ^features/ai-spreadsheet-import/?$ /features/spreadsheet-import/ [R=301,L]
     RewriteRule ^upgrade(/index\.php)?/?$ /pricing/ [R=301,L]
 
+    # Comparison pages retargeted from "argo-books-vs-X" (a query nobody
+    # searches, since it needs our brand name) to "X alternatives" (a query
+    # people actually search before buying). The head-to-head pages that kept
+    # their slug (quickbooks, wave, xero, freshbooks, spreadsheet) are absent
+    # here on purpose: their URLs did not change.
+    RewriteRule ^compare/argo-books-vs-gnucash/?$ /compare/gnucash-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-manager/?$ /compare/manager-io-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-zipbooks/?$ /compare/zipbooks-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-zoho-books/?$ /compare/zoho-books-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-sage/?$ /compare/sage-50-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-odoo/?$ /compare/odoo-accounting-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-bonsai/?$ /compare/bonsai-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-honeybook/?$ /compare/honeybook-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-invoice2go/?$ /compare/invoice2go-alternatives/ [R=301,L]
+    RewriteRule ^compare/argo-books-vs-square-invoices/?$ /compare/square-invoices-alternatives/ [R=301,L]
+
     # /pricing/premium/ is no longer a page. Anyone arriving there has already
     # decided to buy, so it goes straight to checkout, which independently
     # enforces the login gate and the existing-subscription check. The URL has

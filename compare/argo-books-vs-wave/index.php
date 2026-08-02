@@ -477,15 +477,15 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks'  => 'QuickBooks',
-                    'argo-books-vs-freshbooks'  => 'FreshBooks',
-                    'argo-books-vs-xero'        => 'Xero',
-                    'argo-books-vs-zipbooks'    => 'ZipBooks',
-                    'argo-books-vs-odoo'        => 'Odoo',
+                    'argo-books-vs-quickbooks'     => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-freshbooks'     => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'           => 'Argo Books vs. Xero',
+                    'zipbooks-alternatives'        => 'ZipBooks alternatives',
+                    'odoo-accounting-alternatives' => 'Odoo accounting alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>

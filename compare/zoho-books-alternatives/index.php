@@ -26,24 +26,24 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs Zoho Books: Compare features, pricing, and ease of use. See why small businesses choose Argo Books, a simple offline desktop alternative to Zoho Books with a free plan that has no revenue cap.">
+        content="Zoho Books alternatives that work on their own, without being pulled into a wider cloud suite. Compare offline-capable desktop accounting for small business.">
     <meta name="keywords"
-        content="Argo Books vs Zoho Books, Zoho Books alternative, Zoho Books alternative Canada, offline accounting software, simple bookkeeping software, desktop accounting app, small business accounting, free accounting software">
+        content="Zoho Books alternatives, Zoho Books alternative, offline accounting software, desktop accounting software, standalone accounting software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Zoho Books: A Simpler, Offline Alternative">
+    <meta property="og:title" content="Zoho Books Alternatives: Standalone, Offline, Yours">
     <meta property="og:description"
-        content="Compare Argo Books and Zoho Books side by side. See why small businesses choose Argo Books for a simple, offline desktop app with a free plan that has no revenue cap.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-zoho-books/">
+        content="Zoho Books pulls you into a wider suite and needs a connection. Here are the alternatives that stay standalone and work offline.">
+    <meta property="og:url" content="https://argorobots.com/compare/zoho-books-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Zoho Books: A Simpler, Offline Alternative">
+    <meta name="twitter:title" content="Zoho Books Alternatives: Standalone, Offline, Yours">
     <meta name="twitter:description"
-        content="Compare Argo Books and Zoho Books side by side. See why small businesses choose Argo Books for a simple, offline desktop app with a free plan that has no revenue cap.">
+        content="Zoho Books pulls you into a wider suite and needs a connection. Here are the alternatives that stay standalone and work offline.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -54,10 +54,10 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-zoho-books/">
+    <link rel="canonical" href="https://argorobots.com/compare/zoho-books-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Zoho Books" => "/compare/argo-books-vs-zoho-books/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Zoho Books alternatives" => "/compare/zoho-books-alternatives/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -110,7 +110,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Zoho Books: Simpler & Offline | Argo Books</title>
+    <title>Zoho Books Alternatives: Standalone and Offline | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -143,8 +143,8 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">Zoho Books alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs Zoho Books</span></h1>
+                <span class="hero-eyebrow">Zoho Books alternatives</span>
+                <h1>Zoho Books <span class="text-gradient">alternatives</span></h1>
                 <p class="hero-subtitle">A simpler, offline way to manage your small business finances. All the essentials in one native desktop app, with a free plan that has no revenue cap, no 40-app suite to navigate.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -483,18 +483,18 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks'  => 'QuickBooks',
-                    'argo-books-vs-wave'        => 'Wave',
-                    'argo-books-vs-freshbooks'  => 'FreshBooks',
-                    'argo-books-vs-xero'        => 'Xero',
-                    'argo-books-vs-zipbooks'    => 'ZipBooks',
-                    'argo-books-vs-odoo'        => 'Odoo',
-                    'argo-books-vs-honeybook'   => 'HoneyBook',
-                    'argo-books-vs-sage'        => 'Sage',
+                    'argo-books-vs-quickbooks'     => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'           => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks'     => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'           => 'Argo Books vs. Xero',
+                    'zipbooks-alternatives'        => 'ZipBooks alternatives',
+                    'odoo-accounting-alternatives' => 'Odoo accounting alternatives',
+                    'honeybook-alternatives'       => 'HoneyBook alternatives',
+                    'sage-50-alternatives'         => 'Sage 50 alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>

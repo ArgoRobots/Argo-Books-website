@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../track_referral.php';
 $plans        = get_plan_features();
 $pricing      = get_pricing_config();
 $argo_monthly = (int) $pricing['premium_monthly_price'];
-$sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
+$mgr_cloud = competitor_price('manager', 'cloud'); // 83 CAD (59 USD converted), desktop edition is free
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,24 +20,24 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs Square Invoices: both free to start. Compare what each one actually does, from invoicing alone to full bookkeeping with offline access and local data storage.">
+        content="Manager.io alternatives for local, offline bookkeeping. Compare desktop accounting apps on ease of use, AI features and invoicing, with your data staying on your machine.">
     <meta name="keywords"
-        content="Argo Books vs Square Invoices, Square Invoices alternative, free invoicing software, small business accounting, offline accounting, invoicing and bookkeeping">
+        content="Manager.io alternatives, Manager.io alternative, free desktop accounting software, local accounting software, offline bookkeeping, desktop accounting app">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Square Invoices: Invoicing vs Your Whole Books">
+    <meta property="og:title" content="Manager.io Alternatives: Local Books Without the Learning Curve">
     <meta property="og:description"
-        content="Square Invoices is free and unlimited for invoicing. Argo Books is free to start too, and keeps your expenses, receipts, inventory and reports as well.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-square-invoices/">
+        content="Manager.io keeps your data on your machine and expects you to know double-entry. Here is the alternative that keeps the local data and drops the prerequisite.">
+    <meta property="og:url" content="https://argorobots.com/compare/manager-io-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Square Invoices: Invoicing vs Your Whole Books">
+    <meta name="twitter:title" content="Manager.io Alternatives: Local Books Without the Learning Curve">
     <meta name="twitter:description"
-        content="Square Invoices is free and unlimited for invoicing. Argo Books is free to start too, and keeps your expenses, receipts, inventory and reports as well.">
+        content="Manager.io keeps your data on your machine and expects you to know double-entry. Here is the alternative that keeps the local data and drops the prerequisite.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -48,10 +48,10 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-square-invoices/">
+    <link rel="canonical" href="https://argorobots.com/compare/manager-io-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Square Invoices" => "/compare/argo-books-vs-square-invoices/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Manager.io alternatives" => "/compare/manager-io-alternatives/"]) ?></script>
 
     <!-- FAQ Schema, mirrors the visible accordion below -->
     <script type="application/ld+json">
@@ -61,42 +61,42 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Is Square Invoices really free?",
+                    "name": "Is Manager.io free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Square Invoices has a free tier with unlimited invoices, estimates and contracts, unlimited users and unlimited customers. Payment processing fees apply when a customer pays by card. Their Plus plan is $<?= $sq_plus ?> CAD/month and adds custom templates, milestone payment schedules and project tracking."
+                        "text": "Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> CAD/month for remote and multi-user access. Argo Books also has a free tier, with Premium at $<?= $argo_monthly ?> CAD/month."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "So why use Argo Books instead?",
+                    "name": "Do both keep my data on my own computer?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Because invoicing is one part of running the books. Argo Books adds expense and revenue tracking, AI receipt scanning, inventory management, financial reports and predictive analytics. It also works offline and keeps your data on your own computer, which Square Invoices does not do."
+                        "text": "Yes. This is the main thing the two have in common. Both are desktop applications that store your books locally rather than on someone else's servers. Argo Books encrypts your local data with AES-256."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I still take card payments with Argo Books?",
+                    "name": "Do I need accounting knowledge to use Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books connects to your own Stripe, PayPal or Square account, so you keep your existing rates and payout schedule rather than being tied to one processor."
+                        "text": "No. Argo Books uses guided forms and plain language: the amount, the category, who it was with. You do not need to know debits from credits. Manager.io is built around traditional double-entry accounting and expects familiarity with journals and a chart of accounts."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books work offline?",
+                    "name": "What does Argo Books have that Manager.io does not?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption. Square Invoices is cloud-based and needs a connection."
+                        "text": "AI receipt scanning, AI spreadsheet import and predictive cash flow analytics, none of which Manager.io offers. Argo Books also has a more modern interface built around everyday tasks rather than accounting structures."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is Argo Books free as well?",
+                    "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card and no trial period. It includes <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices a month plus AI receipt scanning and inventory. Premium is $<?= $argo_monthly ?> CAD/month and adds predictive analytics, higher limits and biometric login."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux, like Manager.io's desktop edition."
                     }
                 }
             ]
@@ -104,7 +104,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Square Invoices: Free Invoicing vs Full Books | Argo Books</title>
+    <title>Manager.io Alternatives: Desktop Accounting Compared | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -137,9 +137,9 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">Square Invoices alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs Square Invoices</span></h1>
-                <p class="hero-subtitle">Square Invoices is genuinely free for unlimited invoicing. The question is not price, it's whether invoicing alone is enough.</p>
+                <span class="hero-eyebrow">Manager.io alternatives</span>
+                <h1>Manager.io <span class="text-gradient">alternatives</span></h1>
+                <p class="hero-subtitle">Both run on your machine and keep your data local. Argo Books assumes you are a business owner, not a bookkeeper.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Try Argo Books Free</span>
@@ -166,32 +166,32 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The short version</span>
-                <h2>What's the difference between Argo Books and Square Invoices?</h2>
-                <p class="section-desc">This one is not about cost. Square Invoices is free and does not cap your invoices, and we are not going to pretend otherwise. The difference is scope: Square bills your customers, Argo Books keeps your books, and only one of the two works without an internet connection.</p>
+                <h2>What's the difference between Argo Books and Manager.io?</h2>
+                <p class="section-desc">Manager.io is the closest thing to Argo Books in philosophy: a real desktop application, free to download, with your data on your own disk. Where they part company is the audience. Manager.io is built around traditional double-entry accounting; Argo Books is built for the person running the business.</p>
             </div>
             <div class="diff-split">
                 <div class="diff-copy animate-on-scroll">
-                    <h3>Why choose Argo Books over Square Invoices?</h3>
+                    <h3>Why choose Argo Books over Manager.io?</h3>
                     <ul class="why-list">
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Your whole books, not just billing.</strong> Expenses, receipts, inventory, reports and forecasting are built in, where Square Invoices covers the invoice and the payment.</span>
+                                <span><strong>No accounting knowledge required.</strong> Manager.io expects you to understand double-entry, chart of accounts and journal entries. Argo Books asks what you spent and who you paid.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open instantly with no internet, and your data stays on your machine rather than on Square's servers.</span>
+                                <span><strong>AI that's built in.</strong> Receipt scanning turns a photo into a filed expense, spreadsheet import maps your columns automatically, and predictive analytics forecasts your cash flow. Manager.io has none of these.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>AI that's built in.</strong> Receipt scanning turns a photo into a filed expense, and spreadsheet import brings your history across in one go.</span>
+                                <span><strong>Cloud access without $<?= $mgr_cloud ?> CAD a month.</strong> Manager.io's cloud edition is $<?= $mgr_cloud ?> CAD/month. Argo Premium is $<?= $argo_monthly ?> CAD/month.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>You are not tied to one processor.</strong> Argo Books connects to your own Stripe, PayPal or Square account, so you keep your rates and your relationship.</span>
+                                <span><strong>Modern interface.</strong> Argo Books is built to look and behave like software from this decade rather than a forms-and-tables admin panel.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Free to start, and honest about it.</strong> Both are free. Argo's free tier includes AI receipt scanning and inventory, which invoicing tools generally do not.</span>
+                                <span><strong>Local data on both sides.</strong> You do not have to give up privacy to get usability. Argo Books keeps your books on your machine, encrypted, exactly as Manager.io does.</span>
                             </li>
                     </ul>
                 </div>
@@ -201,35 +201,35 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                              indexable text (no duplicate-content/SEO impact). -->
                         <svg viewBox="0 0 640 460" role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
                             <defs>
-                                <clipPath id="dmClipsquareinvoices"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
+                                <clipPath id="dmClipmanager"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
                             </defs>
                             <?php
-                                // Bars are scaled against a 40 top of scale. Square Invoices
-                                // publishes in CAD, so the labels carry the currency
-                                // and the bars are only a relative visual, not a conversion.
+                                // Bars are scaled against a 60 top of scale. Manager.io
+                                // publishes in USD; competitors.json holds
+                                // the CAD conversion, so these bars and labels are all CAD.
                                 $barX0  = 205;
                                 $barMax = 340;
-                                $scaleTop = 40;
+                                $scaleTop = 60;
                                 $premW = (int) round($argo_monthly / $scaleTop * $barMax);
-                                $plusW = (int) round($sq_plus / $scaleTop * $barMax);
+                                $cloudW = (int) round($mgr_cloud / $scaleTop * $barMax);
                             ?>
-                            <g clip-path="url(#dmClipsquareinvoices)">
+                            <g clip-path="url(#dmClipmanager)">
                                 <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
 
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">Both are free to start. Square Invoices does not cap invoicing.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Both have a free desktop edition. Cloud is where they diverge.</text>
 
                                 <rect x="40" y="99" width="12" height="12" rx="3" fill="#3f63e8"/>
                                 <text x="58" y="109" font-size="13" fill="#0f172a">Argo Books</text>
                                 <rect x="150" y="99" width="12" height="12" rx="3" fill="#ef4444"/>
-                                <text x="168" y="109" font-size="13" fill="#0f172a">Square Invoices</text>
+                                <text x="168" y="109" font-size="13" fill="#0f172a">Manager.io</text>
 
                                 <rect x="205" y="145" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="162" font-size="13" font-weight="600" fill="#0f172a">Argo Free</text>
                                 <rect x="205" y="145" width="4" height="26" rx="2" fill="#cbd5e1"/>
                                 <text x="219" y="162" font-size="13" font-weight="700" fill="#64748b">$0</text>
                                 <rect x="205" y="201" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Square Invoices Free</text>
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Manager Desktop</text>
                                 <rect x="205" y="201" width="4" height="26" rx="2" fill="#cbd5e1"/>
                                 <text x="219" y="218" font-size="13" font-weight="700" fill="#64748b">$0</text>
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
@@ -237,16 +237,16 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                                 <rect x="205" y="257" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
                                 <text x="<?= 205 + $premW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?> CAD</text>
                                 <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Square Invoices Plus</text>
-                                <rect x="205" y="313" width="<?= $plusW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $plusW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $sq_plus ?> CAD</text>
+                                <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Manager Cloud</text>
+                                <rect x="205" y="313" width="<?= $cloudW ?>" height="26" rx="5" fill="#ef4444"/>
+                                <text x="<?= 205 + $cloudW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $mgr_cloud ?> CAD</text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
                     </div>
                     <div class="diff-callout">
-                        <span class="diff-callout-title">Both free to start</span>
-                        <span class="diff-callout-sub">The difference is scope, not price: Argo keeps the books as well</span>
+                        <span class="diff-callout-title">Same principle, different audience</span>
+                        <span class="diff-callout-sub">Both keep your data local; Argo does not require accounting training</span>
                     </div>
                 </div>
             </div>
@@ -270,7 +270,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
-                            <th class="brand-col">Square Invoices<span class="th-sub">Free, unlimited invoices</span></th>
+                            <th class="brand-col">Manager.io<span class="th-sub">Desktop: Free</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -278,13 +278,13 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             <td>Expense & revenue tracking</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Financial reports</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Invoicing & payments</td>
@@ -296,13 +296,13 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             <td>Desktop app (offline-capable)</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>No accounting knowledge required</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
@@ -314,7 +314,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             <td>Inventory management</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
@@ -344,7 +344,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             <td>Local data storage</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -357,7 +357,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The honest verdict</span>
-                <h2>Argo Books vs Square Invoices: pros &amp; cons</h2>
+                <h2>Argo Books vs Manager.io: pros &amp; cons</h2>
             </div>
             <div class="pros-cons-grid">
                 <div class="pc-card pc-argo animate-on-scroll">
@@ -365,38 +365,38 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                         <h3>Argo Books pros</h3>
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, revenue, inventory, reports and forecasting</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No accounting jargon</strong>, built for business owners rather than bookkeepers</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Bring your own processor</strong>, including Square itself, so you keep your own rates</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Modern interface</strong> designed around the tasks you actually do each week</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
                         <h3>Argo Books cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Desktop-first, so there's no browser or mobile-web access the way a cloud tool offers</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No point-of-sale hardware, which is Square's core strength</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Less depth for traditional accountants than a full double-entry system</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>A newer platform with a smaller ecosystem than longer-established tools</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Fewer country-specific tax modules than Manager.io's extensive list</span></li>
                         </ul>
                     </div>
                 </div>
                 <div class="pc-card pc-competitor animate-on-scroll">
                     <div class="pc-block">
-                        <h3>Square Invoices cons</h3>
+                        <h3>Manager.io cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Invoicing only</strong>: no expense tracking, no inventory, no financial reports</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, so no internet means no access to your invoices</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Tied to Square processing</strong> rather than letting you choose a provider</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Steep learning curve</strong>, built around double-entry accounting and journal entries</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No AI</strong> receipt scanning, spreadsheet import or forecasting</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Dated interface</strong> that reads as an admin panel rather than an app</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud edition is $<?= $mgr_cloud ?> CAD/month</strong>, well above Argo Premium</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
-                        <h3>Square Invoices pros</h3>
+                        <h3>Manager.io pros</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Genuinely free</strong> with unlimited invoices, estimates and contracts</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Unlimited users and customers on the free tier</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Excellent if you already use Square for point of sale</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Strong mobile apps and instant payment acceptance</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Genuinely free</strong> desktop edition with no feature limits</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Full double-entry accounting with real depth for those who want it</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Your data stays on your own machine, like Argo Books</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Broad international tax and multi-currency support</span></li>
                         </ul>
                     </div>
                 </div>
@@ -409,23 +409,23 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
-                <h2>Free either way, so compare what you get</h2>
-                <p class="section-desc">Square Invoices costs nothing and sends unlimited invoices, so the honest comparison is about scope. Argo Books is also free to start, and covers the bookkeeping that has to happen after the invoice is paid.</p>
+                <h2>Local data without the accounting degree</h2>
+                <p class="section-desc">Manager.io proves people want desktop accounting that keeps data local. Argo Books agrees with that and takes out the part where you have to learn double-entry bookkeeping first.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon">
-                        <?= svg_icon('document', 30, '', 1.5) ?>
+                        <?= svg_icon('users', 30, '', 1.5) ?>
                     </div>
-                    <h3>Books, not just invoices</h3>
-                    <p>Square Invoices ends at the payment. Argo Books tracks the expense side, scans receipts, manages stock, and produces the reports your accountant asks for.</p>
+                    <h3>Built for owners, not bookkeepers</h3>
+                    <p>Manager.io is organised around accounts, journals and ledgers. Argo Books is organised around invoices, expenses, receipts and stock, in the language you already use.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 30, '', 1.5) ?>
                     </div>
-                    <h3>Works offline</h3>
-                    <p>Square Invoices is cloud-only. Argo Books is a desktop app that works without a connection, with your data stored locally on your device.</p>
+                    <h3>AI that does the typing</h3>
+                    <p>Receipt scanning, spreadsheet import and cash flow forecasting are included. Manager.io has no AI features at all.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -446,8 +446,8 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>Square Invoices is a strong free product, and we are not going to invent a price gap that does not exist. If you already run Square for point of sale, unlimited free invoicing inside the same account is hard to argue with, and their mobile apps and payment hardware are better than anything a desktop bookkeeping tool will offer you.</p>
-                <p>What it does not do is keep your books. There is no expense tracking, no inventory, no financial reporting, and nothing works without a connection. If invoicing is genuinely all you need, use Square. If you also need to know what you spent, what you hold, and whether you made money, that is the gap Argo Books fills, and it is free to start too.</p>
+                <p>Manager.io deserves credit. It is free, genuinely capable, keeps your data on your own machine, and its international tax support is broader than ours. If you are comfortable with double-entry accounting and want maximum depth at no cost, it is a legitimate choice and we would rather say so than pretend otherwise.</p>
+                <p>The catch is who it is for. It expects you to understand chart of accounts and journal entries, and its interface has not moved on in years. Argo Books takes the same principle, your books on your own computer, and builds it for someone who runs a business rather than someone who trained in accounting, with AI doing the data entry.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -466,15 +466,15 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks' => 'QuickBooks',
-                    'argo-books-vs-wave' => 'Wave',
-                    'argo-books-vs-freshbooks' => 'FreshBooks',
-                    'argo-books-vs-xero' => 'Xero',
-                    'argo-books-vs-zipbooks' => 'ZipBooks',
+                    'argo-books-vs-quickbooks' => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'       => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks' => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'       => 'Argo Books vs. Xero',
+                    'zipbooks-alternatives'    => 'ZipBooks alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>
@@ -490,33 +490,33 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <?php $faqs = [];
-            ob_start(); ?>Is Square Invoices really free?<?php $q = ob_get_clean();
+            ob_start(); ?>Is Manager.io free?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Square Invoices has a free tier with unlimited invoices, estimates and contracts, unlimited users and unlimited customers. Payment processing fees apply when a customer pays by card.</p>
-                            <p>Their Plus plan is $<?= $sq_plus ?> CAD/month and adds custom templates, milestone payment schedules and project tracking.</p>
+                            <p>Yes. Manager.io's desktop edition is a free download with no feature limits. Their cloud edition is $<?= $mgr_cloud ?> CAD/month for remote and multi-user access.</p>
+                            <p>Argo Books also has a free tier, with Premium at $<?= $argo_monthly ?> CAD/month.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>So why use Argo Books instead?<?php $q = ob_get_clean();
+            ob_start(); ?>Do both keep my data on my own computer?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Because invoicing is one part of running the books. Argo Books adds expense and revenue tracking, AI receipt scanning, inventory management, financial reports and predictive analytics.</p>
-                            <p>It also works offline and keeps your data on your own computer, which Square Invoices does not do.</p>
+                            <p>Yes. This is the main thing the two have in common. Both are desktop applications that store your books locally rather than on someone else's servers.</p>
+                            <p>Argo Books encrypts your local data with AES-256.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Can I still take card payments with Argo Books?<?php $q = ob_get_clean();
+            ob_start(); ?>Do I need accounting knowledge to use Argo Books?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Argo Books connects to your own Stripe, PayPal or Square account, so you keep your existing rates and payout schedule rather than being tied to one processor.</p>
+                            <p>No. Argo Books uses guided forms and plain language: the amount, the category, who it was with. You do not need to know debits from credits.</p>
+                            <p>Manager.io is built around traditional double-entry accounting and expects familiarity with journals and a chart of accounts.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
+            ob_start(); ?>What does Argo Books have that Manager.io does not?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption.</p>
-                            <p>Square Invoices is cloud-based and needs a connection.</p>
+                            <p>AI receipt scanning, AI spreadsheet import and predictive cash flow analytics, none of which Manager.io offers.</p>
+                            <p>Argo Books also has a more modern interface built around everyday tasks rather than accounting structures.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Is Argo Books free as well?<?php $q = ob_get_clean();
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card and no trial period. It includes <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices a month plus AI receipt scanning and inventory.</p>
-                            <p>Premium is $<?= $argo_monthly ?> CAD/month and adds predictive analytics, higher limits and biometric login.</p>
+                            <p>Argo Books runs natively on Windows, macOS, and Linux, like Manager.io's desktop edition.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             echo argo_faq_grid($faqs); ?>
@@ -531,7 +531,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
         <section class="cta-section">
             <div class="container">
                 <div class="cta-card animate-on-scroll">
-                    <h2>Ready for the rest of your books?</h2>
+                    <h2>Ready for local books without the learning curve?</h2>
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">

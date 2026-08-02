@@ -4,11 +4,11 @@ require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans        = get_plan_features();
-$pricing      = get_pricing_config();
-$argo_monthly = (int) $pricing['premium_monthly_price'];
-$bonsai_essentials = competitor_price('bonsai', 'essentials'); // 25 CAD per user
-$bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per user
+$plans              = get_plan_features();
+$pricing            = get_pricing_config();
+$argo_monthly       = (int) $pricing['premium_monthly_price'];
+$zb_smarter         = competitor_price('zipbooks', 'smarter');
+$zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,24 +21,24 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs Bonsai: compare per-user pricing, invoicing, and bookkeeping. Bonsai charges per user and starts invoicing at its middle tier; Argo Books is one flat price.">
+        content="ZipBooks alternatives compared on free-plan limits, pricing and features. See which small business accounting app gives you more without the upgrade pressure.">
     <meta name="keywords"
-        content="Argo Books vs Bonsai, Bonsai alternative, freelancer accounting software, per user pricing alternative, offline invoicing, small business bookkeeping">
+        content="ZipBooks alternatives, ZipBooks alternative, free accounting software, small business accounting software, cheap accounting software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Bonsai: Flat Price, No Per-User Billing">
+    <meta property="og:title" content="ZipBooks Alternatives: More Features, Lower Price">
     <meta property="og:description"
-        content="Bonsai charges per user and its cheapest plan has no invoicing. Argo Books is one flat price with full bookkeeping and offline access.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-bonsai/">
+        content="Comparing ZipBooks alternatives on free-plan limits, upgrade price and what you actually get for it.">
+    <meta property="og:url" content="https://argorobots.com/compare/zipbooks-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Bonsai: Flat Price, No Per-User Billing">
+    <meta name="twitter:title" content="ZipBooks Alternatives: More Features, Lower Price">
     <meta name="twitter:description"
-        content="Bonsai charges per user and its cheapest plan has no invoicing. Argo Books is one flat price with full bookkeeping and offline access.">
+        content="Comparing ZipBooks alternatives on free-plan limits, upgrade price and what you actually get for it.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -49,12 +49,12 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-bonsai/">
+    <link rel="canonical" href="https://argorobots.com/compare/zipbooks-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Bonsai" => "/compare/argo-books-vs-bonsai/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "ZipBooks alternatives" => "/compare/zipbooks-alternatives/"]) ?></script>
 
-    <!-- FAQ Schema, mirrors the visible accordion below -->
+    <!-- FAQ Schema -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -62,26 +62,10 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "How much does Bonsai cost?",
+                    "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> CAD, Premium at $<?= $bonsai_premium ?> CAD, and Elite. Invoicing starts at the Essentials tier. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the whole business, regardless of how many people use it."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Does Bonsai do bookkeeping?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Bonsai includes basic expense and income tracking from the Essentials tier, but it is a client and project workspace rather than accounting software. It has no inventory management, no AI receipt scanning and no financial forecasting."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Does Argo Books have proposals and contracts?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "No. Argo Books is bookkeeping software: invoicing, expenses, receipts, inventory, reports and forecasting. Proposals, contracts and e-signing are Bonsai's strength, not ours. Some businesses use both, with Bonsai for winning work and Argo Books for the books."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features, with no AI capabilities, no inventory management, and no offline access."
                     }
                 },
                 {
@@ -89,15 +73,31 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                     "name": "Does Argo Books work offline?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption. Bonsai is cloud-based and needs a connection."
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. ZipBooks is cloud-only and requires a constant internet connection to access your data."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is Argo Books cheaper for a team?",
+                    "name": "How is Argo Books different from ZipBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes, and the gap widens with headcount. Bonsai charges per user, so a three-person business pays three times its listed price. Argo Books Premium is one flat $<?= $argo_monthly ?> CAD/month."
+                        "text": "Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management, all at a lower premium price ($<?= $argo_monthly ?> CAD/month vs $<?= $zb_smarter ?>+ CAD). ZipBooks is cloud-based and focused on invoicing and time tracking for freelancers."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to ZipBooks?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is $<?= $argo_monthly ?> CAD/month vs ZipBooks Smarter at $<?= $zb_smarter ?> CAD/month. You get more features for less with Argo Books."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books run on?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. ZipBooks is web-based and accessible from any browser."
                     }
                 }
             ]
@@ -105,7 +105,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Bonsai: Flat Price vs Per User | Argo Books</title>
+    <title>ZipBooks Alternatives: Free and Paid Options Compared | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -138,9 +138,9 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">Bonsai alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs Bonsai</span></h1>
-                <p class="hero-subtitle">Bonsai bills per user, and invoicing only starts on its middle tier. Argo Books is one price, with the books included.</p>
+                <span class="hero-eyebrow">ZipBooks alternatives</span>
+                <h1>ZipBooks <span class="text-gradient">alternatives</span></h1>
+                <p class="hero-subtitle">Both simple, both free to start. But Argo Books works offline, includes AI, and costs less to upgrade.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Try Argo Books Free</span>
@@ -167,33 +167,33 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The short version</span>
-                <h2>What's the difference between Argo Books and Bonsai?</h2>
-                <p class="section-desc">Bonsai is a freelancer workspace: proposals, contracts, time tracking and client management, with invoicing layered on. Argo Books is bookkeeping software. The pricing shape differs too: Bonsai charges per user every month, Argo Books charges once per business.</p>
+                <h2>What's the difference between Argo Books and ZipBooks?</h2>
+                <p class="section-desc">Both are simple, and both are free to start. The difference is where your data lives, what's built in, and what you pay to unlock more. Argo Books works offline, includes AI, and costs less to upgrade.</p>
             </div>
             <div class="diff-split">
                 <div class="diff-copy animate-on-scroll">
-                    <h3>Why choose Argo Books over Bonsai?</h3>
+                    <h3>Why choose Argo Books over ZipBooks?</h3>
                     <ul class="why-list">
-                            <li>
-                                <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>One price, not one price per person.</strong> Bonsai bills per user, so a second person doubles your cost. Argo Premium is $<?= $argo_monthly ?> CAD/month regardless of headcount.</span>
-                            </li>
-                            <li>
-                                <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Invoicing is not an upgrade.</strong> Bonsai's Basic tier has no invoicing at all, so the real comparison starts at Essentials. Argo includes invoicing on the free plan.</span>
-                            </li>
-                            <li>
-                                <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Your actual books.</strong> Expenses, receipts, inventory, financial reports and forecasting, where Bonsai focuses on client and project management.</span>
-                            </li>
-                            <li>
-                                <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open with no internet, and your data stays on your machine.</span>
-                            </li>
-                            <li>
-                                <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Priced in CAD.</strong> Bonsai publishes in US dollars, so what a Canadian actually pays moves with the exchange rate.</span>
-                            </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>A more capable free plan.</strong> Both are free to start, but Argo's Free tier adds AI receipt scanning and inventory that ZipBooks' free plan doesn't include.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. ZipBooks is cloud-only.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>AI that's built in.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included, features ZipBooks doesn't offer at all.</span>
+                        </li>
+                        <li>
+                            <span class="why-check"><?= svg_icon('check', 15) ?></span>
+                            <span><strong>One predictable price.</strong> Everything in Premium for $<?= $argo_monthly ?> CAD/month, less than ZipBooks Smarter, with no per-client fees or upsells.</span>
+                        </li>
                     </ul>
                 </div>
                 <div class="diff-visual animate-on-scroll">
@@ -202,53 +202,64 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                              indexable text (no duplicate-content/SEO impact). -->
                         <svg viewBox="0 0 640 460" role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
                             <defs>
-                                <clipPath id="dmClipbonsai"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
+                                <clipPath id="dmClip2"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
                             </defs>
                             <?php
-                                // Bars are scaled against a 30 top of scale. Bonsai
-                                // publishes in USD; competitors.json holds
-                                // the CAD conversion, so these bars and labels are all CAD.
                                 $barX0  = 205;
-                                $barMax = 340;
-                                $scaleTop = 30;
-                                $premW = (int) round($argo_monthly / $scaleTop * $barMax);
-                                $essW = (int) round($bonsai_essentials / $scaleTop * $barMax);
-                                $bpremW = (int) round($bonsai_premium / $scaleTop * $barMax);
+                                $barMax = 340; // px width for the $50 top of scale
+                                $premW  = (int) round($argo_monthly     / 50 * $barMax);
+                                $smartW = (int) round($zb_smarter        / 50 * $barMax);
+                                $sophW  = (int) round($zb_sophisticated  / 50 * $barMax);
                             ?>
-                            <g clip-path="url(#dmClipbonsai)">
+                            <g clip-path="url(#dmClip2)">
                                 <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
 
+                                <!-- Title -->
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">Both shown in CAD. Bonsai prices per user and publishes in USD.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Both free to start. Argo's paid plan costs less.</text>
 
+                                <!-- Legend -->
                                 <rect x="40" y="99" width="12" height="12" rx="3" fill="#3f63e8"/>
                                 <text x="58" y="109" font-size="13" fill="#0f172a">Argo Books</text>
                                 <rect x="150" y="99" width="12" height="12" rx="3" fill="#ef4444"/>
-                                <text x="168" y="109" font-size="13" fill="#0f172a">Bonsai</text>
+                                <text x="168" y="109" font-size="13" fill="#0f172a">ZipBooks</text>
 
+                                <!-- Row 1: Argo Free $0 -->
                                 <rect x="205" y="145" width="340" height="26" rx="5" fill="#f8fafc"/>
                                 <text x="40" y="162" font-size="13" font-weight="600" fill="#0f172a">Argo Free</text>
                                 <rect x="205" y="145" width="4" height="26" rx="2" fill="#cbd5e1"/>
                                 <text x="219" y="162" font-size="13" font-weight="700" fill="#64748b">$0</text>
+
+                                <!-- Row 2: ZipBooks Starter $0 -->
                                 <rect x="205" y="201" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
-                                <rect x="205" y="201" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
-                                <text x="<?= 205 + $premW + 8 ?>" y="218" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?> CAD</text>
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Starter</text>
+                                <rect x="205" y="201" width="4" height="26" rx="2" fill="#cbd5e1"/>
+                                <text x="219" y="218" font-size="13" font-weight="700" fill="#64748b">$0</text>
+
+                                <!-- Row 3: Argo Premium $15 -->
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="274" font-size="13" font-weight="600" fill="#0f172a">Bonsai Essentials</text>
-                                <rect x="205" y="257" width="<?= $essW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $essW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_essentials ?> CAD / user</text>
+                                <text x="40" y="274" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <rect x="205" y="257" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
+                                <text x="<?= 205 + $premW + 8 ?>" y="274" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?></text>
+
+                                <!-- Row 4: ZipBooks Smarter $20 -->
                                 <rect x="205" y="313" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">Bonsai Premium</text>
-                                <rect x="205" y="313" width="<?= $bpremW ?>" height="26" rx="5" fill="#ef4444"/>
-                                <text x="<?= 205 + $bpremW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $bonsai_premium ?> CAD / user</text>
+                                <text x="40" y="330" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Smarter</text>
+                                <rect x="205" y="313" width="<?= $smartW ?>" height="26" rx="5" fill="#ef4444"/>
+                                <text x="<?= 205 + $smartW + 8 ?>" y="330" font-size="13" font-weight="700" fill="#ef4444">$<?= $zb_smarter ?></text>
+
+                                <!-- Row 5: ZipBooks Sophisticated $50 -->
+                                <rect x="205" y="369" width="340" height="26" rx="5" fill="#f8fafc"/>
+                                <text x="40" y="386" font-size="13" font-weight="600" fill="#0f172a">ZipBooks Sophisticated</text>
+                                <rect x="205" y="369" width="<?= $sophW ?>" height="26" rx="5" fill="#ef4444"/>
+                                <text x="<?= 205 + $sophW + 8 ?>" y="386" font-size="13" font-weight="700" fill="#ef4444">$<?= $zb_sophisticated ?></text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
                     </div>
                     <div class="diff-callout">
-                        <span class="diff-callout-title">Flat beats per-user</span>
-                        <span class="diff-callout-sub">Argo does not charge more when your team grows</span>
+                        <span class="diff-callout-title">Less, for more</span>
+                        <span class="diff-callout-sub">Argo Premium is cheaper than ZipBooks Smarter and does more</span>
                     </div>
                 </div>
             </div>
@@ -272,24 +283,24 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
-                            <th class="brand-col">Bonsai<span class="th-sub">Essentials: $<?= $bonsai_essentials ?> CAD/user</span></th>
+                            <th class="brand-col">ZipBooks<span class="th-sub">Starter: Free</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Expense & revenue tracking</td>
+                            <td>Expense &amp; revenue tracking</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-partial">Limited</span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Financial reports</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-partial">Limited</span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Invoicing & payments</td>
+                            <td>Invoicing &amp; payments</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
@@ -359,7 +370,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The honest verdict</span>
-                <h2>Argo Books vs Bonsai: pros &amp; cons</h2>
+                <h2>Argo Books vs ZipBooks: pros &amp; cons</h2>
             </div>
             <div class="pros-cons-grid">
                 <div class="pc-card pc-argo animate-on-scroll">
@@ -367,38 +378,36 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                         <h3>Argo Books pros</h3>
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong> per business rather than per user, so adding people costs nothing</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No accounting jargon</strong>, built for business owners rather than accountants</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, plus AI receipt scanning</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, so the amount never moves with the exchange rate</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month, cheaper than ZipBooks Smarter, with no upsells</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
                         <h3>Argo Books cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No proposals, contracts or e-signing, which is a core part of Bonsai</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No built-in time tracking or CRM</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Desktop-first, so there's no browser or mobile-web access the way a cloud tool offers</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>A newer platform with a smaller ecosystem than longer-established tools</span></li>
                         </ul>
                     </div>
                 </div>
                 <div class="pc-card pc-competitor animate-on-scroll">
                     <div class="pc-block">
-                        <h3>Bonsai cons</h3>
+                        <h3>ZipBooks cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Per-user pricing</strong>, so costs scale with headcount rather than staying flat</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No invoicing on the Basic tier</strong>, so the entry price is not the real price</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, with no offline access and your data on their servers</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Limited bookkeeping</strong>: no inventory, no AI receipt scanning, no forecasting</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, no offline access, so no internet means no access to your books</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No AI</strong> receipt scanning or spreadsheet import, and no predictive analytics</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No inventory management</strong>, and your data lives on their servers rather than your machine</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Limited development</strong> since the BILL Holdings acquisition</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
-                        <h3>Bonsai pros</h3>
+                        <h3>ZipBooks pros</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Proposals, contracts and e-signing built in</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Time tracking and task management for project work</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Client CRM and scheduling in the same tool</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Strong fit for freelancers whose work is project-shaped</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Free Starter tier with basic invoicing and reports</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Simple and clean, with no accounting knowledge required</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Cloud-based and accessible from any browser</span></li>
                         </ul>
                     </div>
                 </div>
@@ -411,23 +420,23 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
-                <h2>One price, and the books to go with it</h2>
-                <p class="section-desc">Bonsai is a good client-and-project workspace. It is not bookkeeping software, and its per-user billing means the price you see is per person, per month, before invoicing is even included.</p>
+                <h2>Same simplicity, more features, lower price</h2>
+                <p class="section-desc">ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and has seen limited development since. Argo Books offers AI receipt scanning, predictive analytics, and local data storage at a lower price, with active support and development.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon">
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
-                    <h3>Flat pricing, in CAD</h3>
-                    <p>Bonsai Essentials is $<?= $bonsai_essentials ?> CAD per user per month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the business, however many people use it.</p>
+                    <h3>Lower premium price</h3>
+                    <p>ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month, with AI receipt scanning, predictive analytics, and inventory management included.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 30, '', 1.5) ?>
                     </div>
                     <h3>Works offline</h3>
-                    <p>Bonsai is cloud-only. Argo Books is a desktop app that works without a connection, with your data stored locally on your device.</p>
+                    <p>ZipBooks is cloud-only: no internet, no access. Argo Books is a desktop app that works offline, with your data stored locally on your device for full privacy and control.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -448,8 +457,8 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>Bonsai is genuinely good at what it is for. Proposals, contracts, e-signing, time tracking and a client CRM in one place is a real workflow for freelancers, and Argo Books does not do any of that. If your work is project-shaped and the paperwork around winning clients is the painful part, Bonsai earns its price.</p>
-                <p>It is not bookkeeping software though. There is no inventory, no AI receipt scanning, no forecasting, and its cheapest tier does not include invoicing at all, so the entry price is misleading. Add per-user billing in US dollars and a two-person shop is paying several times what Argo Books costs, for less of the actual accounting.</p>
+                <p>ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and since the acquisitions, the product appears to have little active development or support. Users have reported issues with bugs, missing features, and difficulty reaching customer service, raising concerns about the long-term viability of the platform.</p>
+                <p>If you're looking for a simple bookkeeping tool that's actively maintained, Argo Books offers AI receipt scanning, predictive analytics, inventory management, and local data storage at a lower premium price, plus offline access so you're never locked out of your own data.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -468,15 +477,15 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks' => 'QuickBooks',
-                    'argo-books-vs-wave' => 'Wave',
-                    'argo-books-vs-freshbooks' => 'FreshBooks',
-                    'argo-books-vs-xero' => 'Xero',
-                    'argo-books-vs-zipbooks' => 'ZipBooks',
+                    'argo-books-vs-quickbooks'     => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'           => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks'     => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'           => 'Argo Books vs. Xero',
+                    'odoo-accounting-alternatives' => 'Odoo accounting alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>
@@ -492,33 +501,34 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <?php $faqs = [];
-            ob_start(); ?>How much does Bonsai cost?<?php $q = ob_get_clean();
+            ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Bonsai's plans are priced per user per month, starting at Basic and rising through Essentials at $<?= $bonsai_essentials ?> CAD, Premium at $<?= $bonsai_premium ?> CAD, and Elite. Invoicing starts at the Essentials tier.</p>
-                            <p>Argo Books Premium is $<?= $argo_monthly ?> CAD/month for the whole business, regardless of how many people use it.</p>
-                        
-            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Does Bonsai do bookkeeping?<?php $q = ob_get_clean();
-            ob_start(); ?>
-                            <p>Bonsai includes basic expense and income tracking from the Essentials tier, but it is a client and project workspace rather than accounting software.</p>
-                            <p>It has no inventory management, no AI receipt scanning and no financial forecasting.</p>
-                        
-            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Does Argo Books have proposals and contracts?<?php $q = ob_get_clean();
-            ob_start(); ?>
-                            <p>No. Argo Books is bookkeeping software: invoicing, expenses, receipts, inventory, reports and forecasting. Proposals, contracts and e-signing are Bonsai's strength, not ours.</p>
-                            <p>Some businesses use both, with Bonsai for winning work and Argo Books for the books.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
+                            <p>ZipBooks also has a free tier, but it's more limited: no AI capabilities, no inventory management, and no offline access.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption.</p>
-                            <p>Bonsai is cloud-based and needs a connection.</p>
+                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
+                            <p>ZipBooks is cloud-only and requires a constant internet connection to access your data.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Is Argo Books cheaper for a team?<?php $q = ob_get_clean();
+            ob_start(); ?>How is Argo Books different from ZipBooks?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes, and the gap widens with headcount. Bonsai charges per user, so a three-person business pays three times its listed price. Argo Books Premium is one flat $<?= $argo_monthly ?> CAD/month.</p>
+                            <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management, all at a lower premium price.</p>
+                            <p>ZipBooks is cloud-based and focused more on invoicing and time tracking for freelancers.</p>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to ZipBooks?<?php $q = ob_get_clean();
+            ob_start(); ?>
+                            <p>Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> vs ZipBooks Smarter at $<?= $zb_smarter ?> CAD/month.</p>
+                            <p>You get more features for less with Argo Books.</p>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
+            ob_start(); ?>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
+                            <p>ZipBooks is web-based and accessible from any browser.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             echo argo_faq_grid($faqs); ?>
@@ -533,7 +543,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
         <section class="cta-section">
             <div class="container">
                 <div class="cta-card animate-on-scroll">
-                    <h2>Ready for flat pricing and real books?</h2>
+                    <h2>Ready to try a more capable free option?</h2>
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">

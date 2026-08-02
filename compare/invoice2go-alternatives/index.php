@@ -22,24 +22,24 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs Invoice2Go: compare pricing, invoice limits, and features. Invoice2Go caps invoices on its cheaper plans; Argo Books does not, and adds full bookkeeping, offline access, and local data storage.">
+        content="Invoice2Go alternatives without monthly invoice caps. Compare invoicing apps that also track expenses, inventory and profit rather than just billing.">
     <meta name="keywords"
-        content="Argo Books vs Invoice2Go, Invoice2Go alternative, invoice app alternative, unlimited invoicing software, offline invoicing, small business accounting">
+        content="Invoice2Go alternatives, Invoice2Go alternative, unlimited invoicing software, invoicing app for small business, free invoicing software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Invoice2Go: No Invoice Caps, Full Bookkeeping">
+    <meta property="og:title" content="Invoice2Go Alternatives Without the Invoice Caps">
     <meta property="og:description"
-        content="Invoice2Go's cheap plans cap you at 2 to 5 invoices a month. Argo Books does not cap invoices on Premium, and it keeps your actual books too.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-invoice2go/">
+        content="Invoice2Go caps how many invoices you send and stops at billing. Here are the alternatives with no caps and the whole books.">
+    <meta property="og:url" content="https://argorobots.com/compare/invoice2go-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Invoice2Go: No Invoice Caps, Full Bookkeeping">
+    <meta name="twitter:title" content="Invoice2Go Alternatives Without the Invoice Caps">
     <meta name="twitter:description"
-        content="Invoice2Go's cheap plans cap you at 2 to 5 invoices a month. Argo Books does not cap invoices on Premium, and it keeps your actual books too.">
+        content="Invoice2Go caps how many invoices you send and stops at billing. Here are the alternatives with no caps and the whole books.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -50,10 +50,10 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-invoice2go/">
+    <link rel="canonical" href="https://argorobots.com/compare/invoice2go-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs Invoice2Go" => "/compare/argo-books-vs-invoice2go/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Invoice2Go alternatives" => "/compare/invoice2go-alternatives/"]) ?></script>
 
     <!-- FAQ Schema, mirrors the visible accordion below -->
     <script type="application/ld+json">
@@ -106,7 +106,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Invoice2Go: No Invoice Caps | Argo Books</title>
+    <title>Invoice2Go Alternatives With No Invoice Limits | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -139,8 +139,8 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">Invoice2Go alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs Invoice2Go</span></h1>
+                <span class="hero-eyebrow">Invoice2Go alternatives</span>
+                <h1>Invoice2Go <span class="text-gradient">alternatives</span></h1>
                 <p class="hero-subtitle">Invoice2Go's cheapest plan allows two invoices a month. Argo Books gives you full bookkeeping, offline, for less than their unlimited tier.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -467,15 +467,15 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks' => 'QuickBooks',
-                    'argo-books-vs-wave' => 'Wave',
-                    'argo-books-vs-freshbooks' => 'FreshBooks',
-                    'argo-books-vs-xero' => 'Xero',
-                    'argo-books-vs-zipbooks' => 'ZipBooks',
+                    'argo-books-vs-quickbooks' => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'       => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks' => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'       => 'Argo Books vs. Xero',
+                    'zipbooks-alternatives'    => 'ZipBooks alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>

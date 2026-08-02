@@ -7,10 +7,8 @@ require_once __DIR__ . '/../../track_referral.php';
 $plans         = get_plan_features();
 $pricing       = get_pricing_config();
 $argo_monthly  = (int) $pricing['premium_monthly_price'];
-$argo_yearly   = (int) $pricing['premium_yearly_price'];
-$hb_starter    = competitor_price('honeybook', 'starter');    // 40
-$hb_essentials = competitor_price('honeybook', 'essentials'); // 67
-$hb_premium    = competitor_price('honeybook', 'premium');    // 149
+$odoo_standard = competitor_price('odoo', 'standard');
+$odoo_custom   = competitor_price('odoo', 'custom');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,24 +21,24 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs HoneyBook: HoneyBook runs your client pipeline and gets you paid; Argo Books actually keeps your books. Compare features, pricing, and what each tool is really for.">
+        content="Odoo Accounting alternatives with one flat price instead of per-user ERP billing. Compare simpler small business options on features, setup effort and cost.">
     <meta name="keywords"
-        content="Argo Books vs HoneyBook, HoneyBook alternative, HoneyBook accounting, is HoneyBook accounting software, HoneyBook for bookkeeping, small business accounting, affordable accounting software">
+        content="Odoo accounting alternatives, Odoo alternative, ERP alternative for small business, flat price accounting software, simple accounting software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs HoneyBook: Client Flow vs Real Books">
+    <meta property="og:title" content="Odoo Accounting Alternatives: One Flat Price">
     <meta property="og:description"
-        content="Compare Argo Books and HoneyBook side by side. HoneyBook manages clients and invoices; Argo Books keeps the actual books, invoicing included.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-honeybook/">
+        content="Odoo bills per user and per module and expects an implementation. Here are the alternatives that are one flat price and ready to use.">
+    <meta property="og:url" content="https://argorobots.com/compare/odoo-accounting-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs HoneyBook: Client Flow vs Real Books">
+    <meta name="twitter:title" content="Odoo Accounting Alternatives: One Flat Price">
     <meta name="twitter:description"
-        content="Compare Argo Books and HoneyBook side by side. HoneyBook manages clients and invoices; Argo Books keeps the actual books, invoicing included.">
+        content="Odoo bills per user and per module and expects an implementation. Here are the alternatives that are one flat price and ready to use.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -51,10 +49,10 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-honeybook/">
+    <link rel="canonical" href="https://argorobots.com/compare/odoo-accounting-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs HoneyBook" => "/compare/argo-books-vs-honeybook/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Odoo accounting alternatives" => "/compare/odoo-accounting-alternatives/"]) ?></script>
 
     <!-- FAQ Schema -->
     <script type="application/ld+json">
@@ -67,15 +65,7 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. HoneyBook has no free plan, only a 7-day trial, and paid plans start at $<?= $hb_starter ?> CAD/month."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is HoneyBook accounting software?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Not really. HoneyBook is a client-flow and CRM platform for service solopreneurs: proposals, contracts, scheduling, a client portal, lead forms, invoicing, and payments. It does not do real bookkeeping, and it even integrates with QuickBooks Online to handle the actual accounting. Argo Books is your actual books, with expense and revenue tracking, financial reports, and invoicing in one app."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month."
                     }
                 },
                 {
@@ -83,15 +73,23 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                     "name": "Does Argo Books work offline?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. HoneyBook is cloud-only, with a mobile app, and requires a constant internet connection."
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure to set up and maintain."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How does Argo Books pricing compare to HoneyBook?",
+                    "name": "Does Argo Books have CRM or HR features?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is far more affordable, and there is no per-client fee. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month (or $<?= $argo_yearly ?>/year). HoneyBook has no free plan and runs about $<?= $hb_starter ?> to $<?= $hb_premium ?> CAD/month across its Starter, Essentials, and Premium tiers. And because HoneyBook is not accounting software, many users still pay for separate books on top."
+                        "text": "No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well: it's simple to learn and doesn't require a consultant to set up."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to Odoo?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $<?= $odoo_standard ?>+ CAD/user/month. Costs escalate quickly as you add modules and users."
                     }
                 },
                 {
@@ -99,7 +97,7 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. HoneyBook is web-based and also has a mobile app for iOS and Android."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
                     }
                 }
             ]
@@ -107,7 +105,7 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs HoneyBook: Client Flow vs Real Books | Argo Books</title>
+    <title>Odoo Accounting Alternatives: No Per-User Billing | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -140,9 +138,9 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">HoneyBook alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs HoneyBook</span></h1>
-                <p class="hero-subtitle">HoneyBook runs your client pipeline and gets you paid. Argo Books actually keeps your books. See where each one fits, and why Argo does the books and the invoicing in one app.</p>
+                <span class="hero-eyebrow">Odoo alternatives</span>
+                <h1>Odoo accounting <span class="text-gradient">alternatives</span></h1>
+                <p class="hero-subtitle">A simpler, more affordable way to manage your small business finances. All the essentials, none of the ERP complexity or the per-user price creep.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Try Argo Books Free</span>
@@ -169,38 +167,38 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The short version</span>
-                <h2>What's the difference between Argo Books and HoneyBook?</h2>
-                <p class="section-desc">They solve different problems. HoneyBook is a client-flow and CRM platform for service solopreneurs: proposals, contracts, scheduling, a client portal, lead forms, invoicing, and payments. Argo Books is bookkeeping: expense and revenue tracking, financial reports, inventory, and invoicing in one app. Many HoneyBook users still run separate accounting; Argo does the books and the invoicing together.</p>
+                <h2>What's the difference between Argo Books and Odoo?</h2>
+                <p class="section-desc">Both can handle your finances. The difference is scope. Odoo is a full modular ERP built for growing, multi-department companies and priced per user; Argo Books is built for the business owner who just needs their books, and priced as one flat plan for the whole team.</p>
             </div>
             <div class="diff-split">
                 <div class="diff-copy animate-on-scroll">
-                    <h3>Why choose Argo Books over HoneyBook?</h3>
+                    <h3>Why choose Argo Books over Odoo?</h3>
                     <ul class="why-list">
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>It actually keeps your books.</strong> Invoicing, expenses, receipts, inventory, and reports in one clean app. HoneyBook isn't accounting software, so with it you'd still need a separate tool for your books.</span>
+                            <span><strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no ERP modules to install or configure and no accounting jargon to learn.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>A genuinely free plan.</strong> All the core features forever, no trial and no credit card. HoneyBook has no free plan, just a 7-day trial.</span>
+                            <span><strong>A genuinely usable free plan.</strong> All the core finance features forever, no credit card. Odoo's free plan is limited to a single app, so a second module already means paying per user.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, while HoneyBook is cloud-only.</span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>AI built into your books.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included, aimed at your bookkeeping rather than your client pipeline.</span>
+                            <span><strong>AI that's included, not upsold.</strong> Receipt scanning, spreadsheet import, and predictive analytics come built in, with no consultant or implementation project required.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>One predictable price.</strong> Everything in Premium for $<?= $argo_monthly ?> CAD/month. No per-client fees, and no HoneyBook-style $<?= $hb_starter ?>+ CAD/month floor.</span>
+                            <span><strong>One predictable price.</strong> Everything in Premium for $<?= $argo_monthly ?> CAD/month, flat. No per-user fees, so your cost doesn't climb as your team grows.</span>
                         </li>
                     </ul>
                 </div>
                 <div class="diff-visual animate-on-scroll">
                     <div class="diff-mockup">
-                        <!-- Decorative price-comparison mockup. aria-hidden so it adds no
+                        <!-- Decorative cost mockup. aria-hidden so it adds no
                              indexable text (no duplicate-content/SEO impact). -->
                         <svg viewBox="0 0 640 460" role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
                             <defs>
@@ -211,50 +209,46 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
 
                                 <!-- Title -->
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">What you'll pay per month</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">One flat Argo price vs HoneyBook's rising plans.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Argo is one flat price. Odoo bills per user.</text>
 
                                 <!-- Legend -->
-                                <rect x="40" y="98" width="16" height="10" rx="2" fill="#3f63e8"/>
-                                <text x="62" y="107" font-size="13" fill="#0f172a">Argo Books</text>
-                                <rect x="166" y="98" width="16" height="10" rx="2" fill="#ef4444"/>
-                                <text x="188" y="107" font-size="13" fill="#0f172a">HoneyBook</text>
+                                <rect x="40" y="100" width="14" height="10" rx="2" fill="#3f63e8"/>
+                                <text x="60" y="109" font-size="13" fill="#0f172a">Argo Books</text>
+                                <rect x="166" y="100" width="14" height="10" rx="2" fill="#ef4444"/>
+                                <text x="186" y="109" font-size="13" fill="#0f172a">Odoo Standard</text>
 
-                                <!-- Bars: width scaled so $149 (widest) = 387px, i.e. ~2.6px per $1.
-                                     Label column runs to x=200 so no label truncates. -->
-                                <!-- Argo Free $0 -->
-                                <text x="40" y="152" font-size="13" font-weight="600" fill="#0f172a">Argo Free</text>
-                                <rect x="200" y="140" width="2" height="18" rx="3" fill="#3f63e8"/>
-                                <text x="212" y="153" font-size="13" font-weight="600" fill="#0f172a">$0</text>
+                                <!-- Bars: width proportional to price, max ($220) = 380px wide -->
+                                <!-- Argo Premium (flat) $15 -->
+                                <text x="40" y="156" font-size="13" font-weight="600" fill="#0f172a">Argo Premium (flat)</text>
+                                <rect x="40" y="166" width="26" height="26" rx="5" fill="#3f63e8"/>
+                                <text x="76" y="184" font-size="14" font-weight="700" fill="#0f172a">$15</text>
 
-                                <!-- Argo Premium $15 -->
-                                <text x="40" y="196" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
-                                <rect x="200" y="184" width="39" height="18" rx="3" fill="#3f63e8"/>
-                                <text x="249" y="197" font-size="13" font-weight="600" fill="#0f172a">$<?= $argo_monthly ?></text>
+                                <!-- Odoo, 1 user $44 -->
+                                <text x="40" y="216" font-size="13" font-weight="600" fill="#0f172a">Odoo, 1 user</text>
+                                <rect x="40" y="226" width="76" height="26" rx="5" fill="#ef4444"/>
+                                <text x="126" y="244" font-size="14" font-weight="700" fill="#0f172a">$44</text>
 
-                                <!-- HoneyBook Starter $40 -->
-                                <text x="40" y="256" font-size="13" font-weight="600" fill="#0f172a">HoneyBook Starter</text>
-                                <rect x="200" y="244" width="104" height="18" rx="3" fill="#ef4444"/>
-                                <text x="314" y="257" font-size="13" font-weight="600" fill="#0f172a">$<?= $hb_starter ?></text>
+                                <!-- Odoo, 3 users $132 -->
+                                <text x="40" y="276" font-size="13" font-weight="600" fill="#0f172a">Odoo, 3 users</text>
+                                <rect x="40" y="286" width="228" height="26" rx="5" fill="#ef4444"/>
+                                <text x="278" y="304" font-size="14" font-weight="700" fill="#0f172a">$132</text>
 
-                                <!-- HoneyBook Essentials $67 -->
-                                <text x="40" y="300" font-size="13" font-weight="600" fill="#0f172a">HoneyBook Essentials</text>
-                                <rect x="200" y="288" width="174" height="18" rx="3" fill="#ef4444"/>
-                                <text x="384" y="301" font-size="13" font-weight="600" fill="#0f172a">$<?= $hb_essentials ?></text>
+                                <!-- Odoo, 5 users $220 -->
+                                <text x="40" y="336" font-size="13" font-weight="600" fill="#0f172a">Odoo, 5 users</text>
+                                <rect x="40" y="346" width="380" height="26" rx="5" fill="#ef4444"/>
+                                <text x="430" y="364" font-size="14" font-weight="700" fill="#0f172a">$220</text>
 
-                                <!-- HoneyBook Premium $149 -->
-                                <text x="40" y="344" font-size="13" font-weight="600" fill="#0f172a">HoneyBook Premium</text>
-                                <rect x="200" y="332" width="387" height="18" rx="3" fill="#ef4444"/>
-                                <text x="597" y="345" font-size="13" font-weight="600" fill="#0f172a">$<?= $hb_premium ?></text>
-
-                                <!-- Baseline -->
-                                <line x1="200" y1="372" x2="200" y2="128" stroke="#e2e8f0" stroke-width="1"/>
+                                <!-- Flat-price reminder -->
+                                <rect x="40" y="402" width="26" height="18" rx="5" fill="#eef2fe"/>
+                                <line x1="53" y1="406" x2="53" y2="416" stroke="#3f63e8" stroke-width="2.4" stroke-linecap="round"/>
+                                <text x="76" y="416" font-size="13" font-weight="600" fill="#3f63e8">Argo stays $15 for the whole team</text>
                             </g>
                             <rect x="1" y="1" width="638" height="458" rx="18" fill="none" stroke="#e2e8f0" stroke-width="1"/>
                         </svg>
                     </div>
                     <div class="diff-callout">
-                        <span class="diff-callout-title">Not your books</span>
-                        <span class="diff-callout-sub">HoneyBook manages clients; Argo keeps the actual books.</span>
+                        <span class="diff-callout-title">Billed per user</span>
+                        <span class="diff-callout-sub">Odoo charges per user, per month. Argo is one flat price for your whole team</span>
                     </div>
                 </div>
             </div>
@@ -278,51 +272,21 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
-                            <th class="brand-col">HoneyBook<span class="th-sub">Starter: $<?= $hb_starter ?> CAD/month</span></th>
+                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $<?= $odoo_standard ?>+ CAD/user/mo</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Expense &amp; revenue tracking (bookkeeping)</td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Financial reports (P&amp;L, balance sheet)</td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Invoicing &amp; payments</td>
+                            <td>Expense &amp; revenue tracking</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Proposals &amp; contracts</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Client scheduling &amp; calendar</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Client portal</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Inventory management</td>
+                            <td>Financial reports</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Desktop app (offline-capable)</td>
@@ -331,10 +295,34 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>AI receipt scanning</td>
+                            <td>No accounting knowledge required</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Unlimited products</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Invoicing &amp; payments</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Inventory management</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>AI receipt scanning</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI spreadsheet import</td>
@@ -346,7 +334,25 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                             <td>Predictive analytics</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Biometric login security</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>CRM &amp; sales pipeline</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>HR &amp; payroll</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -359,44 +365,44 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">The honest verdict</span>
-                <h2>Argo Books vs HoneyBook: pros &amp; cons</h2>
+                <h2>Argo Books vs Odoo: pros &amp; cons</h2>
             </div>
             <div class="pros-cons-grid">
                 <div class="pc-card pc-argo animate-on-scroll">
                     <div class="pc-block">
                         <h3>Argo Books pros</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Real bookkeeping and invoicing in one app</strong>, so you're not stitching together separate tools</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI included</strong>: receipt scanning, spreadsheet import, and predictive analytics</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month with no per-client fees</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month for your whole team, with no per-user fees</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>All your finances in one app</strong>: invoicing, expenses, inventory, and reporting, with no ERP modules to configure</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with no server to host</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Simple from day one</strong>, no consultant or implementation project to get started</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
                         <h3>Argo Books cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No proposals or contracts, so HoneyBook is the better fit if you send those to book clients</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No client scheduling or calendar built in</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No client portal or lead-capture forms; Argo keeps your books, it isn't a client CRM</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No CRM or sales pipeline, so Odoo is the better fit if you need those</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No HR or payroll modules</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>A focused finance tool, not a full modular suite with hundreds of apps</span></li>
                         </ul>
                     </div>
                 </div>
                 <div class="pc-card pc-competitor animate-on-scroll">
                     <div class="pc-block">
-                        <h3>HoneyBook cons</h3>
+                        <h3>Odoo cons</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No free plan</strong> and pricey: about $<?= $hb_starter ?> to $<?= $hb_premium ?> CAD/month</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Not accounting software</strong>, so you'll still need separate books for expenses and reports</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Cloud-only</strong>, no offline desktop access to your data</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Priced per user</strong>: from $<?= $odoo_standard ?> CAD/user/month, so cost climbs fast as your team grows</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Complex to set up</strong>, a full ERP that often needs configuration or a consultant</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Developer-oriented</strong>, and the free plan is limited to a single app</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
-                        <h3>HoneyBook pros</h3>
+                        <h3>Odoo pros</h3>
                         <ul class="pc-list">
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Excellent client flow: proposals, contracts, and scheduling in one place</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Client portal plus lead-capture forms to bring new work in</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Built to book clients and get paid, with HoneyBook AI to help along the way</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Extremely powerful, a full modular ERP that scales to complex needs</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Huge app ecosystem: CRM, HR, manufacturing, e-commerce, and hundreds more</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span>Deeply customizable for growing, multi-department companies</span></li>
                         </ul>
                     </div>
                 </div>
@@ -409,8 +415,8 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
-                <h2>Everything you need, nothing you don't</h2>
-                <p class="section-desc">Both tools help small businesses get paid, but they focus on different things. HoneyBook shines at client flow: proposals, contracts, and scheduling. Argo Books focuses on your actual books, offline access, and inventory.</p>
+                <h2>Built for small businesses, not enterprise ERP</h2>
+                <p class="section-desc">Odoo is a full ERP suite with hundreds of apps designed for mid-to-large businesses. Argo Books is purpose-built for small businesses that need finance and inventory management without the complexity.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -418,14 +424,14 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>HoneyBook has no free plan and runs about $<?= $hb_starter ?> to $<?= $hb_premium ?> CAD/month. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
+                    <p>Odoo charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $<?= $argo_monthly ?> CAD/month, with no per-user fees.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 30, '', 1.5) ?>
                     </div>
-                    <h3>Actually your books</h3>
-                    <p>HoneyBook manages clients and invoices, then hands off to QuickBooks for the accounting. Argo Books keeps the books itself, invoicing included, so it's one tool instead of two.</p>
+                    <h3>Simple from day one</h3>
+                    <p>Odoo's learning curve is steep: it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -446,8 +452,8 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>HoneyBook excels at running a client pipeline: proposals, contracts, scheduling, a client portal, and lead forms, all built to book clients and get you paid. If that client flow is your core need, HoneyBook is a genuinely strong tool.</p>
-                <p>But HoneyBook isn't accounting software, so you'll still need something for your actual books. If you want expense tracking, financial reports, inventory, and invoicing in one app, without paying $<?= $hb_starter ?>+ CAD/month for a tool that then hands off to QuickBooks, Argo Books is built for you.</p>
+                <p>Odoo is a powerful, full-featured ERP platform with CRM, HR, manufacturing, e-commerce, and hundreds of other modules. If your business needs an all-in-one enterprise system, Odoo is hard to beat.</p>
+                <p>But if you're a small business that just needs straightforward finance management, inventory tracking, and invoicing without configuring an entire ERP, Argo Books gets you there in minutes, not weeks.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -466,17 +472,15 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks'  => 'QuickBooks',
-                    'argo-books-vs-wave'        => 'Wave',
-                    'argo-books-vs-freshbooks'  => 'FreshBooks',
-                    'argo-books-vs-xero'        => 'Xero',
-                    'argo-books-vs-zipbooks'    => 'ZipBooks',
-                    'argo-books-vs-odoo'        => 'Odoo',
-                    'argo-books-vs-sage'        => 'Sage',
+                    'argo-books-vs-quickbooks' => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'       => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks' => 'Argo Books vs. FreshBooks',
+                    'argo-books-vs-xero'       => 'Argo Books vs. Xero',
+                    'zipbooks-alternatives'    => 'ZipBooks alternatives',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>
@@ -495,31 +499,31 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
             ob_start(); ?>Is Argo Books really free?<?php $q = ob_get_clean();
             ob_start(); ?>
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
-                            <p>HoneyBook has no free plan, only a 7-day trial, and paid plans start at $<?= $hb_starter ?> CAD/month.</p>
-                        
-            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Is HoneyBook accounting software?<?php $q = ob_get_clean();
-            ob_start(); ?>
-                            <p>Not really. HoneyBook is a client-flow and CRM platform for service solopreneurs: proposals, contracts, scheduling, a client portal, lead forms, invoicing, and payments. It doesn't do real bookkeeping, no expense tracking, no financial statements, no inventory.</p>
-                            <p>In fact, HoneyBook integrates with QuickBooks Online to handle the actual accounting. Argo Books is your actual books, with expense and revenue tracking, financial reports, and invoicing in one app.</p>
+                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Does Argo Books work offline?<?php $q = ob_get_clean();
             ob_start(); ?>
                             <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
-                            <p>HoneyBook is cloud-only, with a mobile app, and requires a constant internet connection to access your data.</p>
+                            <p>Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure to set up and maintain.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>How does Argo Books pricing compare to HoneyBook?<?php $q = ob_get_clean();
+            ob_start(); ?>Does Argo Books have CRM or HR features?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books is far more affordable, and there's no per-client fee. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong> (or $<?= $argo_yearly ?>/year). HoneyBook has no free plan and runs about $<?= $hb_starter ?> to $<?= $hb_premium ?> CAD/month across its Starter, Essentials, and Premium tiers.</p>
-                            <p>And because HoneyBook isn't accounting software, many users still pay for separate books on top.</p>
+                            <p>No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice.</p>
+                            <p>Argo Books is designed to do fewer things really well: it's simple to learn and doesn't require a consultant to set up.</p>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>How does Argo Books pricing compare to Odoo?<?php $q = ob_get_clean();
+            ob_start(); ?>
+                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $<?= $odoo_standard ?>+ CAD/user/month.</p>
+                            <p>Costs escalate quickly as you add modules and users.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
                             <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
-                            <p>HoneyBook is web-based and also has a mobile app for iOS and Android.</p>
+                            <p>Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             echo argo_faq_grid($faqs); ?>
@@ -534,7 +538,7 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
         <section class="cta-section">
             <div class="container">
                 <div class="cta-card animate-on-scroll">
-                    <h2>Ready to keep your books in one place?</h2>
+                    <h2>Ready to try a simpler alternative?</h2>
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">

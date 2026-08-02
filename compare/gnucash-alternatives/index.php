@@ -21,24 +21,24 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs GnuCash: both desktop apps that keep your data local. Compare ease of use, AI features, and how much accounting knowledge each one expects before you can start.">
+        content="Looking for a GnuCash alternative? Compare desktop accounting apps that keep your books on your own machine, without needing to know debits from credits.">
     <meta name="keywords"
-        content="Argo Books vs GnuCash, GnuCash alternative, free desktop accounting software, open source accounting alternative, local accounting software, offline bookkeeping">
+        content="GnuCash alternatives, GnuCash alternative, free desktop accounting software, open source accounting alternative, local accounting software, offline bookkeeping">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs GnuCash: Local Data Without the Learning Curve">
+    <meta property="og:title" content="GnuCash Alternatives: Local Data Without the Learning Curve">
     <meta property="og:description"
-        content="GnuCash is free, local and powerful, and built for people who know double-entry accounting. Argo Books keeps the local data and drops the prerequisite.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-gnucash/">
+        content="GnuCash is free, local and powerful, and built for people who know double-entry accounting. Here is the alternative that keeps the local data and drops the prerequisite.">
+    <meta property="og:url" content="https://argorobots.com/compare/gnucash-alternatives/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs GnuCash: Local Data Without the Learning Curve">
+    <meta name="twitter:title" content="GnuCash Alternatives: Local Data Without the Learning Curve">
     <meta name="twitter:description"
-        content="GnuCash is free, local and powerful, and built for people who know double-entry accounting. Argo Books keeps the local data and drops the prerequisite.">
+        content="GnuCash is free, local and powerful, and built for people who know double-entry accounting. Here is the alternative that keeps the local data and drops the prerequisite.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -49,10 +49,10 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-gnucash/">
+    <link rel="canonical" href="https://argorobots.com/compare/gnucash-alternatives/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Argo Books vs GnuCash" => "/compare/argo-books-vs-gnucash/"]) ?></script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "GnuCash alternatives" => "/compare/gnucash-alternatives/"]) ?></script>
 
     <!-- FAQ Schema, mirrors the visible accordion below -->
     <script type="application/ld+json">
@@ -105,7 +105,7 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs GnuCash: Desktop Accounting Compared | Argo Books</title>
+    <title>GnuCash Alternatives: Local Books, No Double-Entry | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -138,8 +138,8 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
         </div>
         <div class="container">
             <div class="hero-content animate-fade-in">
-                <span class="hero-eyebrow">GnuCash alternative</span>
-                <h1>Argo Books <span class="text-gradient">vs GnuCash</span></h1>
+                <span class="hero-eyebrow">GnuCash alternatives</span>
+                <h1>GnuCash <span class="text-gradient">alternatives</span></h1>
                 <p class="hero-subtitle">GnuCash is free, runs on your machine, and keeps your data yours. It also expects you to already understand double-entry bookkeeping.</p>
                 <div class="hero-ctas">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -462,15 +462,15 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
             <div class="compare-cards animate-on-scroll">
                 <?php
                 $other_comparisons = [
-                    'argo-books-vs-quickbooks' => 'QuickBooks',
-                    'argo-books-vs-wave' => 'Wave',
-                    'argo-books-vs-freshbooks' => 'FreshBooks',
-                    'argo-books-vs-manager' => 'Manager.io',
-                    'argo-books-vs-xero' => 'Xero',
+                    'argo-books-vs-quickbooks' => 'Argo Books vs. QuickBooks',
+                    'argo-books-vs-wave'       => 'Argo Books vs. Wave',
+                    'argo-books-vs-freshbooks' => 'Argo Books vs. FreshBooks',
+                    'manager-io-alternatives'  => 'Manager.io alternatives',
+                    'argo-books-vs-xero'       => 'Argo Books vs. Xero',
                 ];
                 foreach ($other_comparisons as $slug => $name): ?>
                 <a class="compare-card" href="../<?= $slug ?>/">
-                    <span>Argo Books vs. <?= $name ?></span>
+                    <span><?= $name ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>

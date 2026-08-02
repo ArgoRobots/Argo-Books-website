@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
-require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
 require_once __DIR__ . '/../date-range.php';
 
 // Check if user is logged in
@@ -57,6 +57,7 @@ $aggregatedData = [
         'ReceiptScanning' => [],
         'Session' => [],
         'Error' => [],
+        'Warning' => [],
         'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
@@ -164,7 +165,16 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             $normalized['SourceFile'] = $event['sourceFile'] ?? '';
             $normalized['LineNumber'] = $event['lineNumber'] ?? null;
             $normalized['MethodName'] = $event['methodName'] ?? '';
-            return ['category' => 'Error', 'data' => $normalized];
+            // The app stamps severity from its own LogLevel. Warnings are expected,
+            // handled conditions, so they get their own bucket and never reach the
+            // Errors tab's charts or details table. Events uploaded before the field
+            // existed carry no severity and stay errors; we don't infer it from the
+            // error code. Either way the event still counts toward DAU and tier users,
+            // because that accounting happens before this bucket is used.
+            $severity = strcasecmp((string)($event['severity'] ?? ''), 'Warning') === 0
+                ? 'Warning'
+                : 'Error';
+            return ['category' => $severity, 'data' => $normalized];
 
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
@@ -248,10 +258,11 @@ if (empty($dataDirs)) {
                 }
                 $fileAuthId = $fileData['authId'] ?? '';
 
-                // Never let the founder's own installs count toward app stats, even
-                // for files that reached disk before their id was added to
-                // EXCLUDED_AUTH_IDS. Skips the whole file: tier counts, DAU, geo.
-                if (is_excluded_auth_id($fileAuthId)) {
+                // Never let the founder's own installs count toward app stats. This one
+                // skip covers the whole file, so it keeps them out of tier counts, DAU,
+                // geo, versions, features, usage, API and errors in a single place. The
+                // User Activity tab reads the same files separately and does show them.
+                if (is_founder_auth_id($fileAuthId)) {
                     continue;
                 }
 
@@ -537,6 +548,7 @@ include __DIR__ . '/../admin_header.php';
         count($aggregatedData['dataPoints']['ReceiptScanning']) > 0 ||
         count($aggregatedData['dataPoints']['Session']) > 0 ||
         count($aggregatedData['dataPoints']['Error']) > 0 ||
+        count($aggregatedData['dataPoints']['Warning']) > 0 ||
         count($aggregatedData['dataPoints']['FeatureUsage']) > 0
     );
     ?>

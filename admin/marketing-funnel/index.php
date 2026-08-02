@@ -619,7 +619,7 @@ function get_campaign_spend_rows(): array
  */
 function get_app_activation_stats(?string $period_start = null): array
 {
-    require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+    require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
 
     // "Activation" = the user did a real bookkeeping action (got value from the
     // app), as opposed to setup/scaffolding (creating a customer, supplier,
@@ -659,7 +659,7 @@ function get_app_activation_stats(?string $period_start = null): array
             }
 
             $authId = (string)($data['authId'] ?? '');
-            if ($authId === '' || is_excluded_auth_id($authId)) {
+            if ($authId === '' || is_founder_auth_id($authId)) {
                 continue; // unattributable or the founder's own machine
             }
 

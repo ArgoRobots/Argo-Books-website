@@ -18,7 +18,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit('Forbidden');
 }
 
-require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
 
 // Tier and date range come from the page-level control bar, so this tab shows
 // the same slice as the charts. Defaulted here so the partial still renders if
@@ -60,6 +60,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['del_files'])) {
         }
     }
     $ua_flash = "Deleted {$deleted} file(s) for " . htmlspecialchars($label) . ".";
+}
+
+// ---- Severity helper ---------------------------------------------------------
+// True when an Error-dataType event is really a warning: an expected, handled
+// condition rather than a failure. The app stamps this from its own LogLevel.
+// Events uploaded before the field existed have no severity and stay errors,
+// which is deliberate: we don't guess severity from the error code.
+if (!function_exists('ua_is_warning')) {
+    function ua_is_warning(array $ev): bool
+    {
+        return strcasecmp((string)($ev['severity'] ?? ''), 'Warning') === 0;
+    }
 }
 
 // ---- Per-event description helper -------------------------------------------
@@ -114,6 +126,12 @@ function ua_describe_event(array $ev): array
                 if (!empty($ev['lineNumber'])) $loc .= ':' . $ev['lineNumber'];
                 $parts[] = $loc;
             }
+            // The message carries the detail a warning needs to be actionable; error
+            // rows already say enough via category + code + location.
+            if (ua_is_warning($ev)) {
+                if (!empty($ev['message'])) $parts[] = $ev['message'];
+                return ['warning', 'Warning: ' . ($parts ? implode(' · ', $parts) : 'unknown')];
+            }
             return ['error', 'Error: ' . ($parts ? implode(' · ', $parts) : 'unknown')];
 
         default:
@@ -133,10 +151,11 @@ foreach ($ua_files as $name => $path) {
     $authId = $d['authId'] ?? '(no authId)';
     $geo    = $d['geoLocation'] ?? [];
 
-    // Hide the founder's own installs (single source of truth: EXCLUDED_AUTH_IDS).
-    if (is_excluded_auth_id($authId)) {
-        continue;
-    }
+    // This tab is the ONE place the founder's own installs are visible. Every other
+    // read site (app-stats charts and KPIs, crashes, marketing funnel) skips them, so
+    // they never reach a real-user number. Here they render badged and are left out of
+    // the header tally instead.
+    $isFounder = is_founder_auth_id($authId);
 
     // Page-level tier filter.
     if ($ua_tierFilter !== 'all' && $tier !== $ua_tierFilter) {
@@ -147,6 +166,7 @@ foreach ($ua_files as $name => $path) {
         $ua_users[$authId] = [
             'tier'      => $tier,
             'authId'    => $authId,
+            'isFounder' => $isFounder,
             'platforms' => [],
             'versions'  => [],
             'country'   => $geo['country'] ?? '',
@@ -161,6 +181,7 @@ foreach ($ua_files as $name => $path) {
             'exports'   => [],   // exportType  => count
             'apis'      => [],   // apiName     => count
             'errors'    => 0,
+            'warnings'  => 0,    // severity=Warning events, counted apart from errors
             'timeline'  => [],   // every event: ['ts','type','text']
             'files'     => [],
         ];
@@ -211,7 +232,11 @@ foreach ($ua_files as $name => $path) {
                 $u['apis'][$a] = ($u['apis'][$a] ?? 0) + 1;
                 break;
             case 'Error':
-                $u['errors']++;
+                if (ua_is_warning($ev)) {
+                    $u['warnings']++;
+                } else {
+                    $u['errors']++;
+                }
                 break;
         }
 
@@ -266,6 +291,9 @@ if (!function_exists('ua_kv')) {
 .ua-badge { display:inline-block; font-size:.7rem; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:999px; margin-left:.5rem; vertical-align:middle; }
 .ua-badge.free { background:#dbeafe; color:#1e40af; }
 .ua-badge.premium { background:#fef3c7; color:#92400e; }
+/* The founder's own install. Deliberately loud so it can never be mistaken for a
+   real user while reading the list. */
+.ua-badge.founder { background:#7c3aed; color:#fff; }
 .ua-meta { color:var(--black); font-size:.85rem; margin:.4rem 0; }
 .ua-meta span { display:inline-block; margin-right:1.25rem; }
 .ua-row { font-size:.85rem; margin:.25rem 0; }
@@ -290,6 +318,10 @@ if (!function_exists('ua_kv')) {
    noticing, but prose rather than the error rows' monospace: there's no code here. */
 .ua-evt.unclean .ua-evt-text { color:#b91c1c; font-weight:600; }
 .ua-unclean { color:#b91c1c; font-weight:700; }
+/* Warnings are expected, handled conditions. Amber and prose, so they read as
+   "worth knowing" rather than sitting in the error rows' red monospace. */
+.ua-evt.warning .ua-evt-text { color:#b45309; }
+.ua-warn { color:#b45309; font-weight:700; }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
 [data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
@@ -301,6 +333,7 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
 [data-theme="dark"] .ua-evt.unclean .ua-evt-text, [data-theme="dark"] .ua-unclean { color:#f87171; }
+[data-theme="dark"] .ua-evt.warning .ua-evt-text, [data-theme="dark"] .ua-warn { color:#fbbf24; }
 
 /* Filter controls. Pagination itself is the shared admin TablePaginator. */
 .ua-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1rem; }
@@ -346,10 +379,12 @@ if (!function_exists('ua_kv')) {
         $ua_haystack = strtolower(trim(
             $u['authId'] . ' ' . $u['country'] . ' ' . $u['region'] . ' ' .
             implode(' ', array_keys($u['versions'])) . ' ' .
-            implode(' ', array_keys($u['platforms']))
+            implode(' ', array_keys($u['platforms'])) .
+            // So "me" / "you" / "founder" all find your own card.
+            ($u['isFounder'] ? ' founder you me' : '')
         ));
     ?>
-    <tr class="ua-user" data-search="<?= htmlspecialchars($ua_haystack) ?>">
+    <tr class="ua-user"<?= $u['isFounder'] ? ' data-founder="1"' : '' ?> data-search="<?= htmlspecialchars($ua_haystack) ?>">
       <td class="ua-td">
         <div class="ua-card">
         <div class="ua-del">
@@ -362,7 +397,7 @@ if (!function_exists('ua_kv')) {
                 <button type="submit">Delete this user</button>
             </form>
         </div>
-        <h3><?= htmlspecialchars($u['authId']) ?><span class="ua-badge <?= $u['tier'] ?>"><?= htmlspecialchars($u['tier']) ?></span></h3>
+        <h3><?= htmlspecialchars($u['authId']) ?><span class="ua-badge <?= $u['tier'] ?>"><?= htmlspecialchars($u['tier']) ?></span><?php if ($u['isFounder']): ?><span class="ua-badge founder" title="Your own install. Counted nowhere else on the site.">You</span><?php endif; ?></h3>
         <div class="ua-meta">
             <span><b>Platform:</b> <?= htmlspecialchars(implode(', ', array_keys($u['platforms'])) ?: '—') ?></span>
             <span><b>Country:</b> <?= htmlspecialchars($u['country'] ?: '—') ?></span>
@@ -379,6 +414,9 @@ if (!function_exists('ua_kv')) {
             <?php endif; ?>
             <span><b>Total events:</b> <?= $u['events'] ?></span>
             <span><b>Errors:</b> <?= $u['errors'] ?></span>
+            <?php if ($u['warnings'] > 0): ?>
+                <span><b>Warnings:</b> <span class="ua-warn"><?= $u['warnings'] ?></span></span>
+            <?php endif; ?>
         </div>
         <div class="ua-row"><b>Features used:</b> <?= ua_kv($u['features']) ?></div>
         <div class="ua-row"><b>Exports:</b> <?= ua_kv($u['exports']) ?></div>
@@ -427,20 +465,26 @@ if (!function_exists('ua_kv')) {
         function apply() {
             var q = (search.value || '').trim().toLowerCase();
             var visible = 0;
+            var mine = 0;
 
             rows.forEach(function (tr) {
                 var ok = !q || (tr.dataset.search || '').indexOf(q) !== -1;
                 if (ok) {
                     tr.style.display = '';
-                    visible++;
+                    // The founder's own installs render here but are not real users, so
+                    // they are tallied separately rather than inflating the count.
+                    if (tr.dataset.founder) { mine++; } else { visible++; }
                 } else {
                     tr.style.display = 'none';
                     tr.classList.remove('pg-hidden');
                 }
             });
 
-            countEl.textContent = visible + (visible === 1 ? ' user' : ' users');
-            noRes.style.display = visible === 0 ? '' : 'none';
+            countEl.textContent = visible + (visible === 1 ? ' user' : ' users') +
+                (mine ? ' + you' : '');
+            // Founder rows count here: searching "me" matches only your own card, and
+            // that is still a result even though it adds nothing to the user tally.
+            noRes.style.display = (visible + mine) === 0 ? '' : 'none';
             if (table._paginator) table._paginator.reset();
         }
 

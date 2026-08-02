@@ -5,8 +5,6 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../portal/portal-helper.php';
 require_once __DIR__ . '/telemetry_filter.php';
-// Single source of truth for the founder's own installs (EXCLUDED_AUTH_IDS).
-require_once __DIR__ . '/../../founder_exclusion.php';
 // Provides lookup_country_for_ip(): DB-cached + ipinfo.io fallback.
 require_once __DIR__ . '/../../track_referral_event.php';
 
@@ -31,10 +29,9 @@ define('MAX_UPLOADS_PER_HOUR_FREE', 6);
 // shared NATs (a household, a small office) but low enough to block abuse.
 define('MAX_UPLOADS_PER_HOUR_FREE_PER_IP', 60);
 define('MAX_FILENAME_LENGTH', 255);
-// The founder's own installs are excluded via EXCLUDED_AUTH_IDS in .env (read
-// through is_excluded_auth_id() below), so their testing never pollutes
-// production stats and error counts. The upload still returns success so the
-// client marks its events uploaded and stops retrying.
+// The founder's own installs (FOUNDER_AUTH_IDS in .env) upload on exactly the same
+// path as everyone else. Their data is kept so it can be reviewed on the app-stats
+// User Activity tab; every other read site skips it. See founder_identity.php.
 
 /**
  * Atomic check-and-bump on a single rate-limit bucket. Held under an exclusive
@@ -251,20 +248,6 @@ try {
 
     $tier = $auth['tier'];
     $authId = $auth['authId'];
-
-    // Drop telemetry from excluded internal/developer identities before doing any
-    // work, so the founder's own testing never lands in production stats. Returns
-    // a normal success so the client treats the batch as uploaded and stops
-    // retrying it.
-    if (is_excluded_auth_id($authId)) {
-        echo json_encode([
-            'status' => 'success',
-            'file' => 'excluded',
-            'bytes' => 0,
-            'timestamp' => date('Y-m-d H:i:s'),
-        ]);
-        exit;
-    }
 
     $maxFileSize = $tier === 'premium' ? MAX_FILE_SIZE_PREMIUM : MAX_FILE_SIZE_FREE;
     $maxPerHour = $tier === 'premium' ? MAX_UPLOADS_PER_HOUR_PREMIUM : MAX_UPLOADS_PER_HOUR_FREE;

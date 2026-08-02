@@ -95,7 +95,7 @@ $pricing = get_pricing_config();
         <div class="version-grid">
 
             <!-- Version 2.0.11 -->
-            <!-- <div class="version-card">
+            <div class="version-card">
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.11</span>
@@ -132,7 +132,7 @@ $pricing = get_pricing_config();
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
 
             <!-- Version 2.0.10 -->
             <div class="version-card">

@@ -395,7 +395,11 @@ async function runBulkDrafts(opts) {
         ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
         : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
     if (progressText) progressText.textContent = doneMsg;
-    if (progressEl) setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+    // Hide the progress bar as soon as the batch finishes. The same message is
+    // shown as a toast by notify() below, so holding the bar on screen only
+    // made a fast batch (creator/editorial leads use a fixed template and no
+    // AI call, so they finish near-instantly) feel slower than it was.
+    if (progressEl) progressEl.style.display = 'none';
 
     if (draftBtn) draftBtn.disabled = false;
     notify(doneMsg, success ? 'success' : 'error');

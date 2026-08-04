@@ -141,6 +141,11 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
     $preheader = null;
     $format = 'html';
 
+    // Creator/affiliate outreach ships without an unsubscribe line by request,
+    // so the defensive re-injection below is skipped for those leads. Every
+    // other lead type still gets it if the draft body somehow lost the link.
+    $isCreatorLead = strtolower((string) ($lead['source'] ?? '')) === 'creator_auto';
+
     if ($format === 'plain') {
         // Plain text: keep URLs bare so they remain clickable in plain-text
         // clients while still carrying the tracking source param. No HTML
@@ -148,7 +153,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
         $body = (string) $lead['draft_body'];
         $body = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $trackedUrl, $body);
         $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
-        if (strpos($body, 'unsubscribe?t=') === false) {
+        if (!$isCreatorLead && strpos($body, 'unsubscribe?t=') === false) {
             $unsubLine = "\n\nNot interested? " . $unsubUrl . " and I'll stop emailing you.";
             $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $body, 1);
             if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
@@ -175,7 +180,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
         // any drafts created before the substitution moved to draft time.
         $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
 
-        if (strpos($escapedBody, 'unsubscribe?t=') === false) {
+        if (!$isCreatorLead && strpos($escapedBody, 'unsubscribe?t=') === false) {
             $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
             $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
             if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
@@ -2032,12 +2037,12 @@ function generate_draft_for_lead($pdo, $lead)
             . "I think your audience would be a good fit, so I'd like to invite you to join our affiliate program. You'd earn 50% recurring commission on the first 12 months of Premium for anyone who upgrades through your referral link. It's free to join, with a real-time dashboard and PayPal payouts: https://argorobots.com/affiliates\n\n"
             . "I can give you Premium access to Argo Books so you can try it yourself and see whether it's a fit for your audience.\n\n"
             . "If you're interested, just reply and I'll send over the details.\n\n"
-            . "Thanks,\nEvan\nArgo Books\n\n"
-            // Kept deliberately: CASL requires an unsubscribe mechanism in every
-            // commercial electronic message, including cold B2B outreach, and
-            // regardless of whether consent is express or implied. Worded to read
-            // like a person wrote it rather than a bulk sender.
-            . "If you'd rather I didn't follow up, just {UNSUBSCRIBE_URL} and I'll leave it there.";
+            // No unsubscribe line here by request. The send-time fallback in
+            // send_outreach_lead() is also skipped for creator leads, otherwise
+            // it would re-append one. Note this is a deliberate departure from
+            // CASL, which requires an unsubscribe mechanism in every commercial
+            // electronic message including cold B2B outreach.
+            . "Thanks,\nEvan\nArgo Books";
 
         // Same per-lead unsubscribe substitution the AI path uses further down.
         $unsubscribeToken = $lead['unsubscribe_token'] ?? null;

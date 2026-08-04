@@ -132,7 +132,12 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
     $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
     $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
 
-    $fromName = 'Argo Books';
+    // Personal name, not the brand: this is 1:1 outreach and the body opens with
+    // "I'm Evan, the developer of Argo Books". It also has to match the From name
+    // used by send_followup_row(), since follow-ups thread as Re: replies into
+    // this same conversation and a display name that changes mid-thread looks
+    // broken to the recipient.
+    $fromName = 'Evan';
     $preheader = null;
     $format = 'html';
 
@@ -1920,6 +1925,48 @@ PROMPT;
  * Generate an AI email draft for a lead. Saves draft to DB.
  * Returns ['success' => true, 'subject' => ..., 'body' => ...] or ['error' => ...].
  */
+/**
+ * Normalize a lead's name for use in an email greeting.
+ *
+ * Names arrive from CSV imports and website scrapes, so the casing is whatever
+ * the source had ("monica razak", "JANE DOE"). A lowercase first name in the
+ * greeting is the clearest mail-merge tell in the whole email, so re-case it.
+ *
+ * Only names that are entirely lower or entirely upper case get touched.
+ * Anything already mixed is returned as-is, so deliberate casing survives
+ * ("McDonald", "van der Berg", "DeAndre"). Hyphens and apostrophes are treated
+ * as word separators, so "mary-jane o'brien" becomes "Mary-Jane O'Brien".
+ * Names needing an internal capital ("mcdonald") come back as "Mcdonald",
+ * which needs a name list to do properly and is still better than lowercase.
+ */
+function outreach_display_name($raw): string
+{
+    $name = trim((string) $raw);
+    if ($name === '') {
+        return '';
+    }
+
+    $letters = preg_replace('/[^\p{L}]/u', '', $name);
+    if ($letters === '') {
+        return $name;
+    }
+
+    $isUniformCase = mb_strtolower($letters, 'UTF-8') === $letters
+        || mb_strtoupper($letters, 'UTF-8') === $letters;
+    if (!$isUniformCase) {
+        return $name;
+    }
+
+    return preg_replace_callback(
+        '/\p{L}[\p{L}\p{M}]*/u',
+        function ($m) {
+            return mb_strtoupper(mb_substr($m[0], 0, 1, 'UTF-8'), 'UTF-8')
+                . mb_strtolower(mb_substr($m[0], 1, null, 'UTF-8'), 'UTF-8');
+        },
+        $name
+    );
+}
+
 function generate_draft_for_lead($pdo, $lead)
 {
     $id = $lead['id'];
@@ -1974,7 +2021,8 @@ function generate_draft_for_lead($pdo, $lead)
     // the creator's name inserted is honest and predictable, so creators skip
     // the whole Gemini path below.
     if ($isCreator) {
-        $creatorName = trim((string) ($lead['contact_name'] ?? '')) ?: trim((string) ($lead['business_name'] ?? ''));
+        $creatorName = outreach_display_name($lead['contact_name'] ?? '')
+            ?: outreach_display_name($lead['business_name'] ?? '');
         $greeting = $creatorName !== '' ? "Hi {$creatorName}," : 'Hi there,';
 
         $subject = 'Partnership idea for your audience';
@@ -1985,7 +2033,11 @@ function generate_draft_for_lead($pdo, $lead)
             . "I can give you Premium access to Argo Books so you can try it yourself and see whether it's a fit for your audience.\n\n"
             . "If you're interested, just reply and I'll send over the details.\n\n"
             . "Thanks,\nEvan\nArgo Books\n\n"
-            . "Not interested? {UNSUBSCRIBE_URL} and I won't follow up.";
+            // Kept deliberately: CASL requires an unsubscribe mechanism in every
+            // commercial electronic message, including cold B2B outreach, and
+            // regardless of whether consent is express or implied. Worded to read
+            // like a person wrote it rather than a bulk sender.
+            . "If you'd rather I didn't follow up, just {UNSUBSCRIBE_URL} and I'll leave it there.";
 
         // Same per-lead unsubscribe substitution the AI path uses further down.
         $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
@@ -2009,7 +2061,7 @@ function generate_draft_for_lead($pdo, $lead)
     // tools the list doesn't actually cover). A plain template with the author
     // name and their article URL inserted is honest, predictable, and free.
     if ($isEditorial) {
-        $authorName = trim((string) ($lead['contact_name'] ?? ''));
+        $authorName = outreach_display_name($lead['contact_name'] ?? '');
         $greeting = $authorName !== '' ? "Hi {$authorName}," : 'Hi there,';
         $articleUrl = trim((string) ($lead['website'] ?? ''));
         $articleRef = $articleUrl !== ''

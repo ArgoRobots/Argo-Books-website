@@ -87,13 +87,17 @@ $systemRequirements = getSystemRequirements();
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
+    <!-- Platform wording here has to match the page: there is no macOS build yet,
+         only a waitlist. The title and description are what Google prints in the
+         SERP and what link previews and crawlers read, so promising a Mac download
+         here sends Mac users to a signup form they didn't ask for. -->
     <meta name="description"
-        content="Download Argo Books for Windows, macOS, and Linux. Free bookkeeping software for small businesses. Get started with easy invoicing, expense tracking, and financial reports.">
+        content="Download Argo Books free for Windows and Linux. Simple bookkeeping software for small businesses, with easy invoicing, expense tracking, and financial reports. Mac users can join the waitlist.">
     <meta name="keywords"
-        content="argo books download, bookkeeping software, Windows, macOS, Linux, free accounting software, small business software, invoice software">
+        content="argo books download, bookkeeping software, Windows, Linux, free accounting software, small business software, invoice software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Download Argo Books | Windows, macOS & Linux">
+    <meta property="og:title" content="Download Argo Books | Windows & Linux">
     <meta property="og:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:url" content="https://argorobots.com/downloads/">
@@ -103,7 +107,7 @@ $systemRequirements = getSystemRequirements();
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Download Argo Books | Windows, macOS & Linux">
+    <meta name="twitter:title" content="Download Argo Books | Windows & Linux">
     <meta name="twitter:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
@@ -121,7 +125,7 @@ $systemRequirements = getSystemRequirements();
     <link rel="canonical" href="https://argorobots.com/downloads/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
-    <title>Download Argo Books | Windows, macOS & Linux</title>
+    <title>Download Argo Books | Windows & Linux</title>
 
     <script src="../resources/scripts/main.js"></script>
 

@@ -104,12 +104,16 @@ Not shipped. A Mac signup list went live on the downloads page about a week ago 
 - **Test on what customers actually run.** Nearly all Macs sold in the last several years are Apple Silicon, so the shipped build should be `osx-arm64` and tested natively on arm64. An Intel Mac can only really test the x64 build, which runs on Apple Silicon through Rosetta 2 translation rather than natively. Apple has also stopped adding Intel support in new macOS releases, so an Intel machine goes stale fast.
 - **The fingerprint login feature needs real Touch ID hardware.** CI runners and cloud Mac services have no biometric sensor, so this path cannot be automated or rented. It also needs a separate macOS implementation: the Windows Hello APIs have no macOS equivalent, so the Mac side goes through Apple's LocalAuthentication framework.
 
+**The build itself is not the hard part.** Argo Books is Avalonia on .NET 10, so producing a macOS binary is a publish target (`osx-arm64`), not a port. Do not treat shipping Mac as weeks of engineering. The actual costs are a Mac to test on, the Apple Developer membership, and the biometric login path. Everything else is build, test, ship.
+
 Touch ID narrows the hardware options, because **Mac mini and Mac Studio have no built-in fingerprint reader**:
 
 - MacBook Air or MacBook Pro (M-series), Touch ID built into the keyboard.
 - Mac mini (M-series) plus a Magic Keyboard with Touch ID. That keyboard only does Touch ID on Apple Silicon Macs, which is another reason M1+ rather than Intel.
 
-Given 2 paying customers and no proven macOS demand, this is a real cost with no evidence behind it yet. The signup list is the right way to gather that evidence before spending.
+Given 2 paying customers and no proven macOS demand, the hardware purchase is a real cost with no evidence behind it yet. The signup list is the right way to gather that evidence before spending. One option that lowers the bar: ship a first Mac release with fingerprint login disabled. That removes the Touch ID hardware requirement, so any Apple Silicon Mac will do for testing, and the biometric path can follow later.
+
+Note the site currently advertises macOS availability in about 90 places across 42 pages (hero copy, meta descriptions, FAQ schema), which is a live accuracy problem independent of whether the build ever ships.
 
 ## Honest read
 

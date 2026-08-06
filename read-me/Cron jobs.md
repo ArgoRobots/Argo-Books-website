@@ -302,3 +302,47 @@ php indexnow_submit.php --dry-run   # Log what would be submitted; send nothing
 `/cron/logs/indexnow_submit_YYYY-MM-DD.log`
 
 A lock file (`/cron/logs/indexnow_submit.lock`) prevents overlapping runs.
+
+---
+
+## 11. Portal Invoice Reminders
+
+**Script:** `cron/portal_invoice_reminders.php`
+**Schedule:** Daily at 9:00 AM
+
+```bash
+0 9 * * * /usr/bin/php /home/argorobots/public_html/cron/portal_invoice_reminders.php
+```
+
+### What It Does
+
+Emails a merchant's customers when a portal invoice goes unpaid, so chasing payment keeps happening while Argo Books is closed.
+
+1. Selects overdue invoices belonging to companies with `portal_companies.reminders_enabled = 1`, skipping any company that is inactive or locked.
+2. Works out which reminder stage is due: 3, 7 or 14 days past the due date. The highest eligible stage wins, so a run that was missed for a week sends one reminder rather than three.
+3. Claims the stage by inserting into `portal_invoice_reminders` before sending. `UNIQUE (portal_invoice_id, stage)` means a duplicate insert fails, which is the entire defence against sending the same reminder twice.
+4. Re-reads the invoice immediately before sending and skips it if it was paid or cancelled in the meantime, or if the customer sits in `email_suppressions` under the `portal` or `all_marketing` context.
+5. Sends a white-label reminder from the merchant's name via `send_invoice_reminder()`, with a reply-to pointing at the merchant when their owner email is verified.
+
+Stops permanently once an invoice is paid, cancelled, or has been chased three times.
+
+### Behaviour Worth Knowing
+
+- **Enabling never releases a backlog.** `portal_companies.reminders_enabled_at` is re-stamped on every off-to-on transition, and only invoices whose due date falls after it are ever chased. A merchant switching this on for the first time will not blast months of old overdue invoices at their customers.
+- **Environment is filtered.** Sandbox and production share a database, so the run only ever touches invoices matching `current_environment()`. Without that filter a sandbox test invoice would email a real customer.
+- **A failed send is never retried.** The next stage still fires on schedule, so a transient SMTP failure costs one touch. Retrying is how you end up sending four reminders.
+- **Caps.** 200 reminders per run across all companies, 50 per company. Anything deferred is picked up first on the next run, since selection is ordered by due date.
+- **Invoices more than 45 days overdue are ignored**, so a long outage cannot fire a "final reminder" at something from months ago.
+
+### CLI Flags
+
+```bash
+php portal_invoice_reminders.php            # Normal run
+php portal_invoice_reminders.php --dry-run  # Log what would be sent; send nothing, write no rows
+```
+
+### Logs
+
+`/cron/logs/portal_invoice_reminders_YYYY-MM-DD.log`
+
+A lock file (`/cron/logs/portal_invoice_reminders.lock`) prevents overlapping runs.

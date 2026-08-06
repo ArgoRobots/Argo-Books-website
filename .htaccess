@@ -311,6 +311,14 @@ php_value upload_max_filesize 10M
     # Portal API: status check
     RewriteRule ^api/portal/status/?$ api/portal/status.php [L,QSA]
 
+    # Portal API: email preferences (reminders, owner payment notifications)
+    RewriteRule ^api/portal/preferences/?$ api/portal/preferences.php [L,QSA]
+
+    # Portal API: invoice balance/status reconciliation from Argo Books.
+    # Must stay above the publishing rule for readability; the publishing
+    # pattern is end-anchored so it would not swallow this path either way.
+    RewriteRule ^api/portal/invoices/balance/?$ api/portal/invoice-balance.php [L,QSA]
+
     # Portal API: invoice publishing
     RewriteRule ^api/portal/invoices/?$ api/portal/invoices.php [L,QSA]
 

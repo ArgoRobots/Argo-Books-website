@@ -41,6 +41,21 @@ $cronConfig = [
         ],
         'expected_interval_hours' => 48,
     ],
+    'portal_invoice_reminders' => [
+        'label'     => 'Portal Invoice Reminders',
+        'frequency' => 'daily',
+        'description' => "Emails a merchant's customers when a portal invoice goes unpaid, at 3, 7 and 14 days past the due date, then stops. Opt-in per company from the Argo Books settings. Only chases invoices that fell due after the merchant switched reminders on, so enabling it never blasts a backlog of old overdue invoices. Stops immediately once an invoice is paid or cancelled.",
+        'metrics'   => [
+            'invoices_scanned'   => 'Invoices scanned',
+            'reminders_sent'     => 'Reminders sent',
+            'reminders_skipped'  => 'Skipped (paid/cancelled/suppressed)',
+            'reminders_failed'   => 'Send failures',
+            'stage1_sent'        => 'Stage 1 (3 days)',
+            'stage2_sent'        => 'Stage 2 (7 days)',
+            'stage3_sent'        => 'Stage 3 (14 days, final)',
+        ],
+        'expected_interval_hours' => 48,
+    ],
     'subscription_renewal' => [
         'label'     => 'Subscription Renewal',
         'frequency' => 'daily',

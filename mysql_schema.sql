@@ -460,13 +460,25 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     locked TINYINT(1) DEFAULT 0 COMMENT 'Auto-locked by the refund velocity engine on hard-block; manual review required to unlock',
     lock_reason VARCHAR(255) DEFAULT NULL,
     locked_at DATETIME DEFAULT NULL,
+    -- Email preferences (set from Argo Books via PUT /api/portal/preferences)
+    reminders_enabled TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Merchant opted in to automatic overdue-invoice reminders to their customers. Opt-in: defaulting this on would start emailing every existing company''s customers on deploy day',
+    reminders_enabled_at DATETIME DEFAULT NULL COMMENT 'Re-stamped to NOW() on EVERY 0->1 transition of reminders_enabled. Only invoices whose due_date falls after this are ever chased, so enabling (or re-enabling after a long pause) never releases a backlog of old overdue invoices',
+    notify_owner_on_payment TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Email the owner when a customer pays a portal invoice. Defaults on, so existing rows inherit it without a backfill. Also requires a verified owner_email',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE INDEX idx_api_key_hash (api_key_hash),
     INDEX idx_is_active (is_active),
     INDEX idx_environment (environment),
-    INDEX idx_locked (locked)
+    INDEX idx_locked (locked),
+    INDEX idx_reminders_enabled (reminders_enabled)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the email preference columns:
+--   ALTER TABLE portal_companies
+--     ADD COLUMN reminders_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER locked_at,
+--     ADD COLUMN reminders_enabled_at DATETIME DEFAULT NULL AFTER reminders_enabled,
+--     ADD COLUMN notify_owner_on_payment TINYINT(1) NOT NULL DEFAULT 1 AFTER reminders_enabled_at,
+--     ADD INDEX idx_reminders_enabled (reminders_enabled);
 
 -- Google OAuth tokens (free feature, keyed by device ID)
 CREATE TABLE IF NOT EXISTS google_oauth_tokens (
@@ -519,6 +531,7 @@ CREATE TABLE IF NOT EXISTS portal_invoices (
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     due_date DATE DEFAULT NULL,
     pass_processing_fee TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether to add processing fee to online payments',
+    external_paid DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Total paid against this invoice OUTSIDE the portal (cash/cheque/bank, recorded in Argo Books). Stored server-side so POST /api/portal/invoices/balance can apply an idempotent relative delta instead of overwriting balance_due, which would race the atomic decrement in record_portal_payment()',
     environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -559,6 +572,42 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Overdue-invoice reminders sent to a merchant's customers by
+-- cron/portal_invoice_reminders.php. Fixed cadence, three touches, then stop.
+--
+-- UNIQUE (portal_invoice_id, stage) IS the idempotency mechanism: the cron
+-- claims a stage by INSERT IGNORE before sending, and a zero rowCount means
+-- another run already owns it. A counter column on portal_invoices would need
+-- read-modify-write plus a CAS guard and would still lose to an overlapping
+-- run in the window between the send and the counter bump.
+--
+-- Rows are created lazily at send time, not pre-seeded when an invoice is
+-- published: most invoices are paid on time and would never need their rows.
+CREATE TABLE IF NOT EXISTS portal_invoice_reminders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    portal_invoice_id INT NOT NULL,
+    company_id INT NOT NULL,
+    stage TINYINT UNSIGNED NOT NULL COMMENT '1 = due+3 days, 2 = due+7, 3 = due+14. Fixed cadence, not user-configurable',
+    status ENUM('sending', 'sent', 'failed', 'skipped') NOT NULL DEFAULT 'sending' COMMENT 'Claimed as sending, then finalized. A failed row is never retried: the next stage still fires on schedule, so a transient SMTP failure costs one touch rather than the whole sequence',
+    halt_reason VARCHAR(100) DEFAULT NULL COMMENT 'Why a claimed row was skipped at send time: paid, cancelled, zero_balance, no_email, suppressed',
+    error_message VARCHAR(255) DEFAULT NULL,
+    due_date_at_send DATE DEFAULT NULL COMMENT 'Frozen for support: what the customer was actually chased about',
+    balance_at_send DECIMAL(12,2) DEFAULT NULL,
+    recipient_email VARCHAR(255) DEFAULT NULL,
+    sent_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_invoice_stage (portal_invoice_id, stage),
+    INDEX idx_company_sent (company_id, sent_at),
+    FOREIGN KEY (portal_invoice_id) REFERENCES portal_invoices(id) ON DELETE CASCADE,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the external-payment column that the balance
+-- reconciliation endpoint needs, then create the table above:
+--   ALTER TABLE portal_invoices
+--     ADD COLUMN external_paid DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER pass_processing_fee;
 
 -- ============================================
 -- Refund Flow Tables
@@ -846,6 +895,10 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --   'community_digest'   - replies / activity digest
 --   'newsletter'         - opt-in list for no-account subscribers (marketing_subscribers)
 --   'all_marketing'      - blanket suppression of all marketing contexts
+--   'portal'             - a merchant's customer, suppressed from overdue-invoice
+--                          reminders (cron/portal_invoice_reminders.php). Read but
+--                          not yet written: wiring the Resend webhook to record hard
+--                          bounces here is the intended follow-up.
 CREATE TABLE IF NOT EXISTS email_suppressions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,

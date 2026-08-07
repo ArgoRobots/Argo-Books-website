@@ -222,6 +222,15 @@ code {
     font-weight: 500;
 }
 
+.error-message {
+    background: var(--red-100);
+    color: var(--red-800);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
 /* Modal Styles */
 .modal {
     position: fixed;

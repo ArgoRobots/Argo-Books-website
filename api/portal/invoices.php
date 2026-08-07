@@ -50,7 +50,7 @@ function handle_publish_invoice(): void
 
     // Check if invoice already exists (update vs create)
     $stmt = $pdo->prepare(
-        'SELECT id, invoice_token, customer_token FROM portal_invoices
+        'SELECT id, invoice_token, customer_token, status FROM portal_invoices
          WHERE company_id = ? AND invoice_id = ? LIMIT 1'
     );
     $stmt->execute([$companyId, $invoiceId]);
@@ -85,8 +85,10 @@ function handle_publish_invoice(): void
     $dueDate = $data['dueDate'] ?? null;
     $allowedStatuses = ['draft', 'pending', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'cancelled'];
     $status = in_array(strtolower($data['status'] ?? 'pending'), $allowedStatuses) ? strtolower($data['status'] ?? 'pending') : 'pending';
-    // Prevent callers from directly setting status to 'paid': that should only happen through payment processing
-    if ($status === 'paid') { $status = 'pending'; }
+    // Prevent callers from directly setting status to 'paid': that should only happen through payment
+    // processing. Fall back to whatever is already stored rather than a flat 'pending', so re-publishing
+    // an invoice the server has already marked paid (a resend, say) does not demote it.
+    if ($status === 'paid') { $status = $existing['status'] ?? 'pending'; }
     $passProcessingFee = filter_var($data['passProcessingFee'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
     if ($existing) {

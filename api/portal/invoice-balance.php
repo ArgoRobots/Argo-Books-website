@@ -34,6 +34,10 @@ require_method(['POST']);
 // buggy or hostile client cannot hand us an unbounded write loop.
 const PORTAL_BALANCE_MAX_ITEMS = 200;
 
+// Ceiling on one re-rendered invoice. Generous next to a real invoice (tens of
+// KB) while stopping a single request from writing megabytes into a JSON column.
+const PORTAL_BALANCE_MAX_HTML_BYTES = 524288;
+
 $company = authenticate_portal_request();
 if (!$company) {
     send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
@@ -128,6 +132,21 @@ $lookupStmt = $pdo->prepare(
     'SELECT id, currency FROM portal_invoices WHERE company_id = ? AND invoice_id = ? LIMIT 1'
 );
 
+// The stored invoice HTML is a snapshot taken when Argo Books published the
+// invoice, so once anything is paid it keeps showing the original totals with
+// no Amount Paid row. Argo Books re-renders and sends it whenever that would
+// be wrong.
+//
+// JSON_SET patches only this one key: invoice_data also holds lineItems,
+// addresses and notes, which the non-custom portal template renders from, and
+// replacing the whole document would drop them.
+$htmlStmt = $pdo->prepare(
+    'UPDATE portal_invoices
+     SET invoice_data = JSON_SET(COALESCE(invoice_data, JSON_OBJECT()), "$.customInvoiceHtml", ?),
+         updated_at = NOW()
+     WHERE company_id = ? AND invoice_id = ?'
+);
+
 foreach ($items as $item) {
     if (!is_array($item) || empty($item['invoiceId']) || !is_string($item['invoiceId'])) {
         $rejected++;
@@ -202,6 +221,12 @@ foreach ($items as $item) {
             } else {
                 $uncancelStmt->execute([$companyId, $invoiceId]);
             }
+        }
+
+        // Optional: only present when the stored snapshot would be out of date.
+        if (!empty($item['customInvoiceHtml']) && is_string($item['customInvoiceHtml'])
+            && strlen($item['customInvoiceHtml']) <= PORTAL_BALANCE_MAX_HTML_BYTES) {
+            $htmlStmt->execute([$item['customInvoiceHtml'], $companyId, $invoiceId]);
         }
 
         $updated++;

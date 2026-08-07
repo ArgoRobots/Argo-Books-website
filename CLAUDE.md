@@ -27,6 +27,14 @@ PHP/MySQL website for [Argo Books](https://argorobots.com/) accounting software.
 
 ## Database access
 
+**There is ONE database on the server, shared by production (`argorobots.com`) and dev (`dev.argorobots.com`).** They are not separate instances. Rows are separated by an `environment` column (`sandbox` / `production`), compared against `current_environment()`.
+
+Consequences:
+
+- Schema changes are run **once**. Applying them "on dev" applies them to production, because it is the same database.
+- Any query over a table with an `environment` column must filter on it. Forget it and a sandbox test row is treated as live production data, e.g. emailing a real customer from a test invoice.
+- Locally, Laragon has `argo_books` (development) and `argo_books_test` (PHPUnit only). These are the only truly separate databases.
+
 All queries go through the global `$pdo`. PDO is configured with `ATTR_ERRMODE => ERRMODE_EXCEPTION`, default fetch mode `FETCH_ASSOC`, `ATTR_EMULATE_PREPARES => false`. Inside functions, declare `global $pdo;` before use.
 
 - Use prepared statements for anything touching user input. Pass params as an array to `execute([...])`; never concatenate into SQL.
@@ -71,6 +79,18 @@ All colors come from CSS variables in `resources/styles/custom-colors.css`. Don'
 ## Preserving scroll on filter reload
 
 Admin pages with filter pills that reload the page (period selectors, source pills, range buttons) use a shared `sessionStorage.scrollPosition` pattern so the reload doesn't jump back to the top. When adding a new filter, extend the existing handler's selector on that page rather than writing a parallel script. URL anchors (`#section-id`) do NOT solve this; they only change where the jump lands. Reference implementations: `admin/referral-links/index.php`, `admin/website-stats/index.php`, `admin/users/index.php`, `admin/crons/index.php`.
+
+## Server access
+
+**There is no shell on the server.** No SSH, no cPanel Terminal. Never hand over a command to "run on the server" and never write a tool whose only entry point is a shell prompt.
+
+What is available:
+
+- **cPanel > Cron Jobs** is the only way to execute a script server-side. Set a schedule a minute or two out, let it fire, then restore or delete the entry. It runs through the shell, so `php_sapi_name() === 'cli'` and CLI guards still pass. cPanel emails the script's stdout, which is the only way to see its output.
+- **HeidiSQL** for all SQL. Schema changes and any one-off queries go to the user as a copy-pasteable block.
+- **Local Laragon** for anything genuinely interactive. Reproduce there first; the server is not a debugging environment.
+
+Design consequence: any cron script needs a `--dry-run` flag and a summary line on stdout, because a scheduled run with emailed output is the entire feedback loop.
 
 ## Tests
 

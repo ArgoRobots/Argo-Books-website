@@ -86,11 +86,26 @@ Admin pages with filter pills that reload the page (period selectors, source pil
 
 What is available:
 
-- **cPanel > Cron Jobs** is the only way to execute a script server-side. Set a schedule a minute or two out, let it fire, then restore or delete the entry. It runs through the shell, so `php_sapi_name() === 'cli'` and CLI guards still pass. cPanel emails the script's stdout, which is the only way to see its output.
+- **cPanel > Cron Jobs** is the only way to execute a script server-side. Set a schedule a minute or two out, let it fire, then restore or delete the entry. It runs through the shell, so `php_sapi_name() === 'cli'` and CLI guards still pass.
 - **HeidiSQL** for all SQL. Schema changes and any one-off queries go to the user as a copy-pasteable block.
 - **Local Laragon** for anything genuinely interactive. Reproduce there first; the server is not a debugging environment.
 
-Design consequence: any cron script needs a `--dry-run` flag and a summary line on stdout, because a scheduled run with emailed output is the entire feedback loop.
+**Cron mail is not configured, so stdout goes nowhere.** Never treat `echo` as a way to report anything. Existing scripts echo a summary line and that is fine to keep, but it is decoration.
+
+## Cron scripts
+
+`admin/crons/` is where cron results are read. A cron that does not write to `cron_runs` is invisible, whatever else it prints or logs.
+
+Required for every cron:
+
+- Wrap the run in `cron_run_start($pdo, '<name>')` / `cron_run_finish($pdo, $runId, 'ok'|'error', $msg)` from `cron/lib/run_tracker.php`, and count work with `cron_metric_incr()`. All eleven scripts do this; it is the only universal convention.
+- **Report failures through `cron_runs` too**, including ones that happen before the main work starts. An early `exit` that skips `cron_run_start` leaves no trace on the admin page and looks identical to the cron never firing.
+- Add a `$cronConfig` entry in `admin/crons/index.php` with the metric labels, or the page has nothing to render.
+- Add a section to `read-me/Cron jobs.md` with the crontab line.
+- CLI guard at the top (`php_sapi_name()`), so the script cannot be triggered over HTTP.
+- `error_log()` for anything worth diagnosing later.
+
+Situational, not required: a `flock` lock file (5 of 11, for scripts where overlapping runs would double-process), a `--dry-run` flag (3 of 11, worth it for anything that sends email or money), and a daily log in `cron/logs/` (6 of 11).
 
 ## Tests
 

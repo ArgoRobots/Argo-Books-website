@@ -93,7 +93,6 @@ foreach ($rows as $row) {
     $promoted++;
 }
 
-echo "Promoted: $promoted, Auto-cancelled (locked >24h): $auto_cancelled\n";
 cron_metric_incr('refunds_promoted', $promoted);
 cron_metric_incr('refunds_auto_cancelled', $auto_cancelled);
 cron_run_finish($pdo, $runId, 'ok');

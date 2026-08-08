@@ -309,7 +309,6 @@ try {
 
     $summary = ($dryRun ? '[DRY RUN] ' : '')
         . "Scanned: $scanned, Sent: $sentThisRun, Skipped: $skipped, Failed: $failed";
-    echo $summary . "\n";
     $logLine($summary);
 
     cron_run_finish($pdo, $runId, 'ok', $summary);

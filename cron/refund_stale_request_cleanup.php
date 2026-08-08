@@ -55,7 +55,6 @@ foreach ($rows as $r) {
     }
 }
 
-echo "Cleaned $cancelled stale pending_code rows (scanned " . count($rows) . ")\n";
 
 // Also vacuum the idempotency cache (older than 24h is useless).
 $pdo->exec("DELETE FROM refund_idempotency_cache WHERE created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");

@@ -45,7 +45,6 @@ if (!is_dir(__DIR__ . '/logs')) {
 }
 $lockFp = fopen($lockFile, 'c');
 if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
-    echo "Pipeline already running. Exiting.\n";
     exit(0);
 }
 
@@ -138,10 +137,6 @@ function logPipeline($message, $type = 'INFO')
         mkdir(__DIR__ . '/logs', 0755, true);
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-
-    if (!isset($_SERVER['HTTP_HOST'])) {
-        echo $logEntry;
-    }
 }
 
 // log_activity() is provided by cron/lib/outreach_helpers.php

@@ -90,15 +90,16 @@ What is available:
 - **HeidiSQL** for all SQL. Schema changes and any one-off queries go to the user as a copy-pasteable block.
 - **Local Laragon** for anything genuinely interactive. Reproduce there first; the server is not a debugging environment.
 
-**Cron mail is not configured, so stdout goes nowhere.** Never treat `echo` as a way to report anything. Existing scripts echo a summary line and that is fine to keep, but it is decoration.
+**Cron mail is not configured, so stdout goes nowhere.** Never treat `echo` as a way to report anything, and don't add one. No cron script echoes.
 
 ## Cron scripts
 
-`admin/crons/` is where cron results are read. A cron that does not write to `cron_runs` is invisible, whatever else it prints or logs.
+`admin/crons/` is where cron results are read. **It is the only channel.** There is no cron mail and nobody tails the log files, so a cron that does not write to `cron_runs` is invisible, whatever else it logs.
 
 Required for every cron:
 
 - Wrap the run in `cron_run_start($pdo, '<name>')` / `cron_run_finish($pdo, $runId, 'ok'|'error', $msg)` from `cron/lib/run_tracker.php`, and count work with `cron_metric_incr()`. All eleven scripts do this; it is the only universal convention.
+- **Put the numbers in `cron_metric_incr()`, not in prose.** The admin page renders metrics as tiles, so counts recorded there are readable at a glance and comparable across runs. The optional 4th argument to `cron_run_finish()` is for a short summary line shown under "Last run detail"; it lands in the `error_message` column either way, so on an `ok` run keep it to a summary and not an error.
 - **Report failures through `cron_runs` too**, including ones that happen before the main work starts. An early `exit` that skips `cron_run_start` leaves no trace on the admin page and looks identical to the cron never firing.
 - Add a `$cronConfig` entry in `admin/crons/index.php` with the metric labels, or the page has nothing to render.
 - Add a section to `read-me/Cron jobs.md` with the crontab line.

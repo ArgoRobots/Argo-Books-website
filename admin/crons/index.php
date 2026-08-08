@@ -294,7 +294,8 @@ include __DIR__ . '/../admin_header.php';
                 <details class="cron-detail">
                     <summary>Last run detail · <?= htmlspecialchars($latest['started_at']) ?> · <?= htmlspecialchars($latest['status']) ?></summary>
                     <?php if (!empty($latest['error_message'])): ?>
-                        <pre class="cron-error"><?= htmlspecialchars($latest['error_message']) ?></pre>
+                        <?php // The same column carries the summary line on a successful run, so only style it as an error when it is one. ?>
+                        <pre class="<?= $latest['status'] === 'ok' ? 'cron-summary' : 'cron-error' ?>"><?= htmlspecialchars($latest['error_message']) ?></pre>
                     <?php endif; ?>
                     <?php
                         $latestMetrics = !empty($latest['metrics']) ? json_decode($latest['metrics'], true) : null;

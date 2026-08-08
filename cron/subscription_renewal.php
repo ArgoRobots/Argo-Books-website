@@ -42,11 +42,6 @@ function logMessage($message, $type = 'INFO') {
         mkdir(__DIR__ . '/logs', 0755, true);
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-
-    // Also output to CLI
-    if (php_sapi_name() === 'cli') {
-        echo $logEntry;
-    }
 }
 
 logMessage('Starting subscription renewal check...');

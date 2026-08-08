@@ -60,13 +60,27 @@ const PORTAL_REMINDER_MIN_BALANCE = 1.00;
 $dryRun = in_array('--dry-run', $argv ?? [], true);
 
 // ─── Lock file to prevent overlapping runs ───
-$lockFile = __DIR__ . '/logs/portal_invoice_reminders.lock';
-if (!is_dir(__DIR__ . '/logs')) {
-    @mkdir(__DIR__ . '/logs', 0755, true);
+// A lock that cannot be created is reported, not swallowed. Exiting silently here
+// is indistinguishable from the cron never firing, and with no shell on the server
+// that is an expensive thing to have to diagnose. It goes to error_log rather than
+// the daily log because the daily log lives in the directory that just failed.
+$lockDir = __DIR__ . '/logs';
+if (!is_dir($lockDir) && !@mkdir($lockDir, 0755, true) && !is_dir($lockDir)) {
+    error_log("portal_invoice_reminders: cannot create $lockDir (check permissions)");
+    echo "ERROR: cannot create $lockDir (check permissions).\n";
+    exit(1);
 }
+
+$lockFile = $lockDir . '/portal_invoice_reminders.lock';
 $lock = fopen($lockFile, 'c');
-if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
-    // Another run is in progress; exit quietly.
+if ($lock === false) {
+    error_log("portal_invoice_reminders: cannot open $lockFile (check permissions)");
+    echo "ERROR: cannot open $lockFile (check permissions).\n";
+    exit(1);
+}
+
+if (!flock($lock, LOCK_EX | LOCK_NB)) {
+    // Another run holds the lock. Quiet is correct here.
     exit(0);
 }
 
@@ -286,6 +300,7 @@ try {
 
     cron_run_finish($pdo, $runId, 'ok', $summary);
 } catch (Throwable $e) {
+    error_log('portal_invoice_reminders cron error: ' . $e->getMessage());
     $logLine('ERROR: ' . $e->getMessage());
     cron_run_finish($pdo, $runId, 'error', $e->getMessage());
     throw $e;

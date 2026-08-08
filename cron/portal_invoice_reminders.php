@@ -59,24 +59,38 @@ const PORTAL_REMINDER_MIN_BALANCE = 1.00;
 
 $dryRun = in_array('--dry-run', $argv ?? [], true);
 
+/**
+ * Records a failure that happens before the run proper can start, then stops.
+ *
+ * Writes a failed run to cron_runs so it appears on the admin Cron Activity page.
+ * That page is the only place these are actually read: cron mail is not configured,
+ * and the daily log cannot be written because it lives in the directory that failed.
+ */
+function reminders_abort(PDO $pdo, string $message): never
+{
+    error_log('portal_invoice_reminders: ' . $message);
+    try {
+        $runId = cron_run_start($pdo, 'portal_invoice_reminders');
+        cron_run_finish($pdo, $runId, 'error', $message);
+    } catch (Throwable $e) {
+        error_log('portal_invoice_reminders: could not record the failure: ' . $e->getMessage());
+    }
+    exit(1);
+}
+
 // ─── Lock file to prevent overlapping runs ───
-// A lock that cannot be created is reported, not swallowed. Exiting silently here
+// A lock that cannot be created is recorded, not swallowed. Exiting silently here
 // is indistinguishable from the cron never firing, and with no shell on the server
-// that is an expensive thing to have to diagnose. It goes to error_log rather than
-// the daily log because the daily log lives in the directory that just failed.
+// that is expensive to diagnose.
 $lockDir = __DIR__ . '/logs';
 if (!is_dir($lockDir) && !@mkdir($lockDir, 0755, true) && !is_dir($lockDir)) {
-    error_log("portal_invoice_reminders: cannot create $lockDir (check permissions)");
-    echo "ERROR: cannot create $lockDir (check permissions).\n";
-    exit(1);
+    reminders_abort($pdo, "cannot create $lockDir (check permissions)");
 }
 
 $lockFile = $lockDir . '/portal_invoice_reminders.lock';
 $lock = fopen($lockFile, 'c');
 if ($lock === false) {
-    error_log("portal_invoice_reminders: cannot open $lockFile (check permissions)");
-    echo "ERROR: cannot open $lockFile (check permissions).\n";
-    exit(1);
+    reminders_abort($pdo, "cannot open $lockFile (check permissions)");
 }
 
 if (!flock($lock, LOCK_EX | LOCK_NB)) {

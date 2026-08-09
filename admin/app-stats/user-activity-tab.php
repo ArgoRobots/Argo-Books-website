@@ -19,6 +19,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+require_once __DIR__ . '/telemetry-dedupe.php';       // telemetry_is_duplicate_event()
 
 // Tier and date range come from the page-level control bar, so this tab shows
 // the same slice as the charts. Defaulted here so the partial still renders if
@@ -116,6 +117,29 @@ function ua_describe_event(array $ev): array
             $suffix = $bits ? ' (' . implode(', ', $bits) . ')' : '';
             return ['api', "API: {$api}{$suffix}"];
 
+        case 'CompanyProfile':
+            $name = $ev['companyName'] ?? '(unnamed)';
+            $bits = array_filter([
+                $ev['industry'] ?? null,
+                $ev['businessType'] ?? null,
+                $ev['country'] ?? null,
+                $ev['currency'] ?? null,
+            ]);
+            $suffix = $bits ? ' — ' . implode(', ', $bits) : '';
+            // The demo company's details are ours, not theirs, so label them rather than
+            // letting "Argo Robots Inc." read as a real user's business.
+            $prefix = !empty($ev['isSample']) ? 'Sample company' : 'Company';
+            return ['company', "{$prefix}: {$name}{$suffix}"];
+
+        case 'Startup':
+            $bits = [];
+            if (isset($ev['toFirstPaintMs'])) $bits[] = 'blank screen ' . (int)$ev['toFirstPaintMs'] . ' ms';
+            if (isset($ev['toReadyMs']))      $bits[] = 'ready ' . (int)$ev['toReadyMs'] . ' ms';
+            if (array_key_exists('coldStart', $ev)) {
+                $bits[] = $ev['coldStart'] ? 'cold' : 'warm';
+            }
+            return ['startup', 'Launch' . ($bits ? ': ' . implode(', ', $bits) : '')];
+
         case 'Error':
             $parts = [];
             if (!empty($ev['errorCategory'])) $parts[] = $ev['errorCategory'];
@@ -141,6 +165,16 @@ function ua_describe_event(array $ev): array
 
 // ---- Aggregate per authId ---------------------------------------------------
 $ua_users = []; // authId => aggregate
+
+// This tab reads the files in its own pass, so it needs its own seen-set rather
+// than sharing index.php's. See telemetry-dedupe.php for why duplicates exist.
+$ua_seenEventIds = [];
+
+// Surfaced under the filters rather than silently swallowed. Once the client-side
+// locking fix has rolled out, this should trend to zero for recent uploads; if it
+// doesn't, devices are still losing their "uploaded" flags somewhere.
+$ua_duplicatesCollapsed = 0;
+
 foreach ($ua_files as $name => $path) {
     $raw = file_get_contents($path);
     if ($raw === false || trim($raw) === '') continue;
@@ -182,6 +216,8 @@ foreach ($ua_files as $name => $path) {
             'apis'      => [],   // apiName     => count
             'errors'    => 0,
             'warnings'  => 0,    // severity=Warning events, counted apart from errors
+            'company'   => null, // most recent non-sample CompanyProfile, shown on the card
+            'startup'   => null, // slowest cold launch seen, in ms to first paint
             'timeline'  => [],   // every event: ['ts','type','text']
             'files'     => [],
         ];
@@ -195,6 +231,13 @@ foreach ($ua_files as $name => $path) {
     if (empty($u['timezone']) && !empty($geo['timezone'])) $u['timezone'] = $geo['timezone'];
 
     foreach ($d['events'] as $ev) {
+        // A re-uploaded event is the same action, not a second one. This is what
+        // stops a single tutorial skip rendering as three at the same timestamp.
+        if (telemetry_is_duplicate_event($ev, $authId, $ua_seenEventIds)) {
+            $ua_duplicatesCollapsed++;
+            continue;
+        }
+
         $ts = isset($ev['timestamp']) ? strtotime($ev['timestamp']) : false;
 
         // Page-level date range. An event we can't date is kept, matching how
@@ -236,6 +279,24 @@ foreach ($ua_files as $name => $path) {
                     $u['warnings']++;
                 } else {
                     $u['errors']++;
+                }
+                break;
+            case 'CompanyProfile':
+                // Their own business, not the demo one: the sample's details are ours and
+                // would otherwise overwrite the real company on anyone who tried both.
+                if (empty($ev['isSample'])) {
+                    $u['company'] = $ev;
+                }
+                break;
+            case 'Startup':
+                // The worst cold launch, because that is the one that makes someone click
+                // the shortcut a second time. Warm relaunches read from cache and would
+                // drag any average down to a number nobody actually experiences.
+                if (!empty($ev['coldStart']) && isset($ev['toFirstPaintMs'])) {
+                    $blank = (int)$ev['toFirstPaintMs'];
+                    if ($u['startup'] === null || $blank > $u['startup']) {
+                        $u['startup'] = $blank;
+                    }
                 }
                 break;
         }
@@ -322,6 +383,12 @@ if (!function_exists('ua_kv')) {
    "worth knowing" rather than sitting in the error rows' red monospace. */
 .ua-evt.warning .ua-evt-text { color:#b45309; }
 .ua-warn { color:#b45309; font-weight:700; }
+/* Who the user is, rather than what they did. Bold and near-black so it stands out
+   from the activity around it: it's usually the only row on a card worth reading first. */
+.ua-evt.company .ua-evt-text { color:#6d28d9; font-weight:600; }
+/* Launch timings. Deliberately muted: one per session, and only interesting in bulk. */
+.ua-evt.startup .ua-evt-text { color:#6b7280; font-family:monospace; }
+.ua-business { color:#6d28d9; font-weight:700; }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
 [data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
@@ -334,9 +401,14 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
 [data-theme="dark"] .ua-evt.unclean .ua-evt-text, [data-theme="dark"] .ua-unclean { color:#f87171; }
 [data-theme="dark"] .ua-evt.warning .ua-evt-text, [data-theme="dark"] .ua-warn { color:#fbbf24; }
+[data-theme="dark"] .ua-evt.company .ua-evt-text { color:#c4b5fd; }
+[data-theme="dark"] .ua-evt.startup .ua-evt-text { color:#9ca3af; }
+[data-theme="dark"] .ua-evt.company .ua-evt-text, [data-theme="dark"] .ua-business { color:#c4b5fd; }
 
 /* Filter controls. Pagination itself is the shared admin TablePaginator. */
 .ua-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1rem; }
+.ua-dupes { font-size:.78rem; color:#b45309; }
+[data-theme="dark"] .ua-dupes { color:#fbbf24; }
 .ua-input { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:.85rem; background:#fff; color:var(--admin-text); }
 .ua-input:focus { outline:none; border-color:#3b82f6; }
 #ua-search { flex:1; min-width:220px; }
@@ -366,6 +438,11 @@ if (!function_exists('ua_kv')) {
     <div class="ua-controls" id="ua-controls">
         <input type="text" id="ua-search" class="ua-input" placeholder="Search id, country, region, version&hellip;">
         <span class="ua-count" id="ua-count"></span>
+        <?php if ($ua_duplicatesCollapsed > 0): ?>
+            <span class="ua-dupes" title="The same event uploaded more than once and collapsed by dataId. Should trend to zero as the client-side locking fix rolls out.">
+                <?= number_format($ua_duplicatesCollapsed) ?> duplicate event<?= $ua_duplicatesCollapsed === 1 ? '' : 's' ?> collapsed
+            </span>
+        <?php endif; ?>
     </div>
 
     <div class="table-responsive">
@@ -417,7 +494,33 @@ if (!function_exists('ua_kv')) {
             <?php if ($u['warnings'] > 0): ?>
                 <span><b>Warnings:</b> <span class="ua-warn"><?= $u['warnings'] ?></span></span>
             <?php endif; ?>
+            <?php if ($u['startup'] !== null): ?>
+                <?php // Blank screen on a cold launch: the window a user spends deciding
+                      // whether to click the shortcut again. ?>
+                <span><b>Slowest launch:</b> <?= number_format($u['startup']) ?> ms blank</span>
+            <?php endif; ?>
         </div>
+        <?php if ($u['company'] !== null): ?>
+            <?php
+            $c = $u['company'];
+            // Escaped per item, then joined with the raw separator: escaping the joined
+            // string would turn the separator entity into visible "&middot;" text.
+            $companyBits = array_map(
+                'htmlspecialchars',
+                array_filter([
+                    $c['industry'] ?? null,
+                    $c['businessType'] ?? null,
+                    $c['country'] ?? null,
+                    $c['currency'] ?? null,
+                ])
+            );
+            ?>
+            <div class="ua-row">
+                <b>Business:</b>
+                <span class="ua-business"><?= htmlspecialchars($c['companyName'] ?? '(unnamed)') ?></span><?php
+                    if ($companyBits): ?> &middot; <?= implode(' &middot; ', $companyBits) ?><?php endif; ?>
+            </div>
+        <?php endif; ?>
         <div class="ua-row"><b>Features used:</b> <?= ua_kv($u['features']) ?></div>
         <div class="ua-row"><b>Exports:</b> <?= ua_kv($u['exports']) ?></div>
         <div class="ua-row"><b>API calls:</b> <?= ua_kv($u['apis']) ?></div>

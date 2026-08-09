@@ -22,6 +22,10 @@ const TELEMETRY_ERROR_CATEGORIES = [
     'Export', 'Import', 'License', 'Authentication', 'Encryption'
 ];
 
+// How serious an Error event is. The app has stamped this since v2.0.12; anything
+// without it is read as an error by the dashboard rather than guessed at.
+const TELEMETRY_ERROR_SEVERITIES = ['Error', 'Warning'];
+
 const TELEMETRY_FEATURE_NAMES = [
     'ReportGenerated',
     'ReceiptScanned',
@@ -33,8 +37,14 @@ const TELEMETRY_FEATURE_NAMES = [
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
     'ThemeChanged', 'LanguageChanged',
-    'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped'
+    'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped',
+    'SampleCompanyOpened'
 ];
+
+// Business descriptors on a CompanyProfile event. Free text, not enum-checked: these
+// come from a combo box the user can type into, and the point is to learn what people
+// actually enter. Length-capped like every other string field.
+const TELEMETRY_COMPANY_PROFILE_MAX = 96;
 
 /**
  * Bound a string field: must be a string, length-cap at $maxLen, drop control chars.
@@ -134,13 +144,34 @@ function filter_telemetry_event(array $event): ?array
             ];
 
         case 'Error':
-            return $base + [
+            $severity = telemetry_validate_enum($event['severity'] ?? null, TELEMETRY_ERROR_SEVERITIES);
+            // "Unknown" is not a severity the app can send. Builds older than v2.0.12
+            // omit the field entirely, and the dashboard's rule is that a missing
+            // severity means Error rather than a guess from the error code.
+            if ($severity === 'Unknown') {
+                $severity = 'Error';
+            }
+
+            $out = $base + [
+                'severity' => $severity,
                 'errorCategory' => telemetry_validate_enum($event['errorCategory'] ?? null, TELEMETRY_ERROR_CATEGORIES),
                 'errorCode' => telemetry_clean_string($event['errorCode'] ?? null, 128),
                 'sourceFile' => telemetry_clean_string($event['sourceFile'] ?? null, 128),
                 'lineNumber' => telemetry_clean_int($event['lineNumber'] ?? null),
                 'methodName' => telemetry_clean_string($event['methodName'] ?? null, 128),
             ];
+
+            // Warning text is authored by us at the call site, so it is safe to keep and
+            // it is the only thing that makes a warning actionable: the code alone rarely
+            // says what happened. Error text is an exception's own Message, which we do
+            // not control and which can quote a filename, a company name or a server
+            // response, so it stays dropped. sourceFile + lineNumber locate an error
+            // precisely enough without it.
+            if ($severity === 'Warning') {
+                $out['message'] = telemetry_clean_string($event['message'] ?? null, 300);
+            }
+
+            return $out;
 
         case 'Export':
             return $base + [
@@ -154,6 +185,36 @@ function filter_telemetry_event(array $event): ?array
                 'apiName' => telemetry_validate_enum($event['apiName'] ?? null, TELEMETRY_API_NAMES),
                 'durationMs' => telemetry_clean_int($event['durationMs'] ?? null),
                 'success' => isset($event['success']) ? (bool)$event['success'] : null,
+            ];
+
+        case 'CompanyProfile':
+            // Who the user actually is, sent once per session for the open company.
+            // Unlike every other event type this is not anonymous: a sole trader's
+            // company name is frequently their own name. It is disclosed in
+            // /legal/privacy.php under "Business Profile Data" and it is why that page
+            // no longer calls desktop telemetry anonymous. Do not widen this list
+            // without updating that page in the same change.
+            return $base + [
+                'companyName' => telemetry_clean_string($event['companyName'] ?? null, TELEMETRY_COMPANY_PROFILE_MAX),
+                'businessType' => telemetry_clean_string($event['businessType'] ?? null, TELEMETRY_COMPANY_PROFILE_MAX),
+                'industry' => telemetry_clean_string($event['industry'] ?? null, TELEMETRY_COMPANY_PROFILE_MAX),
+                'country' => telemetry_clean_string($event['country'] ?? null, 64),
+                // ISO 4217, so three letters is the real bound; 8 leaves room for a
+                // malformed value to arrive intact rather than truncated into a
+                // different currency's code.
+                'currency' => telemetry_clean_string($event['currency'] ?? null, 8),
+                'isSample' => isset($event['isSample']) ? (bool)$event['isSample'] : null,
+            ];
+
+        case 'Startup':
+            // Launch timing, one event per run. toFirstPaintMs covers everything before
+            // the app can draw anything (runtime load, assembly mapping, first-run AV
+            // scan) and is the part a splash screen cannot cover. Capped at ten minutes:
+            // a machine resumed from sleep mid-launch can otherwise report hours.
+            return $base + [
+                'toFirstPaintMs' => telemetry_clean_int($event['toFirstPaintMs'] ?? null, 600000),
+                'toReadyMs' => telemetry_clean_int($event['toReadyMs'] ?? null, 600000),
+                'coldStart' => isset($event['coldStart']) ? (bool)$event['coldStart'] : null,
             ];
 
         default:

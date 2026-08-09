@@ -3,6 +3,7 @@ require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
 require_once __DIR__ . '/../date-range.php';
+require_once __DIR__ . '/telemetry-dedupe.php'; // telemetry_is_duplicate_event()
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -218,6 +219,10 @@ if (empty($dataDirs)) {
         $processedFiles = 0;
         $failedFiles = 0;
 
+        // Shared across every file: the same event can appear in several of them when
+        // an upload was retried or its "uploaded" flag was lost. See telemetry-dedupe.php.
+        $seenEventIds = [];
+
         // Track per-tier unique users (from ALL files, regardless of $tierFilter)
         $tierUsers = [
             'free' => ['all' => [], 'mau' => []],
@@ -283,6 +288,13 @@ if (empty($dataDirs)) {
                 $includeFile = $tierFilter === 'all' || $tierFilter === $fileTier;
 
                 foreach ($fileData['events'] as $event) {
+                    // Collapse re-uploads before any accounting: a duplicate must not
+                    // reach tier stats or DAU either, or one launch reads as several
+                    // users' worth of activity.
+                    if (telemetry_is_duplicate_event($event, $fileAuthId, $seenEventIds)) {
+                        continue;
+                    }
+
                     $result = processEvent($event, $sourceFile, $sessionMeta);
                     if ($result === null) {
                         continue;

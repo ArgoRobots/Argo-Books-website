@@ -240,6 +240,23 @@
     line-height: 1.4;
 }
 
+/* Sits where the toggle would be on an always-on alert, so the rows still line up. */
+.notif-always-tag {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+[data-theme="dark"] .notif-always-tag {
+    background: var(--gray-800);
+    color: var(--gray-300);
+}
+
 /* ---- Toggle switch ---- */
 .switch {
     position: relative;

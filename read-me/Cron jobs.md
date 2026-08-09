@@ -346,3 +346,42 @@ php portal_invoice_reminders.php --dry-run  # Log what would be sent; send nothi
 `/cron/logs/portal_invoice_reminders_YYYY-MM-DD.log`
 
 A lock file (`/cron/logs/portal_invoice_reminders.lock`) prevents overlapping runs.
+
+---
+
+## 12. Payroll Rate Reminder
+
+**Script:** `cron/payroll_rate_reminder.php`  
+**Frequency:** daily
+
+```
+0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/payroll_rate_reminder.php
+```
+
+### What It Does
+
+Emails a reminder that CRA is about to publish new payroll deduction tables. CRA changes them
+twice a year, effective 1 January and 1 July, and Argo Books ships no tax numbers in the app,
+so a new rate file has to be prepared and uploaded before each changeover.
+
+Runs daily but does nothing outside the two windows: the 10th to the 20th of December, which
+warns about the January edition, and the same days in June for July's.
+
+### Behaviour Worth Knowing
+
+Sends **once per window**, not once per day. It checks `cron_runs` for a successful send
+naming the same edition in the last 30 days, so a daily schedule produces one email rather
+than eleven.
+
+**Cannot be disabled.** There is no notification preference for it. The whole point is that it
+arrives in a month when payroll is not on anyone's mind, and missing a changeover means every
+pay run calculated afterwards uses the wrong rates.
+
+December warns about `YYYY+1-01`, June about `YYYY-07`.
+
+### Logs
+
+No daily log file. Activity is visible on `/admin/crons/`, and failures go to `error_log`.
+
+Full instructions for actually doing the update are in `docs/Payroll rate updates.md` in the
+desktop repository.

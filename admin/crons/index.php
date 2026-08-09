@@ -27,6 +27,16 @@ $rangeInterval = $rangeMap[$range]['interval'];
 // metric across all runs in the time range. Crons not yet writing to
 // cron_runs will show "No runs in range" with zeros across the board.
 $cronConfig = [
+    'payroll_rate_reminder' => [
+        'label'     => 'Payroll Rate Reminder',
+        'frequency' => 'daily',
+        'description' => 'Emails a reminder in mid-December and mid-June that CRA is about to publish new payroll deduction tables, effective January 1 and July 1. Does nothing the rest of the year, and sends once per window. Missing a changeover means every pay run calculated afterwards uses the wrong rates.',
+        'metrics'   => [
+            'in_window'    => 'Ran inside a reminder window',
+            'email_sent'   => 'Reminder emails sent',
+            'already_sent' => 'Skipped, already sent this window',
+        ],
+    ],
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
         'frequency' => 'daily',

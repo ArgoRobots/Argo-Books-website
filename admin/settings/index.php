@@ -173,6 +173,19 @@ $notif_groups = [
     ],
 ];
 
+// Alerts that are always sent. Listed so they are visible rather than hidden in a footnote,
+// but with no toggle, because turning any of them off would mean finding out about a problem
+// from a customer instead of from the system.
+$notif_always = [
+    'Safety' => [
+        ['Refund blocked', 'When the refund safety check stops a refund from going through.'],
+        ['Payment price mismatch', 'When a payment amount does not match the price it should have been.'],
+    ],
+    'Maintenance' => [
+        ['Payroll rates need updating', 'Twice a year, before CRA\'s new payroll deduction tables take effect on January 1 and July 1. Sent in mid-December and mid-June. Miss it and every pay run calculated after the changeover is wrong.'],
+    ],
+];
+
 include __DIR__ . '/../admin_header.php';
 ?>
 
@@ -313,14 +326,30 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             <?php endforeach; ?>
 
+            <?php foreach ($notif_always as $group_label => $rows): ?>
+                <div class="settings-card">
+                    <div class="settings-card-head">
+                        <div>
+                            <h2><?= htmlspecialchars($group_label) ?></h2>
+                            <p class="settings-muted">Always sent. These cannot be turned off.</p>
+                        </div>
+                    </div>
+                    <?php foreach ($rows as [$label, $desc]): ?>
+                        <div class="notif-row">
+                            <div class="notif-text">
+                                <div class="notif-label"><?= htmlspecialchars($label) ?></div>
+                                <div class="notif-desc settings-muted"><?= htmlspecialchars($desc) ?></div>
+                            </div>
+                            <span class="notif-always-tag">Always on</span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+
             <div class="settings-actions settings-center">
                 <button type="submit" class="btn btn-blue">Save settings</button>
             </div>
         </form>
-
-        <p class="settings-muted settings-footnote">
-            Safety alerts (refund blocks, payment price mismatches) are always sent and can't be turned off here.
-        </p>
     </div>
 </div>
 

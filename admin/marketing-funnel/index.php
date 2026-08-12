@@ -915,15 +915,15 @@ include __DIR__ . '/../admin_header.php';
 
         $total_spend = 0.0;
         $total_revenue = 0.0;
-        $total_paying = 0;
         foreach ($per_source as $row) {
             if ($funnel_source_filter !== '' && $row['source_code'] !== $funnel_source_filter) {
                 continue;
             }
             $total_spend   += (float)$row['spend'];
             $total_revenue += (float)$row['revenue'];
-            $total_paying  += (int)$row['paying'];
         }
+
+        $total_paying = $funnel_counts['premium_paid'];
         $cac = $total_paying > 0 ? $total_spend / $total_paying : null;
         $ltv = $total_paying > 0 ? $total_revenue / $total_paying : null;
         $ltv_cac = ($cac !== null && $cac > 0 && $ltv !== null) ? $ltv / $cac : null;

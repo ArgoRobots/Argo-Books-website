@@ -203,6 +203,10 @@ function filter_telemetry_event(array $event): ?array
                 // malformed value to arrive intact rather than truncated into a
                 // different currency's code.
                 'currency' => telemetry_clean_string($event['currency'] ?? null, 8),
+                // The language the app is displayed in, as its English name. Not the same
+                // question as country: an English app in a non-English country is what
+                // tells us which translations are actually used rather than just shipped.
+                'language' => telemetry_clean_string($event['language'] ?? null, 64),
                 'isSample' => isset($event['isSample']) ? (bool)$event['isSample'] : null,
             ];
 

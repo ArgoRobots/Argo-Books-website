@@ -221,9 +221,10 @@
                 <li>Industry</li>
                 <li>Country the business operates in</li>
                 <li>Currency the books are kept in</li>
+                <li>Language the application is displayed in</li>
             </ul>
-            <p>We collect this to understand what kinds of businesses use Argo Books, which industries and
-                currencies to prioritize, and which markets to build for. We do not sell it, share it with
+            <p>We collect this to understand what kinds of businesses use Argo Books, which industries,
+                currencies and languages to prioritize, and which markets to build for. We do not sell it, share it with
                 advertisers, or use it to contact you. If you use the built-in sample company, its details are
                 marked as sample data and are not treated as yours.</p>
             <p>We recognize that for a sole trader a company name is often a personal name. If you would rather

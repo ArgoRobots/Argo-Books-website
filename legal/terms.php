@@ -75,7 +75,7 @@
                 prioritize new features, and optimize the app for different regions. This includes operational data,
                 API usage, error tracking, session information, startup timing, geographic data (country, region,
                 and timezone), and the profile of the business you keep books for (company name, business type,
-                industry, country, and currency). It does not include your transactions, customers, suppliers, or
+                industry, country, currency, and display language). It does not include your transactions, customers, suppliers, or
                 documents. The data is uploaded to our servers while the application runs and when it is closed.
                 You can view the data collected on your device and delete it from your device at any time through
                 the Settings panel. This data collection is separate from any standard web analytics used on our

@@ -80,6 +80,22 @@
                 <li><strong>Plan changes for PayPal subscribers</strong>: The new subscription is billed by PayPal on activation, and the prorated value of your unused old period (plus any account credit) is refunded to your PayPal account within 5&ndash;10 business days.</li>
             </ul>
 
+            <h2>Refund Eligibility</h2>
+            <p>We offer refunds in the following situations:</p>
+            <ul>
+                <li><strong>First payment</strong>: You may request a full refund for any reason within 30 days of your first Premium payment.</li>
+                <li><strong>Automatic renewals</strong>: If a subscription renews and you did not intend to continue, you may request a full refund of that renewal charge within 7 days of the charge.</li>
+                <li><strong>Unresolved technical issues</strong>: If a problem with Argo Books cannot be resolved after reasonable attempts by our support team, we may offer a refund regardless of how long you have been subscribed.</li>
+            </ul>
+            <p>The following are not refundable:</p>
+            <ul>
+                <li>Requests made outside the windows above, except for unresolved technical issues.</li>
+                <li>Account credit, which has no cash value and is forfeited on cancellation.</li>
+                <li>Subscriptions where the licence has been revoked for a breach of our <a class="link" href="terms.php">Terms of Service</a>.</li>
+            </ul>
+            <p>When a refund is issued, your subscription is cancelled, Premium features end immediately, and the associated licence key is deactivated.</p>
+            <p>Purchases made through a third-party marketplace are covered by that marketplace's refund policy, not this one. Please contact them directly.</p>
+
             <h2>How to Request a Refund</h2>
             <p>To request a refund, please contact our support team with the following information:</p>
             <ol>
@@ -116,8 +132,6 @@
             </ol>
             <p>Many issues can be resolved with proper guidance, and we are committed to helping you get the most out of
                 our software.</p>
-            <p>If technical issues cannot be resolved after reasonable attempts by our support team, we may offer a
-                refund at our discretion.</p>
 
             <h2>Changes to This Policy</h2>
             <p>We reserve the right to modify this Refund Policy at any time. Changes will be effective immediately upon
@@ -130,7 +144,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: April 30, 2026</p>
+            <p class="last-updated">Last updated: August 13, 2026</p>
         </div>
     </div>
 

@@ -75,10 +75,9 @@
                 prioritize new features, and optimize the app for different regions. This includes operational data,
                 API usage, error tracking, session information, startup timing, geographic data (country, region,
                 and timezone), and the profile of the business you keep books for (company name, business type,
-                industry, country, currency, and display language). It does not include your transactions, customers, suppliers, or
+                industry, country, currency, and language). It does not include your transactions, customers, suppliers, or 
                 documents. The data is uploaded to our servers while the application runs and when it is closed.
-                You can view the data collected on your device and delete it from your device at any time through
-                the Settings panel. This data collection is separate from any standard web analytics used on our
+                This data collection is separate from any standard web analytics used on our
                 website. For more information about what data is collected and how it is used, please see our
                 <a class="link" href="privacy.php">Privacy Policy</a>.</p>
 
@@ -118,7 +117,11 @@
                 terms. We reserve the right to revoke license keys that are used in violation of these Terms.</p>
 
             <h2>Argo Premium Subscription</h2>
-            <p>Argo Premium is an optional subscription service that provides invoices and AI-powered features. By subscribing, you agree to the following:</p>
+            <p>Argo Premium is an optional subscription that raises the monthly usage limits of the free version,
+                including invoicing, receipt scanning, and spreadsheet and bank statement imports, and unlocks
+                additional features such as revenue forecasting, biometric sign-in, and priority support. The current
+                limits and full feature list for each plan are published on our <a href="../pricing/">pricing page</a>.
+                By subscribing, you agree to the following:</p>
             <ul>
 <?php
                     require_once __DIR__ . '/../config/pricing.php';
@@ -131,7 +134,6 @@
                 <li><strong>Plan Changes (Downgrade)</strong>: When downgrading from yearly to monthly billing, the prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. Any leftover value remains as account credit and is automatically applied to future monthly renewals until depleted.</li>
                 <li><strong>Account Credit</strong>: Account credit is non-refundable, has no cash value, and is forfeited upon cancellation. Credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
                 <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square. PayPal plan changes are refunded to your PayPal account; Stripe and Square plan changes apply credits or partial charges directly.</li>
-                <li><strong>Usage Limits</strong>: AI Receipt Scanning is limited to 500 scans per month.</li>
             </ul>
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>
 
@@ -225,7 +227,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: August 9, 2026</p>
+            <p class="last-updated">Last updated: August 13, 2026</p>
         </div>
     </div>
 

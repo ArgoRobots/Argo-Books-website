@@ -95,7 +95,8 @@ function get_premium_subscription_keys()
                    s.status   AS subscription_status
             FROM premium_subscription_keys k
             LEFT JOIN premium_subscriptions s ON s.subscription_id = k.subscription_id
-            WHERE s.subscription_id IS NULL OR s.payment_method = 'free_key'
+            WHERE (s.subscription_id IS NULL OR s.payment_method = 'free_key')
+              AND k.batch_label IS NULL
             ORDER BY k.created_at DESC
         ");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -163,6 +164,113 @@ function generate_premium_subscription_key($email = null, $duration_months = 1, 
     } catch (PDOException $e) {
         error_log("Error generating Premium subscription key: " . $e->getMessage());
         return false;
+    }
+}
+
+/**
+ * One row per reseller batch, with the numbers that decide whether a deal worked.
+ *
+ * Redemption rate says whether the codes are reaching buyers at all. Capture rate says whether
+ * the deal produced contactable customers, which is the entire reason the email prompt exists:
+ * a reseller hands over codes and keeps the buyer details, so without capture a batch converts
+ * revenue into people we can never reach again.
+ *
+ * @return array Batch summaries, newest first
+ */
+function get_reseller_batches()
+{
+    global $pdo;
+
+    try {
+        $stmt = $pdo->query("
+            SELECT k.batch_label,
+                   MIN(k.created_at) AS created_at,
+                   COUNT(*) AS total_keys,
+                   SUM(CASE WHEN k.redeemed_at IS NOT NULL THEN 1 ELSE 0 END) AS redeemed,
+                   SUM(CASE WHEN k.customer_email IS NOT NULL THEN 1 ELSE 0 END) AS captured,
+                   SUM(CASE WHEN k.customer_email_verified_at IS NOT NULL THEN 1 ELSE 0 END) AS verified
+            FROM premium_subscription_keys k
+            WHERE k.batch_label IS NOT NULL
+            GROUP BY k.batch_label
+            ORDER BY MIN(k.created_at) DESC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching reseller batches: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Every key in one batch. Used by the key list and by the CSV handed to the reseller.
+ *
+ * @param string $label Batch label
+ * @return array Key rows, oldest first so a downloaded CSV keeps a stable order
+ */
+function get_reseller_batch_keys($label)
+{
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT k.*,
+                   s.end_date AS subscription_end_date,
+                   s.status   AS subscription_status
+            FROM premium_subscription_keys k
+            LEFT JOIN premium_subscriptions s ON s.subscription_id = k.subscription_id
+            WHERE k.batch_label = ?
+            ORDER BY k.id ASC
+        ");
+        $stmt->execute([$label]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching batch keys: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Mints a batch of unrestricted keys to hand to a reseller.
+ *
+ * No email is set on these, deliberately. The email column restricts who may redeem, and a
+ * reseller sells to people whose addresses we do not know yet. That is exactly what makes the
+ * capture prompt fire in the app at redemption.
+ *
+ * Inserted in one transaction so a failure part way through cannot leave half a batch that has
+ * already been counted and quoted to the reseller.
+ *
+ * @param string $label Batch label
+ * @param int $count How many keys
+ * @param int $duration_months 0 for a lifetime licence
+ * @return int Number of keys created
+ */
+function generate_reseller_batch($label, $count, $duration_months)
+{
+    global $pdo;
+
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscription_keys
+                (subscription_key, email, duration_months, notes, batch_label)
+            VALUES (?, NULL, ?, NULL, ?)
+        ");
+
+        $created = 0;
+        for ($i = 0; $i < $count; $i++) {
+            $stmt->execute([generate_license_key('premium'), $duration_months, $label]);
+            $created++;
+        }
+
+        $pdo->commit();
+        return $created;
+    } catch (PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Error generating reseller batch: " . $e->getMessage());
+        return 0;
     }
 }
 
@@ -267,6 +375,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['message'] = "Invalid request. Please try again.";
         $_SESSION['message_type'] = 'error';
         header('Location: index.php');
+        exit;
+    }
+
+    if (isset($_POST['generate_batch'])) {
+        $label = trim($_POST['batch_label'] ?? '');
+        $count = intval($_POST['batch_count'] ?? 0);
+        $duration = intval($_POST['batch_duration'] ?? 0);
+
+        if ($label === '' || mb_strlen($label) > 60) {
+            $_SESSION['message'] = "Enter a batch label of 60 characters or fewer.";
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php#reseller-batches');
+            exit;
+        }
+
+        // Capped at 2000. A typo in this box mints keys that cannot be un-minted without
+        // deleting rows, and a reseller deal of more than 2000 is worth running twice.
+        if ($count < 1 || $count > 2000) {
+            $_SESSION['message'] = "Enter a key count between 1 and 2000.";
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php#reseller-batches');
+            exit;
+        }
+
+        if ($duration < 0) $duration = 0;
+        if ($duration > 24 && $duration !== 0) $duration = 24;
+
+        $created = generate_reseller_batch($label, $count, $duration);
+
+        $_SESSION['message'] = $created > 0
+            ? "Generated $created key(s) for \"$label\". Download the CSV to send to the reseller."
+            : "Could not generate the batch. Nothing was created.";
+        $_SESSION['message_type'] = $created > 0 ? 'success' : 'error';
+
+        header('Location: index.php?batch=' . urlencode($label) . '#reseller-batches');
+        exit;
+    }
+
+    if (isset($_POST['download_batch'])) {
+        $label = trim($_POST['batch_label'] ?? '');
+        $keys = $label === '' ? [] : get_reseller_batch_keys($label);
+
+        if (empty($keys)) {
+            $_SESSION['message'] = "That batch has no keys to download.";
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php#reseller-batches');
+            exit;
+        }
+
+        // Sent before any page output, so the CSV is the whole response.
+        $filename = preg_replace('/[^A-Za-z0-9._-]+/', '-', $label) . '-keys.csv';
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['license_key', 'status', 'redeemed_at', 'customer_email', 'email_verified_at']);
+        foreach ($keys as $k) {
+            fputcsv($out, [
+                $k['subscription_key'],
+                get_subscription_key_status($k),
+                $k['redeemed_at'] ?? '',
+                $k['customer_email'] ?? '',
+                $k['customer_email_verified_at'] ?? '',
+            ]);
+        }
+        fclose($out);
         exit;
     }
 
@@ -484,6 +658,19 @@ $premium_subscriptions = get_premium_subscriptions();
 $premium_subscription_keys = get_premium_subscription_keys();
 $subscription_chart_data = get_subscription_chart_data();
 
+// Reseller batches, plus the keys of whichever batch is open.
+$reseller_batches = get_reseller_batches();
+$selected_batch = isset($_GET['batch']) ? trim($_GET['batch']) : '';
+$selected_batch_keys = $selected_batch !== '' ? get_reseller_batch_keys($selected_batch) : [];
+
+$batch_totals = ['keys' => 0, 'redeemed' => 0, 'captured' => 0, 'verified' => 0];
+foreach ($reseller_batches as $b) {
+    $batch_totals['keys']     += (int) $b['total_keys'];
+    $batch_totals['redeemed'] += (int) $b['redeemed'];
+    $batch_totals['captured'] += (int) $b['captured'];
+    $batch_totals['verified'] += (int) $b['verified'];
+}
+
 // Get usage data and limits
 $pricing_config = get_pricing_config();
 $receipt_limit = $pricing_config['receipt_scan_monthly_limit'];
@@ -598,6 +785,7 @@ include __DIR__ . '/../admin_header.php';
     <div class="section-tabs">
         <button class="section-tab active" data-tab="premium-subscriptions">Premium Subscriptions</button>
         <button class="section-tab" data-tab="free-sub-keys">Free Premium Subscription Keys</button>
+        <button class="section-tab" data-tab="reseller-batches">Reseller Batches</button>
     </div>
 
     <?php if (!empty($message)): ?>
@@ -929,6 +1117,163 @@ include __DIR__ . '/../admin_header.php';
                 </form>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Reseller Batches Tab -->
+    <div id="reseller-batches" class="tab-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Batch Keys</h3>
+                <div class="value"><?php echo $batch_totals['keys']; ?></div>
+            </div>
+            <div class="stat-card pending">
+                <h3>Redeemed</h3>
+                <div class="value"><?php echo $batch_totals['redeemed']; ?></div>
+            </div>
+            <div class="stat-card free">
+                <h3>Emails Captured</h3>
+                <div class="value"><?php echo $batch_totals['captured']; ?></div>
+            </div>
+            <div class="stat-card">
+                <h3>Emails Verified</h3>
+                <div class="value"><?php echo $batch_totals['verified']; ?></div>
+            </div>
+        </div>
+
+        <div class="table-container" style="padding: 20px 20px 30px 20px;">
+            <h2>Generate Batch</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                Keys for a reseller to hand out. No email is attached to them, so the app asks each
+                buyer for one when they redeem. Download the CSV and send that to the reseller.
+            </p>
+
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                <div class="generate-form-grid">
+                    <div class="form-group">
+                        <label for="batch_label">Batch label</label>
+                        <input type="text" id="batch_label" name="batch_label" maxlength="60"
+                               placeholder="StackSocial Aug 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="batch_count">How many keys</label>
+                        <input type="number" id="batch_count" name="batch_count" min="1" max="2000"
+                               value="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="batch_duration">Duration</label>
+                        <select id="batch_duration" name="batch_duration">
+                            <option value="0" selected>Lifetime</option>
+                            <option value="12">12 months</option>
+                            <option value="24">24 months</option>
+                        </select>
+                    </div>
+                    <button type="submit" name="generate_batch" class="btn btn-premium" style="margin-top: 24px;">Generate Batch</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h2>Batches</h2>
+            <?php if (empty($reseller_batches)): ?>
+                <p style="padding: 20px; color: var(--text-secondary);">No reseller batches yet.</p>
+            <?php else: ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Batch</th>
+                            <th>Created</th>
+                            <th>Keys</th>
+                            <th>Redeemed</th>
+                            <th>Emails captured</th>
+                            <th>Verified</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($reseller_batches as $b): ?>
+                            <?php
+                            $total = (int) $b['total_keys'];
+                            $redeemed = (int) $b['redeemed'];
+                            $captured = (int) $b['captured'];
+                            $verified = (int) $b['verified'];
+                            // Capture is measured against REDEEMED, not against the whole batch.
+                            // Unsold codes have nobody to ask, so counting them would read as a
+                            // failure of the prompt rather than of the deal.
+                            $redeemPct = $total > 0 ? round($redeemed / $total * 100) : 0;
+                            $capturePct = $redeemed > 0 ? round($captured / $redeemed * 100) : 0;
+                            $verifyPct = $captured > 0 ? round($verified / $captured * 100) : 0;
+                            ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars($b['batch_label']); ?></strong></td>
+                                <td><?php echo date('M j, Y', strtotime($b['created_at'])); ?></td>
+                                <td><?php echo $total; ?></td>
+                                <td><?php echo $redeemed; ?> <span style="color: var(--text-secondary);">(<?php echo $redeemPct; ?>%)</span></td>
+                                <td><?php echo $captured; ?> <span style="color: var(--text-secondary);">(<?php echo $capturePct; ?>% of redeemed)</span></td>
+                                <td><?php echo $verified; ?> <span style="color: var(--text-secondary);">(<?php echo $verifyPct; ?>% of captured)</span></td>
+                                <td>
+                                    <a class="btn btn-secondary" href="index.php?batch=<?php echo urlencode($b['batch_label']); ?>#reseller-batches">View keys</a>
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                                        <input type="hidden" name="batch_label" value="<?php echo htmlspecialchars($b['batch_label']); ?>">
+                                        <button type="submit" name="download_batch" class="btn btn-secondary">Download CSV</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($selected_batch !== ''): ?>
+            <div class="table-container">
+                <h2>Keys in &ldquo;<?php echo htmlspecialchars($selected_batch); ?>&rdquo;</h2>
+                <?php if (empty($selected_batch_keys)): ?>
+                    <p style="padding: 20px; color: var(--text-secondary);">No keys found for this batch.</p>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Status</th>
+                                <th>Redeemed</th>
+                                <th>Email</th>
+                                <th>Verified</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($selected_batch_keys as $k): ?>
+                                <?php $status = get_subscription_key_status($k); ?>
+                                <tr>
+                                    <td><code><?php echo htmlspecialchars($k['subscription_key']); ?></code></td>
+                                    <td>
+                                        <?php if ($status === 'expired'): ?>
+                                            <span class="badge badge-expired">Expired</span>
+                                        <?php elseif ($status === 'redeemed'): ?>
+                                            <span class="badge badge-redeemed">Redeemed</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-free">Available</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo $k['redeemed_at'] ? date('M j, Y', strtotime($k['redeemed_at'])) : '&mdash;'; ?></td>
+                                    <td>
+                                        <?php if (!empty($k['customer_email'])): ?>
+                                            <?php echo htmlspecialchars($k['customer_email']); ?>
+                                        <?php elseif ($k['redeemed_at']): ?>
+                                            <span style="color: var(--text-secondary);">not given</span>
+                                        <?php else: ?>
+                                            &mdash;
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo $k['customer_email_verified_at'] ? 'Yes' : ($k['customer_email'] ? 'No' : '&mdash;'); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

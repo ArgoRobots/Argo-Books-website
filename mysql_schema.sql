@@ -390,10 +390,12 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     customer_email_verified_at DATETIME DEFAULT NULL COMMENT 'Data quality flag only. Premium is never gated on this',
     customer_email_token CHAR(64) DEFAULT NULL COMMENT 'One-click verification link token',
     customer_email_source VARCHAR(30) DEFAULT NULL COMMENT 'Where the address came from, e.g. app_redemption',
+    batch_label VARCHAR(60) DEFAULT NULL COMMENT 'Reseller batch this key was minted for, e.g. StackSocial Aug 2026. NULL for a hand-issued promo key',
     INDEX idx_subscription_key (subscription_key),
     INDEX idx_email (email),
     INDEX idx_redeemed (redeemed_at),
     INDEX idx_psk_customer_email (customer_email),
+    INDEX idx_psk_batch_label (batch_label),
     UNIQUE KEY uk_psk_customer_email_token (customer_email_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

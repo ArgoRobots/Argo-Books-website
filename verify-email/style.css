@@ -1,0 +1,18 @@
+/* Icon colours for this page's states.
+   Layout and typography come from ../unsubscribe/style.css, which this extends rather than
+   copies. Only the state modifiers below are specific to email verification. */
+
+.state-verified .success-icon,
+.state-already_verified .success-icon {
+  background: linear-gradient(45deg, #10b981, #059669);
+}
+
+.state-invalid .success-icon,
+.state-error .success-icon {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+}
+
+/* Two stacked sentences read as one paragraph without a gap between them. */
+.success-message + .success-message {
+  margin-top: 14px;
+}

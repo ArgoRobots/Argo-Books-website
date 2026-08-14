@@ -437,6 +437,56 @@ function send_password_reset_email($email, $token, $username)
 }
 
 /**
+ * Confirm a Premium activation and ask the buyer to verify the address they gave.
+ *
+ * Sent after Premium is already switched on, never before. Verification here is a data quality
+ * flag: it tells us the address is real, it does not decide whether anyone gets what they paid
+ * for. Anything else generates support tickets from customers whose activation appears stuck
+ * behind an email that has not arrived yet.
+ *
+ * Goes through send_styled_email(), which tries the Resend SMTP relay first and only falls back
+ * to mail() when no relay is configured.
+ *
+ * @param string $email The address the buyer entered in the app
+ * @param string $token One-click verification token
+ * @return bool Success status
+ */
+function send_license_email_verification($email, $token)
+{
+    $verify_link = site_url('/verify-email/?token=' . urlencode($token));
+
+    $body = <<<HTML
+        <h1>Your Premium licence is active</h1>
+        <p>Thanks for activating Argo Books Premium. Everything is already unlocked, so there is nothing you need to do to start using it.</p>
+
+        <p>Confirming your email lets us send your receipt, reach you about your licence, and help if you ever need to move it to another computer.</p>
+
+        <div class="button-container">
+            <a href="{$verify_link}" class="button">Verify email</a>
+        </div>
+
+        <p>If the button above doesn't work, you can also copy and paste the following link into your browser:</p>
+        <div class="reset-link">{$verify_link}</div>
+
+        <p>If you did not activate Argo Books Premium, you can safely ignore this email.</p>
+
+        <p>Regards,<br>The Argo Team</p>
+        HTML;
+
+    return send_styled_email(
+        $email,
+        'Confirm your email - Argo Books Premium',
+        $body,
+        'premium',
+        null,
+        null,
+        null,
+        [],
+        'Your Premium licence is already active. Confirm your email so we can reach you.'
+    );
+}
+
+/**
  * Send account deletion scheduled email
  *
  * @param string $email User's email address

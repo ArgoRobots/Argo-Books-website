@@ -385,9 +385,16 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device',
     subscription_id VARCHAR(50) DEFAULT NULL COMMENT 'Link to created subscription',
     notes TEXT DEFAULT NULL COMMENT 'Admin notes about this key',
+    customer_email VARCHAR(255) DEFAULT NULL COMMENT 'Buyer email captured in the app at redemption. Deliberately NOT the email column above: that one restricts who may redeem, this one is contact detail collected after the fact',
+    customer_email_captured_at DATETIME DEFAULT NULL,
+    customer_email_verified_at DATETIME DEFAULT NULL COMMENT 'Data quality flag only. Premium is never gated on this',
+    customer_email_token CHAR(64) DEFAULT NULL COMMENT 'One-click verification link token',
+    customer_email_source VARCHAR(30) DEFAULT NULL COMMENT 'Where the address came from, e.g. app_redemption',
     INDEX idx_subscription_key (subscription_key),
     INDEX idx_email (email),
-    INDEX idx_redeemed (redeemed_at)
+    INDEX idx_redeemed (redeemed_at),
+    INDEX idx_psk_customer_email (customer_email),
+    UNIQUE KEY uk_psk_customer_email_token (customer_email_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Add indexes for license_keys table

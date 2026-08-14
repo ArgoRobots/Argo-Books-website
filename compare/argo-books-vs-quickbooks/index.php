@@ -294,7 +294,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD / month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD / month</span></th>
                             <th class="brand-col">QuickBooks<span class="th-sub">EasyStart: $<?= $qb_easystart ?> CAD / month</span></th>
                         </tr>
                     </thead>

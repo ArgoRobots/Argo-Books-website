@@ -63,7 +63,7 @@
                 understand that sometimes a purchase may not work out as expected.</p>
 
             <h2>Premium Subscription Cancellations</h2>
-            <p>For Argo Premium subscriptions:</p>
+            <p>For Argo Books Premium subscriptions:</p>
             <ul>
                 <li>You can cancel your subscription at any time from your account settings.</li>
                 <li>After cancellation, you retain access to Premium features until the end of your current billing period.</li>
@@ -72,7 +72,7 @@
             </ul>
 
             <h2>Plan Changes</h2>
-            <p>You may switch your Argo Premium subscription between monthly and yearly billing at any time from your account settings. Plan changes are not refunds; they are handled automatically:</p>
+            <p>You may switch your Argo Books Premium subscription between monthly and yearly billing at any time from your account settings. Plan changes are not refunds; they are handled automatically:</p>
             <ul>
                 <li><strong>Upgrade (monthly to yearly)</strong>: You are charged the yearly amount immediately, less the prorated value of your current unused monthly period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
                 <li><strong>Downgrade (yearly to monthly)</strong>: The prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. If the prorated value exceeds one month, the leftover remains as account credit and is automatically applied to future monthly renewals until depleted. No cash refund is issued.</li>

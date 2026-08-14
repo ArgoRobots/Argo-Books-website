@@ -9,7 +9,7 @@
  *   php setup-paypal-plans.php
  *
  * This will create:
- *   1. A Product (Argo Premium Subscription)
+ *   1. A Product (Argo Books Premium Subscription)
  *   2. A Monthly Plan (configured in pricing.php)
  *   3. A Yearly Plan (configured in pricing.php)
  */
@@ -138,7 +138,7 @@ function getAccessToken($baseUrl, $clientId, $clientSecret) {
 
 function createProduct($baseUrl, $accessToken) {
     $productData = [
-        'name' => 'Argo Premium Subscription',
+        'name' => 'Argo Books Premium Subscription',
         'description' => 'Access to AI-powered features including receipt scanning, and predictive analytics.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
@@ -174,8 +174,8 @@ function createPlan($baseUrl, $accessToken, $productId, $interval, $price) {
 
     $planData = [
         'product_id' => $productId,
-        'name' => "Argo Premium - $planName",
-        'description' => "Argo Premium Subscription - $planName billing",
+        'name' => "Argo Books Premium - $planName",
+        'description' => "Argo Books Premium Subscription - $planName billing",
         'status' => 'ACTIVE',
         'billing_cycles' => [
             [

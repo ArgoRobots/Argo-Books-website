@@ -226,8 +226,8 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                                 <rect x="205" y="140" width="2" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="217" y="153" font-size="13" font-weight="600" fill="#0f172a">$0</text>
 
-                                <!-- Argo Premium $<?= $argo_monthly ?> -->
-                                <text x="40" y="192" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <!-- Argo Books Premium $<?= $argo_monthly ?> -->
+                                <text x="40" y="192" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="205" y="180" width="14" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="229" y="193" font-size="13" font-weight="600" fill="#0f172a">$<?= $argo_monthly ?></text>
 
@@ -277,7 +277,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Sage 50<span class="th-sub">Pro: $<?= $sage_pro ?> CAD/mo (billed annually)</span></th>
                         </tr>
                     </thead>

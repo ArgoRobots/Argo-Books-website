@@ -218,8 +218,8 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                                 <text x="186" y="109" font-size="13" fill="#0f172a">Odoo Standard</text>
 
                                 <!-- Bars: width proportional to price, max ($220) = 380px wide -->
-                                <!-- Argo Premium (flat) $15 -->
-                                <text x="40" y="156" font-size="13" font-weight="600" fill="#0f172a">Argo Premium (flat)</text>
+                                <!-- Argo Books Premium (flat) $15 -->
+                                <text x="40" y="156" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium (flat)</text>
                                 <rect x="40" y="166" width="26" height="26" rx="5" fill="#3f63e8"/>
                                 <text x="76" y="184" font-size="14" font-weight="700" fill="#0f172a">$15</text>
 
@@ -271,7 +271,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Odoo<span class="th-sub">One App Free / $<?= $odoo_standard ?>+ CAD/user/mo</span></th>
                         </tr>
                     </thead>

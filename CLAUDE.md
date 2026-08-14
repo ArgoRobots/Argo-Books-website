@@ -57,7 +57,7 @@ For local dev, set up MailHog so the fallback path doesn't try to hit a real MTA
 
 **PayPal portal Connect is disabled.** The "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, and proper merchant onboarding requires the Partner Referrals API (gated behind Platforms & Marketplaces partner enrollment). All portal-side PayPal handlers (`api/portal/connect.php`, `connect-callback.php`, `checkout.php` `handle_paypal_checkout()`, `process-payment.php` `process_paypal_payment()`) return 503 `PROVIDER_UNSUPPORTED`, and `get_available_payment_methods()` in `api/portal/portal-helper.php` deliberately omits PayPal even when `paypal_merchant_id` is set. The desktop app hides the PayPal Connect button.
 
-**PayPal IS still used for the SaaS subscription flow** (Argo Premium billing on argorobots.com): separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout. Do not touch SaaS-subscription PayPal code when working on portal features.
+**PayPal IS still used for the SaaS subscription flow** (Argo Books Premium billing on argorobots.com): separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout. Do not touch SaaS-subscription PayPal code when working on portal features.
 
 ## Header / footer loading
 

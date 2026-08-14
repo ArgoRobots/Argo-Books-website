@@ -168,7 +168,7 @@ $notif_groups = [
         'notify_new_reports'  => ['Content reports', 'When a user reports content for moderation.'],
     ],
     'Sales' => [
-        'notify_new_customer'           => ['New paying customer', 'When someone subscribes to Argo Premium.'],
+        'notify_new_customer'           => ['New paying customer', 'When someone subscribes to Argo Books Premium.'],
         'notify_subscription_cancelled' => ['Subscription cancelled', 'When someone cancels their Premium subscription.'],
     ],
 ];

@@ -109,7 +109,7 @@ $is_upgrade = ($new_cycle === 'yearly');
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,follow">
-    <meta name="description" content="Switch your Argo Premium billing cycle">
+    <meta name="description" content="Switch your Argo Books Premium billing cycle">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Switch Billing Cycle - Argo Community</title>
@@ -310,7 +310,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 <h1>Switch to <?= htmlspecialchars($new_cycle_label) ?> Billing?</h1>
 
                 <p class="confirm-description">
-                    You're about to change your Argo Premium subscription from
+                    You're about to change your Argo Books Premium subscription from
                     <strong><?= htmlspecialchars($old_cycle_label) ?></strong>
                     to <strong><?= htmlspecialchars($new_cycle_label) ?></strong>.
                 </p>

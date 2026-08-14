@@ -94,7 +94,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                     "name": "How does Argo Books pricing compare to Zoho Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "They are priced about the same. Both are free to start. Argo Premium is $<?= $argo_monthly ?> CAD/month (or $<?= $argo_yearly ?>/year), the same entry price as Zoho Books Standard at $<?= $zoho_standard ?> CAD/month. Zoho's plans then rise to Professional at $<?= $zoho_professional ?> and Premium at $<?= $zoho_premium ?>, and up to $<?= $zoho_elite ?> and $<?= $zoho_ultimate ?> CAD/month for its Elite and Ultimate tiers. The real difference isn't the price, it's what kind of tool each one is."
+                        "text": "They are priced about the same. Both are free to start. Argo Books Premium is $<?= $argo_monthly ?> CAD/month (or $<?= $argo_yearly ?>/year), the same entry price as Zoho Books Standard at $<?= $zoho_standard ?> CAD/month. Zoho's plans then rise to Professional at $<?= $zoho_professional ?> and Premium at $<?= $zoho_premium ?>, and up to $<?= $zoho_elite ?> and $<?= $zoho_ultimate ?> CAD/month for its Elite and Ultimate tiers. The real difference isn't the price, it's what kind of tool each one is."
                     }
                 },
                 {
@@ -228,8 +228,8 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                                 <rect x="175" y="140" width="2" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="189" y="153" font-size="13" font-weight="600" fill="#0f172a">$0</text>
 
-                                <!-- Argo Premium $15 -->
-                                <text x="40" y="199" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <!-- Argo Books Premium $15 -->
+                                <text x="40" y="199" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="175" y="186" width="21" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="208" y="199" font-size="13" font-weight="600" fill="#0f172a">$<?= $argo_monthly ?></text>
 
@@ -294,7 +294,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Zoho Books<span class="th-sub">Standard: $<?= $zoho_standard ?> CAD/month</span></th>
                         </tr>
                     </thead>
@@ -530,7 +530,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>How does Argo Books pricing compare to Zoho Books?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>They're priced about the same, and both are free to start. Argo Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> (or $<?= $argo_yearly ?>/year), the same entry price as Zoho Books Standard at $<?= $zoho_standard ?> CAD/month.</p>
+                            <p>They're priced about the same, and both are free to start. Argo Books Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> (or $<?= $argo_yearly ?>/year), the same entry price as Zoho Books Standard at $<?= $zoho_standard ?> CAD/month.</p>
                             <p>Zoho's plans then rise to Professional at $<?= $zoho_professional ?> and Premium at $<?= $zoho_premium ?>, and up to $<?= $zoho_elite ?> and $<?= $zoho_ultimate ?> CAD/month for its Elite and Ultimate tiers. The real difference isn't the price, it's what kind of tool each one is.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

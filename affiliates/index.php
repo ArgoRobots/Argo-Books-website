@@ -133,7 +133,7 @@ $fmt = function (float $n): string {
                     </div>
 
                     <p class="aff-calc-fine" id="affFine">
-                        Based on Argo Premium at <?php echo $fmt($premium_monthly); ?>/mo. You keep
+                        Based on Argo Books Premium at <?php echo $fmt($premium_monthly); ?>/mo. You keep
                         <?php echo $commission_rate_pct; ?>% (<?php echo $fmt($c_month); ?>) of every monthly payment,
                         for 12 months. Figures in CAD.
                     </p>
@@ -336,13 +336,13 @@ $fmt = function (float $n): string {
                     setBig(cMonth * n);
                     unitEl.textContent = '/ month';
                     subEl.textContent = money(cMonth * 12 * n) + ' over their first year';
-                    fineEl.innerHTML = 'Based on Argo Premium at ' + money(monthly) + '/mo. You keep 50% ('
+                    fineEl.innerHTML = 'Based on Argo Books Premium at ' + money(monthly) + '/mo. You keep 50% ('
                         + money(cMonth) + ') of every monthly payment, for 12 months. Figures in CAD.';
                 } else {
                     setBig(cYear * n);
                     unitEl.textContent = '/ year';
                     subEl.textContent = money(cYear) + ' per yearly subscriber, paid upfront';
-                    fineEl.innerHTML = 'Based on Argo Premium at ' + money(yearly) + '/yr. You keep 50% ('
+                    fineEl.innerHTML = 'Based on Argo Books Premium at ' + money(yearly) + '/yr. You keep 50% ('
                         + money(cYear) + ') of each yearly subscription. Figures in CAD.';
                 }
             }

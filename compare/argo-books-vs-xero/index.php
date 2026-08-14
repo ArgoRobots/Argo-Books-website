@@ -219,8 +219,8 @@ $xero_premium  = competitor_price('xero', 'premium');
                                 <rect x="200" y="120" width="4" height="18" rx="4" fill="#3f63e8"/>
                                 <text x="214" y="134" font-size="14" font-weight="700" fill="#3f63e8">$0</text>
 
-                                <!-- Argo Premium $15 -->
-                                <text x="40" y="182" font-size="14" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <!-- Argo Books Premium $15 -->
+                                <text x="40" y="182" font-size="14" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="200" y="170" width="71" height="18" rx="4" fill="#3f63e8"/>
                                 <text x="281" y="184" font-size="14" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?></text>
 
@@ -276,7 +276,7 @@ $xero_premium  = competitor_price('xero', 'premium');
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Xero<span class="th-sub">Starter: $<?= $xero_starter ?> CAD/month</span></th>
                         </tr>
                     </thead>

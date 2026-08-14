@@ -176,7 +176,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                     <ul class="why-list">
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>One price, not one price per person.</strong> Bonsai bills per user, so a second person doubles your cost. Argo Premium is $<?= $argo_monthly ?> CAD/month regardless of headcount.</span>
+                                <span><strong>One price, not one price per person.</strong> Bonsai bills per user, so a second person doubles your cost. Argo Books Premium is $<?= $argo_monthly ?> CAD/month regardless of headcount.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -231,7 +231,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                                 <rect x="205" y="145" width="4" height="26" rx="2" fill="#cbd5e1"/>
                                 <text x="219" y="162" font-size="13" font-weight="700" fill="#64748b">$0</text>
                                 <rect x="205" y="201" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="205" y="201" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
                                 <text x="<?= 205 + $premW + 8 ?>" y="218" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?> CAD</text>
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
@@ -271,7 +271,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Bonsai<span class="th-sub">Essentials: $<?= $bonsai_essentials ?> CAD/user</span></th>
                         </tr>
                     </thead>

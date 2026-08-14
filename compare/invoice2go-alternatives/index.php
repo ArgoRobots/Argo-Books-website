@@ -177,7 +177,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                     <ul class="why-list">
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>No invoice caps to work around.</strong> Invoice2Go Starter allows 2 invoices a month and Professional allows 5. Argo Premium does not cap invoices at all.</span>
+                                <span><strong>No invoice caps to work around.</strong> Invoice2Go Starter allows 2 invoices a month and Professional allows 5. Argo Books Premium does not cap invoices at all.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -232,7 +232,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                                 <rect x="205" y="145" width="4" height="26" rx="2" fill="#cbd5e1"/>
                                 <text x="219" y="162" font-size="13" font-weight="700" fill="#64748b">$0</text>
                                 <rect x="205" y="201" width="340" height="26" rx="5" fill="#f8fafc"/>
-                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="205" y="201" width="<?= $premW ?>" height="26" rx="5" fill="#3f63e8"/>
                                 <text x="<?= 205 + $premW + 8 ?>" y="218" font-size="13" font-weight="700" fill="#3f63e8">$<?= $argo_monthly ?> CAD</text>
                                 <rect x="205" y="257" width="340" height="26" rx="5" fill="#f8fafc"/>
@@ -249,7 +249,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                     </div>
                     <div class="diff-callout">
                         <span class="diff-callout-title">Unlimited for less</span>
-                        <span class="diff-callout-sub">Argo Premium costs less than Invoice2Go Premium and keeps your whole books</span>
+                        <span class="diff-callout-sub">Argo Books Premium costs less than Invoice2Go Premium and keeps your whole books</span>
                     </div>
                 </div>
             </div>
@@ -272,7 +272,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Invoice2Go<span class="th-sub">Premium: $<?= $i2g_premium ?> CAD/month</span></th>
                         </tr>
                     </thead>

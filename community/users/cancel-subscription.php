@@ -355,7 +355,7 @@ $premium_features = get_plan_features()['premium']['features'];
     <main class="cancel-page">
         <div class="cancel-card">
             <div class="cancel-hero">
-                <span class="cancel-eyebrow">Argo Premium</span>
+                <span class="cancel-eyebrow">Argo Books Premium</span>
                 <h1>Are you sure you want to cancel?</h1>
                 <p>Your subscription will stay active until the end of your current billing period. You can resubscribe at any time.</p>
             </div>

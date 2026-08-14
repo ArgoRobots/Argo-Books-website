@@ -150,7 +150,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
         }
 
-        // Map style keywords to CSS classes. 'premium' is the blue Argo Premium
+        // Map style keywords to CSS classes. 'premium' is the blue Argo Books Premium
         // header used by subscription mail; 'purple' remains the generic second
         // accent for affiliate, portal and refund mail; 'blue' is the default.
         $header_class_map = [
@@ -265,7 +265,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
 
     $body = <<<HTML
         <h1>Your Premium License Key</h1>
-        <p>As requested, here is your Argo Premium license key:</p>
+        <p>As requested, here is your Argo Books Premium license key:</p>
 
         <div class="license-key">{$subscription_id}</div>
 
@@ -289,7 +289,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
         <p>If you have any questions or need assistance, please don't hesitate to <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($to_email, 'Your Requested Argo Premium License Key', $body, 'premium');
+    return send_styled_email($to_email, 'Your Requested Argo Books Premium License Key', $body, 'premium');
 }
 
 /**
@@ -855,7 +855,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
 
     $body = <<<HTML
         <h1>Payment Receipt</h1>
-        <p>Thank you for subscribing to Argo Premium!</p>
+        <p>Thank you for subscribing to Argo Books Premium!</p>
 
         <div class="payment-box">
             <h3>Payment Details</h3>
@@ -903,7 +903,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
         </div>
         HTML;
 
-    return send_styled_email($email, 'Payment Receipt - Argo Premium Subscription', $body, 'premium');
+    return send_styled_email($email, 'Payment Receipt - Argo Books Premium Subscription', $body, 'premium');
 }
 
 /**
@@ -927,7 +927,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
 
     $body = <<<HTML
         <h1>Subscription Cancelled</h1>
-        <p>Your Argo Premium subscription has been cancelled as requested.</p>
+        <p>Your Argo Books Premium subscription has been cancelled as requested.</p>
 
         <div class="info-box info-box-warning">
             <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
@@ -946,12 +946,12 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
 
         <div class="receipt-footer">
             <p>License Key: {$subscriptionId}</p>
-            <p>Thank you for trying Argo Premium!</p>
+            <p>Thank you for trying Argo Books Premium!</p>
             <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
-    return send_styled_email($email, 'Subscription Cancelled - Argo Premium', $body, 'premium');
+    return send_styled_email($email, 'Subscription Cancelled - Argo Books Premium', $body, 'premium');
 }
 
 /**
@@ -981,7 +981,7 @@ function send_premium_subscription_cancelled_admin_notification($email, $subscri
 
     $body = <<<HTML
         <h2>A Premium subscription was cancelled</h2>
-        <p>A customer just cancelled their Argo Premium subscription.</p>
+        <p>A customer just cancelled their Argo Books Premium subscription.</p>
         <ul>
             <li><strong>Customer:</strong> $custEmail</li>
             <li><strong>Subscription ID:</strong> $subSafe</li>
@@ -1019,7 +1019,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 
     $body = <<<HTML
         <h1>Welcome Back!</h1>
-        <p>Your Argo Premium subscription has been reactivated.</p>
+        <p>Your Argo Books Premium subscription has been reactivated.</p>
 
         <div class="info-box info-box-success">
             <p><strong>Your Premium features are now active!</strong> You have full access to all Premium features.</p>
@@ -1058,12 +1058,12 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
         <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
-            <p>Thank you for continuing with Argo Premium!</p>
+            <p>Thank you for continuing with Argo Books Premium!</p>
             <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
-    return send_styled_email($email, 'Subscription Reactivated - Argo Premium', $body, 'premium');
+    return send_styled_email($email, 'Subscription Reactivated - Argo Books Premium', $body, 'premium');
 }
 
 /**
@@ -1104,14 +1104,14 @@ function send_premium_subscription_cycle_changed_email(
     $isUpgrade       = ($newCycle === 'yearly');
 
     $subject = $isUpgrade
-        ? "You've upgraded to Argo Premium Yearly"
-        : "Your Argo Premium plan changed to Monthly";
+        ? "You've upgraded to Argo Books Premium Yearly"
+        : "Your Argo Books Premium plan changed to Monthly";
 
     $headline = $isUpgrade
         ? 'Subscription upgraded to Yearly'
         : 'Subscription changed to Monthly';
 
-    $intro = "Your Argo Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below.";
+    $intro = "Your Argo Books Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below.";
 
     // Build breakdown table rows conditionally
     $rows = '';
@@ -1163,7 +1163,7 @@ function send_premium_subscription_cycle_changed_email(
         <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
-            <p>Thank you for being part of Argo Premium!</p>
+            <p>Thank you for being part of Argo Books Premium!</p>
             <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
@@ -1196,7 +1196,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 
     $body = <<<HTML
         <h1>You've Received a Free Premium Subscription Key!</h1>
-        <p>Great news! You've been given a free Argo Premium subscription key.</p>
+        <p>Great news! You've been given a free Argo Books Premium subscription key.</p>
 
         <div class="license-key">{$subscriptionKey}</div>
 
@@ -1221,7 +1221,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
         <p>Thank you for being part of the Argo community!</p>
         HTML;
 
-    return send_styled_email($email, 'Your Free Argo Premium Subscription Key', $body, 'premium');
+    return send_styled_email($email, 'Your Free Argo Books Premium Subscription Key', $body, 'premium');
 }
 
 /**
@@ -1266,7 +1266,7 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
         <p>If you need assistance, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'premium');
+    return send_styled_email($email, 'Payment Failed - Argo Books Premium Subscription', $body, 'premium');
 }
 
 /**
@@ -1292,7 +1292,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
 
     $body = <<<HTML
         <h1>You've Received Free Credit!</h1>
-        <p>Free credit has been added to your Argo Premium subscription.</p>
+        <p>Free credit has been added to your Argo Books Premium subscription.</p>
 
         <div class="credit-display">
             <p class="label">Credit Added</p>
@@ -1318,12 +1318,12 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         <p>If you have any questions about your credit or subscription, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
-            <p>Thank you for being an Argo Premium subscriber!</p>
+            <p>Thank you for being an Argo Books Premium subscriber!</p>
             <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
-    return send_styled_email($email, "You've Received Free Credit - Argo Premium", $body, 'premium');
+    return send_styled_email($email, "You've Received Free Credit - Argo Books Premium", $body, 'premium');
 }
 
 /**

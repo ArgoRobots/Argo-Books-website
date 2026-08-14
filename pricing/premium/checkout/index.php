@@ -291,7 +291,7 @@
             <div class="order-summary">
                 <h3>Order Summary</h3>
                 <div class="order-item">
-                    <span>Argo Premium (<span data-cycle-label><?php echo ucfirst($billing); ?></span>)</span>
+                    <span>Argo Books Premium (<span data-cycle-label><?php echo ucfirst($billing); ?></span>)</span>
                     <span>$<span data-cycle-base><?php echo number_format($basePrice, 2); ?></span> CAD</span>
                 </div>
                 <div class="order-item" data-cycle-fee-row<?php echo $feeToday > 0 ? '' : ' style="display:none"'; ?>>

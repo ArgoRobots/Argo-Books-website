@@ -226,8 +226,8 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                                 <rect x="200" y="140" width="2" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="212" y="153" font-size="13" font-weight="600" fill="#0f172a">$0</text>
 
-                                <!-- Argo Premium $15 -->
-                                <text x="40" y="196" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <!-- Argo Books Premium $15 -->
+                                <text x="40" y="196" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="200" y="184" width="39" height="18" rx="3" fill="#3f63e8"/>
                                 <text x="249" y="197" font-size="13" font-weight="600" fill="#0f172a">$<?= $argo_monthly ?></text>
 
@@ -277,7 +277,7 @@ $hb_premium    = competitor_price('honeybook', 'premium');    // 149
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">HoneyBook<span class="th-sub">Starter: $<?= $hb_starter ?> CAD/month</span></th>
                         </tr>
                     </thead>

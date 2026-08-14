@@ -144,7 +144,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
             <?php endif; ?>
 
             <p class="confirm-description">
-                You're about to reactivate your Argo Premium subscription. Here's what you need to know:
+                You're about to reactivate your Argo Books Premium subscription. Here's what you need to know:
             </p>
 
             <div class="info-box success-box">

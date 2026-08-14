@@ -222,8 +222,8 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                                 <rect x="175" y="162" width="4" height="20" rx="2" fill="#cbd5e1"/>
                                 <text x="188" y="177" font-size="13" font-weight="700" fill="#0f172a">$0</text>
 
-                                <!-- Argo Premium -->
-                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Premium</text>
+                                <!-- Argo Books Premium -->
+                                <text x="40" y="218" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
                                 <rect x="175" y="206" width="<?= $argo_monthly * 13 ?>" height="20" rx="4" fill="#3f63e8"/>
                                 <text x="<?= 175 + $argo_monthly * 13 + 10 ?>" y="221" font-size="13" font-weight="700" fill="#0f172a">$<?= $argo_monthly ?></text>
 
@@ -270,7 +270,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Argo Books Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">Wave<span class="th-sub">Pro: $<?= $wave_pro ?> CAD/month</span></th>
                         </tr>
                     </thead>

@@ -116,8 +116,8 @@
             <p>License keys may not be shared, distributed, or used on more instances than permitted by the license
                 terms. We reserve the right to revoke license keys that are used in violation of these Terms.</p>
 
-            <h2>Argo Premium Subscription</h2>
-            <p>Argo Premium is an optional subscription that raises the monthly usage limits of the free version,
+            <h2>Argo Books Premium Subscription</h2>
+            <p>Argo Books Premium is an optional subscription that raises the monthly usage limits of the free version,
                 including invoicing, receipt scanning, and spreadsheet and bank statement imports, and unlocks
                 additional features such as revenue forecasting, biometric sign-in, and priority support. The current
                 limits and full feature list for each plan are published on our <a href="../pricing/">pricing page</a>.

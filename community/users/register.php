@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="auth-subtitle">Join Argo Community to share ideas and connect with other users</p>
 
             <div class="account-note">
-                <strong>Just here for the free app?</strong> No account needed. Download it and start right away. An account is only for Argo Premium or joining the community.
+                <strong>Just here for the free app?</strong> No account needed. Download it and start right away. An account is only for Argo Books Premium or joining the community.
             </div>
 
             <?php if ($error): ?>

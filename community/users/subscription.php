@@ -114,7 +114,7 @@ if ($premium_subscription) {
                 <div class="subscription-card">
                     <div class="subscription-header">
                         <div class="subscription-plan">
-                            <span class="plan-name">Argo Premium</span>
+                            <span class="plan-name">Argo Books Premium</span>
                             <span class="billing-cycle"><?php echo ucfirst($premium_subscription['billing_cycle']); ?> Plan</span>
                         </div>
                         <?php if ($premium_subscription['status'] != 'payment_failed'): ?>

@@ -1168,7 +1168,9 @@ include __DIR__ . '/../admin_header.php';
                             <option value="24">24 months</option>
                         </select>
                     </div>
-                    <button type="submit" name="generate_batch" class="btn btn-premium" style="margin-top: 24px;">Generate Batch</button>
+                    <div class="form-group">
+                        <button type="submit" name="generate_batch" class="btn btn-premium" style="margin-top: 24px;">Generate Batch</button>
+                    </div>
                 </div>
             </form>
         </div>

@@ -8,9 +8,9 @@ declare(strict_types=1);
  * file can be prepared and uploaded before it takes effect.
  *
  * CRA publishes twice a year, effective January 1 and July 1. The app refuses to calculate a
- * pay date no loaded edition covers, and never falls back to the previous one, so a missed
- * deadline does not produce wrong deductions: it stops payroll working at all until a new
- * file ships. That is a loud failure rather than a silent one, but it still lands on every
+ * pay run when it holds no edition covering that pay date, and never falls back to the
+ * previous one, so a missed deadline does not produce wrong deductions: it stops payroll
+ * working at all until a new file ships. That is a loud failure rather than a silent one, but it still lands on every
  * customer at once, on a date fixed by CRA, which is what this reminder exists to prevent.
  *
  * Sent from the 10th to the 20th of December and June, roughly two weeks of lead time. Sends
@@ -148,9 +148,10 @@ if ($stage === 'final') {
         <p><strong>' . $safeEdition . '.json is still not on the server</strong>, and CRA\'s new
         payroll deduction tables take effect on <strong>' . $safeEffective . '</strong>.</p>
 
-        <p>On that date every customer\'s payroll stops. The app refuses a pay date no loaded
-        edition covers rather than falling back to the old rates, so nothing wrong gets
-        calculated, but nobody can run payroll at all until the file is up.</p>
+        <p>On that date every customer\'s payroll stops. The app refuses to calculate a pay run
+        when it holds no edition covering that pay date, rather than falling back to the old
+        rates, so nothing wrong gets calculated, but nobody can run payroll at all until the
+        file is up.</p>
     ' . $steps;
 } else {
     $subject = 'Payroll rates change on ' . $effectiveDate;

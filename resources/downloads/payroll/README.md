@@ -2,9 +2,9 @@
 
 CRA's payroll deduction tables, one file per edition, served as plain static JSON.
 
-The desktop app fetches `{host}/resources/downloads/payroll/{edition}.json` when it meets a pay
-date no loaded edition covers. Dropping a file in here is what makes a CRA changeover reach
-customers without an app release.
+The desktop app fetches `{host}/resources/downloads/payroll/{edition}.json` the first time a pay
+run needs an edition it does not hold. Dropping a file in here is what makes a CRA changeover
+reach customers without an app release.
 
 ## Naming
 

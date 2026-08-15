@@ -182,7 +182,7 @@ $notif_always = [
         ['Payment price mismatch', 'When a payment amount does not match the price it should have been.'],
     ],
     'Maintenance' => [
-        ['Payroll rates need updating', 'Twice a year, before CRA\'s new payroll deduction tables take effect on January 1 and July 1. Sent in mid-December and mid-June. Miss it and every pay run calculated after the changeover is wrong.'],
+        ['Payroll rates need updating', 'Twice a year, before CRA\'s new payroll deduction tables take effect on January 1 and July 1. Sent in mid-December and mid-June. Miss it and payroll stops: the app refuses a pay date it has no table for rather than guessing, so nothing wrong is produced, but nobody can run payroll until the new file ships.'],
     ],
 ];
 

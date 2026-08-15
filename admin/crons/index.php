@@ -30,9 +30,10 @@ $cronConfig = [
     'payroll_rate_reminder' => [
         'label'     => 'Payroll Rate Reminder',
         'frequency' => 'daily',
-        'description' => 'Emails a reminder in mid-December and mid-June that CRA is about to publish new payroll deduction tables, effective January 1 and July 1. Does nothing the rest of the year, and sends once per window. Missing a changeover means every pay run calculated afterwards uses the wrong rates.',
+        'description' => 'Chases the twice yearly CRA rate update. Emails on the 10th to 20th of December and June to start the work, and again in the last three days before the changeover if the file still is not up. Both go quiet as soon as the edition appears in resources/downloads/payroll/, so the three day warning arriving means the upload has not happened. Missing a changeover stops payroll: the app refuses a pay date it has no table for rather than falling back to the previous edition, so nothing wrong is produced, but nobody can run payroll until the new file ships.',
         'metrics'   => [
             'in_window'    => 'Ran inside a reminder window',
+            'file_present' => 'Edition already uploaded, nothing to chase',
             'email_sent'   => 'Reminder emails sent',
             'already_sent' => 'Skipped, already sent this window',
         ],

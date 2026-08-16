@@ -49,6 +49,24 @@ foreach ($dirs as $dir) {
 ksort($files);
 
 /**
+ * Renders a tri-state telemetry flag: 'true', 'false', or empty for "not recorded".
+ *
+ * These fields are nullable in the app (SessionEvent.Clean is bool?), and a null
+ * serializes into the uploaded JSON as a present key holding null. A truthiness
+ * check would collapse that into 'false' and assert something the data never said:
+ * a session whose shutdown was never recorded would read as a force-quit. Only an
+ * actual boolean produces a word here, which matches ua_describe_event(), where
+ * only a strict === false says "ended unexpectedly".
+ */
+function ua_csv_bool(array $ev, string $key): string
+{
+    if (!array_key_exists($key, $ev) || !is_bool($ev[$key])) {
+        return '';
+    }
+    return $ev[$key] ? 'true' : 'false';
+}
+
+/**
  * Neutralizes a value that a spreadsheet would treat as a formula.
  *
  * Error messages now travel in telemetry and originate from uploaded files, so a
@@ -129,9 +147,9 @@ foreach ($files as $name => $path) {
             'method_name'      => $ev['methodName'] ?? '',
             'duration_ms'      => $ev['durationMs'] ?? '',
             'duration_seconds' => $ev['durationSeconds'] ?? '',
-            'clean'            => array_key_exists('clean', $ev) ? ($ev['clean'] ? 'true' : 'false') : '',
+            'clean'            => ua_csv_bool($ev, 'clean'),
             'file_size'        => $ev['fileSize'] ?? '',
-            'success'          => array_key_exists('success', $ev) ? ($ev['success'] ? 'true' : 'false') : '',
+            'success'          => ua_csv_bool($ev, 'success'),
             'telemetry_file'   => $name,
         ];
     }

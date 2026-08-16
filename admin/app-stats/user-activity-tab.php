@@ -19,6 +19,9 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+// ua_describe_event() / ua_is_warning() / ua_unwrap_event(). Shared with
+// download-user.php so the CSV export says the same thing this timeline does.
+require_once __DIR__ . '/user-activity-events.php';
 require_once __DIR__ . '/telemetry-dedupe.php';       // telemetry_is_duplicate_event()
 
 // Tier and date range come from the page-level control bar, so this tab shows
@@ -61,106 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['del_files'])) {
         }
     }
     $ua_flash = "Deleted {$deleted} file(s) for " . htmlspecialchars($label) . ".";
-}
-
-// ---- Severity helper ---------------------------------------------------------
-// True when an Error-dataType event is really a warning: an expected, handled
-// condition rather than a failure. The app stamps this from its own LogLevel.
-// Events uploaded before the field existed have no severity and stay errors,
-// which is deliberate: we don't guess severity from the error code.
-if (!function_exists('ua_is_warning')) {
-    function ua_is_warning(array $ev): bool
-    {
-        return strcasecmp((string)($ev['severity'] ?? ''), 'Warning') === 0;
-    }
-}
-
-// ---- Per-event description helper -------------------------------------------
-// Returns [type, text] for a single telemetry event. $type drives the colour.
-function ua_describe_event(array $ev): array
-{
-    switch ($ev['dataType'] ?? '') {
-        case 'Session':
-            if (($ev['action'] ?? '') === 'SessionStart') {
-                return ['session', 'Session started'];
-            }
-            $dur = (int)($ev['durationSeconds'] ?? 0);
-            $human = $dur >= 60 ? round($dur / 60, 1) . ' min' : $dur . 's';
-            // Only an explicit false is unclean. Ends uploaded before the flag existed
-            // have no value at all and must not be shown as if they'd been force-quit.
-            // The duration on an unclean end is accurate to the app's heartbeat interval,
-            // not to the moment it died.
-            if (array_key_exists('clean', $ev) && $ev['clean'] === false) {
-                return ['unclean', "Session ended unexpectedly ({$human})"];
-            }
-            return ['session', "Session ended ({$human})"];
-
-        case 'FeatureUsage':
-            $name = $ev['featureName'] ?? 'Unknown';
-            $extra = !empty($ev['durationMs']) ? ' (' . (int)$ev['durationMs'] . ' ms)' : '';
-            return ['feature', $name . $extra];
-
-        case 'Export':
-            $type = $ev['exportType'] ?? 'Unknown';
-            $bits = [];
-            if (!empty($ev['fileSize']))   $bits[] = number_format((int)$ev['fileSize']) . ' bytes';
-            if (!empty($ev['durationMs'])) $bits[] = (int)$ev['durationMs'] . ' ms';
-            $suffix = $bits ? ' (' . implode(', ', $bits) . ')' : '';
-            return ['export', "Export: {$type}{$suffix}"];
-
-        case 'ApiUsage':
-            $api = $ev['apiName'] ?? 'Unknown';
-            $ok  = array_key_exists('success', $ev) ? ($ev['success'] ? 'ok' : 'FAILED') : '';
-            $bits = [];
-            if ($ok !== '')                $bits[] = $ok;
-            if (!empty($ev['durationMs'])) $bits[] = (int)$ev['durationMs'] . ' ms';
-            $suffix = $bits ? ' (' . implode(', ', $bits) . ')' : '';
-            return ['api', "API: {$api}{$suffix}"];
-
-        case 'CompanyProfile':
-            $name = $ev['companyName'] ?? '(unnamed)';
-            $bits = array_filter([
-                $ev['industry'] ?? null,
-                $ev['businessType'] ?? null,
-                $ev['country'] ?? null,
-                $ev['currency'] ?? null,
-            ]);
-            $suffix = $bits ? ' — ' . implode(', ', $bits) : '';
-            // The demo company's details are ours, not theirs, so label them rather than
-            // letting "Argo Robots Inc." read as a real user's business.
-            $prefix = !empty($ev['isSample']) ? 'Sample company' : 'Company';
-            return ['company', "{$prefix}: {$name}{$suffix}"];
-
-        case 'Startup':
-            $bits = [];
-            if (isset($ev['toFirstPaintMs'])) $bits[] = 'blank screen ' . (int)$ev['toFirstPaintMs'] . ' ms';
-            if (isset($ev['toReadyMs']))      $bits[] = 'ready ' . (int)$ev['toReadyMs'] . ' ms';
-            if (array_key_exists('coldStart', $ev)) {
-                $bits[] = $ev['coldStart'] ? 'cold' : 'warm';
-            }
-            return ['startup', 'Launch' . ($bits ? ': ' . implode(', ', $bits) : '')];
-
-        case 'Error':
-            $parts = [];
-            if (!empty($ev['errorCategory'])) $parts[] = $ev['errorCategory'];
-            if (!empty($ev['errorCode']))     $parts[] = 'code=' . $ev['errorCode'];
-            if (!empty($ev['methodName']))    $parts[] = $ev['methodName'] . '()';
-            if (!empty($ev['sourceFile'])) {
-                $loc = $ev['sourceFile'];
-                if (!empty($ev['lineNumber'])) $loc .= ':' . $ev['lineNumber'];
-                $parts[] = $loc;
-            }
-            // The message carries the detail a warning needs to be actionable; error
-            // rows already say enough via category + code + location.
-            if (ua_is_warning($ev)) {
-                if (!empty($ev['message'])) $parts[] = $ev['message'];
-                return ['warning', 'Warning: ' . ($parts ? implode(' · ', $parts) : 'unknown')];
-            }
-            return ['error', 'Error: ' . ($parts ? implode(' · ', $parts) : 'unknown')];
-
-        default:
-            return ['other', $ev['dataType'] ?? 'Unknown'];
-    }
 }
 
 // ---- Aggregate per authId ---------------------------------------------------
@@ -237,6 +140,10 @@ foreach ($ua_files as $name => $path) {
             $ua_duplicatesCollapsed++;
             continue;
         }
+
+        // Normalize the compact format's nesting before reading any field. The dedupe
+        // check above already does this internally; everything below it needs it too.
+        $ev = ua_unwrap_event($ev);
 
         $ts = isset($ev['timestamp']) ? strtotime($ev['timestamp']) : false;
 
@@ -360,9 +267,14 @@ if (!function_exists('ua_kv')) {
 .ua-row { font-size:.85rem; margin:.25rem 0; }
 .ua-row b { color:var(--black); }
 .ua-files { font-family:monospace; font-size:.7rem; color:var(--black); margin-top:.5rem; word-break:break-all; }
-.ua-del { float:right; }
+/* Download sits left of Delete. Flex rather than the old bare float, because the
+   delete form is block-level and would otherwise push the link onto its own line. */
+.ua-del { float:right; display:flex; gap:8px; align-items:center; }
 .ua-del button { background:#ef4444; color:#fff; border:0; border-radius:6px; padding:6px 12px; font-size:.8rem; cursor:pointer; }
 .ua-del button:hover { background:#dc2626; }
+/* Secondary to Delete: this one is safe to click, so it reads as a quiet action. */
+.ua-dl { background:#f3f4f6; color:#374151; border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-size:.8rem; text-decoration:none; white-space:nowrap; }
+.ua-dl:hover { background:#e5e7eb; color:#111827; }
 .ua-events { margin-top:.6rem; }
 .ua-events > summary { cursor:pointer; font-size:.85rem; font-weight:600; color:#2563eb; }
 .ua-timeline { margin-top:.5rem; max-height:340px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:8px; }
@@ -401,6 +313,8 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
 [data-theme="dark"] .ua-evt.unclean .ua-evt-text, [data-theme="dark"] .ua-unclean { color:#f87171; }
 [data-theme="dark"] .ua-evt.warning .ua-evt-text, [data-theme="dark"] .ua-warn { color:#fbbf24; }
+[data-theme="dark"] .ua-dl { background:var(--gray-700); border-color:var(--gray-600); color:var(--white); }
+[data-theme="dark"] .ua-dl:hover { background:var(--gray-600); color:var(--white); }
 [data-theme="dark"] .ua-evt.company .ua-evt-text { color:#c4b5fd; }
 [data-theme="dark"] .ua-evt.startup .ua-evt-text { color:#9ca3af; }
 [data-theme="dark"] .ua-evt.company .ua-evt-text, [data-theme="dark"] .ua-business { color:#c4b5fd; }
@@ -465,6 +379,11 @@ if (!function_exists('ua_kv')) {
       <td class="ua-td">
         <div class="ua-card">
         <div class="ua-del">
+            <!-- Plain GET link, so the browser downloads it natively with no JS. Exports
+                 every event this user ever sent, ignoring the page's range and tier the
+                 same way the Delete button beside it does. -->
+            <a class="ua-dl" href="download-user.php?authId=<?= urlencode($u['authId']) ?>"
+               title="Every event this user has ever sent, ignoring the filters above.">Download CSV</a>
             <form method="post" action="<?= htmlspecialchars($ua_action) ?>"
                   onsubmit="return confirm('Delete ALL <?= count($u['files']) ?> file(s) for this user? This cannot be undone.');">
                 <input type="hidden" name="del_label" value="<?= htmlspecialchars($u['authId']) ?>">

@@ -120,6 +120,68 @@ if (empty($geminiKey)) {
     send_error_response(500, 'Gemini AI service not configured on server.', 'CONFIG_ERROR');
 }
 
+// ---- Receipt-scan quota -----------------------------------------------------
+// Taken here, before a single byte goes to Gemini, because this is the request that
+// spends the money. It used to be enforced only by the client calling
+// api/receipt/usage.php's increment after a scan succeeded, which meant a client that
+// sent more requests than it reported, or skipped the call entirely, was unmetered.
+// The take is a conditional UPDATE, so a parallel batch cannot overrun the cap.
+//
+// Only receipt extraction is metered. Other AI operations (spreadsheet analysis, bank
+// categorization, plain completions) are covered by the rate limits above and have no
+// monthly allowance of their own.
+$scanQuotaIdentifier = null;
+$scanQuotaSettled = false;
+if ($isReceiptExtraction) {
+    require_once __DIR__ . '/../receipt/scan_quota.php';
+
+    // The raw key, not the hash: usage.php keys premium rows on the key itself, and
+    // both endpoints have to land on the same row. Read the same headers
+    // authenticate_license_request() does, since it only hands back a hash.
+    $rawLicenseKey = '';
+    if (!empty($_SERVER['HTTP_X_LICENSE_KEY'])) {
+        $rawLicenseKey = (string) $_SERVER['HTTP_X_LICENSE_KEY'];
+    } elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])
+        && preg_match('/Bearer\s+(.+)/i', (string) $_SERVER['HTTP_AUTHORIZATION'], $m)) {
+        $rawLicenseKey = $m[1];
+    }
+
+    $identity = receipt_scan_quota_identity($pdo, $rawLicenseKey, $deviceIdHash);
+    if ($identity === null) {
+        send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
+    }
+
+    $take = receipt_scan_quota_consume($pdo, $identity['identifier'], $identity['limit']);
+    if (!$take['allowed']) {
+        send_error_response(
+            429,
+            sprintf(
+                'Monthly scan limit reached (%d of %d used). Your limit resets on %s.',
+                $take['scan_count'],
+                $identity['limit'],
+                date('Y-m-01', strtotime('first day of next month'))
+            ),
+            'SCAN_LIMIT_REACHED'
+        );
+    }
+
+    $scanQuotaIdentifier = $identity['identifier'];
+
+    // The scan is paid for up front, so anything that stops a result reaching the user
+    // has to hand it back. A shutdown hook rather than a refund at each of the seven
+    // failure exits below: those all exit() immediately, and this also covers a fatal
+    // or a timeout, which no amount of call-site editing would.
+    register_shutdown_function(static function () use (&$scanQuotaSettled, &$scanQuotaIdentifier) {
+        if ($scanQuotaSettled || $scanQuotaIdentifier === null) {
+            return;
+        }
+        global $pdo;
+        if ($pdo instanceof PDO) {
+            receipt_scan_quota_refund($pdo, $scanQuotaIdentifier);
+        }
+    });
+}
+
 $model = $requestedModel;
 
 // Build Gemini request: https://ai.google.dev/api/generate-content
@@ -427,9 +489,13 @@ if ($content === null) {
 // content where it cut off) as a normal {"error": ...} 200 response, which is the only shape the
 // desktop app displays verbatim. This replaces the cryptic client-side "truncated JSON" parse
 // error with something we can actually read, and confirms whether this deploy is even live.
+$receiptContentUsable = true;
 if ($isReceiptExtraction) {
     json_decode($content);
     if (json_last_error() !== JSON_ERROR_NONE) {
+        // A scan whose JSON never parsed is a failed scan as far as the user is
+        // concerned, so it must not cost them one. Left unsettled for the refund hook.
+        $receiptContentUsable = false;
         $diag = sprintf(
             'DIAG truncated: finishReason=%s model=%s budget=%d tokens(p/o/t)=%d/%d/%d parts=%d len=%d err=%s tail=[%s]',
             $finishReason ?? 'null',
@@ -463,6 +529,10 @@ ai_timing_record([
     'success' => true,
     'app_platform' => $appPlatform,
 ]);
+
+// A consumed scan is only kept once a usable result is genuinely on its way back.
+// Anything else leaves this false and the shutdown hook returns it to the allowance.
+$scanQuotaSettled = $receiptContentUsable;
 
 send_json_response(200, [
     'success' => true,

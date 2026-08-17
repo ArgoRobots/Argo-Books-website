@@ -330,6 +330,10 @@ if (!function_exists('ua_kv')) {
 .ua-noresults { color:#6b7280; font-size:.9rem; padding:1rem 0; }
 .ua-table { width:100%; border-collapse:collapse; }
 .ua-table td.ua-td { padding:0; border:0; background:transparent; }
+/* The rows only exist so the shared paginator can page the cards. They aren't
+   selectable table rows, so the global admin row-hover highlight is cancelled. */
+.ua-table tbody tr, .ua-table tbody tr:hover,
+[data-theme="dark"] .ua-table tbody tr, [data-theme="dark"] .ua-table tbody tr:hover { background:transparent !important; transition:none; }
 [data-theme="dark"] .ua-input { background:var(--gray-800); border-color:var(--gray-700); color:var(--white); }
 [data-theme="dark"] .ua-count, [data-theme="dark"] .ua-noresults { color:var(--gray-400); }
 </style>

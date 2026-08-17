@@ -16,6 +16,7 @@
       <li><a href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a></li>
       <li><a href="<?= $base ?>features/inventory-management/">Inventory Management</a></li>
       <li><a href="<?= $base ?>features/invoicing/">Invoicing</a></li>
+      <li><a href="<?= $base ?>features/payroll/">Payroll</a></li>
       <li><a href="<?= $base ?>features/">View All Features</a></li>
     </ul>
   </div>

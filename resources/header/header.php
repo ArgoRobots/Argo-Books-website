@@ -32,6 +32,7 @@
                     <span class="dropdown-col-header">Financial Tools</span>
                     <a class="dropdown-item" href="<?= $base ?>features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
                     <a class="dropdown-item" href="<?= $base ?>features/invoicing/">Invoicing</a>
+                    <a class="dropdown-item" href="<?= $base ?>features/payroll/">Payroll</a>
                     <a class="dropdown-item" href="<?= $base ?>features/report-builder/">Report Builder</a>
                   </div>
                   <div class="dropdown-col">

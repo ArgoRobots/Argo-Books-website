@@ -68,9 +68,9 @@ include __DIR__ . '/../../docs-header.php';
             <p>There is no bank login and no third-party connection. You import a file that you download from your bank, your data stays on your device, encrypted, and it is never stored or used for training.</p>
 
             <div class="page-navigation">
-                <a href="invoicing.php" class="nav-button prev">
+                <a href="payroll-year-end.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Invoicing & Payments</span>
+                    <span class="nav-title">&larr; Payroll Year-End</span>
                 </a>
                 <a href="bank-matching.php" class="nav-button next">
                     <span class="nav-label">Next</span>

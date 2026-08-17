@@ -33,6 +33,8 @@ $sidebarSections = [
             'report-generator' => ['title' => 'Report Generator'],
             'sales-tracking' => ['title' => 'Expense/Revenue Tracking'],
             'invoicing' => ['title' => 'Invoicing & Payments'],
+            'payroll' => ['title' => 'Payroll'],
+            'payroll-year-end' => ['title' => 'Payroll Year-End'],
             'bank-statement-import' => ['title' => 'Bank Statement Import'],
             'bank-matching' => ['title' => 'Bank Matching'],
             'rental' => ['title' => 'Rental Management'],

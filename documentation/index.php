@@ -210,6 +210,20 @@ $isDocsLanding = true;
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
                 </a>
+                <a href="pages/features/payroll.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('users', 20) ?>
+                    </div>
+                    <h3>Payroll</h3>
+                    <p>Run Canadian payroll and post net pay to your books</p>
+                </a>
+                <a href="pages/features/payroll-year-end.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('clipboard-check', 20) ?>
+                    </div>
+                    <h3>Payroll Year-End</h3>
+                    <p>T4 slips, RL-1, ROE, and what you owe CRA</p>
+                </a>
                 <a href="pages/features/bank-statement-import.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('document-download', 20) ?>

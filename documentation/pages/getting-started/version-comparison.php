@@ -64,6 +64,11 @@ include __DIR__ . '/../../docs-header.php';
                             <td><?= (int) $pricing['premium_bank_import_monthly_limit'] ?> imports / month</td>
                         </tr>
                         <tr>
+                            <td>Canadian Payroll</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
                             <td>Predictive Analytics</td>
                             <td>—</td>
                             <td>✓</td>

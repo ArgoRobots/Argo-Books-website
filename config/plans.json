@@ -33,6 +33,7 @@
             {"label": "Scan {receipt_scan_monthly_limit} receipts a month, no typing"},
             {"label": "Import {premium_ai_import_monthly_limit} spreadsheets a month"},
             {"label": "Import {premium_bank_import_monthly_limit} bank statements a month"},
+            {"label": "Run Canadian payroll and produce T4s"},
             {"label": "Forecast revenue and spot trends early"},
             {"label": "Sign in with your fingerprint or face"},
             {"label": "Priority support when you need it"}

@@ -89,6 +89,17 @@ function sitemap_build_urls(): array
         sitemap_add_url($urls, site_url('/' . $slug . '/'), $file, '0.8', 'monthly');
     }
 
+    // --- Documentation sub-pages ---
+    // Served directly as .php under their category folder. Only /documentation/
+    // itself was listed before, so none of the individual guides were in the
+    // sitemap or reaching IndexNow. Adding a page to documentation/pages/ now
+    // needs no sitemap edit.
+    foreach (glob($root . '/documentation/pages/*/*.php') as $file) {
+        $category = basename(dirname($file));
+        $slug     = basename($file, '.php');
+        sitemap_add_url($urls, site_url('/documentation/pages/' . $category . '/' . $slug . '.php'), $file, '0.6', 'monthly');
+    }
+
     // --- Legal pages (served as .php, change rarely) ---
     foreach (['privacy', 'terms', 'eula', 'refund'] as $doc) {
         sitemap_add_url($urls, site_url('/legal/' . $doc . '.php'), $root . '/legal/' . $doc . '.php', '0.4', 'yearly');

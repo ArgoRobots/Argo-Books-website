@@ -20,6 +20,18 @@ $docsPath = isset($pageCategory) ? '../../' : '';
 
 $fullTitle = $pageTitle . ' - Argo Books Documentation';
 
+// Sub-pages are served at /documentation/pages/<category>/<slug>.php. This used
+// to emit https://argorobots.com/documentation/ for every one of them, which
+// told search engines the index was the canonical version of all 36 pages and
+// kept them out of the results individually. documentation/index.php sets its
+// own canonical and does not include this file, so the fallback below is only a
+// safety net for a page that forgets to set the two variables.
+$canonicalUrl = 'https://argorobots.com/documentation/';
+if (isset($pageCategory) && isset($currentPage)) {
+    $canonicalUrl = 'https://argorobots.com/documentation/pages/'
+        . $pageCategory . '/' . $currentPage . '.php';
+}
+
 // Category display names and colors
 $categoryInfo = [
     'getting-started' => ['name' => 'Getting Started', 'color' => 'emerald'],
@@ -59,7 +71,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <meta name="twitter:description" content="<?php echo htmlspecialchars($pageDescription); ?>">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/documentation/">
+    <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl); ?>">
 
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>

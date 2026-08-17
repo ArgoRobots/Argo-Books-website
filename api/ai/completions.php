@@ -92,8 +92,16 @@ $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 // from .env (RECEIPT_SCAN_MAX_OUTPUT_TOKENS) and ignores whatever the client sent, so it
 // can be tuned for all client versions instantly (older builds still send 16000) without
 // an app release. Overrides the generic clamp above for this operation only.
+// Two flags, not one, because the second pass of a scan needs everything a first pass needs
+// EXCEPT the charge. The app re-sends the image when the extracted amounts do not reconcile
+// against the printed total; that is the app deciding to look again, not the user asking for a
+// second scan, and billing it meant ten receipts could cost twelve and the last be refused.
+$isReceiptWork = (($operation === 'receipt_scan' || $operation === 'receipt_verify') && !empty($base64Image));
+
+// Only the first pass is metered.
 $isReceiptExtraction = ($operation === 'receipt_scan' && !empty($base64Image));
-if ($isReceiptExtraction) {
+
+if ($isReceiptWork) {
     $maxTokens = max(1, (int)($_ENV['RECEIPT_SCAN_MAX_OUTPUT_TOKENS'] ?? 32000));
 }
 
@@ -130,6 +138,13 @@ if (empty($geminiKey)) {
 // Only receipt extraction is metered. Other AI operations (spreadsheet analysis, bank
 // categorization, plain completions) are covered by the rate limits above and have no
 // monthly allowance of their own.
+//
+// receipt_verify sits with those: it is the same billable receipt looked at twice, so it is
+// bounded by the rate limits rather than the monthly allowance. That does leave a caller able
+// to spend vision calls under receipt_verify without touching its allowance, capped by the
+// 60-per-15-minutes limiter above. Accepted deliberately: the alternative is charging a user
+// twice for one receipt, and the cap is the same one already trusted for every other unmetered
+// AI operation on this endpoint.
 $scanQuotaIdentifier = null;
 $scanQuotaSettled = false;
 if ($isReceiptExtraction) {

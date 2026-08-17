@@ -1037,22 +1037,22 @@
    Built for a feature-page hero rather than the landing page tab strip, so
    they are sized for the narrower column from the start.
    ======================================== */
-.bk-stage, .sh-stage, .rp-stage, .st-stage {
+.bk-stage, .sh-stage, .rp-stage, .st-stage, .pr-stage {
     flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px;
 }
 
 /* --- shared file chip --- */
-.bk-file, .sh-file {
+.bk-file, .sh-file, .pr-file {
     display: flex; align-items: center; gap: 8px;
     background: var(--white); border: 1px solid var(--gray-200); border-radius: 9px;
     padding: 8px 11px; font-size: 0.72rem; color: var(--gray-800);
     opacity: 0; transform: translateY(-6px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.bk-stage.shown .bk-file, .sh-stage.shown .sh-file { opacity: 1; transform: none; }
-.bk-file-ic, .sh-file-ic { display: inline-flex; color: var(--blue-500); }
-.bk-file-name, .sh-file-name { font-weight: 700; }
-.bk-file-meta, .sh-file-meta { margin-left: auto; color: var(--gray-400); font-size: 0.66rem; }
+.bk-stage.shown .bk-file, .sh-stage.shown .sh-file, .pr-stage.shown .pr-file { opacity: 1; transform: none; }
+.bk-file-ic, .sh-file-ic, .pr-file-ic { display: inline-flex; color: var(--blue-500); }
+.bk-file-name, .sh-file-name, .pr-file-name { font-weight: 700; }
+.bk-file-meta, .sh-file-meta, .pr-file-meta { margin-left: auto; color: var(--gray-400); font-size: 0.66rem; }
 
 /* --- bank import --- */
 .bk-rows { display: flex; flex-direction: column; gap: 5px; }
@@ -1175,3 +1175,55 @@
 .st-payout-row span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--gray-800); }
 .st-payout-net { border-top: 1px solid var(--gray-200); margin-top: 4px; padding-top: 6px; font-weight: 800; color: var(--gray-900); }
 .st-payout-net span:last-child { color: var(--blue-700); font-size: 0.8rem; }
+
+/* --- payroll pay run --- */
+/* Six columns of figures in a hero-width panel, so the type is a notch smaller
+   than the other demos and every number is tabular. The employee column is the
+   only elastic one; the rest are sized to hold a four-figure amount. */
+.pr-grid { display: flex; flex-direction: column; gap: 5px; }
+.pr-head, .pr-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(5, minmax(0, 52px));
+    align-items: center; gap: 6px;
+}
+.pr-head {
+    padding: 0 10px 2px;
+    font-size: 0.54rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--gray-400);
+    opacity: 0; transition: opacity 0.4s ease;
+}
+.pr-head span:not(:first-child) { text-align: right; }
+.pr-stage.shown .pr-head { opacity: 1; }
+.pr-row {
+    background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 8px 10px; font-size: 0.66rem;
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.pr-row.in { opacity: 1; transform: none; }
+.pr-name { font-weight: 600; color: var(--gray-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-name i {
+    font-style: normal; font-size: 0.54rem; font-weight: 700; letter-spacing: 0.03em;
+    background: var(--gray-100); color: var(--gray-500);
+    padding: 2px 5px; border-radius: 50px; margin-left: 5px;
+}
+.pr-num { font-variant-numeric: tabular-nums; text-align: right; color: var(--gray-800); }
+/* The deductions and the net are what the app worked out, so they arrive after
+   the row rather than with it. */
+.pr-ded, .pr-net { opacity: 0; transition: opacity 0.35s ease; }
+.pr-row.tagged .pr-ded, .pr-row.tagged .pr-net { opacity: 1; }
+.pr-ded { color: var(--gray-400); }
+.pr-net { font-weight: 700; color: var(--gray-900); }
+.pr-foot {
+    margin-top: auto; display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.68rem; color: var(--gray-500);
+    opacity: 0; transition: opacity 0.4s ease;
+}
+.pr-stage.shown .pr-foot { opacity: 1; }
+.pr-count b { color: var(--gray-900); font-variant-numeric: tabular-nums; }
+.pr-go {
+    background: var(--gray-200); color: var(--gray-500);
+    font-weight: 700; padding: 5px 12px; border-radius: 7px; font-size: 0.66rem;
+    transition: background 0.35s ease, color 0.35s ease;
+}
+.pr-stage.done .pr-go { background: var(--blue-500); color: var(--white); }

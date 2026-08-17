@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'sheet-import': animateSheetImport(t); break;
                 case 'report': animateReport(t); break;
                 case 'stripe': animateStripe(t); break;
+                case 'payroll': animatePayroll(t); break;
             }
 
             activeTabAnimation = timeouts;
@@ -640,6 +641,43 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (net) money(net, 2255.73, 900, '$');
                 }, end + 250);
                 t(run, end + 5000);
+            }
+            run();
+        }
+
+        // --- Payroll pay run ------------------------------------------
+        // The deduction cells land a beat after their row so the figures read as
+        // being worked out. The net total counts up across the same beats, which
+        // is the number the employer actually cares about.
+        function animatePayroll(t) {
+            const stage = document.getElementById('payrollStage');
+            if (!stage) return;
+            const rows = stage.querySelectorAll('.pr-row');
+            const totalEl = document.getElementById('prNet');
+            const nets = [1804.74, 1524.79, 1273.18];
+
+            function run() {
+                stage.classList.remove('shown', 'done');
+                rows.forEach(r => r.classList.remove('in', 'tagged'));
+                if (totalEl) totalEl.textContent = '$0.00';
+                let running = 0;
+
+                t(() => stage.classList.add('shown'), 200);
+                rows.forEach((r, i) => {
+                    t(() => r.classList.add('in'), 600 + i * 420);
+                    t(() => {
+                        r.classList.add('tagged');
+                        running += nets[i] || 0;
+                        if (totalEl) {
+                            totalEl.textContent = '$' + running.toLocaleString('en-US', {
+                                minimumFractionDigits: 2, maximumFractionDigits: 2
+                            });
+                        }
+                    }, 1000 + i * 420);
+                });
+                const end = 1000 + rows.length * 420;
+                t(() => stage.classList.add('done'), end + 200);
+                t(run, end + 4800);
             }
             run();
         }

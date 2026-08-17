@@ -44,7 +44,7 @@ function argo_feature_demo_exists(string $key): bool
  */
 function argo_feature_demo_hero_keys(): array
 {
-    return ['bank-import', 'sheet-import', 'report', 'stripe'];
+    return ['bank-import', 'sheet-import', 'report', 'stripe', 'payroll'];
 }
 
 /** Every demo key, in the order the landing page tabs use. */
@@ -75,6 +75,7 @@ function argo_feature_demo(string $key): string
         case 'sheet-import': argo_feature_demo_sheet_import(); break;
         case 'report': argo_feature_demo_report(); break;
         case 'stripe': argo_feature_demo_stripe(); break;
+        case 'payroll': argo_feature_demo_payroll(); break;
     }
     return (string) ob_get_clean();
 }
@@ -862,6 +863,91 @@ function argo_feature_demo_stripe(): void
                                         <div class="st-payout-row"><span>Gross</span><span class="st-gross">$0.00</span></div>
                                         <div class="st-payout-row"><span>Processing fees</span><span class="st-fee">−$0.00</span></div>
                                         <div class="st-payout-row st-payout-net"><span>Net</span><span class="st-net">$0.00</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+/**
+ * Pay run review. The deduction columns land after the row they belong to, so
+ * the demo shows the figures being worked out rather than arriving pre-filled,
+ * which is the part of payroll people are actually buying.
+ *
+ * The numbers are a real biweekly run under the 2026 rates and add up: gross
+ * less CPP, EI and tax equals the net on the same row, and the three nets equal
+ * the total in the footer. Anyone who checks is the sort of person who would
+ * notice, and payroll figures that do not add up sell the opposite of trust.
+ */
+function argo_feature_demo_payroll(): void
+{
+    ?>
+    <div class="tab-content-inner tab-content-inner--solo">
+        <div class="tab-content-visual">
+            <div class="feature-visual-card invoice-studio-card">
+                <div class="invoice-studio">
+                    <div class="invoice-window">
+                        <div class="app-topbar">
+                            <span class="app-brand"><img src="<?= argo_feature_demo_base() ?>resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-nav" aria-hidden="true">
+                                <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('users', 18) ?></span>
+                                <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                            </div>
+                            <div class="app-content">
+                                <div class="app-page-title">Pay Run</div>
+                                <div class="pr-stage" id="payrollStage">
+                                    <div class="pr-file">
+                                        <span class="pr-file-ic"><?= svg_icon('calendar', 15) ?></span>
+                                        <span class="pr-file-name">Aug 3 &ndash; Aug 16</span>
+                                        <span class="pr-file-meta">Paid Aug 21 &middot; 3 employees</span>
+                                    </div>
+                                    <div class="pr-grid">
+                                        <div class="pr-head">
+                                            <span>Employee</span><span>Gross</span><span>CPP</span><span>EI</span><span>Tax</span><span>Net</span>
+                                        </div>
+                                        <div class="pr-row" data-i="0">
+                                            <span class="pr-name">D. Okafor <i>ON</i></span>
+                                            <span class="pr-num">2,400.00</span>
+                                            <span class="pr-num pr-ded">134.79</span>
+                                            <span class="pr-num pr-ded">39.12</span>
+                                            <span class="pr-num pr-ded">421.35</span>
+                                            <span class="pr-num pr-net">1,804.74</span>
+                                        </div>
+                                        <div class="pr-row" data-i="1">
+                                            <span class="pr-name">S. Miller <i>BC</i></span>
+                                            <span class="pr-num">1,950.00</span>
+                                            <span class="pr-num pr-ded">108.02</span>
+                                            <span class="pr-num pr-ded">31.79</span>
+                                            <span class="pr-num pr-ded">285.40</span>
+                                            <span class="pr-num pr-net">1,524.79</span>
+                                        </div>
+                                        <div class="pr-row" data-i="2">
+                                            <span class="pr-name">A. Nadeau <i>AB</i></span>
+                                            <span class="pr-num">1,600.00</span>
+                                            <span class="pr-num pr-ded">87.19</span>
+                                            <span class="pr-num pr-ded">26.08</span>
+                                            <span class="pr-num pr-ded">213.55</span>
+                                            <span class="pr-num pr-net">1,273.18</span>
+                                        </div>
+                                    </div>
+                                    <div class="pr-foot">
+                                        <span class="pr-count">Net pay <b id="prNet">$0.00</b></span>
+                                        <span class="pr-go">Approve</span>
                                     </div>
                                 </div>
                             </div>

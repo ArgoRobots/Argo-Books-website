@@ -92,7 +92,7 @@ HTML,
 <tr><td><strong>Xero</strong></td><td>No, trial only</td><td>Closest to QuickBooks</td><td>Add-on</td><td>~${xero_starter}/mo</td></tr>
 <tr><td><strong>Zoho Books</strong></td><td>Yes, smallest businesses</td><td>Zoho users, automation</td><td>No</td><td>Low-cost tiers</td></tr>
 <tr><td><strong>ZipBooks</strong></td><td>Yes, starter tier</td><td>Simple, light needs</td><td>No</td><td>~${zipbooks_smarter}/mo</td></tr>
-<tr><td><strong>Argo Books</strong></td><td>Yes, no time limit</td><td>Free, with data on your machine</td><td>No</td><td>~${argo_premium_monthly}/mo</td></tr>
+<tr><td><strong>Argo Books</strong></td><td>Yes, no time limit</td><td>Free, with data on your machine</td><td>Canada only, on Premium</td><td>~${argo_premium_monthly}/mo</td></tr>
 </tbody>
 </table>
 <ul>
@@ -102,7 +102,7 @@ HTML,
 <li><strong>Zoho Books.</strong> Full accounting with strong automation, especially if you already use other Zoho products. Reasonable pricing and a real free tier for the smallest businesses. The trade-off: it works best when you're inside the wider Zoho world, and the suite has a learning curve of its own.</li>
 <li><strong>ZipBooks.</strong> Simpler and lighter than QuickBooks, with a free starter tier and a clean interface, paid plans from around ${zipbooks_smarter} CAD a month. Good for a small service business that wants basics without bulk. The trade-off: fewer advanced features and a smaller ecosystem than the bigger names.</li>
 <li><strong>Odoo.</strong> Not just accounting, a whole modular business suite. The accounting app is free on its own as a single app, with paid plans once you add modules. Powerful if you want inventory, CRM, and more in one system. The trade-off: it's far more than most small businesses need, and the power comes with setup work.</li>
-<li><strong>Argo Books.</strong> Newer, freemium, with a generous free tier ({argo_free_invoice_limit} invoices a month, basic bookkeeping, free <a href="/best-free-ai-receipt-scanner/">receipt scans</a>, no time limit) and Premium at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher volumes, more receipt scanning, and advanced features. Built as a desktop app (Windows, Linux, and macOS) so your data lives on your machine. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older players, and no built-in payroll, so it suits businesses that don't run payroll through their accounting tool.</li>
+<li><strong>Argo Books.</strong> Newer, freemium, with a generous free tier ({argo_free_invoice_limit} invoices a month, basic bookkeeping, free <a href="/best-free-ai-receipt-scanner/">receipt scans</a>, no time limit) and Premium at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher volumes, more receipt scanning, and advanced features. Built as a desktop app (Windows, Linux, and macOS) so your data lives on your machine. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older players, and built-in payroll that covers Canada only, so staff outside Canada still need a separate payroll service.</li>
 </ul>
 <p>For most people the real shortlist is two or three of these. If you want free and simple, look at Wave and Argo Books. If you're a service business that values ease of use, FreshBooks. If you want the nearest thing to QuickBooks itself, Xero. Pick one, try it for a month on a free trial or free tier, and switch if it's wrong.</p>
 <figure class="article-figure">
@@ -121,7 +121,7 @@ HTML,
 <li><strong>Sole proprietor, cost-driven.</strong> Wave or Argo Books. Both have real free tiers you can run a small business on without paying.</li>
 <li><strong>Freelancer or consultant who bills time.</strong> FreshBooks for the time tracking and client portal, or Argo Books if you want a free tier.</li>
 <li><strong>Outside North America.</strong> Xero is usually the smoother pick, with the largest local accountant network in the UK, Australia, and New Zealand.</li>
-<li><strong>You run payroll in-house.</strong> Stay with a tool that has built-in payroll for your region, which points back toward QuickBooks, Xero, or a dedicated payroll add-on. This is the single feature most likely to keep you put.</li>
+<li><strong>You run payroll in-house.</strong> Stay with a tool that has built-in payroll for your region: QuickBooks, Xero, a dedicated payroll add-on, or Argo Books if your staff are in Canada. This is the single feature most likely to keep you put.</li>
 <li><strong>You need inventory, CRM, and operations in one system.</strong> Odoo, accepting the setup cost.</li>
 <li><strong>You want simple, with your data on your own machine.</strong> Argo Books, accepting the smaller ecosystem.</li>
 </ul>

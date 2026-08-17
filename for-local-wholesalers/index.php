@@ -229,7 +229,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>What Argo Books isn't</h3>
-                <p>Argo Books handles inventory, customer accounts, net-30 invoicing, and standing orders for local-scale wholesale. It is not a warehouse management system, it does not do Electronic Data Interchange with national retail chains, and it does not optimize delivery routes. If you sell into Walmart, Loblaws, or Sysco-scale customers, NetSuite, Cin7, or Unleashed are built for that and Argo Books is not the right fit. It also doesn't do payroll yet. For local distributors with dozens of small accounts, Argo Books is the right size. Free desktop app, inventory built in, books stay simple.</p>
+                <p>Argo Books handles inventory, customer accounts, net-30 invoicing, and standing orders for local-scale wholesale. It is not a warehouse management system, it does not do Electronic Data Interchange with national retail chains, and it does not optimize delivery routes. If you sell into Walmart, Loblaws, or Sysco-scale customers, NetSuite, Cin7, or Unleashed are built for that and Argo Books is not the right fit. It does payroll for Canadian staff, but not for staff outside Canada. For local distributors with dozens of small accounts, Argo Books is the right size. Free desktop app, inventory built in, books stay simple.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>

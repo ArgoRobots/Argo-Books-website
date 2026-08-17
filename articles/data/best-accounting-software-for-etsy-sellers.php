@@ -103,7 +103,7 @@ HTML,
 <li><strong>You import your data, there's no live Etsy sync.</strong> As covered above, Argo doesn't connect to Etsy and pull sales automatically. You export your Etsy CSV or settlement report and import it. That's a periodic habit, usually monthly, not a hands-off feed.</li>
 <li><strong>Stripe is the only live third-party integration.</strong> If you take payments through Stripe, Argo can import your Stripe sales, fees, and customers directly. There's no native sync for Etsy, Shopify, Amazon, Square, or PayPal sales. More integrations are on the way, but we won't promise a specific one or a date, because that wouldn't be honest.</li>
 <li><strong>It's not a continuous live bank feed.</strong> Argo imports bank statements and spreadsheets rather than watching your account in real time. For most small makers a monthly import is fine, but if you want transactions appearing the moment they clear, that's not how Argo works today.</li>
-<li><strong>No payroll.</strong> If you've grown to the point of running payroll for employees, you'll need a dedicated payroll tool alongside or instead of Argo.</li>
+<li><strong>Canadian payroll only.</strong> Argo runs payroll for Canadian staff on its Premium plan. If your employees are anywhere else, you'll need a dedicated payroll tool alongside it.</li>
 <li><strong>It tracks tax, it doesn't file it.</strong> Argo gives you a clear tax summary, but it does not file or remit sales tax or income tax for you. That step stays with you or your accountant, and the rules vary by country, so confirm yours with a local tax authority.</li>
 </ul>
 <p>None of these are dealbreakers for a typical Etsy seller who's comfortable importing a monthly report, but you deserve to know them before you commit, not after.</p>

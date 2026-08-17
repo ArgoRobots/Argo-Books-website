@@ -105,6 +105,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 },
                 {
                     "@type": "Question",
+                    "name": "Can I run payroll for my cleaners?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books. Cleaners on different schedules can go on the same pay run, and at year end it prepares your T4 slips and the file the CRA needs. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada."
+                    }
+                },
+                {
+                    "@type": "Question",
                     "name": "Is it really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
@@ -213,10 +221,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
                 <div class="fp-benefit animate-on-scroll">
                     <div class="fp-benefit-ic">
-                        <?= svg_icon('shield-check', 20) ?>
+                        <?= svg_icon('user-focused', 20) ?>
                     </div>
-                    <h3>Works offline, free tier covers solo cleaners and small crews</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed in the truck or at the office, no monthly subscription climbing every year, no website to load when you're trying to close out the day. The free tier covers most cleaning businesses forever.</p>
+                    <h3>Pay your cleaners without a separate payroll service</h3>
+                    <p>Enter the hours and Argo Books works out CPP, EI and income tax from the CRA's own tables, prints the pay stubs, and puts the wages straight into your books. Staff on different schedules or in different provinces can go on the same run, and your T4s are ready in January. Payroll is on Premium and covers Canadian staff.</p>
                 </div>
             </div>
         </div>
@@ -229,7 +237,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>What Argo Books isn't</h3>
-                <p>Argo Books is bookkeeping software, not field-service software. It does not run a cleaning calendar, dispatch crews to addresses, send "on the way" texts to clients, or run a per-property profit-and-loss. If you need Jobber, ZenMaid, or Maidily for scheduling and crew routing, run them alongside Argo Books: those for the schedule, Argo Books for the books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the recurring invoices run themselves, and your data stays on your computer.</p>
+                <p>Argo Books is bookkeeping software, not field-service software. It does not run a cleaning calendar, dispatch crews to addresses, send "on the way" texts to clients, or run a per-property profit-and-loss. If you need Jobber, ZenMaid, or Maidily for scheduling and crew routing, run them alongside Argo Books: those for the schedule, Argo Books for the books. Payroll covers Canadian staff only, so a crew outside Canada needs a separate payroll service. If those are dealbreakers, that's fair. If they're not, the desktop app is free, it works offline, the recurring invoices run themselves, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -323,6 +331,13 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                             <p>No. Argo Books does not run a scheduling calendar, dispatch crews, or send "on the way" texts.</p>
                             <p>Jobber, ZenMaid, and Maidily are built for that side. Run them alongside Argo Books: those for the schedule, Argo Books for the books.</p>
                         
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I run payroll for my cleaners?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
+                            <p>Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books.</p>
+                            <p>Cleaners on different schedules can go on the same pay run, and at year end it prepares your T4 slips and the file the CRA needs. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada.</p>
+
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
             ob_start(); ?>

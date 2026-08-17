@@ -229,7 +229,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>What Argo Books isn't</h3>
-                <p>Argo Books is bookkeeping software, not shop management software. It does not run a work-order queue, send pickup-ready texts to customers, or look up labor times from a VIN. If you need Shopmonkey, Tekmetric, or RepairShopr for the front-of-shop workflow, run them side by side: those for the queue, Argo Books for your books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
+                <p>Argo Books is bookkeeping software, not shop management software. It does not run a work-order queue, send pickup-ready texts to customers, or look up labor times from a VIN. If you need Shopmonkey, Tekmetric, or RepairShopr for the front-of-shop workflow, run them side by side: those for the queue, Argo Books for your books. It does payroll for Canadian staff, but not for staff outside Canada. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>

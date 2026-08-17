@@ -229,7 +229,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>What Argo Books isn't</h3>
-                <p>Argo Books has rental management for the operating and bookkeeping side, but it is not an online booking platform. It does not run a reservation calendar on your website, send automated pickup-and-return SMS reminders, or handle customer-facing self-service rentals. If those are critical, Booqable, Rentle, or EZRentOut handle the booking, and Argo Books handles the books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the rental tracking is built in, and your data stays on your computer.</p>
+                <p>Argo Books has rental management for the operating and bookkeeping side, but it is not an online booking platform. It does not run a reservation calendar on your website, send automated pickup-and-return SMS reminders, or handle customer-facing self-service rentals. If those are critical, Booqable, Rentle, or EZRentOut handle the booking, and Argo Books handles the books. It does payroll for Canadian staff, but not for staff outside Canada. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the rental tracking is built in, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>

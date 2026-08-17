@@ -354,9 +354,9 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Payroll</td>
+                            <td>Payroll (Canada)</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                     </tbody>
@@ -382,6 +382,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month, less than Wave Pro at $<?= $wave_pro ?></span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Canadian payroll included</strong> in that price: CPP, EI, T4s and RL-1s, where Wave charges for payroll separately</span></li>
                         </ul>
                     </div>
                     <div class="pc-block">
@@ -389,7 +390,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No automatic bank transaction import yet</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No mobile app yet, Wave has iOS and Android apps</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>No payroll yet, so Wave is the better fit if you run payroll today</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span>Payroll covers Canada only, so Wave is the better fit if you pay staff elsewhere</span></li>
                         </ul>
                     </div>
                 </div>

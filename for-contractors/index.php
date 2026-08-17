@@ -105,6 +105,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 },
                 {
                     "@type": "Question",
+                    "name": "Can I run payroll for my crew?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books. At year end it prepares your T4 slips and the file the CRA needs, and when someone finishes it gathers the figures for their Record of Employment. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada."
+                    }
+                },
+                {
+                    "@type": "Question",
                     "name": "Is it really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
@@ -206,10 +214,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
                 <div class="fp-benefit animate-on-scroll">
                     <div class="fp-benefit-ic">
-                        <?= svg_icon('shield-check', 20) ?>
+                        <?= svg_icon('user-focused', 20) ?>
                     </div>
-                    <h3>Works without internet, your data stays on your computer</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed at the job trailer, no monthly subscription climbing every year, no website to log into when the cell signal cuts out. The free tier covers most solo contractors and small crews forever.</p>
+                    <h3>Pay the crew without a separate payroll service</h3>
+                    <p>Enter the hours and Argo Books works out CPP, EI and income tax from the CRA's own tables, prints the pay stubs, and puts the wages straight into your books. Different provinces on the same run is fine, and your T4s are ready in January. Payroll is on Premium and covers Canadian staff.</p>
                 </div>
 
                 <div class="fp-benefit animate-on-scroll">
@@ -231,7 +239,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 </div>
                 <h3>What Argo Books isn't</h3>
                 <p>Argo Books is bookkeeping software, not construction-management software. It does not do job costing per project, crew scheduling, or bid and estimating. If you're trying to replace Buildertrend, CoConstruct, or QuickBooks Contractor for those, run them side by side: those for the project, Argo Books for your books.</p>
-                <p>It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
+                <p>Payroll covers Canadian staff only, so a crew outside Canada needs a separate payroll service. If those are dealbreakers, that's fair. If they're not, the desktop app is free, it works without internet at the job trailer, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -326,6 +334,13 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                             <p>Not the way QuickBooks Contractor or a dedicated job-costing tool does. Argo Books tracks expenses by category and revenue by customer and invoice, which covers most solo contractors and small crews.</p>
                             <p>If you need a true per-project P&L across labor, materials, subs, and overhead, a job-costing tool is a better fit. Many contractors run a simpler bookkeeping tool alongside their estimating or scheduling software.</p>
                         
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I run payroll for my crew?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
+                            <p>Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books.</p>
+                            <p>At year end it prepares your T4 slips and the file the CRA needs, and when someone finishes it gathers the figures for their Record of Employment. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada.</p>
+
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
             ob_start(); ?>

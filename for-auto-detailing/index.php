@@ -229,7 +229,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>What Argo Books isn't</h3>
-                <p>Argo Books is bookkeeping software, not booking software. It does not run a customer-facing booking calendar, take online appointments through your website, or send "on the way" texts before you arrive. Mobile Tech RX, Urable, and DetailPlus handle that side. It also does not run a dedicated ceramic coating warranty database. If you need either, run them alongside Argo Books: those for booking and warranties, Argo Books for the books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
+                <p>Argo Books is bookkeeping software, not booking software. It does not run a customer-facing booking calendar, take online appointments through your website, or send "on the way" texts before you arrive. Mobile Tech RX, Urable, and DetailPlus handle that side. It also does not run a dedicated ceramic coating warranty database. If you need either, run them alongside Argo Books: those for booking and warranties, Argo Books for the books. It does payroll for Canadian staff, but not for staff outside Canada. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the books stay simple, and your data stays on your computer.</p>
                 <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>

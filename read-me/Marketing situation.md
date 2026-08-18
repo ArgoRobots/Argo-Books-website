@@ -12,7 +12,8 @@ Related: [Google Ads economics.md](Google%20Ads%20economics.md), [Email outreach
   - Customer 1 came from a YouTube video (the receipt scanning one).
   - Customer 2 came from Google search.
 - Pricing: \$15/month or \$150/year. Customer 1 is grandfathered at \$10/month with no payment processing fee added, which is why all-time revenue is \$51.48 rather than \$60.
-- Revenue: \$51.48 all time, \$25.74 in the last 30 days. 2 active licenses, 0% churn so far.
+- Revenue: **\$61 CAD all time**, \$25.74 in the last 30 days. 2 active licenses, 0% churn so far.
+- **LTV is not known.** Both customers are only a few months in and neither has churned, so there is no retention data to calculate it from. At the \$15/month list price a customer retained a full year is roughly \$180 CAD gross before processing fees, and the grandfathered customer is on \$10. Treat \$180 as an optimistic ceiling rather than a measurement, and do not use the \$150 annual list price as a stand-in for LTV.
 - App telemetry: 19 total unique users all time, 7 monthly active, 2 Premium.
 - **Both paying customers have not opened the app in over a month**, despite still being billed. A feedback email went to both about 2 weeks ago and neither replied. 0% churn is not a retention signal yet, it just means nobody has reached a renewal decision while noticing they don't use it.
 
@@ -59,7 +60,7 @@ Note that having an email is not the same as getting a reply. Both paying custom
 ## What has been tried
 
 ### Google Ads: stopped, not worth restarting yet
-About CA\$300 spent, 0 attributable customers. Details in [Google Ads economics.md](Google%20Ads%20economics.md). Roughly two thirds of spend went to mobile and tablet clicks that cannot install a Windows app. Even with device exclusions, realistic cost per customer looks like \$300+ against a \$150/year price. Not viable at current conversion rates.
+About CA\$300 spent, 0 attributable customers. Details in [Google Ads economics.md](Google%20Ads%20economics.md). Roughly two thirds of spend went to mobile and tablet clicks that cannot install a Windows app. Even with device exclusions, realistic cost per customer looks like \$300+ against an unproven LTV whose optimistic ceiling is about \$180. Not viable at current conversion rates.
 
 ### Cold email outreach: stopped
 ~1,100 emails sent starting about 5 months ago. A couple of replies, zero customers. Stopped about 2 months ago.

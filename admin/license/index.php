@@ -409,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             : "Could not generate the batch. Nothing was created.";
         $_SESSION['message_type'] = $created > 0 ? 'success' : 'error';
 
-        header('Location: index.php?batch=' . urlencode($label) . '#reseller-batches');
+        header('Location: index.php#reseller-batches');
         exit;
     }
 
@@ -660,8 +660,6 @@ $subscription_chart_data = get_subscription_chart_data();
 
 // Reseller batches, plus the keys of whichever batch is open.
 $reseller_batches = get_reseller_batches();
-$selected_batch = isset($_GET['batch']) ? trim($_GET['batch']) : '';
-$selected_batch_keys = $selected_batch !== '' ? get_reseller_batch_keys($selected_batch) : [];
 
 $batch_totals = ['keys' => 0, 'redeemed' => 0, 'captured' => 0, 'verified' => 0];
 foreach ($reseller_batches as $b) {
@@ -1214,7 +1212,6 @@ include __DIR__ . '/../admin_header.php';
                                 <td><?php echo $captured; ?> <span style="color: var(--text-secondary);">(<?php echo $capturePct; ?>% of redeemed)</span></td>
                                 <td><?php echo $verified; ?> <span style="color: var(--text-secondary);">(<?php echo $verifyPct; ?>% of captured)</span></td>
                                 <td>
-                                    <a class="btn btn-secondary" href="index.php?batch=<?php echo urlencode($b['batch_label']); ?>#reseller-batches">View keys</a>
                                     <form method="post" style="display: inline;">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                                         <input type="hidden" name="batch_label" value="<?php echo htmlspecialchars($b['batch_label']); ?>">
@@ -1228,54 +1225,6 @@ include __DIR__ . '/../admin_header.php';
             <?php endif; ?>
         </div>
 
-        <?php if ($selected_batch !== ''): ?>
-            <div class="table-container">
-                <h2>Keys in &ldquo;<?php echo htmlspecialchars($selected_batch); ?>&rdquo;</h2>
-                <?php if (empty($selected_batch_keys)): ?>
-                    <p style="padding: 20px; color: var(--text-secondary);">No keys found for this batch.</p>
-                <?php else: ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Key</th>
-                                <th>Status</th>
-                                <th>Redeemed</th>
-                                <th>Email</th>
-                                <th>Verified</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($selected_batch_keys as $k): ?>
-                                <?php $status = get_subscription_key_status($k); ?>
-                                <tr>
-                                    <td><code><?php echo htmlspecialchars($k['subscription_key']); ?></code></td>
-                                    <td>
-                                        <?php if ($status === 'expired'): ?>
-                                            <span class="badge badge-expired">Expired</span>
-                                        <?php elseif ($status === 'redeemed'): ?>
-                                            <span class="badge badge-redeemed">Redeemed</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-free">Available</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo $k['redeemed_at'] ? date('M j, Y', strtotime($k['redeemed_at'])) : '&mdash;'; ?></td>
-                                    <td>
-                                        <?php if (!empty($k['customer_email'])): ?>
-                                            <?php echo htmlspecialchars($k['customer_email']); ?>
-                                        <?php elseif ($k['redeemed_at']): ?>
-                                            <span style="color: var(--text-secondary);">not given</span>
-                                        <?php else: ?>
-                                            &mdash;
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo $k['customer_email_verified_at'] ? 'Yes' : ($k['customer_email'] ? 'No' : '&mdash;'); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
     </div>
 </div>
 

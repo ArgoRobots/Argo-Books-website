@@ -99,7 +99,7 @@ $pricing = get_pricing_config();
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.12</span>
-                        <span class="date-tag">August 16 2026</span>
+                        <span class="date-tag">August 18 2026</span>
                     </div>
                     <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>

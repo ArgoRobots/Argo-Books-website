@@ -385,3 +385,53 @@ No daily log file. Activity is visible on `/admin/crons/`, and failures go to `e
 
 Full instructions for actually doing the update are in `docs/Payroll rate updates.md` in the
 desktop repository.
+
+---
+
+## 13. API Webhook Delivery
+
+**Script:** `cron/api_webhook_delivery.php`
+**Schedule:** Every minute
+
+```bash
+* * * * * /usr/bin/php /home/argorobots/public_html/cron/api_webhook_delivery.php
+```
+
+### What It Does
+
+Delivers Argo Books public API events to the webhook endpoints developers have registered.
+
+Events fire when a merchant acts on data a developer pushed: `<object>.imported`,
+`<object>.rejected`, `import_batch.completed`, `import_batch.reverted`. There is deliberately
+no `<object>.created` event, since the developer who created it already knows.
+
+1. Claims up to 200 due deliveries, oldest first
+2. POSTs each one with an `Argo-Signature: t=<unix>,v1=<hmac-sha256>` header
+3. Treats 2xx as success, everything else as retryable
+4. Backs off across six attempts spread over roughly a day
+5. Auto-disables an endpoint whose last 20 deliveries all failed
+6. Prunes `api_events` rows older than 90 days
+
+### Why It Is a Cron
+
+Delivery is not inline with the request that creates the event, because a developer's slow or
+hanging server would otherwise become a merchant's slow import. The cost is up to a minute of
+latency, which is nothing next to a queue whose next step is a person opening an app.
+
+### Behaviour Worth Knowing
+
+Takes a `flock` on `cron/logs/api_webhook_delivery.lock`. Overlapping runs would double-POST the
+same delivery, so a run that cannot get the lock records an `ok` result saying it skipped, rather
+than exiting silently and looking like a missed cron.
+
+A 410 is retried like any other failure. Guessing "this endpoint is gone" from a status code
+would drop events during a bad deploy on the developer's side; the attempt limit catches a
+genuinely dead URL soon enough.
+
+Redirects are never followed. The signature is for the URL the merchant approved.
+
+Supports `--dry-run`, which resolves everything and logs what would be sent without sending it.
+
+### Logs
+
+No daily log file. Metrics are on `/admin/crons/`, and failures go to `error_log`.

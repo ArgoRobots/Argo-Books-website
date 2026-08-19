@@ -1402,3 +1402,387 @@ CREATE TABLE IF NOT EXISTS mobile_sync_queue (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company_uid (company_uid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Argo Books public API (v1)
+--
+-- An ingest store, NOT a mirror of anyone's books. Third-party developers push
+-- objects here with a merchant-issued key; the desktop app pulls them, shows the
+-- merchant a preview, and imports the approved ones into the local company file
+-- as a single undoable action (the same shape as the Stripe importer).
+--
+-- Consequences baked into these tables:
+--   * Every resource row carries an import lifecycle. A row is a proposal
+--     until the desktop says otherwise.
+--   * Public ids (cus_, exp_, ...) are API ids. They are NOT the ids the desktop
+--     assigns; local_ref carries that back once known.
+--   * Money is stored in integer minor units, like Stripe, so nothing rounds.
+--   * environment is the deploy split (sandbox = dev.argorobots.com), not a
+--     user-facing test mode. Every query MUST filter on it.
+-- ============================================================================
+
+-- One row per Argo Books company that has turned the API on.
+CREATE TABLE IF NOT EXISTS api_accounts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    public_id VARCHAR(40) NOT NULL COMMENT 'acct_<24 hex>, returned to callers',
+    owner_identity_hash CHAR(64) NOT NULL COMMENT 'Same identity as api/sync: sha256 of license key (premium) or device id (free)',
+    company_uid VARCHAR(64) NOT NULL COMMENT 'Which company file on the desktop this account feeds',
+    display_name VARCHAR(255) NOT NULL DEFAULT '',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_api_accounts_public_id (public_id),
+    UNIQUE KEY uk_api_accounts_owner_company (owner_identity_hash, company_uid, environment),
+    INDEX idx_api_accounts_env (environment)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Merchant-issued credentials. Multiple live keys per account so a merchant can
+-- hand a distinct one to each developer and revoke them independently.
+CREATE TABLE IF NOT EXISTS api_keys (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'key_<24 hex>',
+    key_hash CHAR(64) NOT NULL COMMENT 'sha256 of the secret. The secret itself is shown once at creation and never stored',
+    key_hint VARCHAR(24) NOT NULL COMMENT 'ab_1a2b...wxyz, safe to display in Settings and logs',
+    label VARCHAR(100) NOT NULL DEFAULT '',
+    scopes VARCHAR(255) NOT NULL DEFAULT 'read,write' COMMENT 'Comma-separated: read, write',
+    last_used_at DATETIME DEFAULT NULL,
+    revoked_at DATETIME DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_keys_hash (key_hash),
+    UNIQUE KEY uk_api_keys_public_id (public_id),
+    INDEX idx_api_keys_account (account_id, revoked_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A desktop import run. Groups the objects the merchant approved together so the
+-- app can undo the whole thing, and so a developer can see when their data landed.
+CREATE TABLE IF NOT EXISTS api_import_batches (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'imb_<24 hex>',
+    status ENUM('open','completed','reverted') NOT NULL DEFAULT 'open',
+    object_counts JSON DEFAULT NULL COMMENT 'Per-resource counts, e.g. {"expense":4,"customer":2}',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_batches_public_id (public_id),
+    INDEX idx_api_batches_account (account_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_customers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'cus_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    company VARCHAR(255) DEFAULT NULL,
+    tax_number VARCHAR(60) DEFAULT NULL,
+    address_line1 VARCHAR(255) DEFAULT NULL,
+    address_line2 VARCHAR(255) DEFAULT NULL,
+    city VARCHAR(120) DEFAULT NULL,
+    state VARCHAR(120) DEFAULT NULL,
+    postal_code VARCHAR(30) DEFAULT NULL,
+    country CHAR(2) DEFAULT NULL COMMENT 'ISO 3166-1 alpha-2',
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL COMMENT 'Id the desktop assigned after import. NULL until then',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_customers_public_id (public_id),
+    INDEX idx_api_customers_list (account_id, deleted_at, id),
+    INDEX idx_api_customers_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_suppliers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'sup_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    website VARCHAR(255) DEFAULT NULL,
+    tax_number VARCHAR(60) DEFAULT NULL,
+    address_line1 VARCHAR(255) DEFAULT NULL,
+    address_line2 VARCHAR(255) DEFAULT NULL,
+    city VARCHAR(120) DEFAULT NULL,
+    state VARCHAR(120) DEFAULT NULL,
+    postal_code VARCHAR(30) DEFAULT NULL,
+    country CHAR(2) DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_suppliers_public_id (public_id),
+    INDEX idx_api_suppliers_list (account_id, deleted_at, id),
+    INDEX idx_api_suppliers_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'cat_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    kind ENUM('expense','revenue') NOT NULL,
+    parent VARCHAR(40) DEFAULT NULL COMMENT 'public_id of another api_categories row',
+    description TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_categories_public_id (public_id),
+    INDEX idx_api_categories_list (account_id, deleted_at, id),
+    INDEX idx_api_categories_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'prd_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    sku VARCHAR(120) DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    unit VARCHAR(40) DEFAULT NULL COMMENT 'each, hour, kg, ...',
+    unit_amount BIGINT DEFAULT NULL COMMENT 'Minor units of currency, like Stripe. 1999 = 19.99 USD',
+    currency CHAR(3) DEFAULT NULL,
+    tax_rate DECIMAL(7,4) DEFAULT NULL COMMENT 'Percent, e.g. 13.0000',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_products_public_id (public_id),
+    INDEX idx_api_products_list (account_id, deleted_at, id),
+    INDEX idx_api_products_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_expenses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'exp_<24 hex>',
+    description VARCHAR(500) NOT NULL,
+    amount BIGINT NOT NULL COMMENT 'Total including tax, in minor units',
+    currency CHAR(3) NOT NULL,
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    occurred_on DATE NOT NULL,
+    supplier VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_suppliers row',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    payment_method VARCHAR(40) DEFAULT NULL,
+    reference VARCHAR(120) DEFAULT NULL COMMENT 'Developer-side document number, shown to the merchant during review',
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_expenses_public_id (public_id),
+    INDEX idx_api_expenses_list (account_id, deleted_at, id),
+    INDEX idx_api_expenses_pending (account_id, import_status, id),
+    INDEX idx_api_expenses_occurred (account_id, occurred_on)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_revenue (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'rev_<24 hex>',
+    description VARCHAR(500) NOT NULL,
+    amount BIGINT NOT NULL COMMENT 'Gross including tax, in minor units',
+    currency CHAR(3) NOT NULL,
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    discount_amount BIGINT NOT NULL DEFAULT 0,
+    fee_amount BIGINT NOT NULL DEFAULT 0 COMMENT 'Processing fee withheld upstream, so the desktop can book it as an expense',
+    occurred_on DATE NOT NULL,
+    customer VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_customers row',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    payment_method VARCHAR(40) DEFAULT NULL,
+    reference VARCHAR(120) DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_revenue_public_id (public_id),
+    INDEX idx_api_revenue_list (account_id, deleted_at, id),
+    INDEX idx_api_revenue_pending (account_id, import_status, id),
+    INDEX idx_api_revenue_occurred (account_id, occurred_on)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A refund always points at a revenue row, so the desktop can book it as a return
+-- against the original sale rather than a free-floating negative amount.
+CREATE TABLE IF NOT EXISTS api_refunds (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 're_<24 hex>',
+    revenue VARCHAR(40) NOT NULL COMMENT 'public_id of the api_revenue row being refunded',
+    amount BIGINT NOT NULL COMMENT 'Positive minor units. The desktop applies the sign',
+    currency CHAR(3) NOT NULL,
+    reason VARCHAR(255) DEFAULT NULL,
+    occurred_on DATE NOT NULL,
+    reference VARCHAR(120) DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected','superseded') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_refunds_public_id (public_id),
+    INDEX idx_api_refunds_list (account_id, deleted_at, id),
+    INDEX idx_api_refunds_pending (account_id, import_status, id),
+    INDEX idx_api_refunds_revenue (account_id, revenue)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Line detail for expenses and revenue. Separate table rather than a JSON column
+-- so it can be listed and expanded like any other sub-resource.
+CREATE TABLE IF NOT EXISTS api_line_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'li_<24 hex>',
+    parent_type ENUM('expense','revenue') NOT NULL,
+    parent_public_id VARCHAR(40) NOT NULL,
+    product VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_products row',
+    description VARCHAR(500) NOT NULL,
+    quantity DECIMAL(15,4) NOT NULL DEFAULT 1.0000,
+    unit_amount BIGINT NOT NULL COMMENT 'Minor units, excluding tax',
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    discount_amount BIGINT NOT NULL DEFAULT 0,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_line_items_public_id (public_id),
+    INDEX idx_api_line_items_parent (account_id, parent_type, parent_public_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Idempotency-Key cache, same claim-then-run contract as refund_idempotency_cache
+-- but keyed on api_accounts instead of portal_companies.
+CREATE TABLE IF NOT EXISTS api_idempotency_cache (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    idempotency_key VARCHAR(128) NOT NULL,
+    body_hash CHAR(64) NOT NULL,
+    response_status SMALLINT UNSIGNED NOT NULL COMMENT '0 = claimed, handler still running',
+    response_body LONGTEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_idem_account_key (account_id, idempotency_key),
+    INDEX idx_api_idem_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Fixed-window rate limit counters, one row per (key, minute).
+CREATE TABLE IF NOT EXISTS api_rate_limits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    api_key_id INT NOT NULL,
+    window_started_at DATETIME NOT NULL,
+    request_count INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_rate_key_window (api_key_id, window_started_at),
+    INDEX idx_api_rate_window (window_started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Argo Books public API: webhooks
+--
+-- Events describe what the MERCHANT did, not what the developer did. A
+-- developer already knows they created an expense; what they cannot see is the
+-- moment a human accepted, declined, or undid it. That is the whole value here,
+-- and it is why there is no <object>.created event.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS api_webhook_endpoints (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'whe_<24 hex>',
+    url VARCHAR(500) NOT NULL,
+    signing_secret VARCHAR(80) NOT NULL COMMENT 'whsec_..., shown once at creation and used to sign every delivery',
+    enabled_events JSON DEFAULT NULL COMMENT 'Array of event types, or NULL for all',
+    description VARCHAR(255) NOT NULL DEFAULT '',
+    status ENUM('enabled','disabled') NOT NULL DEFAULT 'enabled',
+    disabled_reason VARCHAR(255) DEFAULT NULL COMMENT 'Set when auto-disabled after sustained failure',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_whe_public_id (public_id),
+    INDEX idx_api_whe_account (account_id, status, deleted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The event log. Readable through GET /v1/events so a developer whose endpoint
+-- was down can catch up without needing us to replay anything.
+CREATE TABLE IF NOT EXISTS api_events (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'evt_<24 hex>',
+    type VARCHAR(60) NOT NULL COMMENT 'e.g. revenue.imported, import_batch.reverted',
+    object_id VARCHAR(40) DEFAULT NULL COMMENT 'The object the event is about',
+    data JSON NOT NULL COMMENT 'The serialized object at the time of the event',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_events_public_id (public_id),
+    INDEX idx_api_events_account (account_id, id),
+    INDEX idx_api_events_type (account_id, type, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- One row per (event, endpoint). Separate from api_events because the same
+-- event fans out to every matching endpoint and each retries independently.
+CREATE TABLE IF NOT EXISTS api_webhook_deliveries (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    endpoint_id INT NOT NULL,
+    event_id INT NOT NULL,
+    status ENUM('pending','succeeded','failed') NOT NULL DEFAULT 'pending',
+    attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    next_attempt_at DATETIME NOT NULL,
+    last_status_code SMALLINT UNSIGNED DEFAULT NULL,
+    last_error VARCHAR(500) DEFAULT NULL,
+    delivered_at DATETIME DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (endpoint_id) REFERENCES api_webhook_endpoints(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES api_events(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_delivery_endpoint_event (endpoint_id, event_id),
+    INDEX idx_api_delivery_due (status, next_attempt_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

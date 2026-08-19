@@ -29,6 +29,15 @@ require_once PROJECT_ROOT . '/cron/lib/renewal_helpers.php';
 require_once PROJECT_ROOT . '/cron/lib/purge_helpers.php';
 require_once PROJECT_ROOT . '/api/waitlist/waitlist_functions.php';
 
+// Public API (/v1). API_TESTING must be defined BEFORE the lib loads, so
+// api_json() throws ApiResponseSent instead of ending the process and every
+// validator can be exercised in-process.
+define('API_TESTING', true);
+require_once PROJECT_ROOT . '/api/v1/lib/bootstrap.php';
+require_once PROJECT_ROOT . '/api/v1/lib/definitions.php';
+require_once PROJECT_ROOT . '/api/v1/lib/events.php';
+require_once PROJECT_ROOT . '/api/v1/lib/webhook_endpoints.php';
+
 // db_connect.php assigns $pdo at "top-level" of the included file, but when
 // included from a function/method scope (e.g. PHPUnit's TestRunner) that
 // "top-level" is actually local to the caller. Promote it to $GLOBALS so

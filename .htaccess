@@ -279,7 +279,23 @@ php_value upload_max_filesize 10M
 
     # Protect database directory
     RewriteRule ^database/ - [F,L]
-    
+
+    # --- Public developer API (/v1) ----------------------------------------
+    # Everything under /v1 goes to one front controller, which reads the real
+    # path back out of REQUEST_URI. Deliberately NOT passed as a query
+    # parameter: with QSA a caller could append their own ?__path= and PHP
+    # would honour the later occurrence, addressing a route the rewrite never
+    # matched. The lib directory is blocked outright, since those files expect
+    # bootstrap.php to have run and must never be reachable on their own.
+    RewriteRule ^api/v1/lib/ - [F,L]
+    RewriteRule ^v1(/.*)?$ api/v1/index.php [L,QSA]
+
+    # Control plane for the above: Argo Books itself creates and revokes the
+    # keys here, authenticated by its licence identity rather than by a key.
+    RewriteRule ^api/developer/account/?$ api/developer/account.php [L,QSA]
+    RewriteRule ^api/developer/keys/revoke/?$ api/developer/revoke-key.php [L,QSA]
+    RewriteRule ^api/developer/keys/?$ api/developer/keys.php [L,QSA]
+
     # --- Customer Payment Portal routes ---
 
     # Invoice view: /invoice/{48-char-hex-token}

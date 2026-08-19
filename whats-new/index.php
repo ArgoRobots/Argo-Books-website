@@ -94,6 +94,49 @@ $pricing = get_pricing_config();
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.12 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.12</span>
+                        <span class="date-tag">August 16 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Payroll for Canadian businesses:</strong> Pay your staff without a separate payroll service. Argo Books works out CPP, EI and income tax using the CRA's own figures, for every province and territory, then produces pay stubs for your employees. At year end it prepares your T4 slips and the file the CRA needs, plus RL-1 slips if you have Quebec staff. When someone leaves, it gathers the figures for their Record of Employment.</li>
+                                <li><strong>Automatic payment reminders:</strong> Argo Books can now chase overdue invoices for you, emailing the customer a payment link 3, 7 and 14 days after the due date and stopping as soon as they pay. The reminders are sent by our servers, so they keep going even when Argo Books is closed. Turn it on in the Payment Portal settings; only invoices that fall due after you switch it on are chased.</li>
+                                <li><strong>Know the moment you get paid:</strong> Choose to be emailed whenever a customer pays an invoice online, so you find out without having the app open.</li>
+                                <li><strong>Send an invoice again:</strong> Resend any invoice straight from the invoice list, for the customer who says it never arrived.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Payments live on the invoice:</strong> Record a cash or cheque payment on the invoice it belongs to, and edit or remove it from the same place. No more hopping to a separate page and picking the invoice back out of a list.</li>
+                                <li><strong>A menu that follows the money:</strong> The sidebar is now split into Expenses and Revenue, so suppliers sit alongside what you buy and customers alongside what you sell.</li>
+                                <li><strong>Spreadsheet exports carry more:</strong> Every row now names the supplier or customer name instead of only showing an ID. Invoices bring their line items with them, amounts carry their quantity and currency, and there are new sheets for your employees and your pay runs.</li>
+                                <li><strong>Loading screen for exports</strong> A loading screen now appears while a spreadsheet is being exported, instead of freezing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Timestamps show the local time</strong> Some timestamps were showing UTC instead of the local time.</li>
+                                <li><strong>Invoices show partial payments</strong> If an invoice was published on the payment portal, then marked as partially payed, the invoice now updates and shows the new amount.</li>
+                                <li><strong>Rendering issue</strong> Fixed a rendering issue that could sometimes appear when opening a search box during the tutorial.</li>
+                                <li>The usual round of polish and performance work across the app.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.11 -->
             <div class="version-card">
                 <div class="version-header">

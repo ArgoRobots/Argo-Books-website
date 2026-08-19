@@ -153,7 +153,7 @@ $isDocsLanding = true;
                         <?= svg_icon('key', 20) ?>
                     </div>
                     <h3>Redeem a License Key</h3>
-                    <p>Activate Premium with a key you were given</p>
+                    <p>Activate Premium with your license key</p>
                 </a>
             </div>
         </section>

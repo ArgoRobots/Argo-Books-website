@@ -10,7 +10,7 @@
             { id: 'installation', title: 'Installation Guide', category: 'Getting Started', folder: 'getting-started', keywords: 'install download setup installer wizard run appimage smartscreen' },
             { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', folder: 'getting-started', keywords: 'tutorial getting started begin first steps currency company sidebar category product supplier sample company' },
             { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade pricing features comparison limits biometric login fingerprint payroll forecasting priority support' },
-            { id: 'redeem-license-key', title: 'Redeem a License Key', category: 'Getting Started', folder: 'getting-started', keywords: 'license key redeem activate activation code serial promo promotional retailer voucher enter a key verify key premium transfer another computer move license invalid key wrong device expired' },
+            { id: 'redeem-license-key', title: 'Redeem a License Key', category: 'Getting Started', folder: 'getting-started', keywords: 'license key redeem activate activation code serial subscription id receipt lost key resend promo promotional retailer voucher enter a key verify key premium transfer another computer move license reinstall invalid key wrong device expired' },
 
             // Core Features
             { id: 'dashboard', title: 'Dashboard', category: 'Core Features', folder: 'features', keywords: 'dashboard home overview widgets customize edit layout stat card chart quick actions setup checklist low stock upcoming due dates overdue rentals drag resize' },

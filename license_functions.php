@@ -10,7 +10,14 @@ require_once __DIR__ . '/track_referral_event.php';
  */
 function generate_license_key($type = 'premium')
 {
-    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // Alphabet excludes ambiguous characters (no 0 1 I L O U), matching
+    // generate_pairing_short_code() in api/sync/sync-helper.php. Keys get read off
+    // a screen and retyped by hand, most of all the batches sold through resellers,
+    // and a key rejected over an O that was really a 0 is a support ticket at best
+    // and a chargeback at worst. Keys issued before this change still contain the
+    // full set and still validate: lookup is an exact match on the stored string,
+    // so nothing here is applied on the way in.
+    $chars = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
 
     $prefix = 'PREM';
 

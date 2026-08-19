@@ -91,7 +91,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Do I need to install anything?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
+                        "text": "Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
                     }
                 },
                 {
@@ -373,7 +373,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             ob_start(); ?>Do I need to install anything?<?php $q = ob_get_clean();
             ob_start(); ?>
 
-                            <p>Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
+                            <p>Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
                             <p>You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import. <a href="../downloads/">Download Argo Books</a></p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

@@ -97,7 +97,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
+                        "text": "Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
                     }
                 }
             ]
@@ -184,7 +184,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.</span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -374,7 +374,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month for your whole team, with no per-user fees</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>All your finances in one app</strong>: invoicing, expenses, inventory, and reporting, with no ERP modules to configure</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with no server to host</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with no server to host</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Simple from day one</strong>, no consultant or implementation project to get started</span></li>
                         </ul>
@@ -522,7 +522,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong> and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

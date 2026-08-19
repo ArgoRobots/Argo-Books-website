@@ -164,7 +164,7 @@ $niches = [
                     <span>Find Your Industry</span>
                 </a>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows and Linux. No account, no credit card.</p>
         </div>
     </section>
 

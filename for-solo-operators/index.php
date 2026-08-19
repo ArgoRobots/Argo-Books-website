@@ -163,7 +163,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See What's Included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="ai-receipts">
@@ -216,7 +216,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works offline at the craft fair, free tier covers solo operators</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed at the market booth, no monthly subscription climbing every year, no website to load when the venue wifi is gone. The free tier covers most solo operators forever.</p>
+                    <p>Argo Books runs natively on Windows and Linux. No internet needed at the market booth, no monthly subscription climbing every year, no website to load when the venue wifi is gone. The free tier covers most solo operators forever.</p>
                 </div>
             </div>
         </div>

@@ -362,7 +362,7 @@ $argo_monthly = (int) $pricing['premium_monthly_price'];
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Nothing breaks when you add a row</strong>: no formulas, ranges or references to maintain</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally, exactly like a file on your disk</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally, exactly like a file on your disk</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Reports generate themselves</strong> from your records rather than being a sheet you build</span></li>
                         </ul>

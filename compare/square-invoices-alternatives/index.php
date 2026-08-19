@@ -179,7 +179,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open instantly with no internet, and your data stays on your machine rather than on Square's servers.</span>
+                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your records open instantly with no internet, and your data stays on your machine rather than on Square's servers.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -366,7 +366,7 @@ $sq_plus = competitor_price('square-invoices', 'plus'); // 30 CAD
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, revenue, inventory, reports and forecasting</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Bring your own processor</strong>, including Square itself, so you keep your own rates</span></li>
                         </ul>

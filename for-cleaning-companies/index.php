@@ -30,7 +30,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows, Mac, and Linux.">
+        content="Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for cleaning companies, cleaning business bookkeeping, janitorial accounting software, residential cleaning invoicing, recurring invoice software cleaning">
 
@@ -171,7 +171,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See What's Included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="customers">

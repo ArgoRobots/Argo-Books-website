@@ -112,7 +112,7 @@ HTML,
       'h2' => 'Where Argo Books fits (and where it doesn\'t)',
       'anchor' => 'where-argo-fits',
       'html' => <<<'HTML'
-<p>Argo Books ships a real Linux build, not a browser wrapper: an x64 AppImage that runs on Ubuntu, Debian, Fedora, and other modern distros with nothing to install. The same app also runs on Windows, with a Mac version in progress. Here's the honest version of what it does and doesn't do.</p>
+<p>Argo Books ships a real Linux build, not a browser wrapper: an x64 AppImage that runs on Ubuntu, Debian, Fedora, and other modern distros with nothing to install. The same app also runs on Windows. Here's the honest version of what it does and doesn't do.</p>
 <p><strong>What it's good at for Linux users:</strong></p>
 <ul>
 <li>It runs natively as a desktop app and works offline. Your books are a file on your own machine rather than on someone else's server, and you back it up with whatever you already use.</li>

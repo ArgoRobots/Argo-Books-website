@@ -98,7 +98,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Invoice2Go is web and mobile based."
+                        "text": "Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Invoice2Go is web and mobile based."
                     }
                 }
             ]
@@ -185,7 +185,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly with no internet, and your data stays on your machine.</span>
+                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly with no internet, and your data stays on your machine.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -369,7 +369,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No invoice caps</strong> on Premium, so billing volume never forces an upgrade</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, not just invoices</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, so the amount never moves with the exchange rate</span></li>
                         </ul>
@@ -517,7 +517,7 @@ $i2g_premium      = competitor_price('invoice2go', 'premium');      // 63 CAD (4
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
+                            <p>Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Invoice2Go is web and mobile based.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

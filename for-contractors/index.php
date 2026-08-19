@@ -30,7 +30,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for general contractors and tradespeople. Built for progress billing, materials, and change orders. Free desktop app for Windows, Mac, and Linux.">
+        content="Accounting software for general contractors and tradespeople. Built for progress billing, materials, and change orders. Free desktop app for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for contractors, contractor bookkeeping software, construction invoicing software, contractor accounting app, free accounting software contractor">
 
@@ -172,7 +172,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See what's included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card, and your books stay on your own computer.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card, and your books stay on your own computer.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="invoices">

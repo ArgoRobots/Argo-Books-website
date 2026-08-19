@@ -98,7 +98,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. QuickBooks Online is web-based, and QuickBooks Desktop (Windows only) has been discontinued for new purchases in favor of the cloud version."
+                        "text": "Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. QuickBooks Online is web-based, and QuickBooks Desktop (Windows only) has been discontinued for new purchases in favor of the cloud version."
                     }
                 }
             ]
@@ -186,7 +186,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine.</span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -403,7 +403,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No accounting jargon</strong>, built for business owners rather than accountants</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month with no upsells or yearly hikes</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Canadian payroll included</strong> in that price: CPP, EI, T4s and RL-1s, with no per-employee fee</span></li>
@@ -569,7 +569,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
 
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong> and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>QuickBooks Online is web-based, and QuickBooks Desktop (Windows only) has been discontinued for new purchases in favor of the cloud version.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

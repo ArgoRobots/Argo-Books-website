@@ -1101,6 +1101,20 @@ body.docs-page .account-avatar {
   color: var(--black);
 }
 
+/* Shown when a platform has no build yet (system-requirements.json "available") */
+.req-coming-soon {
+  padding: 2px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .requirement-card ul {
   margin: 0;
   padding-left: 20px;

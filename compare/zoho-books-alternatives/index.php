@@ -102,7 +102,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Zoho Books is web-based and also has mobile apps for iOS and Android."
+                        "text": "Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Zoho Books is web-based and also has mobile apps for iOS and Android."
                     }
                 }
             ]
@@ -185,7 +185,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Zoho Books is cloud-only.</span>
+                            <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Zoho Books is cloud-only.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -384,7 +384,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
                         <h3>Argo Books pros</h3>
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free plan with no revenue cap</strong>, every core feature, no trial and no credit card</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Genuinely simple</strong>, built for business owners rather than accountants</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Standalone</strong>, one focused tool rather than a slice of a 40-app suite</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Canadian (CAD)</strong> with AI receipt scanning included in one flat $<?= $argo_monthly ?>/mo plan</span></li>
@@ -536,7 +536,7 @@ $zoho_ultimate     = competitor_price('zoho-books', 'ultimate');     // 290
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong> and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Zoho Books is web-based and also has mobile apps for iOS and Android.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

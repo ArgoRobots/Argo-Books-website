@@ -599,7 +599,7 @@ $pricing = get_pricing_config();
 
                         <h3>A New Foundation: Cross-Platform and Modern</h3>
                         <p>
-                            We've rebuilt Argo Books using Avalonia UI and .NET 10, replacing the old Windows-only WinForms architecture. This means you can now run Argo Books natively on <strong>Windows, macOS, and Linux</strong>. The interface has been completely redesigned with a fresh, modern look that's more intuitive and responsive than ever before.
+                            We've rebuilt Argo Books using Avalonia UI and .NET 10, replacing the old Windows-only WinForms architecture. This means you can now run Argo Books natively on <strong>Windows and Linux</strong>. The interface has been completely redesigned with a fresh, modern look that's more intuitive and responsive than ever before.
                         </p>
 
                         <h3>AI-Powered Receipt Scanning</h3>

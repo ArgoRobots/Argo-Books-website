@@ -94,7 +94,7 @@ HTML,
       'h2' => 'Where Argo Books fits',
       'anchor' => 'where-argo-fits',
       'html' => <<<'HTML'
-<p>Argo Books was built for exactly the people this guide is about. It's a desktop accounting app for Windows, Mac, and Linux. It works offline, and your data is stored locally on your own machine, so your books belong to you, not to a server somewhere.</p>
+<p>Argo Books was built for exactly the people this guide is about. It's a desktop accounting app for Windows and Linux. It works offline, and your data is stored locally on your own machine, so your books belong to you, not to a server somewhere.</p>
 {{illustration:bank-import}}
 <p>It's free to start, and Premium is cheap: $15 a month or $150 a year in Canadian dollars, with unlimited invoices, more receipt scanning, predictive cash-flow analytics, biometric login, and priority support. The free tier covers 25 invoices and 10 receipt scans a month, which is plenty for a lot of small operations. Because it runs locally, a lapsed subscription doesn't lock you out of your own history the way some cloud tools do.</p>
 <p>On features, it handles the everyday work: invoicing and taking payments, AI receipt scanning, expense and revenue tracking, inventory and cost of goods sold, sales-tax tracking (it tracks tax you collected against tax you paid and gives you a summary, though it does not file or remit tax for you, that's still on you or your accountant), and a report builder for profit and loss, balance sheet, and tax-ready reports.</p>

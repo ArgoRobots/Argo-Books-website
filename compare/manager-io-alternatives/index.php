@@ -96,7 +96,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 83 CAD (59 USD converted),
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux, like Manager.io's desktop edition."
+                        "text": "Argo Books runs natively on Windows and Linux, like Manager.io's desktop edition."
                     }
                 }
             ]
@@ -366,7 +366,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 83 CAD (59 USD converted),
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>No accounting jargon</strong>, built for business owners rather than bookkeepers</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Modern interface</strong> designed around the tasks you actually do each week</span></li>
                         </ul>
@@ -516,7 +516,7 @@ $mgr_cloud = competitor_price('manager', 'cloud'); // 83 CAD (59 USD converted),
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books runs natively on Windows, macOS, and Linux, like Manager.io's desktop edition.</p>
+                            <p>Argo Books runs natively on Windows and Linux, like Manager.io's desktop edition.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             echo argo_faq_grid($faqs); ?>

@@ -31,7 +31,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Accounting software for landscaping businesses. Built for deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free download for Windows, Mac, and Linux.">
+        content="Accounting software for landscaping businesses. Built for deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free download for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for landscapers, landscaping bookkeeping software, lawn care accounting, landscaper invoicing software, free accounting software landscaping">
 
@@ -107,7 +107,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     "name": "Is there a phone app?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Not yet. Argo Books is a desktop application for Windows, Mac, and Linux. If you need to send an invoice in the field, you can take receipt photos on your phone and import them when you are back at the laptop."
+                        "text": "Not yet. Argo Books is a desktop application for Windows and Linux. If you need to send an invoice in the field, you can take receipt photos on your phone and import them when you are back at the laptop."
                     }
                 },
                 {
@@ -179,7 +179,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See What's Included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="invoices">
@@ -342,7 +342,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             ob_start(); ?>Is there a phone app?<?php $q = ob_get_clean();
             ob_start(); ?>
 
-                            <p>Not yet. Argo Books is a desktop application for Windows, Mac, and Linux.</p>
+                            <p>Not yet. Argo Books is a desktop application for Windows and Linux.</p>
                             <p>If you need to send an invoice in the field, you can take receipt photos on your phone and import them when you're back at the laptop.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

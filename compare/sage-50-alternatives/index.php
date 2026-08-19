@@ -73,10 +73,10 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books run on Mac and Linux?",
+                    "name": "Does Argo Books run on Linux?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books runs natively on Windows, macOS, and Linux from the same app. Sage 50 is a Windows-only desktop program, so Mac and Linux users are left out. If you are not on Windows, Argo Books is the more flexible choice."
+                        "text": "Yes. Argo Books runs natively on Windows and Linux from the same app. Sage 50 is a Windows-only desktop program, so Linux users are left out. If you are not on Windows, Argo Books is the more flexible choice."
                     }
                 },
                 {
@@ -100,7 +100,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, and it works offline. Sage 50 is also a desktop app, but it is Windows-only, so macOS and Linux users are not supported."
+                        "text": "Argo Books runs natively on Windows and Linux. Because it's a desktop app, it's fast and responsive, and it works offline. Sage 50 is also a desktop app, but it is Windows-only, so Linux users are not supported."
                     }
                 }
             ]
@@ -187,7 +187,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                            <span><strong>Modern and cross-platform.</strong> A native desktop app that runs on Windows, macOS, and Linux, with a clean modern interface. Sage 50 is powerful, but it's Windows-only and its interface looks and feels its age.</span>
+                            <span><strong>Modern and cross-platform.</strong> A native desktop app that runs on Windows and Linux, with a clean modern interface. Sage 50 is powerful, but it's Windows-only and its interface looks and feels its age.</span>
                         </li>
                         <li>
                             <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -313,7 +313,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Runs on Windows, macOS &amp; Linux</td>
+                            <td>Runs on Windows &amp; Linux</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
@@ -375,7 +375,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong>, Premium is $<?= $argo_monthly ?> CAD/month vs Sage from around $<?= $sage_pro ?>/month (billed yearly)</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Modern and simple</strong>, built for business owners with no accounting degree required</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Truly cross-platform</strong>, runs on Windows, macOS, and Linux from one app</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Truly cross-platform</strong>, runs on Windows and Linux from one app</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included</span></li>
                         </ul>
                     </div>
@@ -393,7 +393,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                         <h3>Sage 50 cons</h3>
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Expensive</strong>: from around $<?= $sage_pro ?>/month (~$814/yr) up to $5,636/yr, and billed annually</span></li>
-                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Windows-only</strong>, so macOS and Linux users are left out</span></li>
+                            <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Windows-only</strong>, so Linux users are left out</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Steep learning curve and a dated interface</strong>: dense menus and toolbars that feel a decade or two behind, built for accountants rather than owners</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>No free plan</strong>, only a time-limited trial</span></li>
                             <li><span class="pc-ico pc-con"><?= svg_icon('x', 16) ?></span><span><strong>Document capture costs extra</strong>: receipt and statement capture (AutoEntry) is a usage-based add-on at about $<?= $sage_autoentry ?> CAD/month for 500 credits, and there's no predictive analytics</span></li>
@@ -433,7 +433,7 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                         <?= svg_icon('bolt', 30, '', 1.5) ?>
                     </div>
                     <h3>Modern &amp; cross-platform</h3>
-                    <p>Sage 50 is powerful but Windows-only with a steep learning curve. Argo Books is the opposite: so simple that anyone can keep their own books from day one, with no training and no accounting background, on Windows, macOS, or Linux.</p>
+                    <p>Sage 50 is powerful but Windows-only with a steep learning curve. Argo Books is the opposite: so simple that anyone can keep their own books from day one, with no training and no accounting background, on Windows or Linux.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -506,10 +506,10 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
                             <p>Sage 50 has no free plan, only a time-limited trial before paid plans that start around $<?= $sage_pro ?> CAD/month (billed annually).</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
-            ob_start(); ?>Does Argo Books run on Mac and Linux?<?php $q = ob_get_clean();
+            ob_start(); ?>Does Argo Books run on Linux?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Yes. Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong> from the same app.</p>
-                            <p>Sage 50 is a Windows-only desktop program, so Mac and Linux users are left out. If you're not on Windows, Argo Books is the more flexible choice.</p>
+                            <p>Yes. Argo Books runs natively on <strong>Windows</strong> and <strong>Linux</strong> from the same app.</p>
+                            <p>Sage 50 is a Windows-only desktop program, so Linux users are left out. If you're not on Windows, Argo Books is the more flexible choice.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>Is Argo Books as powerful as Sage 50?<?php $q = ob_get_clean();
@@ -526,8 +526,8 @@ $sage_autoentry = competitor_price('sage', 'autoentry'); // 145 (AutoEntry docum
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             ob_start(); ?>What platforms does Argo Books run on?<?php $q = ob_get_clean();
             ob_start(); ?>
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, and it works offline.</p>
-                            <p>Sage 50 is also a desktop app, but it's Windows-only, so macOS and Linux users aren't supported.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong> and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, and it works offline.</p>
+                            <p>Sage 50 is also a desktop app, but it's Windows-only, so Linux users aren't supported.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
             echo argo_faq_grid($faqs); ?>

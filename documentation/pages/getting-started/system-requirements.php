@@ -32,6 +32,9 @@ include __DIR__ . '/../../docs-header.php';
                             <path d="<?php echo getPlatformIconPath($platform); ?>"/>
                         </svg>
                         <?php echo htmlspecialchars($data['name']); ?>
+                        <?php if (empty($data['available'])): ?>
+                        <span class="req-coming-soon">Coming soon</span>
+                        <?php endif; ?>
                     </h3>
                     <ul>
                         <?php foreach ($data['requirements'] as $req): ?>

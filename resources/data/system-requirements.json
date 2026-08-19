@@ -25,7 +25,7 @@
     "linux": {
         "name": "Linux",
         "icon": "linux",
-        "available": false,
+        "available": true,
         "requirements": [
             "Ubuntu 22.04+, Debian 12+, Fedora 42+, or equivalent",
             "64-bit processor",

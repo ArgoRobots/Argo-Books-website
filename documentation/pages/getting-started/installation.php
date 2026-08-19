@@ -24,15 +24,8 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <h2>macOS</h2>
-            <ol class="steps-list">
-                <li>Download the <strong>.dmg</strong> file from the <a class="link" href="../../../downloads/">downloads page</a></li>
-                <li>Open the downloaded .dmg file</li>
-                <li>Drag Argo Books to your Applications folder</li>
-                <li>Launch Argo Books from your Applications folder or Launchpad</li>
-            </ol>
-
             <div class="info-box">
-                <strong>Tip:</strong> If macOS blocks the application, go to System Settings > Privacy & Security and click "Open Anyway" next to the Argo Books message.
+                <strong>Coming soon.</strong> There is no macOS build of Argo Books yet, so there is nothing to install on a Mac at the moment. You can leave your email on the <a class="link" href="../../../downloads/">downloads page</a> to be notified once the Mac version ships. Installation steps will be added here at the same time.
             </div>
 
             <h2>Linux</h2>

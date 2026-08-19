@@ -188,7 +188,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
-                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open with no internet, and your data stays on your machine.</span>
+                                <span><strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your records open with no internet, and your data stays on your machine.</span>
                             </li>
                             <li>
                                 <span class="why-check"><?= svg_icon('check', 15) ?></span>
@@ -368,7 +368,7 @@ $bonsai_premium    = competitor_price('bonsai', 'premium');    // 39 CAD per use
                         <ul class="pc-list">
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Free forever plan</strong> with every core feature, no trial and no credit card</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>One flat price</strong> per business rather than per user, so adding people costs nothing</span></li>
-                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally</span></li>
+                            <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, plus AI receipt scanning</span></li>
                             <li><span class="pc-ico pc-pro"><?= svg_icon('check', 16) ?></span><span><strong>Priced in CAD</strong> at $<?= $argo_monthly ?>/month, so the amount never moves with the exchange rate</span></li>
                         </ul>

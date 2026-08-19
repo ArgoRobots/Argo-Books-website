@@ -36,7 +36,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <meta property="og:title" content="Argo Books for Local Wholesalers: Inventory, Net-30, and Standing Orders">
     <meta property="og:description"
-        content="Inventory, net-30 invoicing, and standing orders for local distributors. Free desktop app for Windows, Mac, and Linux.">
+        content="Inventory, net-30 invoicing, and standing orders for local distributors. Free desktop app for Windows and Linux.">
     <meta property="og:url" content="https://argorobots.com/for-local-wholesalers/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -163,7 +163,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See What's Included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="inventory">
@@ -216,7 +216,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works offline, free tier covers small distributors</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed in the warehouse or on the route, no monthly subscription climbing every year, no website to load when you're packing a truck. The free tier covers most small distributors forever.</p>
+                    <p>Argo Books runs natively on Windows and Linux. No internet needed in the warehouse or on the route, no monthly subscription climbing every year, no website to load when you're packing a truck. The free tier covers most small distributors forever.</p>
                 </div>
             </div>
         </div>

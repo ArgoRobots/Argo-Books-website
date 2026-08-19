@@ -87,7 +87,7 @@ HTML,
       'h2' => 'Where Argo Books fits, and where it honestly doesn\'t',
       'anchor' => 'argo-fit',
       'html' => <<<'HTML'
-<p>Argo Books is our desktop accounting app for Windows, Mac, and Linux, and it's a natural landing spot for a chunk of the Self-Employed audience, so here's the honest fit check rather than a sales pitch.</p>
+<p>Argo Books is our desktop accounting app for Windows and Linux, and it's a natural landing spot for a chunk of the Self-Employed audience, so here's the honest fit check rather than a sales pitch.</p>
 <p><strong>Where it fits well.</strong> If your Self-Employed usage was mostly "track my income and expenses, keep business separate from personal, scan receipts, send the occasional invoice, and hand my accountant clean numbers at tax time," Argo covers that comfortably. You get expense and revenue tracking, AI receipt scanning, invoicing, sales-tax tracking, and tax-ready reports like profit and loss. It's free to start, with no subscription required to begin, and your data lives on your own machine instead of on a server that can be retired out from under you. After watching a product you paid for get discontinued, that last point tends to resonate.</p>
 <p><strong>Where it doesn't fit.</strong> Two gaps matter for this audience, and we'd rather you know now than find out after moving:</p>
 <ul>

@@ -32,7 +32,7 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for software and SaaS companies. Connect Stripe with a read-only key and import charges, fees, tax, refunds, and payouts straight into your books. Free desktop app for Windows, Mac, and Linux.">
+        content="Accounting software for software and SaaS companies. Connect Stripe with a read-only key and import charges, fees, tax, refunds, and payouts straight into your books. Free desktop app for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for saas, saas bookkeeping software, stripe accounting software, accounting software for software companies, indie hacker bookkeeping, stripe to accounting import">
 
@@ -173,7 +173,7 @@ $stripe_docs  = '../documentation/pages/integrations/stripe-integration.php';
                         </a>
                         <a href="#stripe" class="fp-textlink">See the Stripe Integration</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="expenses">

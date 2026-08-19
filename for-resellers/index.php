@@ -30,7 +30,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for online resellers and thrift flippers. Track cost of goods, sourcing receipts, and margins by channel. Free desktop app for Windows, Mac, and Linux.">
+        content="Accounting software for online resellers and thrift flippers. Track cost of goods, sourcing receipts, and margins by channel. Free desktop app for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for resellers, ebay reseller bookkeeping, amazon fba accounting, thrift flipper accounting, online reseller tax software">
 
@@ -163,7 +163,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         </a>
                         <a href="#features" class="fp-textlink">See What's Included</a>
                     </div>
-                    <p class="fp-hero-facts">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
                 </div>
 
                 <div class="fp-hero-demo" data-feature-demo="inventory">
@@ -216,7 +216,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                         <?= svg_icon('shield-check', 20) ?>
                     </div>
                     <h3>Works offline, free tier covers solo resellers</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed in the garage or at the auction, no monthly subscription climbing every year. The free tier covers most side-hustle and solo full-time resellers forever.</p>
+                    <p>Argo Books runs natively on Windows and Linux. No internet needed in the garage or at the auction, no monthly subscription climbing every year. The free tier covers most side-hustle and solo full-time resellers forever.</p>
                 </div>
             </div>
         </div>

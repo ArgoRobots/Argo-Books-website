@@ -88,7 +88,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             "description": "Free accounting and invoicing software for small business, with receipt scanning, spreadsheet import, and inventory management",
             "url": "https://argorobots.com/",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows, macOS, Linux",
+            "operatingSystem": "Windows, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "0",

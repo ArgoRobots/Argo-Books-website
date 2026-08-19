@@ -97,7 +97,7 @@ HTML,
       'h2' => 'Where Argo Books fits (and where it doesn\'t)',
       'anchor' => 'where-argo-fits',
       'html' => <<<'HTML'
-<p>Argo Books is a real installed Windows app, not a browser tool with a shortcut. It runs on Windows 10 and later, and the same app also runs on Linux, with a Mac version in progress. Here is the honest version of what it does and doesn't do, so you can tell quickly whether it fits.</p>
+<p>Argo Books is a real installed Windows app, not a browser tool with a shortcut. It runs on Windows 10 and later, and the same app also runs on Linux. Here is the honest version of what it does and doesn't do, so you can tell quickly whether it fits.</p>
 <p><strong>What it's good at for Windows users:</strong></p>
 <ul>
 <li>It installs and runs as a native Windows program, and it works offline. Your books are stored locally on your own PC rather than on someone else's server, so you keep working whether or not you have a connection.</li>

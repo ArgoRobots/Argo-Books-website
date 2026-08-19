@@ -37,6 +37,7 @@ $categoryInfo = [
     'getting-started' => ['name' => 'Getting Started', 'color' => 'emerald'],
     'features' => ['name' => 'Core Features', 'color' => 'blue'],
     'integrations' => ['name' => 'Integrations', 'color' => 'sky'],
+    'api' => ['name' => 'Developer API', 'color' => 'blue'],
     'reference' => ['name' => 'Reference', 'color' => 'amber'],
     'security' => ['name' => 'Security', 'color' => 'purple']
 ];
@@ -60,7 +61,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="<?php echo htmlspecialchars($fullTitle); ?>">
     <meta property="og:description" content="<?php echo htmlspecialchars($pageDescription); ?>">
-    <meta property="og:url" content="https://argorobots.com/documentation/">
+    <meta property="og:url" content="<?php echo htmlspecialchars($canonicalUrl); ?>">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">

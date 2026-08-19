@@ -16,8 +16,9 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <p>Argo Books offers two tiers to match your business needs. Start with our free version,
-            perfect for small businesses just getting started with inventory tracking. As your business
-            grows, upgrade to Premium for unlimited products and higher monthly limits.</p>
+            perfect for small businesses just getting started. As your business grows, upgrade to
+            Premium for unlimited invoicing, higher monthly limits, and the payroll and forecasting
+            tools.</p>
 
             <p>Not sure which version is right for you? <a href="../../../downloads/" class="link">Try our free
                 version first</a> – you can always <a href="../../../pricing/" class="link">upgrade
@@ -74,7 +75,7 @@ include __DIR__ . '/../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>Biometric Login</td>
+                            <td>Biometric Login (Windows)</td>
                             <td>—</td>
                             <td>✓</td>
                         </tr>
@@ -142,9 +143,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Quick Start Tutorial</span>
                 </a>
-                <a href="../features/dashboard.php" class="nav-button next">
+                <a href="redeem-license-key.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Dashboard &rarr;</span>
+                    <span class="nav-title">Redeem a License Key &rarr;</span>
                 </a>
             </div>
         </div>

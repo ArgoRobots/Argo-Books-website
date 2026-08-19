@@ -13,7 +13,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Adding a Supplier</h2>
             <ol class="steps-list">
-                <li>Go to "Suppliers" in the navigation menu (under Management)</li>
+                <li>Go to "Suppliers" in the navigation menu, under Expenses</li>
                 <li>Click "Add Supplier"</li>
                 <li>Enter the supplier's name and contact information</li>
                 <li>Add address details if applicable</li>
@@ -24,9 +24,12 @@ include __DIR__ . '/../../docs-header.php';
             <p>Each supplier profile can include:</p>
             <ul>
                 <li><strong>Name:</strong> The business or vendor name</li>
+                <li><strong>Contact Person:</strong> Who you deal with at that business</li>
                 <li><strong>Contact Information:</strong> Phone number, email address</li>
                 <li><strong>Website:</strong> The supplier's website URL</li>
-                <li><strong>Address:</strong> Street address, city, state/province, ZIP code, country</li>
+                <li><strong>Address:</strong> Street address, city, state or province, postal code, country</li>
+                <li><strong>Payment Terms:</strong> The terms you have agreed with them, for reference</li>
+                <li><strong>Photo:</strong> An optional logo or photo shown in supplier lists</li>
                 <li><strong>Notes:</strong> Any additional information about the supplier</li>
             </ul>
 

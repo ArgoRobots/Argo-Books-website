@@ -19,7 +19,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>How Bank Matching Works</h2>
             <ol class="steps-list">
-                <li>Open <strong>Bank Matching</strong> from the sidebar, under Transactions</li>
+                <li>Open <strong>Bank Matching</strong> from the sidebar, under Import</li>
                 <li>Click <strong>Import statement</strong> and choose a CSV or Excel file from your bank</li>
                 <li>Argo Books reads the columns and automatically matches each line against your books</li>
                 <li>Review the results: confident matches are confirmed for you, likely matches are suggested for you to accept, and anything left over is flagged as unmatched</li>

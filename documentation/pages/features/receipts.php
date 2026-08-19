@@ -9,7 +9,7 @@ include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Keep your records organized by attaching and managing digital receipts for all transactions.</p>
+            <p>Keep your records organized by attaching and managing digital receipts for all transactions. The Receipts page lives under <strong>Import</strong> in the sidebar, and shows your total receipts, expense receipts, revenue receipts, and how many were scanned with AI.</p>
             <p>For faster entry, Argo Books can read details straight off a receipt photo and create the transaction for you. See <a class="link" href="receipt-scanning.php">AI Receipt Scanning</a> for how to use it.</p>
 
             <h2>Adding Receipts</h2>
@@ -29,7 +29,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Exporting Receipts from the Receipts page</h2>
             <ol class="steps-list">
-                <li>Go to "Receipts" in the navigation menu (under Tracking)</li>
+                <li>Go to "Receipts" in the navigation menu, under Import</li>
                 <li>Filter the receipts you want to export (optional)</li>
                 <li>Select the receipts you want to export</li>
                 <li>Click the "Export Selected" button and choose the location that you want to save the files</li>

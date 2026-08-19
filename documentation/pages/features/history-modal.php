@@ -12,7 +12,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>The Version History modal gives you a complete timeline of every change made to your company data. It is a read-only record: you can review and search everything that has happened, but changes are made and reversed elsewhere in Argo Books, not from this modal.</p>
 
             <h2>Opening Version History</h2>
-            <p>Click the clock icon in the header bar to open the Version History modal.</p>
+            <p>Click the clock icon in the header bar, labelled <strong>Version History</strong>, to open the modal.</p>
 
             <h2>Event Timeline</h2>
             <p>The modal displays a chronological list of all changes. Each event shows:</p>
@@ -27,7 +27,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>Undo and redo are done with the undo and redo buttons in Argo Books, not from this modal. When you use them, the reversal is recorded here as its own entry in the timeline, listed newest first alongside everything else. So a change and its later reversal both appear, each with its own timestamp.</p>
 
             <h2>Searching and Filtering History</h2>
-            <p>Use the search bar to find events by name or description. You can also narrow the list by the type of item that changed, such as customers or products, or by the kind of action, such as Added or Deleted. A clear button resets the search and both filters at once.</p>
+            <p>Use the search bar to find events by name or description. You can also narrow the list by the type of item that changed, such as customers or products, or by the kind of action: Added, Modified, or Deleted. A clear button resets the search and both filters at once.</p>
 
             <div class="info-box">
                 <strong>Tip:</strong> Version History is a permanent record rather than a control panel. Nothing you do in this modal changes your data, so you can search and filter freely without any risk of altering your books.
@@ -38,9 +38,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Spreadsheet Export</span>
                 </a>
-                <a href="../reference/how-numbers-are-calculated.php" class="nav-button next">
+                <a href="../integrations/stripe-integration.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">How Numbers Are Calculated &rarr;</span>
+                    <span class="nav-title">Stripe Integration &rarr;</span>
                 </a>
             </div>
         </div>

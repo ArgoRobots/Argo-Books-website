@@ -13,7 +13,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Creating a Purchase Order</h2>
             <ol class="steps-list">
-                <li>Go to "Purchase Orders" in the navigation menu (under Inventory)</li>
+                <li>Go to "Purchase Orders" in the navigation menu, under Inventory</li>
                 <li>Click "Add Purchase Order"</li>
                 <li>Select a supplier</li>
                 <li>Add line items by selecting products and entering quantities and unit costs</li>
@@ -39,7 +39,9 @@ include __DIR__ . '/../../docs-header.php';
             <ul>
                 <li><strong>Draft:</strong> Order created but not yet finalized</li>
                 <li><strong>Pending:</strong> Awaiting approval</li>
+                <li><strong>Approved:</strong> Approved but not yet sent to the supplier</li>
                 <li><strong>Sent:</strong> Order sent to the supplier</li>
+                <li><strong>On Order:</strong> Confirmed by the supplier and awaiting delivery</li>
                 <li><strong>Partially Received:</strong> Some items from the order have arrived</li>
                 <li><strong>Received:</strong> All items have been received</li>
                 <li><strong>Cancelled:</strong> Order has been cancelled</li>

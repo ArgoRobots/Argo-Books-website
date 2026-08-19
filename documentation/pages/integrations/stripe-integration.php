@@ -31,13 +31,13 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="../features/bank-matching.php" class="nav-button prev">
+                <a href="../features/history-modal.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Bank Matching</span>
+                    <span class="nav-title">&larr; Version History</span>
                 </a>
-                <a href="../features/rental.php" class="nav-button next">
+                <a href="../api/overview.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Rental Management &rarr;</span>
+                    <span class="nav-title">API Overview &rarr;</span>
                 </a>
             </div>
         </div>

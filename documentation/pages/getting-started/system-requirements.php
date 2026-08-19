@@ -14,7 +14,7 @@ function getSystemRequirements()
 $systemRequirements = getSystemRequirements();
 
 $pageTitle = 'System Requirements';
-$pageDescription = 'View the system requirements for running Argo Books on Windows, macOS, and Linux.';
+$pageDescription = 'View the system requirements for running Argo Books on Windows and Linux, plus the planned requirements for the macOS build.';
 $currentPage = 'system-requirements';
 $pageCategory = 'getting-started';
 

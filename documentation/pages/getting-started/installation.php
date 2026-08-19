@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Installation Guide';
-$pageDescription = 'Learn how to download and install Argo Books on your Windows, macOS, or Linux computer.';
+$pageDescription = 'Learn how to download and install Argo Books on Windows or Linux. The macOS build is coming soon.';
 $currentPage = 'installation';
 $pageCategory = 'getting-started';
 
@@ -24,9 +24,7 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <h2>macOS</h2>
-            <div class="info-box">
-                <strong>Coming soon.</strong> There is no macOS build of Argo Books yet, so there is nothing to install on a Mac at the moment. You can leave your email on the <a class="link" href="../../../downloads/">downloads page</a> to be notified once the Mac version ships. Installation steps will be added here at the same time.
-            </div>
+            <p><strong>Coming soon.</strong> There is no macOS build of Argo Books yet, so there is nothing to install on a Mac at the moment. You can leave your email on the <a class="link" href="../../../downloads/">downloads page</a> to be notified once the Mac version ships. Installation steps will be added here at the same time.</p>
 
             <h2>Linux</h2>
             <ol class="steps-list">

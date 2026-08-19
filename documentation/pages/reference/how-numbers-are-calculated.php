@@ -229,28 +229,28 @@ include __DIR__ . '/../../docs-header.php';
                 <li>Tax Collected: <strong>$10</strong>.</li>
             </ul>
 
-            <p>When you open the refund modal, you choose exactly what to refund; you don't have to give the whole invoice back. Each line item on the invoice is a separate checkbox. Tax, fees, and security deposits each get their own row too.</p>
+            <p>Refunds are issued from the <strong>Refund</strong> action on the invoice row. In the refund modal you choose exactly what to refund; you don't have to give the whole invoice back. Each line item on the invoice is a separate checkbox. Tax, fees, and security deposits each get their own row too.</p>
 
             <p>What you see depends on how much you refunded:</p>
 
             <p><strong>Full refund ($110)</strong>, where you ticked everything:</p>
             <ul>
                 <li>Revenue page: the sale's <strong>Total</strong> column shows <strong>$0</strong>; status badge becomes <strong>Refunded</strong>.</li>
-                <li>Payments page: the original $110 payment plus a separate &minus;$110 refund row.</li>
+                <li>Invoice history (the "View History" action on the invoice row): the original $110 payment plus a separate &minus;$110 refund entry.</li>
                 <li>Dashboard: Total Revenue <strong>$0</strong>, Net Profit <strong>$0</strong>.</li>
             </ul>
 
             <p><strong>Partial refund ($40)</strong>, where you only refunded one item:</p>
             <ul>
                 <li>Revenue page: the sale's <strong>Total</strong> column shows <strong>$70</strong> ($110 minus $40); status badge becomes <strong>Partially Refunded</strong>.</li>
-                <li>Payments page: the original $110 payment plus a &minus;$40 refund row.</li>
+                <li>Invoice history: the original $110 payment plus a &minus;$40 refund entry.</li>
                 <li>Dashboard: Total Revenue <strong>$70</strong>. Net Profit drops by the pre-tax portion of the refund (the tax portion was never profit on the way in, so it doesn't reduce profit on the way out either).</li>
             </ul>
 
             <div class="page-navigation">
-                <a href="../features/history-modal.php" class="nav-button prev">
+                <a href="../api/errors.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Version History</span>
+                    <span class="nav-title">&larr; API Errors</span>
                 </a>
                 <a href="supported-currencies.php" class="nav-button next">
                     <span class="nav-label">Next</span>

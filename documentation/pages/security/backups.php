@@ -48,10 +48,6 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Password Protection</span>
                 </a>
-                <a href="anonymous-data.php" class="nav-button next">
-                    <span class="nav-label">Next</span>
-                    <span class="nav-title">Anonymous Usage Data &rarr;</span>
-                </a>
             </div>
         </div>
 

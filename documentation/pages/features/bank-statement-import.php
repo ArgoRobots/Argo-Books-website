@@ -36,7 +36,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>If a line references a category, supplier, or customer that does not exist yet, Argo Books creates it for you, so you never have to stop and set things up first.</p>
 
             <h2>Category Rules</h2>
-            <p>Rules are how you teach Argo Books to categorize the merchants you see often. A rule matches part of a statement description (the merchant name) and assigns a category. You can manage your rules under <strong>Settings</strong>, where you can add, edit, or remove them. Rules created automatically as you correct categories during an import appear here too.</p>
+            <p>Rules are how you teach Argo Books to categorize the merchants you see often. A rule matches part of a statement description (the merchant name) and assigns a category. You can manage your rules under <strong>Settings &gt; Bank import rules</strong>, where you can add, edit, or remove them. Rules created automatically as you correct categories during an import appear here too.</p>
 
             <h2>Reviewing and Editing Rows</h2>
             <p>Before anything is imported, you get a row for each statement line so you stay in control:</p>

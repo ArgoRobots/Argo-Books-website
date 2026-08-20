@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const exportData = rawData.dataPoints.Export || [];
   const geminiData = rawData.dataPoints.Gemini || [];
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
-  const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
@@ -48,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -56,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -76,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -86,7 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   );
@@ -94,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   );
@@ -149,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -157,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -226,7 +218,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -234,7 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -544,7 +534,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -552,7 +541,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -620,7 +608,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -628,7 +615,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -708,7 +694,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -716,7 +701,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -1400,7 +1384,7 @@ document.addEventListener("DOMContentLoaded", function () {
       new Chart(cwCanvas, {
         type: "bar",
         data: {
-          labels: ["Blank screen", "Time to ready"],
+          labels: ["To loading screen", "To ready"],
           datasets: [
             {
               label: "Cold (" + cold.length + ")",

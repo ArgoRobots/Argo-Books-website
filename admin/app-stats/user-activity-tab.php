@@ -418,9 +418,9 @@ if (!function_exists('ua_kv')) {
                 <span><b>Warnings:</b> <span class="ua-warn"><?= $u['warnings'] ?></span></span>
             <?php endif; ?>
             <?php if ($u['startup'] !== null): ?>
-                <?php // Blank screen on a cold launch: the window a user spends deciding
-                      // whether to click the shortcut again. ?>
-                <span><b>Slowest launch:</b> <?= number_format($u['startup']) ?> ms blank</span>
+                <?php // Time before the loading screen appears on a cold launch: the window
+                      // a user spends deciding whether to click the shortcut again. ?>
+                <span><b>Slowest launch:</b> <?= number_format($u['startup']) ?> ms to loading screen</span>
             <?php endif; ?>
         </div>
         <?php if ($u['company'] !== null): ?>

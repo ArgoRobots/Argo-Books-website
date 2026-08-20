@@ -15,7 +15,7 @@ const TELEMETRY_SESSION_ACTIONS = ['SessionStart', 'SessionEnd'];
 
 const TELEMETRY_EXPORT_TYPES = ['Excel', 'GoogleSheets', 'Pdf', 'Csv', 'Backup'];
 
-const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'GoogleSheets', 'ReceiptScanProxy'];
+const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'ReceiptScanProxy'];
 
 const TELEMETRY_ERROR_CATEGORIES = [
     'Unknown', 'Network', 'FileSystem', 'Parsing', 'Validation', 'UI', 'Api',
@@ -36,6 +36,7 @@ const TELEMETRY_FEATURE_NAMES = [
     'PurchaseOrderCreated', 'ReturnRecorded', 'LostDamagedRecorded',
     'CustomerCreated', 'SupplierCreated',
     'RentalItemCreated', 'RentalRecordCreated',
+    'ChartExportedToGoogleSheets', 'ChartExportedToExcel',
     'ThemeChanged', 'LanguageChanged',
     'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped',
     'SampleCompanyOpened'

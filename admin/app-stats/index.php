@@ -54,7 +54,6 @@ $aggregatedData = [
         'Export' => [],
         'Gemini' => [],
         'OpenExchangeRates' => [],
-        'GoogleSheets' => [],
         'ReceiptScanning' => [],
         'Session' => [],
         'Error' => [],
@@ -148,9 +147,6 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
 
                 case 'OpenExchangeRates':
                     return ['category' => 'OpenExchangeRates', 'data' => $normalized];
-
-                case 'GoogleSheets':
-                    return ['category' => 'GoogleSheets', 'data' => $normalized];
 
                 case 'ReceiptScanProxy':
                     return ['category' => 'ReceiptScanning', 'data' => $normalized];
@@ -580,7 +576,6 @@ include __DIR__ . '/../admin_header.php';
         count($aggregatedData['dataPoints']['Export']) > 0 ||
         count($aggregatedData['dataPoints']['Gemini']) > 0 ||
         count($aggregatedData['dataPoints']['OpenExchangeRates']) > 0 ||
-        count($aggregatedData['dataPoints']['GoogleSheets']) > 0 ||
         count($aggregatedData['dataPoints']['ReceiptScanning']) > 0 ||
         count($aggregatedData['dataPoints']['Session']) > 0 ||
         count($aggregatedData['dataPoints']['Error']) > 0 ||
@@ -917,12 +912,12 @@ include __DIR__ . '/../admin_header.php';
                 <h3 class="section-subtitle">Startup Performance</h3>
                 <div class="stats-grid" id="startupKpiGrid">
                     <div class="stat-card">
-                        <h3>Blank Screen (median)</h3>
+                        <h3>Time to Loading Screen (median)</h3>
                         <div class="value" id="kpiFirstPaintP50">—</div>
-                        <p class="subtext">Cold launches, to first pixel</p>
+                        <p class="subtext">Cold launches, nothing on screen yet</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Blank Screen (90th pct)</h3>
+                        <h3>Time to Loading Screen (90th pct)</h3>
                         <div class="value" id="kpiFirstPaintP90">—</div>
                         <p class="subtext">1 in 10 waits at least this long</p>
                     </div>

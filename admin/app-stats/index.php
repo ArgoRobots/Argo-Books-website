@@ -177,6 +177,17 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
                 : 'Error';
             return ['category' => $severity, 'data' => $normalized];
 
+        case 'Startup':
+            // ToReadyMs already contains ToFirstPaintMs rather than continuing from
+            // it, so the two are nested, not additive. Null on either means the app
+            // never reached that milestone (or predates the field), and null is kept
+            // rather than coerced to 0 so a missing measurement cannot pull an
+            // average down as though the launch were instant.
+            $normalized['ToFirstPaintMs'] = isset($event['toFirstPaintMs']) ? (int)$event['toFirstPaintMs'] : null;
+            $normalized['ToReadyMs']      = isset($event['toReadyMs']) ? (int)$event['toReadyMs'] : null;
+            $normalized['ColdStart']      = !empty($event['coldStart']);
+            return ['category' => 'Startup', 'data' => $normalized];
+
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
             $normalized['Context'] = $event['context'] ?? '';
@@ -476,6 +487,19 @@ include __DIR__ . '/../admin_header.php';
     color: var(--black);
     font-size: 1.5rem;
     font-weight: 600;
+}
+
+/* Groups a set of stat cards under a named heading inside a tab that already
+   has a .section-title, so Usage can hold more than one topic. */
+.section-subtitle {
+    margin: 0.5rem 0 1rem;
+    color: var(--gray-700);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .section-subtitle {
+    color: var(--gray-300);
 }
 
 @media (max-width: 768px) {
@@ -889,6 +913,41 @@ include __DIR__ . '/../admin_header.php';
             <!-- Usage Tab -->
             <div id="usage" class="tab-content">
                 <h2 class="section-title">Usage Analytics</h2>
+
+                <h3 class="section-subtitle">Startup Performance</h3>
+                <div class="stats-grid" id="startupKpiGrid">
+                    <div class="stat-card">
+                        <h3>Blank Screen (median)</h3>
+                        <div class="value" id="kpiFirstPaintP50">—</div>
+                        <p class="subtext">Cold launches, to first pixel</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Blank Screen (90th pct)</h3>
+                        <div class="value" id="kpiFirstPaintP90">—</div>
+                        <p class="subtext">1 in 10 waits at least this long</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time to Ready (median)</h3>
+                        <div class="value" id="kpiReadyP50">—</div>
+                        <p class="subtext">Cold launches, to usable window</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time to Ready (90th pct)</h3>
+                        <div class="value" id="kpiReadyP90">—</div>
+                        <p class="subtext" id="kpiStartupSample">—</p>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Cold Launch Time to Ready</h2>
+                        <canvas id="startupDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Startup: Cold vs Warm (median)</h2>
+                        <canvas id="startupColdWarmChart"></canvas>
+                    </div>
+                </div>
 
                 <div class="chart-row">
                     <div class="chart-container">

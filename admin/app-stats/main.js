@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
   const featureUsageData = rawData.dataPoints.FeatureUsage || [];
+  const startupData = rawData.dataPoints.Startup || [];
 
   // Initialize all charts
   if (isGeoEnabled) {
@@ -131,6 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
   generateAIImportDurationChart(featureUsageData);
   generateAIImportDurationByTypeChart(featureUsageData);
 
+  generateStartupCharts(startupData);
   generateSessionDurationChart(sessionData);
   generateExportTypesBreakdown(exportData);
   generateExportDurationByTypeChart(exportData);
@@ -1269,6 +1271,172 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Usage Charts
+  /**
+   * Startup timings. ToReadyMs contains ToFirstPaintMs rather than continuing
+   * from it, so the two are nested and must never be summed.
+   *
+   * Cold and warm are reported separately on purpose. A warm launch reads its
+   * files from the OS cache, so blending them pulls the average down exactly
+   * when a slow first launch is what we are trying to see.
+   */
+  function generateStartupCharts(startupData) {
+    const setText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+
+    // Percentile by nearest-rank on a sorted copy. Small samples are the norm
+    // here, so an interpolating percentile would invent precision we lack.
+    const percentile = (sorted, p) => {
+      if (sorted.length === 0) return null;
+      const rank = Math.ceil((p / 100) * sorted.length);
+      return sorted[Math.min(sorted.length - 1, Math.max(0, rank - 1))];
+    };
+
+    const fmtMs = (ms) =>
+      ms === null ? "—" : ms < 1000 ? ms + " ms" : (ms / 1000).toFixed(1) + " s";
+
+    const nums = (rows, key) =>
+      rows
+        .map((r) => r[key])
+        .filter((v) => typeof v === "number" && isFinite(v) && v >= 0)
+        .sort((a, b) => a - b);
+
+    const cold = startupData.filter((r) => r.ColdStart);
+    const warm = startupData.filter((r) => !r.ColdStart);
+
+    const coldPaint = nums(cold, "ToFirstPaintMs");
+    const coldReady = nums(cold, "ToReadyMs");
+
+    setText("kpiFirstPaintP50", fmtMs(percentile(coldPaint, 50)));
+    setText("kpiFirstPaintP90", fmtMs(percentile(coldPaint, 90)));
+    setText("kpiReadyP50", fmtMs(percentile(coldReady, 50)));
+    setText("kpiReadyP90", fmtMs(percentile(coldReady, 90)));
+    setText(
+      "kpiStartupSample",
+      coldReady.length === 0
+        ? "No cold launches recorded"
+        : "From " + coldReady.length + " cold launch" + (coldReady.length === 1 ? "" : "es")
+    );
+
+    if (startupData.length === 0) {
+      const dist = document.getElementById("startupDistributionChart");
+      const cw = document.getElementById("startupColdWarmChart");
+      if (dist)
+        dist.parentElement.innerHTML =
+          '<div class="chart-no-data">No startup data available</div>';
+      if (cw)
+        cw.parentElement.innerHTML =
+          '<div class="chart-no-data">No startup data available</div>';
+      return;
+    }
+
+    // Distribution, not a time series: the question this answers is "is nine
+    // seconds normal or an outlier", which an average over time cannot show.
+    const buckets = [
+      { label: "< 2s", min: 0, max: 2000 },
+      { label: "2-4s", min: 2000, max: 4000 },
+      { label: "4-6s", min: 4000, max: 6000 },
+      { label: "6-8s", min: 6000, max: 8000 },
+      { label: "8-10s", min: 8000, max: 10000 },
+      { label: "10-15s", min: 10000, max: 15000 },
+      { label: "15s+", min: 15000, max: Infinity },
+    ];
+    const bucketCounts = buckets.map(
+      (b) => coldReady.filter((v) => v >= b.min && v < b.max).length
+    );
+
+    const distCanvas = document.getElementById("startupDistributionChart");
+    if (distCanvas) {
+      if (coldReady.length === 0) {
+        distCanvas.parentElement.innerHTML =
+          '<div class="chart-no-data">No cold launches recorded</div>';
+      } else {
+        new Chart(distCanvas, {
+          type: "bar",
+          data: {
+            labels: buckets.map((b) => b.label),
+            datasets: [
+              {
+                label: "Cold launches",
+                data: bucketCounts,
+                backgroundColor: "#8b5cf6",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) =>
+                    ctx.parsed.y +
+                    " of " +
+                    coldReady.length +
+                    " launches (" +
+                    Math.round((ctx.parsed.y / coldReady.length) * 100) +
+                    "%)",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                title: { display: true, text: "Launches" },
+              },
+              x: { title: { display: true, text: "Time to ready" } },
+            },
+          },
+        });
+      }
+    }
+
+    const cwCanvas = document.getElementById("startupColdWarmChart");
+    if (cwCanvas) {
+      const toSec = (ms) => (ms === null ? 0 : Math.round((ms / 1000) * 10) / 10);
+      new Chart(cwCanvas, {
+        type: "bar",
+        data: {
+          labels: ["Blank screen", "Time to ready"],
+          datasets: [
+            {
+              label: "Cold (" + cold.length + ")",
+              data: [
+                toSec(percentile(coldPaint, 50)),
+                toSec(percentile(coldReady, 50)),
+              ],
+              backgroundColor: "#6366f1",
+            },
+            {
+              label: "Warm (" + warm.length + ")",
+              data: [
+                toSec(percentile(nums(warm, "ToFirstPaintMs"), 50)),
+                toSec(percentile(nums(warm, "ToReadyMs"), 50)),
+              ],
+              backgroundColor: "#a5b4fc",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ": " + ctx.parsed.y + " s" } },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Median seconds" },
+            },
+          },
+        },
+      });
+    }
+  }
+
   function generateSessionDurationChart(sessionData) {
     const sessionEndData = sessionData.filter(
       (s) => s.action === "SessionEnd" && s.duration > 0
@@ -2009,7 +2177,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Avg Session Duration bar chart (last 30 days) ---
     const sessionDurations = {};
     const sessionEvents = (rawData.dataPoints.Session || []).filter(
-      (e) => e.hashedIP && e.action === "SessionStart" && e.duration > 0
+      // Duration only exists on the end event: processEvent() sets it from
+      // durationSeconds, which is null on SessionStart, so filtering on starts
+      // matched nothing and left every bar at zero.
+      (e) => e.hashedIP && e.action === "SessionEnd" && e.duration > 0
     );
     sessionEvents.forEach((e) => {
       const d = toDateStr(e.timestamp);

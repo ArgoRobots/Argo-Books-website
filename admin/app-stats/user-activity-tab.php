@@ -219,6 +219,48 @@ foreach ($ua_files as $name => $path) {
 // user" removes every file they uploaded, not just the ones in range.
 $ua_users = array_filter($ua_users, function ($u) { return $u['events'] > 0; });
 
+// Which premium installs are running on a redeemed key rather than a paid
+// subscription. api/data/upload.php stamps a premium authId as
+// 'subscription:<subscription_id>', and redeem_premium_key() records the
+// subscription with payment_method = 'free_key'. That column is what separates a
+// promo or reseller key from someone who actually paid: both end up with a row in
+// premium_subscription_keys, because paid checkout auto-creates one too, so the
+// key table alone cannot tell them apart.
+$ua_keySubs = [];
+$ua_subIds  = [];
+foreach ($ua_users as $ua_authId => $_ua_ignored) {
+    if (strncmp($ua_authId, 'subscription:', 13) === 0) {
+        $ua_subIds[] = substr($ua_authId, 13);
+    }
+}
+if ($ua_subIds && isset($pdo)) {
+    try {
+        $ua_ph = implode(',', array_fill(0, count($ua_subIds), '?'));
+        $ua_stmt = $pdo->prepare("
+            SELECT s.subscription_id, k.batch_label
+            FROM premium_subscriptions s
+            LEFT JOIN premium_subscription_keys k ON k.subscription_id = s.subscription_id
+            WHERE s.subscription_id IN ($ua_ph)
+              AND s.payment_method = 'free_key'
+              AND s.environment = ?
+        ");
+        $ua_stmt->execute(array_merge($ua_subIds, [current_environment()]));
+        foreach ($ua_stmt->fetchAll(PDO::FETCH_ASSOC) as $ua_row) {
+            $ua_keySubs[$ua_row['subscription_id']] = $ua_row['batch_label'] ?? null;
+        }
+    } catch (PDOException $e) {
+        // A badge is not worth failing the page over. Without it these users simply
+        // render as ordinary premium, which is what happened before this existed.
+        error_log('user-activity free-key badge lookup failed: ' . $e->getMessage());
+    }
+}
+foreach ($ua_users as $ua_authId => &$ua_u) {
+    $ua_sid = strncmp($ua_authId, 'subscription:', 13) === 0 ? substr($ua_authId, 13) : null;
+    $ua_u['isKeyUser']  = $ua_sid !== null && array_key_exists($ua_sid, $ua_keySubs);
+    $ua_u['keyBatch']   = $ua_u['isKeyUser'] ? $ua_keySubs[$ua_sid] : null;
+}
+unset($ua_u);
+
 // Sort users: free first (what you care about), then most-recent activity.
 uasort($ua_users, function ($a, $b) {
     if ($a['tier'] !== $b['tier']) return $a['tier'] === 'free' ? -1 : 1;
@@ -259,6 +301,10 @@ if (!function_exists('ua_kv')) {
 .ua-badge { display:inline-block; font-size:.7rem; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:999px; margin-left:.5rem; vertical-align:middle; }
 .ua-badge.free { background:#dbeafe; color:#1e40af; }
 .ua-badge.premium { background:#fef3c7; color:#92400e; }
+/* Premium via a redeemed key rather than a payment. Distinct from the premium
+   badge because these users pay nothing recurring and are worth reading
+   separately when judging what Premium usage actually costs. */
+.ua-badge.keyuser { background:#dcfce7; color:#166534; }
 /* The founder's own install. Deliberately loud so it can never be mistaken for a
    real user while reading the list. */
 .ua-badge.founder { background:#7c3aed; color:#fff; }
@@ -369,6 +415,7 @@ if (!function_exists('ua_kv')) {
     <?php foreach ($ua_users as $u):
         // Newest-first timeline for display.
         $timeline = $u['timeline'];
+        $timeline = ua_merge_timeline($timeline);
         usort($timeline, fn($a, $b) => $b['ts'] <=> $a['ts']);
         // Searchable haystack + filter keys for the client-side filters.
         $ua_haystack = strtolower(trim(
@@ -376,7 +423,9 @@ if (!function_exists('ua_kv')) {
             implode(' ', array_keys($u['versions'])) . ' ' .
             implode(' ', array_keys($u['platforms'])) .
             // So "me" / "you" / "founder" all find your own card.
-            ($u['isFounder'] ? ' founder you me' : '')
+            ($u['isFounder'] ? ' founder you me' : '') .
+            // And so a promo cohort can be pulled up by name, e.g. "stacksocial".
+            (!empty($u['isKeyUser']) ? ' freekey free key promo redeemed ' . ($u['keyBatch'] ?? '') : '')
         ));
     ?>
     <tr class="ua-user"<?= $u['isFounder'] ? ' data-founder="1"' : '' ?> data-search="<?= htmlspecialchars($ua_haystack) ?>">
@@ -397,7 +446,7 @@ if (!function_exists('ua_kv')) {
                 <button type="submit">Delete this user</button>
             </form>
         </div>
-        <h3><?= htmlspecialchars($u['authId']) ?><span class="ua-badge <?= $u['tier'] ?>"><?= htmlspecialchars($u['tier']) ?></span><?php if ($u['isFounder']): ?><span class="ua-badge founder" title="Your own install. Counted nowhere else on the site.">You</span><?php endif; ?></h3>
+        <h3><?= htmlspecialchars($u['authId']) ?><span class="ua-badge <?= $u['tier'] ?>"><?= htmlspecialchars($u['tier']) ?></span><?php if (!empty($u['isKeyUser'])): ?><span class="ua-badge keyuser" title="Premium from a redeemed key, not a paid subscription<?= $u['keyBatch'] ? ' — batch: ' . htmlspecialchars($u['keyBatch']) : '' ?>."><?= $u['keyBatch'] ? htmlspecialchars($u['keyBatch']) : 'Free key' ?></span><?php endif; ?><?php if ($u['isFounder']): ?><span class="ua-badge founder" title="Your own install. Counted nowhere else on the site.">You</span><?php endif; ?></h3>
         <div class="ua-meta">
             <span><b>Platform:</b> <?= htmlspecialchars(implode(', ', array_keys($u['platforms'])) ?: '—') ?></span>
             <span><b>Country:</b> <?= htmlspecialchars($u['country'] ?: '—') ?></span>

@@ -132,3 +132,72 @@ if (!function_exists('ua_describe_event')) {
         }
     }
 }
+
+if (!function_exists('ua_merge_timeline')) {
+    /**
+     * Folds the "action" event and the "state" event the app sends for the same
+     * moment into one line.
+     *
+     * Opening the sample company emits FeatureUsage/SampleCompanyOpened and a
+     * CompanyProfile within the same second, and creating one emits
+     * FeatureUsage/CompanyCreated followed by a CompanyProfile a few seconds later
+     * once the details are filled in. The profile line already carries everything
+     * the feature line said plus the industry, country and currency, so the feature
+     * line is dropped and its verb folded into the profile line's wording.
+     *
+     * Deliberately NOT applied to download-user.php. The wording of any single event
+     * still comes from ua_describe_event(), which both share, so the two cannot drift
+     * about what an event means. This is a presentation pass on top of that: the CSV
+     * keeps one row per event because it is the raw record, and collapsing rows there
+     * would blank the feature_name column on the row that survived.
+     *
+     * @param array $timeline Rows of ['ts' => int, 'type' => string, 'text' => string]
+     * @return array The same rows, merged, original order preserved.
+     */
+    function ua_merge_timeline(array $timeline): array
+    {
+        $verbs = [
+            'SampleCompanyOpened' => 'Opened sample company: ',
+            'CompanyCreated'      => 'Created company: ',
+        ];
+        // Wide enough for the gap between creating a company and finishing its
+        // details, tight enough that a later profile edit in the same session is
+        // not mistaken for the creation itself.
+        $window = 60;
+
+        $companyIdx = [];
+        foreach ($timeline as $i => $row) {
+            if (($row['type'] ?? '') === 'company') $companyIdx[$i] = true;
+        }
+        if (!$companyIdx) return $timeline;
+
+        $drop   = [];
+        $claimed = [];
+        foreach ($timeline as $i => $row) {
+            if (($row['type'] ?? '') !== 'feature') continue;
+            $verb = $verbs[$row['text'] ?? ''] ?? null;
+            if ($verb === null) continue;
+
+            $bestJ = null;
+            $bestD = null;
+            foreach (array_keys($companyIdx) as $j) {
+                if (isset($claimed[$j])) continue;
+                $d = abs((int)($timeline[$j]['ts'] ?? 0) - (int)($row['ts'] ?? 0));
+                if ($d <= $window && ($bestD === null || $d < $bestD)) {
+                    $bestD = $d;
+                    $bestJ = $j;
+                }
+            }
+            if ($bestJ === null) continue;
+
+            $text = (string)($timeline[$bestJ]['text'] ?? '');
+            $text = preg_replace('/^(Sample company|Company):\s*/', '', $text);
+            $timeline[$bestJ]['text'] = $verb . $text;
+            $claimed[$bestJ] = true;
+            $drop[$i] = true;
+        }
+
+        if (!$drop) return $timeline;
+        return array_values(array_diff_key($timeline, $drop));
+    }
+}

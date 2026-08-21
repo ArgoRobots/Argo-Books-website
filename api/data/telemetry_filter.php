@@ -208,7 +208,6 @@ function filter_telemetry_event(array $event): ?array
                 // question as country: an English app in a non-English country is what
                 // tells us which translations are actually used rather than just shipped.
                 'language' => telemetry_clean_string($event['language'] ?? null, 64),
-                'isSample' => isset($event['isSample']) ? (bool)$event['isSample'] : null,
             ];
 
         case 'Startup':

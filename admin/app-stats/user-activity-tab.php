@@ -115,12 +115,9 @@ foreach ($ua_files as $name => $path) {
             'unclean'   => 0,     // sessions that ended without a clean shutdown
             'events'    => 0,
             'features'  => [],   // featureName => count
-            'exports'   => [],   // exportType  => count
-            'apis'      => [],   // apiName     => count
             'errors'    => 0,
             'warnings'  => 0,    // severity=Warning events, counted apart from errors
             'company'   => null, // most recent non-sample CompanyProfile, shown on the card
-            'startup'   => null, // slowest cold launch seen, in ms to first paint
             'timeline'  => [],   // every event: ['ts','type','text']
             'files'     => [],
         ];
@@ -173,14 +170,6 @@ foreach ($ua_files as $name => $path) {
                 $f = $ev['featureName'] ?? 'Unknown';
                 $u['features'][$f] = ($u['features'][$f] ?? 0) + 1;
                 break;
-            case 'Export':
-                $e = $ev['exportType'] ?? 'Unknown';
-                $u['exports'][$e] = ($u['exports'][$e] ?? 0) + 1;
-                break;
-            case 'ApiUsage':
-                $a = $ev['apiName'] ?? 'Unknown';
-                $u['apis'][$a] = ($u['apis'][$a] ?? 0) + 1;
-                break;
             case 'Error':
                 if (ua_is_warning($ev)) {
                     $u['warnings']++;
@@ -189,22 +178,7 @@ foreach ($ua_files as $name => $path) {
                 }
                 break;
             case 'CompanyProfile':
-                // Their own business, not the demo one: the sample's details are ours and
-                // would otherwise overwrite the real company on anyone who tried both.
-                if (empty($ev['isSample'])) {
-                    $u['company'] = $ev;
-                }
-                break;
-            case 'Startup':
-                // The worst cold launch, because that is the one that makes someone click
-                // the shortcut a second time. Warm relaunches read from cache and would
-                // drag any average down to a number nobody actually experiences.
-                if (!empty($ev['coldStart']) && isset($ev['toFirstPaintMs'])) {
-                    $blank = (int)$ev['toFirstPaintMs'];
-                    if ($u['startup'] === null || $blank > $u['startup']) {
-                        $u['startup'] = $blank;
-                    }
-                }
+                $u['company'] = $ev;
                 break;
         }
 
@@ -219,14 +193,14 @@ foreach ($ua_files as $name => $path) {
 // user" removes every file they uploaded, not just the ones in range.
 $ua_users = array_filter($ua_users, function ($u) { return $u['events'] > 0; });
 
-// Which premium installs are running on a redeemed key rather than a paid
-// subscription. api/data/upload.php stamps a premium authId as
-// 'subscription:<subscription_id>', and redeem_premium_key() records the
+// What a premium install is running on: the subscription key behind it, and whether
+// that key was redeemed rather than paid for. api/data/upload.php stamps a premium
+// authId as 'subscription:<subscription_id>', and redeem_premium_key() records the
 // subscription with payment_method = 'free_key'. That column is what separates a
 // promo or reseller key from someone who actually paid: both end up with a row in
-// premium_subscription_keys, because paid checkout auto-creates one too, so the
-// key table alone cannot tell them apart.
-$ua_keySubs = [];
+// premium_subscription_keys, because paid checkout auto-creates one too, so the key
+// table alone cannot tell them apart.
+$ua_subInfo = [];   // subscription_id => ['key' =>, 'batch' =>, 'isFreeKey' =>]
 $ua_subIds  = [];
 foreach ($ua_users as $ua_authId => $_ua_ignored) {
     if (strncmp($ua_authId, 'subscription:', 13) === 0) {
@@ -236,28 +210,37 @@ foreach ($ua_users as $ua_authId => $_ua_ignored) {
 if ($ua_subIds && isset($pdo)) {
     try {
         $ua_ph = implode(',', array_fill(0, count($ua_subIds), '?'));
+        // Ordered by key id so that if a subscription ever carries more than one key
+        // row, the newest is the one left on the card: that is the key the install is
+        // actually running on.
         $ua_stmt = $pdo->prepare("
-            SELECT s.subscription_id, k.batch_label
+            SELECT s.subscription_id, s.payment_method, k.subscription_key, k.batch_label
             FROM premium_subscriptions s
             LEFT JOIN premium_subscription_keys k ON k.subscription_id = s.subscription_id
             WHERE s.subscription_id IN ($ua_ph)
-              AND s.payment_method = 'free_key'
               AND s.environment = ?
+            ORDER BY k.id ASC
         ");
         $ua_stmt->execute(array_merge($ua_subIds, [current_environment()]));
         foreach ($ua_stmt->fetchAll(PDO::FETCH_ASSOC) as $ua_row) {
-            $ua_keySubs[$ua_row['subscription_id']] = $ua_row['batch_label'] ?? null;
+            $ua_subInfo[$ua_row['subscription_id']] = [
+                'key'       => $ua_row['subscription_key'] ?? null,
+                'batch'     => $ua_row['batch_label'] ?? null,
+                'isFreeKey' => ($ua_row['payment_method'] ?? '') === 'free_key',
+            ];
         }
     } catch (PDOException $e) {
-        // A badge is not worth failing the page over. Without it these users simply
-        // render as ordinary premium, which is what happened before this existed.
-        error_log('user-activity free-key badge lookup failed: ' . $e->getMessage());
+        // Neither the key nor the badge is worth failing the page over. Without them
+        // these users render as plain premium, which is what happened before this existed.
+        error_log('user-activity subscription lookup failed: ' . $e->getMessage());
     }
 }
 foreach ($ua_users as $ua_authId => &$ua_u) {
-    $ua_sid = strncmp($ua_authId, 'subscription:', 13) === 0 ? substr($ua_authId, 13) : null;
-    $ua_u['isKeyUser']  = $ua_sid !== null && array_key_exists($ua_sid, $ua_keySubs);
-    $ua_u['keyBatch']   = $ua_u['isKeyUser'] ? $ua_keySubs[$ua_sid] : null;
+    $ua_sid  = strncmp($ua_authId, 'subscription:', 13) === 0 ? substr($ua_authId, 13) : null;
+    $ua_info = $ua_sid !== null ? ($ua_subInfo[$ua_sid] ?? null) : null;
+    $ua_u['isKeyUser']  = $ua_info !== null && $ua_info['isFreeKey'];
+    $ua_u['keyBatch']   = $ua_u['isKeyUser'] ? $ua_info['batch'] : null;
+    $ua_u['licenseKey'] = $ua_info !== null ? $ua_info['key'] : null;
 }
 unset($ua_u);
 
@@ -312,7 +295,7 @@ if (!function_exists('ua_kv')) {
 .ua-meta span { display:inline-block; margin-right:1.25rem; }
 .ua-row { font-size:.85rem; margin:.25rem 0; }
 .ua-row b { color:var(--black); }
-.ua-files { font-family:monospace; font-size:.7rem; color:var(--black); margin-top:.5rem; word-break:break-all; }
+.ua-key { font-family:monospace; font-size:.8rem; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:5px; padding:1px 6px; user-select:all; }
 /* Download sits left of Delete. Flex rather than the old bare float, because the
    delete form is block-level and would otherwise push the link onto its own line. */
 .ua-del { float:right; display:flex; gap:8px; align-items:center; }
@@ -348,7 +331,7 @@ if (!function_exists('ua_kv')) {
 .ua-evt.startup .ua-evt-text { color:#6b7280; font-family:monospace; }
 .ua-business { color:#6d28d9; font-weight:700; }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
-[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
+[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
 [data-theme="dark"] .ua-evt { border-bottom-color:var(--gray-700); }
 [data-theme="dark"] .ua-evt-ts { color:var(--gray-400); }
@@ -363,6 +346,7 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-dl:hover { background:var(--gray-600); color:var(--white); }
 [data-theme="dark"] .ua-evt.company .ua-evt-text { color:#c4b5fd; }
 [data-theme="dark"] .ua-evt.startup .ua-evt-text { color:#9ca3af; }
+[data-theme="dark"] .ua-key { background:var(--gray-700); border-color:var(--gray-600); color:var(--white); }
 [data-theme="dark"] .ua-evt.company .ua-evt-text, [data-theme="dark"] .ua-business { color:#c4b5fd; }
 
 /* Filter controls. Pagination itself is the shared admin TablePaginator. */
@@ -425,7 +409,9 @@ if (!function_exists('ua_kv')) {
             // So "me" / "you" / "founder" all find your own card.
             ($u['isFounder'] ? ' founder you me' : '') .
             // And so a promo cohort can be pulled up by name, e.g. "stacksocial".
-            (!empty($u['isKeyUser']) ? ' freekey free key promo redeemed ' . ($u['keyBatch'] ?? '') : '')
+            (!empty($u['isKeyUser']) ? ' freekey free key promo redeemed ' . ($u['keyBatch'] ?? '') : '') .
+            // Pasting a key from a support email should land on the install using it.
+            ' ' . ($u['licenseKey'] ?? '')
         ));
     ?>
     <tr class="ua-user"<?= $u['isFounder'] ? ' data-founder="1"' : '' ?> data-search="<?= htmlspecialchars($ua_haystack) ?>">
@@ -466,12 +452,12 @@ if (!function_exists('ua_kv')) {
             <?php if ($u['warnings'] > 0): ?>
                 <span><b>Warnings:</b> <span class="ua-warn"><?= $u['warnings'] ?></span></span>
             <?php endif; ?>
-            <?php if ($u['startup'] !== null): ?>
-                <?php // Time before the loading screen appears on a cold launch: the window
-                      // a user spends deciding whether to click the shortcut again. ?>
-                <span><b>Slowest launch:</b> <?= number_format($u['startup']) ?> ms to loading screen</span>
-            <?php endif; ?>
         </div>
+        <?php if (!empty($u['licenseKey'])): ?>
+            <?php // The key this install's premium is running on. Support material, so it
+                  // renders whole rather than masked: the page is already behind admin 2FA. ?>
+            <div class="ua-row"><b>License key:</b> <span class="ua-key"><?= htmlspecialchars($u['licenseKey']) ?></span></div>
+        <?php endif; ?>
         <?php if ($u['company'] !== null): ?>
             <?php
             $c = $u['company'];
@@ -494,8 +480,6 @@ if (!function_exists('ua_kv')) {
             </div>
         <?php endif; ?>
         <div class="ua-row"><b>Features used:</b> <?= ua_kv($u['features']) ?></div>
-        <div class="ua-row"><b>Exports:</b> <?= ua_kv($u['exports']) ?></div>
-        <div class="ua-row"><b>API calls:</b> <?= ua_kv($u['apis']) ?></div>
 
         <?php if ($timeline): ?>
         <details class="ua-events">
@@ -510,8 +494,6 @@ if (!function_exists('ua_kv')) {
             </div>
         </details>
         <?php endif; ?>
-
-        <div class="ua-files"><?= count($u['files']) ?> file(s): <?= htmlspecialchars(implode(', ', $u['files'])) ?></div>
         </div>
       </td>
     </tr>

@@ -66,6 +66,9 @@ if (!function_exists('ua_describe_event')) {
 
             case 'FeatureUsage':
                 $name = $ev['featureName'] ?? 'Unknown';
+                // The app sends the enum name. This one lands among real user actions in the
+                // timeline, where "SampleCompanyOpened" reads as a leaked identifier.
+                if ($name === 'SampleCompanyOpened') $name = 'Opened sample company';
                 $extra = !empty($ev['durationMs']) ? ' (' . (int)$ev['durationMs'] . ' ms)' : '';
                 return ['feature', $name . $extra];
 
@@ -95,10 +98,9 @@ if (!function_exists('ua_describe_event')) {
                     $ev['currency'] ?? null,
                 ]);
                 $suffix = $bits ? ' — ' . implode(', ', $bits) : '';
-                // The demo company's details are ours, not theirs, so label them rather than
-                // letting "Argo Robots Inc." read as a real user's business.
-                $prefix = !empty($ev['isSample']) ? 'Sample company' : 'Company';
-                return ['company', "{$prefix}: {$name}{$suffix}"];
+                // The sample company is never reported: the app stopped sending its profile
+                // because the details are the demo file's and identical on every install.
+                return ['company', "Company: {$name}{$suffix}"];
 
             case 'Startup':
                 $bits = [];
@@ -135,15 +137,23 @@ if (!function_exists('ua_describe_event')) {
 
 if (!function_exists('ua_merge_timeline')) {
     /**
-     * Folds the "action" event and the "state" event the app sends for the same
-     * moment into one line.
+     * Turns the raw event stream into the lines the timeline shows: folds the
+     * "action" event and the "state" event the app sends for the same moment into
+     * one row, and says what actually happened to the company on each remaining
+     * profile row.
      *
-     * Opening the sample company emits FeatureUsage/SampleCompanyOpened and a
-     * CompanyProfile within the same second, and creating one emits
-     * FeatureUsage/CompanyCreated followed by a CompanyProfile a few seconds later
-     * once the details are filled in. The profile line already carries everything
-     * the feature line said plus the industry, country and currency, so the feature
-     * line is dropped and its verb folded into the profile line's wording.
+     * Creating a company emits FeatureUsage/CompanyCreated followed by a
+     * CompanyProfile a few seconds later, once the details are filled in. The
+     * profile line already carries everything the feature line said plus the
+     * industry, country and currency, so the feature line is dropped and its verb
+     * folded into the profile line's wording.
+     *
+     * A CompanyProfile with no feature event beside it is the app re-reporting the
+     * profile on the company-open path. The app records one profile per company per
+     * session and re-records it when the name, country, currency or language change,
+     * so a repeat with different details is an edit and a first sighting is an open.
+     * Saying which is the whole point: a bare "Company: aslevo" row reads as nothing
+     * having happened.
      *
      * Deliberately NOT applied to download-user.php. The wording of any single event
      * still comes from ua_describe_event(), which both share, so the two cannot drift
@@ -156,10 +166,6 @@ if (!function_exists('ua_merge_timeline')) {
      */
     function ua_merge_timeline(array $timeline): array
     {
-        $verbs = [
-            'SampleCompanyOpened' => 'Opened sample company: ',
-            'CompanyCreated'      => 'Created company: ',
-        ];
         // Wide enough for the gap between creating a company and finishing its
         // details, tight enough that a later profile edit in the same session is
         // not mistaken for the creation itself.
@@ -169,14 +175,12 @@ if (!function_exists('ua_merge_timeline')) {
         foreach ($timeline as $i => $row) {
             if (($row['type'] ?? '') === 'company') $companyIdx[$i] = true;
         }
-        if (!$companyIdx) return $timeline;
 
-        $drop   = [];
-        $claimed = [];
+        $drop    = [];
+        $claimed = [];   // company row index => true once a CompanyCreated has taken it
         foreach ($timeline as $i => $row) {
             if (($row['type'] ?? '') !== 'feature') continue;
-            $verb = $verbs[$row['text'] ?? ''] ?? null;
-            if ($verb === null) continue;
+            if (($row['text'] ?? '') !== 'CompanyCreated') continue;
 
             $bestJ = null;
             $bestD = null;
@@ -188,13 +192,42 @@ if (!function_exists('ua_merge_timeline')) {
                     $bestJ = $j;
                 }
             }
-            if ($bestJ === null) continue;
-
-            $text = (string)($timeline[$bestJ]['text'] ?? '');
-            $text = preg_replace('/^(Sample company|Company):\s*/', '', $text);
-            $timeline[$bestJ]['text'] = $verb . $text;
+            // No profile row to fold into: the feature name is a raw enum, so it is
+            // rewritten in place rather than left on screen as "CompanyCreated".
+            if ($bestJ === null) {
+                $timeline[$i]['text'] = 'Created company';
+                continue;
+            }
             $claimed[$bestJ] = true;
             $drop[$i] = true;
+        }
+
+        // Oldest first, so "first sighting of this company" means what it says. The
+        // rows arrive grouped by upload file, which is not chronological once a user
+        // has more than one.
+        $order = array_keys($companyIdx);
+        usort($order, function ($a, $b) use ($timeline) {
+            return ((int)($timeline[$a]['ts'] ?? 0) <=> (int)($timeline[$b]['ts'] ?? 0)) ?: ($a <=> $b);
+        });
+
+        $lastDetails = [];   // company name => the detail string last seen for it
+        foreach ($order as $j) {
+            $rest    = preg_replace('/^Company:\s*/', '', (string)($timeline[$j]['text'] ?? ''));
+            $parts   = explode(' — ', $rest, 2);
+            $name    = $parts[0];
+            $details = $parts[1] ?? '';
+
+            if (isset($claimed[$j])) {
+                $timeline[$j]['text'] = 'Created company: ' . $rest;
+            } elseif (array_key_exists($name, $lastDetails) && $lastDetails[$name] !== $details) {
+                $timeline[$j]['text'] = 'Updated company details: ' . $rest;
+            } else {
+                // Also covers a language-only change, which re-fires the profile without
+                // altering anything shown here. Rare, and reading it as another open is
+                // the harmless way to be wrong.
+                $timeline[$j]['text'] = 'Opened company: ' . $rest;
+            }
+            $lastDetails[$name] = $details;
         }
 
         if (!$drop) return $timeline;

@@ -57,6 +57,7 @@ function sitemap_build_urls(): array
         ['/features/',       'features/index.php',       '0.9', 'monthly'],
         ['/pricing/',        'pricing/index.php',        '0.9', 'monthly'],
         ['/documentation/',  'documentation/index.php',  '0.9', 'weekly'],
+        ['/integrations/',   'integrations/index.php',   '0.9', 'monthly'],
         ['/about-us/',       'about-us/index.php',       '0.9', 'monthly'],
         ['/who-its-for/',    'who-its-for/index.php',    '0.8', 'monthly'],
         ['/contact-us/',     'contact-us/index.php',     '0.8', 'monthly'],
@@ -75,6 +76,7 @@ function sitemap_build_urls(): array
     $clusters = [
         ['glob' => 'features/*/index.php', 'prefix' => '/features/',  'priority' => '0.8'],
         ['glob' => 'compare/*/index.php',  'prefix' => '/compare/',   'priority' => '0.8'],
+        ['glob' => 'integrations/*/index.php', 'prefix' => '/integrations/', 'priority' => '0.8'],
     ];
     foreach ($clusters as $cluster) {
         foreach (glob($root . '/' . $cluster['glob']) as $file) {

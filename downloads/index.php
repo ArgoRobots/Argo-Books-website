@@ -248,6 +248,23 @@ $systemRequirements = getSystemRequirements();
              numbered list. Revealed after a Windows download click. -->
         <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
 
+        <!-- What you get after installing. Sits between the download buttons and the
+             requirements because this is where the "should I run an unknown installer"
+             hesitation lands, and the page had nothing but text to answer it. -->
+        <div class="preview-section">
+            <img class="preview-image"
+                 src="../resources/images/laptop-coffee-800.webp"
+                 srcset="../resources/images/laptop-coffee-800.webp 800w, ../resources/images/laptop-coffee-1200.webp 1200w, ../resources/images/laptop-coffee-1600.webp 1600w"
+                 sizes="(max-width: 900px) 100vw, 560px"
+                 width="1200" height="900"
+                 alt="Argo Books running on a laptop, showing the dashboard with total revenue, expenses, outstanding invoices and recent transactions"
+                 loading="lazy" decoding="async">
+            <div class="preview-copy">
+                <h2>What you get</h2>
+                <p>Argo Books opens straight onto your dashboard: revenue, expenses, profit and everything still outstanding, in one place. There is no account to create and no trial clock. Install it, open it, and your books stay on your computer.</p>
+            </div>
+        </div>
+
         <!-- System Requirements -->
         <div class="requirements-section">
             <h2>System Requirements</h2>

@@ -88,7 +88,7 @@ if ($smartScreenGuide) {
 } else {
     // Browser without a keep-guide: still show the Windows launch step alone.
     $guideHeading = 'Opening Argo Books on Windows';
-    $guideIntro   = 'Windows may warn you because Argo Books is a newer app, not because it is unsafe. After the download finishes, here is the last step to open it:';
+    $guideIntro   = 'Windows may warn you because Argo Books is a newer app. After the download finishes, here is the last step to open it:';
     $guideSteps   = [];
 }
 // Append the Windows launch step as the final numbered step.

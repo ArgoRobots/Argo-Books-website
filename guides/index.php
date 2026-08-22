@@ -262,6 +262,13 @@ ob_start();
   </script>
 
   <aside class="guides-hub-banner" role="complementary">
+    <img class="guides-hub-banner-image"
+         src="../resources/images/desk-workspace-800.webp"
+         srcset="../resources/images/desk-workspace-800.webp 800w, ../resources/images/desk-workspace-1200.webp 1200w"
+         sizes="(max-width: 900px) 100vw, 320px"
+         width="1200" height="800"
+         alt="Argo Books open on a laptop on a desk, showing the dashboard with revenue, expenses and recent transactions"
+         loading="lazy" decoding="async">
     <div class="guides-hub-banner-copy">
       <p class="guides-hub-banner-eyebrow">From the guides into your books</p>
       <p class="guides-hub-banner-text">If you want to handle payments, refunds, and track everything, Argo Books is the accounting app these guides are based on.</p>

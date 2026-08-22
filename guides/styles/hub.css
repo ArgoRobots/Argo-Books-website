@@ -307,11 +307,22 @@ body:has(.guides-hub) {
   background: var(--hub-surface);
   border: 1px solid var(--hub-rule);
   display: grid;
-  grid-template-columns: 1fr auto;
+  /* Photo, copy, link. The photo is a fixed track so the copy keeps the
+     full remaining width rather than being squeezed by a flexible image. */
+  grid-template-columns: 320px 1fr auto;
   gap: 40px;
   align-items: center;
   position: relative;
   overflow: hidden;
+}
+
+.guides-hub-banner-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border: 1px solid var(--hub-rule);
 }
 
 .guides-hub-banner::before {
@@ -416,6 +427,11 @@ body:has(.guides-hub) {
     gap: 18px;
     padding: 28px;
     margin-top: 64px;
+  }
+  /* On a narrow screen the photo would push the actual pitch below the fold,
+     so it drops out rather than stacking above it. */
+  .guides-hub-banner-image {
+    display: none;
   }
   .guides-hub-banner-text {
     font-size: 17px;

@@ -170,46 +170,15 @@ function record_failed_lookup(string $ip): void
 
 /**
  * Check and enforce rate limiting for payment endpoints.
- * Atomically checks the limit and records the attempt under a single file lock
- * to prevent concurrent requests from bypassing the limit.
+ * Atomically checks the limit and records the attempt in one statement so
+ * concurrent requests can't bypass the limit.
  * Allows 20 payment attempts per IP per 15 minutes.
  * Sends a 429 response and exits if rate limited.
  */
 function enforce_payment_rate_limit(): void
 {
-    $ip = get_client_ip();
-    $maxAttempts = 20;
-    $windowSeconds = 900;
-    $prefix = 'payment';
-
-    // Atomic check + increment under a single lock
-    $result = read_rate_limits_locked($windowSeconds);
-    $rateLimits = $result['rateLimits'];
-    $handle = $result['handle'];
-
-    $key = $prefix . '_' . hash('sha256', $ip);
-    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
-
-    if ($isLimited) {
-        if ($handle) {
-            write_rate_limits_unlock($handle, $rateLimits);
-        }
+    if (check_and_record_rate_limit(get_client_ip(), 20, 900, 'payment')) {
         send_error_response(429, 'Too many payment attempts. Please try again later.', 'RATE_LIMITED');
-    }
-
-    // Record this attempt while still holding the lock
-    $now = time();
-    if (!isset($rateLimits[$key])) {
-        $rateLimits[$key] = [
-            'count' => 1,
-            'first_attempt' => $now
-        ];
-    } else {
-        $rateLimits[$key]['count']++;
-    }
-
-    if ($handle) {
-        write_rate_limits_unlock($handle, $rateLimits);
     }
 }
 

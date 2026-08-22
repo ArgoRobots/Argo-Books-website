@@ -1723,6 +1723,39 @@ CREATE TABLE IF NOT EXISTS api_rate_limits (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- Site-wide rate limit counters (rate_limit_helper.php)
+--
+-- Backs every anonymous, IP-keyed limit on the site: admin and community
+-- login, portal token lookups, license validate/redeem, the paid AI and OCR
+-- endpoints, outbound email, sync pairing. Replaced a flat JSON file, which
+-- forced every rate-limited request across the whole site to queue behind one
+-- exclusive file lock. One row per bucket means requests only contend when
+-- they are the same bucket.
+--
+-- Distinct from the two other counter tables, which key off a real record:
+-- `rate_limits` is per community user, `api_rate_limits` is per API key. This
+-- one keys off whatever the caller has, usually an IP with no account behind
+-- it, so there is no foreign key to hang it on.
+--
+-- bucket_key is '<environment>:<prefix>_<sha256(identifier)>'. The identifier
+-- is normally an IP but can be any opaque string (a license key, a browser
+-- fingerprint, the literal 'GLOBAL' for a site-wide cap). ascii_bin because
+-- the value is hex plus an ASCII prefix, which keeps the primary key narrow
+-- and the comparison exact.
+--
+-- Windows are anchored at first_attempt_at rather than clock-aligned, so a
+-- bucket stays tripped until its own window elapses. Rows are deleted
+-- opportunistically once they are over a day old; stale rows are harmless
+-- before then because reads filter on the window.
+CREATE TABLE IF NOT EXISTS rate_limit_counters (
+    bucket_key VARCHAR(120) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    attempt_count INT UNSIGNED NOT NULL DEFAULT 0,
+    first_attempt_at DATETIME NOT NULL COMMENT 'UTC. Start of the current window for this bucket',
+    PRIMARY KEY (bucket_key),
+    INDEX idx_rlc_first_attempt (first_attempt_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- Argo Books public API: webhooks
 --
 -- Events describe what the MERCHANT did, not what the developer did. A

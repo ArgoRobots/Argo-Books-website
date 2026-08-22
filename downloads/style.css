@@ -422,6 +422,52 @@ body {
    (shared with the paid landing pages). */
 
 /* Requirements Section */
+/* Product shot beside a short reassurance, shown between the download buttons
+   and the requirements. Colours come from the same tokens the rest of this page
+   uses, so it follows the theme rather than pinning its own values. */
+.preview-section {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 1px solid var(--gray-border);
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+}
+
+.preview-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--gray-border);
+}
+
+.preview-copy h2 {
+    margin: 0 0 14px 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.preview-copy p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--gray-600);
+}
+
+@media (max-width: 900px) {
+    .preview-section {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 24px;
+    }
+}
+
 .requirements-section {
     background: var(--white);
     border-radius: 20px;

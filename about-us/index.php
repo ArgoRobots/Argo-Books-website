@@ -152,34 +152,34 @@
                     and grow their business.</p>
             </div>
             <div class="features-grid">
-                <div class="feature-item animate-on-scroll">
+                <a class="feature-item animate-on-scroll" href="../features/receipt-scanning/">
                     <div class="feature-icon">
                         <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
                     <h3>Receipt Scanning</h3>
                     <p>Snap a photo and let Argo Books extract all the details automatically</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
+                </a>
+                <a class="feature-item animate-on-scroll" href="../features/invoicing/">
                     <div class="feature-icon green">
                         <?= svg_icon('document', null, '', 1.5) ?>
                     </div>
-                    <h3>Invoicing & Payments</h3>
+                    <h3>Invoicing &amp; Payments</h3>
                     <p>Create professional invoices and get paid faster</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
+                </a>
+                <a class="feature-item animate-on-scroll" href="../features/predictive-analytics/">
                     <div class="feature-icon purple">
                         <?= svg_icon('analytics', null, '', 1.5) ?>
                     </div>
                     <h3>Predictive Analytics</h3>
                     <p>Forecast sales trends and make data-driven decisions</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
+                </a>
+                <a class="feature-item animate-on-scroll" href="../features/expense-revenue-tracking/">
                     <div class="feature-icon amber">
                         <?= svg_icon('dollar', null, '', 1.5) ?>
                     </div>
                     <h3>Expense &amp; Revenue</h3>
                     <p>See exactly where your money comes in and goes out, all in one place</p>
-                </div>
+                </a>
             </div>
             <div class="features-cta animate-on-scroll">
                 <a href="../features/" class="features-cta-link">

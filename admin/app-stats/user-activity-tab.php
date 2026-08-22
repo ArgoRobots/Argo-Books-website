@@ -82,6 +82,9 @@ $ua_duplicatesCollapsed = 0;
 // Installs whose premium came from another environment's subscription, counted so
 // the page can say they were left out rather than silently dropping them.
 $ua_otherEnvUsers = [];
+// Name the environment rather than saying "another" one: on the live site what gets
+// hidden is sandbox, and on dev it is production.
+$ua_otherEnvLabel = current_environment() === 'production' ? 'sandbox' : 'production';
 
 foreach ($ua_files as $name => $path) {
     $raw = file_get_contents($path);
@@ -398,7 +401,7 @@ if (!function_exists('ua_kv')) {
     <?php if ($ua_otherEnvUsers): ?>
         <?php // Otherwise an empty page looks like nothing was uploaded, when in fact
               // every install that did upload belongs to another environment. ?>
-        <p><?= count($ua_otherEnvUsers) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> hidden: their premium subscription is not in this environment.</p>
+        <p><?= count($ua_otherEnvUsers) ?> <?= htmlspecialchars($ua_otherEnvLabel) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> hidden: no subscription for them in this environment.</p>
     <?php endif; ?>
 <?php else: ?>
     <!-- Search only. Tier and date range are set once in the page's control bar. -->
@@ -407,7 +410,7 @@ if (!function_exists('ua_kv')) {
         <span class="ua-count" id="ua-count"></span>
         <?php if ($ua_otherEnvUsers): ?>
             <span class="ua-dupes" title="Premium installs whose subscription is not in this environment: a sandbox test redemption, or a subscription since deleted. Hidden here and everywhere else on this page.">
-                <?= count($ua_otherEnvUsers) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> from another environment hidden
+                <?= count($ua_otherEnvUsers) ?> <?= htmlspecialchars($ua_otherEnvLabel) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> hidden
             </span>
         <?php endif; ?>
         <?php if ($ua_duplicatesCollapsed > 0): ?>

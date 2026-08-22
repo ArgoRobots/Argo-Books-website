@@ -18,7 +18,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit('Forbidden');
 }
 
-require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 // ua_describe_event() / ua_is_warning() / ua_unwrap_event(). Shared with
 // download-user.php so the CSV export says the same thing this timeline does.
 require_once __DIR__ . '/user-activity-events.php';
@@ -78,6 +79,10 @@ $ua_seenEventIds = [];
 // doesn't, devices are still losing their "uploaded" flags somewhere.
 $ua_duplicatesCollapsed = 0;
 
+// Installs whose premium came from another environment's subscription, counted so
+// the page can say they were left out rather than silently dropping them.
+$ua_otherEnvUsers = [];
+
 foreach ($ua_files as $name => $path) {
     $raw = file_get_contents($path);
     if ($raw === false || trim($raw) === '') continue;
@@ -93,6 +98,15 @@ foreach ($ua_files as $name => $path) {
     // they never reach a real-user number. Here they render badged and are left out of
     // the header tally instead.
     $isFounder = is_founder_auth_id($authId);
+
+    // Sandbox is the one thing it does not show. The upload endpoint authenticates a
+    // license without checking which environment its subscription belongs to, so a test
+    // redemption lands here looking like a customer. An id with no subscription in this
+    // environment at all is the same story: either sandbox, or an account since deleted.
+    if (is_other_environment_auth_id($authId)) {
+        $ua_otherEnvUsers[$authId] = true;
+        continue;
+    }
 
     // Page-level tier filter.
     if ($ua_tierFilter !== 'all' && $tier !== $ua_tierFilter) {
@@ -381,11 +395,21 @@ if (!function_exists('ua_kv')) {
     <?php else: ?>
         <p>No telemetry files found.</p>
     <?php endif; ?>
+    <?php if ($ua_otherEnvUsers): ?>
+        <?php // Otherwise an empty page looks like nothing was uploaded, when in fact
+              // every install that did upload belongs to another environment. ?>
+        <p><?= count($ua_otherEnvUsers) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> hidden: their premium subscription is not in this environment.</p>
+    <?php endif; ?>
 <?php else: ?>
     <!-- Search only. Tier and date range are set once in the page's control bar. -->
     <div class="ua-controls" id="ua-controls">
         <input type="text" id="ua-search" class="ua-input" placeholder="Search id, country, region, version&hellip;">
         <span class="ua-count" id="ua-count"></span>
+        <?php if ($ua_otherEnvUsers): ?>
+            <span class="ua-dupes" title="Premium installs whose subscription is not in this environment: a sandbox test redemption, or a subscription since deleted. Hidden here and everywhere else on this page.">
+                <?= count($ua_otherEnvUsers) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> from another environment hidden
+            </span>
+        <?php endif; ?>
         <?php if ($ua_duplicatesCollapsed > 0): ?>
             <span class="ua-dupes" title="The same event uploaded more than once and collapsed by dataId. Should trend to zero as the client-side locking fix rolls out.">
                 <?= number_format($ua_duplicatesCollapsed) ?> duplicate event<?= $ua_duplicatesCollapsed === 1 ? '' : 's' ?> collapsed

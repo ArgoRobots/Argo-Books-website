@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
-require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 require_once __DIR__ . '/../date-range.php';
 require_once __DIR__ . '/telemetry-dedupe.php'; // telemetry_is_duplicate_event()
 
@@ -275,6 +276,14 @@ if (empty($dataDirs)) {
                 // geo, versions, features, usage, API and errors in a single place. The
                 // User Activity tab reads the same files separately and does show them.
                 if (is_founder_auth_id($fileAuthId)) {
+                    continue;
+                }
+
+                // Nor an install whose premium came from another environment. The upload
+                // endpoint authenticates a license without checking which environment its
+                // subscription belongs to, so a sandbox test redemption would otherwise sit
+                // in production's charts as a real premium user.
+                if (is_other_environment_auth_id($fileAuthId)) {
                     continue;
                 }
 

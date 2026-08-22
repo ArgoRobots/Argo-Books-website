@@ -14,7 +14,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit('Forbidden');
 }
 
-require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 
 // Date-range bounds come from the host page. Defaulted here so this partial
 // still renders if it's ever included somewhere that doesn't set them.
@@ -42,6 +43,12 @@ foreach ($crashFiles as $crashFile) {
     // Hide the founder's own installs (single source of truth: FOUNDER_AUTH_IDS).
     // Their crash reports are still stored; only User Activity surfaces them.
     if (is_founder_auth_id($data['authId'] ?? null)) {
+        continue;
+    }
+
+    // Same for a crash from an install whose premium subscription belongs to another
+    // environment: a sandbox test crash is not a production crash.
+    if (is_other_environment_auth_id($data['authId'] ?? null)) {
         continue;
     }
 

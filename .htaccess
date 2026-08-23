@@ -294,6 +294,7 @@ php_value upload_max_filesize 10M
     # keys here, authenticated by its licence identity rather than by a key.
     RewriteRule ^api/developer/account/?$ api/developer/account.php [L,QSA]
     RewriteRule ^api/developer/keys/revoke/?$ api/developer/revoke-key.php [L,QSA]
+    RewriteRule ^api/developer/keys/rename/?$ api/developer/rename-key.php [L,QSA]
     RewriteRule ^api/developer/keys/?$ api/developer/keys.php [L,QSA]
 
     # --- Customer Payment Portal routes ---

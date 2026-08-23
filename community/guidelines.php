@@ -67,10 +67,6 @@
         <!-- Prohibited Content -->
         <div class="guidelines-section">
             <h3>Prohibited Content</h3>
-            <div class="important-note">
-                <strong>The following types of content are not permitted and will result in immediate removal and
-                    potential account suspension:</strong>
-            </div>
             <ul class="guidelines-list">
                 <li>Sexual, explicit, or inappropriate content of any kind.</li>
                 <li>Hate speech, harassment, threats, or discriminatory content.</li>
@@ -133,12 +129,6 @@
                 <li>Don't publicly call out violations - use the proper reporting channels.</li>
                 <li>False or malicious reports may result in penalties for the reporter.</li>
             </ul>
-        </div>
-
-        <div class="important-note">
-            <strong>Remember:</strong> These guidelines help maintain a productive environment for all Argo Books
-            users. When in doubt, ask yourself: "Does this contribute positively to helping others use the
-            software effectively?" Thank you for being part of our community!
         </div>
     </div>
 

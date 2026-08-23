@@ -25,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
 // Accept either license_key (premium) or device_id (free)
@@ -222,7 +221,6 @@ try {
             : $config['ai_import_monthly_limit'];
     }
 
-    // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $import_count = $usage['scan_count'];
 

@@ -1,0 +1,468 @@
+/* shared/styles/calculator.css
+   The calculator component shared by the tool pages: input form, money fields,
+   results breakdown, and the article layer beneath. The craft pricing and Etsy
+   fee calculators had 17 byte-identical rules between them before this existed.
+
+   Loads after invoice-generator/styles/tool.css (shared chrome, .faq-* accordion)
+   and before the per-tool stylesheet, which keeps only what is genuinely its own.
+   Colours are variables from custom-colors.css, so dark mode is inherited.
+
+   See read-me/Tool page standards.md. */
+
+.calc-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+
+  /* The muted token is #9ca3af, roughly 2.6:1 on white, which fails contrast
+     for body text. On a calculator every hint, label, and cost line is real
+     content that people need to read, so muted resolves to the main text
+     colour here. Hierarchy comes from size and weight instead. Overriding the
+     token rather than the ~22 call sites keeps dark mode working, and covers
+     the per-tool stylesheets too, since they inherit from this scope. */
+  --tool-muted: var(--tool-text);
+  --invoice-muted: var(--tool-text);
+}
+
+/* Fields and rows below use display:flex, which would otherwise beat the user
+   agent's [hidden] rule and leave hidden elements on screen. */
+.calc-app [hidden] {
+  display: none !important;
+}
+
+/* ---------- Layout ---------- */
+.calc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.calc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 20px var(--shadow-sm);
+}
+
+/* ---------- Inputs ---------- */
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tool-text);
+}
+
+.calc-field input[type="number"],
+.calc-field input[type="text"],
+.calc-field select {
+  width: 100%;
+  font: inherit;
+  color: var(--tool-text);
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+
+.calc-field input:focus,
+.calc-field select:focus {
+  outline: none;
+  border-color: var(--tool-primary);
+  box-shadow: 0 0 0 3px var(--blue-100);
+}
+
+.calc-money {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Starting padding for the currency symbol. shared/scripts/currency-format.js
+   overrides it per currency once the affix renders, because symbols run from
+   one glyph ($) to three (CHF, NT$). */
+.calc-money input {
+  padding-left: 26px;
+}
+
+.calc-money-affix {
+  position: absolute;
+  left: 12px;
+  color: var(--tool-muted);
+  pointer-events: none;
+  font-weight: 600;
+}
+
+.calc-money-affix-right {
+  left: auto;
+  right: 12px;
+}
+
+.calc-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--tool-muted);
+}
+
+/* ---------- Results ---------- */
+.calc-results {
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 4px 20px var(--shadow-sm);
+  /* Long forms scroll the answer off screen otherwise, which defeats the point
+     of a live calculator. Unpinned again in the single-column breakpoint. */
+  position: sticky;
+  top: 20px;
+}
+
+.calc-headline {
+  text-align: center;
+  padding: 4px 0 20px;
+  border-bottom: 1px solid var(--tool-border);
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calc-headline-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tool-primary);
+}
+
+.calc-headline-amount {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tool-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.calc-headline-sub {
+  font-size: 13px;
+  color: var(--tool-muted);
+}
+
+.calc-breakdown {
+  margin: 0;
+}
+
+.calc-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 7px 0;
+  font-size: 15px;
+}
+
+.calc-breakdown-row dt {
+  color: var(--invoice-text);
+}
+
+.calc-breakdown-row dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--tool-text);
+  white-space: nowrap;
+}
+
+.calc-row-profit dt,
+.calc-row-profit dd {
+  color: var(--emerald-600);
+  font-weight: 700;
+}
+
+.calc-row-rate dt,
+.calc-row-rate dd {
+  color: var(--tool-muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* ---------- Article / SEO content ---------- */
+.calc-content {
+  max-width: 760px;
+  margin: 48px auto 0;
+  color: var(--tool-text);
+}
+
+.calc-content section {
+  margin-bottom: 40px;
+}
+
+.calc-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+}
+
+.calc-content h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+
+.calc-content p {
+  margin: 0 0 12px;
+  line-height: 1.65;
+}
+
+.calc-content ul,
+.calc-content ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  line-height: 1.65;
+}
+
+.calc-content li {
+  margin-bottom: 8px;
+}
+
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 12px;
+  font-size: 15px;
+}
+
+.calc-table th,
+.calc-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--tool-border);
+}
+
+.calc-table thead th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--tool-muted);
+}
+
+.calc-table-wrap {
+  overflow-x: auto;
+}
+
+.calc-example {
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.calc-link {
+  color: var(--tool-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* FAQ uses the shared accordion (.faq-grid / .faq-item) from tool.css; this
+   just sets the section width and heading to match the article. */
+.calc-faqs {
+  max-width: 820px;
+  margin: 8px auto 0;
+}
+
+.calc-faqs h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calc-results {
+    position: static;
+  }
+
+  .calc-headline-amount {
+    font-size: 36px;
+  }
+
+  .calc-content h2 {
+    font-size: 21px;
+  }
+}
+
+/* ---------- Small shared bits used by the standalone calculators ---------- */
+
+/* Suffix fields (%, miles, min) put the affix on the right. */
+.calc-money-suffix input {
+  padding-left: 12px;
+  padding-right: 56px;
+}
+
+.calc-note {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--amber-50);
+  border: 1px solid var(--amber-200);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--invoice-text);
+}
+
+.calc-note p {
+  margin: 0;
+}
+
+.calc-verified {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--tool-muted);
+}
+
+.calc-disclaimer {
+  max-width: 760px;
+  margin: 40px auto 0;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--tool-muted);
+}
+
+.calc-band-rate {
+  font-size: 12px;
+  color: var(--tool-muted);
+  margin-left: 4px;
+}
+
+.calc-callout {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+}
+
+.calc-callout .calc-headline-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.calc-callout p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--invoice-text);
+}
+
+/* ---------- Presets, groups, and article bits shared by every calculator ---------- */
+
+.calc-preset-btn {
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--tool-border);
+  background: var(--tool-surface);
+  color: var(--tool-text);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.calc-preset-btn:hover {
+  border-color: var(--tool-primary);
+}
+
+.calc-preset-btn.is-active {
+  border-color: var(--tool-primary);
+  background: var(--blue-50);
+  color: var(--blue-700);
+}
+
+.calc-preset-pct {
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.calc-row-cost dt,
+.calc-row-cost dd {
+  color: var(--tool-muted);
+  font-weight: 500;
+}
+
+.calc-row-subtotal {
+  border-top: 1px solid var(--tool-border);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.calc-row-subtotal dt,
+.calc-row-subtotal dd {
+  font-weight: 700;
+}
+
+.calc-list {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  line-height: 1.65;
+}
+
+.calc-list li {
+  margin-bottom: 12px;
+}
+
+.calc-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Group heading inside a results breakdown, e.g. "Etsy takes" or "Per sale". */
+.calc-group {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tool-muted);
+  margin-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* Cost lines read as a sub-list under the group heading, not as peers of the
+   totals below them. */
+.calc-row-cost {
+  padding-left: 12px;
+  font-size: 14px;
+}
+
+.calc-formula {
+  background: var(--tool-secondary);
+  border: 1px solid var(--tool-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  text-align: center;
+}

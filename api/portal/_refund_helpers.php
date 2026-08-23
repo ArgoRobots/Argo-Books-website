@@ -121,7 +121,7 @@ function refund_email_send_code(string $to, string $code, string $invoice_number
         <p>Your refund verification code is:</p>
         <p style="font-size:28px;font-weight:bold;letter-spacing:6px;">$code</p>
         <p>You're refunding <strong>$amount_str</strong> on invoice <strong>$invoice_safe</strong>.</p>
-        <p>The code expires in 10 minutes. If you didn't request this refund, ignore this email and the request will expire.</p>
+        <p>The code expires in 10 minutes, and the refund can't go through without it, so if you don't enter it the request expires on its own. This was started from your Argo Books account, so if it wasn't you, check who has access to your device.</p>
 HTML;
     send_styled_email($to, $subject, $body, 'blue');
 }
@@ -243,7 +243,7 @@ function refund_email_send_change_old_code(string $to, string $code, string $new
         <p>Someone (hopefully you) requested an email change on your Argo Books account from this address to <strong>$new_safe</strong>.</p>
         <p>Confirm with this code:</p>
         <p style="font-size:28px;font-weight:bold;letter-spacing:6px;">$code</p>
-        <p>If this wasn't you, ignore this email and the request will expire. The change cannot proceed without this code.</p>
+        <p>You'll need this code to complete the change, so if you don't enter it the request expires on its own. This was started from your Argo Books account, so if it wasn't you, check who has access to your device.</p>
 HTML;
     send_styled_email($to, "Confirm email change to $new_safe", $body, 'purple');
 }

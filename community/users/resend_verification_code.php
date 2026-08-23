@@ -29,7 +29,6 @@ if ($user['email_verified'] == 1) {
     exit;
 }
 
-// Generate a new verification code
 $new_verification_code = generate_verification_code();
 
 // Update the database with the new verification code
@@ -41,7 +40,6 @@ if (!$update_result) {
     exit;
 }
 
-// Send the verification email
 $email_sent = send_verification_email($user['email'], $new_verification_code, $user['username']);
 
 if ($email_sent) {

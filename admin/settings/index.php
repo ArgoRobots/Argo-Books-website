@@ -168,8 +168,21 @@ $notif_groups = [
         'notify_new_reports'  => ['Content reports', 'When a user reports content for moderation.'],
     ],
     'Sales' => [
-        'notify_new_customer'           => ['New paying customer', 'When someone subscribes to Argo Premium.'],
+        'notify_new_customer'           => ['New paying customer', 'When someone subscribes to Argo Books Premium.'],
         'notify_subscription_cancelled' => ['Subscription cancelled', 'When someone cancels their Premium subscription.'],
+    ],
+];
+
+// Alerts that are always sent. Listed so they are visible rather than hidden in a footnote,
+// but with no toggle, because turning any of them off would mean finding out about a problem
+// from a customer instead of from the system.
+$notif_always = [
+    'Safety' => [
+        ['Refund blocked', 'When the refund safety check stops a refund from going through.'],
+        ['Payment price mismatch', 'When a payment amount does not match the price it should have been.'],
+    ],
+    'Maintenance' => [
+        ['Payroll rates need updating', 'Twice a year, before CRA\'s new payroll deduction tables take effect on January 1 and July 1. Sent in mid-December and mid-June. Miss it and payroll stops: the app refuses to calculate a pay run when it has no table for that pay date, rather than guessing, so nothing wrong is produced, but nobody can run payroll until the new file ships.'],
     ],
 ];
 
@@ -209,9 +222,9 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <?php if ($is_enabled): ?>
-                <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
+                <form method="post" class="settings-center" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <button type="submit" name="disable_2fa" value="1" class="btn btn-red">Disable 2FA</button>
+                    <button type="submit" name="disable_2fa" value="1" class="settings-linkbtn">Disable 2FA</button>
                 </form>
             <?php elseif (isset($_GET['setup'])): ?>
                 <ol class="settings-steps">
@@ -250,7 +263,6 @@ include __DIR__ . '/../admin_header.php';
                         <h2>Trusted Devices</h2>
                         <p class="settings-muted">Browsers allowed to skip the 2FA code for 30 days.</p>
                     </div>
-                    <span class="settings-count"><?= (int)$trusted_count ?></span>
                 </div>
                 <p>
                     <?php if ($trusted_count === 0): ?>
@@ -259,7 +271,9 @@ include __DIR__ . '/../admin_header.php';
                         <?= (int)$trusted_count ?> device<?= $trusted_count === 1 ? '' : 's' ?> can currently skip the code.
                     <?php endif; ?>
                 </p>
-                <a href="trusted-devices.php" class="btn btn-blue">Manage trusted devices</a>
+                <div class="settings-center">
+                    <a href="trusted-devices.php" class="btn btn-secondary">Manage trusted devices</a>
+                </div>
             </div>
         <?php endif; ?>
     </div>
@@ -312,14 +326,30 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             <?php endforeach; ?>
 
-            <div class="settings-actions">
-                <button type="submit" class="btn btn-blue">Save Notifications</button>
+            <?php foreach ($notif_always as $group_label => $rows): ?>
+                <div class="settings-card">
+                    <div class="settings-card-head">
+                        <div>
+                            <h2><?= htmlspecialchars($group_label) ?></h2>
+                            <p class="settings-muted">Always sent. These cannot be turned off.</p>
+                        </div>
+                    </div>
+                    <?php foreach ($rows as [$label, $desc]): ?>
+                        <div class="notif-row">
+                            <div class="notif-text">
+                                <div class="notif-label"><?= htmlspecialchars($label) ?></div>
+                                <div class="notif-desc settings-muted"><?= htmlspecialchars($desc) ?></div>
+                            </div>
+                            <span class="notif-always-tag">Always on</span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="settings-actions settings-center">
+                <button type="submit" class="btn btn-blue">Save settings</button>
             </div>
         </form>
-
-        <p class="settings-muted settings-footnote">
-            Safety alerts (refund blocks, payment price mismatches) are always sent and can't be turned off here.
-        </p>
     </div>
 </div>
 

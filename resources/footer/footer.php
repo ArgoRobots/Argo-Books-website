@@ -16,6 +16,7 @@
       <li><a href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a></li>
       <li><a href="<?= $base ?>features/inventory-management/">Inventory Management</a></li>
       <li><a href="<?= $base ?>features/invoicing/">Invoicing</a></li>
+      <li><a href="<?= $base ?>features/payroll/">Payroll</a></li>
       <li><a href="<?= $base ?>features/">View All Features</a></li>
     </ul>
   </div>
@@ -31,12 +32,7 @@
   <div class="footer-section">
     <h3>Compare</h3>
     <ul class="footer-links">
-      <li><a href="<?= $base ?>compare/argo-books-vs-quickbooks/">Argo Books vs QuickBooks</a></li>
-      <li><a href="<?= $base ?>compare/argo-books-vs-freshbooks/">Argo Books vs FreshBooks</a></li>
-      <li><a href="<?= $base ?>compare/argo-books-vs-wave/">Argo Books vs Wave</a></li>
-      <li><a href="<?= $base ?>compare/argo-books-vs-odoo/">Argo Books vs Odoo</a></li>
-      <li><a href="<?= $base ?>compare/argo-books-vs-xero/">Argo Books vs Xero</a></li>
-      <li><a href="<?= $base ?>compare/argo-books-vs-zipbooks/">Argo Books vs ZipBooks</a></li>
+      <li><a href="<?= $base ?>compare/">Compare Argo Books</a></li>
       <li><a href="<?= $base ?>best-quickbooks-alternatives/">Best QuickBooks Alternatives</a></li>
     </ul>
   </div>
@@ -64,3 +60,9 @@
 <div class="footer-bottom">
   <p>&copy; 2026 Argo Books. All Rights Reserved.</p>
 </div>
+<?php
+// JS-confirmation beacon (bot filter for the marketing funnel); shared with
+// shared/layout.php via the single partial.
+$confirm_url_js = json_encode(($base ?? '/') . 'api/referral/confirm.php');
+include __DIR__ . '/../referral-confirm-beacon.php';
+?>

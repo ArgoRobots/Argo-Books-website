@@ -13,7 +13,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>How to Generate a Report</h2>
             <ol class="steps-list">
-                <li>Go to "Reports" in the navigation menu (under Main)</li>
+                <li>Go to "Reports" in the navigation menu, under Main</li>
                 <li>Follow the 3-step wizard to create your custom report</li>
             </ol>
 
@@ -34,10 +34,15 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>General Ledger:</strong> Detailed transaction records for all accounts</li>
                 <li><strong>Accounts Receivable Aging:</strong> Outstanding customer payments grouped by age</li>
                 <li><strong>Tax Summary:</strong> Tax-related totals for the selected period</li>
+                <li><strong>Sales by Product:</strong> Revenue and units sold, broken down per product</li>
             </ul>
 
             <div class="info-box">
                 <strong>Tip:</strong> Accounting reports are generated directly from your transaction records, with no Chart of Accounts setup required.
+            </div>
+
+            <div class="info-box">
+                <strong>Note:</strong> Reports use the accrual basis, counting all invoiced revenue whether or not it has been paid, while the Dashboard and Analytics count only money collected. That is why the two can disagree. See <a class="link" href="../reference/how-numbers-are-calculated.php#cash-vs-accrual">How Numbers Are Calculated</a>.
             </div>
 
             <h2>Step 2: Layout Designer</h2>
@@ -50,7 +55,7 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Resize:</strong> Select an element and drag the corner handles to resize</li>
                 <li><strong>Customize:</strong> Use the properties panel to adjust colors, fonts, borders, and alignment</li>
                 <li><strong>Alignment Tools:</strong> Align and distribute multiple elements using the toolbar</li>
-                <li><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y to undo or redo changes</li>
+                <li><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y to undo or redo changes. See <a class="link" href="../reference/keyboard_shortcuts.php">Keyboard Shortcuts</a> for the rest</li>
             </ul>
 
             <h3>Multi-Page Reports</h3>

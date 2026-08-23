@@ -66,7 +66,6 @@ $pdo->exec("
 ");
 
 $updated = $pdo->query("SELECT COUNT(*) FROM refund_velocity_baselines WHERE last_recomputed_at > DATE_SUB(NOW(), INTERVAL 1 MINUTE)")->fetchColumn();
-echo "Refreshed baselines for $updated companies\n";
 cron_metric_incr('baselines_recomputed', (int) $updated);
 cron_run_finish($pdo, $runId, 'ok');
 

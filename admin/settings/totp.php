@@ -24,7 +24,6 @@ class TOTP {
         // Pack time counter as binary (big endian)
         $binary = pack('N*', 0) . pack('N*', $counter); // 8 bytes (64 bits)
         
-        // Decode the secret
         $secretkey = self::base32_decode($secret);
         
         // HMAC-SHA1
@@ -71,7 +70,6 @@ class TOTP {
             return 0;
         }
 
-        // Get current time
         $currentTime = time();
 
         // Use a tight time window (±1 step = ±30 seconds) to limit brute-force surface

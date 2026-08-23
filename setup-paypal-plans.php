@@ -9,7 +9,7 @@
  *   php setup-paypal-plans.php
  *
  * This will create:
- *   1. A Product (Argo Premium Subscription)
+ *   1. A Product (Argo Books Premium Subscription)
  *   2. A Monthly Plan (configured in pricing.php)
  *   3. A Yearly Plan (configured in pricing.php)
  */
@@ -60,7 +60,6 @@ if (empty($clientId) || empty($clientSecret)) {
     die("ERROR: PayPal credentials not configured in .env file\n");
 }
 
-// Get access token
 echo "Getting access token...\n";
 $accessToken = getAccessToken($baseUrl, $clientId, $clientSecret);
 if (!$accessToken) {
@@ -139,8 +138,8 @@ function getAccessToken($baseUrl, $clientId, $clientSecret) {
 
 function createProduct($baseUrl, $accessToken) {
     $productData = [
-        'name' => 'Argo Premium Subscription',
-        'description' => 'Access to AI-powered features including receipt scanning, and predictive analytics.',
+        'name' => 'Argo Books Premium Subscription',
+        'description' => 'Higher monthly limits for receipt scanning, spreadsheet imports, and bank statement imports, plus unlimited invoicing, revenue forecasting, biometric sign-in, and priority support.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
         'home_url' => 'https://argorobots.com/pricing/premium/'
@@ -175,8 +174,8 @@ function createPlan($baseUrl, $accessToken, $productId, $interval, $price) {
 
     $planData = [
         'product_id' => $productId,
-        'name' => "Argo Premium - $planName",
-        'description' => "Argo Premium Subscription - $planName billing",
+        'name' => "Argo Books Premium - $planName",
+        'description' => "Argo Books Premium Subscription - $planName billing",
         'status' => 'ACTIVE',
         'billing_cycles' => [
             [

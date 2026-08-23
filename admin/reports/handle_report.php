@@ -159,7 +159,6 @@ try {
         $stmt->execute([$admin_user_id, $report_id, $user_id, $user_id, $user_id]);
         $affected_reports = $stmt->rowCount();
 
-        // Send ban notification email
         send_ban_notification_email($user['email'], $user['username'], $ban_reason, $ban_duration, $expires_at);
 
         $message = 'User banned successfully';

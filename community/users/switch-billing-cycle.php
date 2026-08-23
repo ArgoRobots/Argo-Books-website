@@ -109,7 +109,7 @@ $is_upgrade = ($new_cycle === 'yearly');
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,follow">
-    <meta name="description" content="Switch your Argo Premium billing cycle">
+    <meta name="description" content="Switch your Argo Books Premium billing cycle">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Switch Billing Cycle - Argo Community</title>
@@ -289,7 +289,7 @@ $is_upgrade = ($new_cycle === 'yearly');
 
                 <div class="confirm-actions">
                     <a href="../../pricing/premium/checkout/?method=paypal&billing=<?= urlencode($new_cycle) ?>&change_method=1&cycle_switch=1"
-                       class="btn btn-purple">Continue with PayPal →</a>
+                       class="btn btn-premium">Continue with PayPal →</a>
                     <a href="subscription.php" class="btn btn-outline">Cancel</a>
                 </div>
 
@@ -310,7 +310,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 <h1>Switch to <?= htmlspecialchars($new_cycle_label) ?> Billing?</h1>
 
                 <p class="confirm-description">
-                    You're about to change your Argo Premium subscription from
+                    You're about to change your Argo Books Premium subscription from
                     <strong><?= htmlspecialchars($old_cycle_label) ?></strong>
                     to <strong><?= htmlspecialchars($new_cycle_label) ?></strong>.
                 </p>
@@ -382,7 +382,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 </div>
 
                 <div class="confirm-actions">
-                    <button type="button" id="confirm-switch-btn" class="btn btn-purple">
+                    <button type="button" id="confirm-switch-btn" class="btn btn-premium">
                         <?php if ($charge_today > 0): ?>
                             Confirm Switch: Charge $<?= number_format($charge_today, 2) ?> CAD
                         <?php else: ?>
@@ -418,7 +418,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 <h2>Switch Complete!</h2>
                 <p class="modal-description" id="success-message"></p>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-purple" id="success-close-btn">Done</button>
+                    <button type="button" class="btn btn-premium" id="success-close-btn">Done</button>
                 </div>
             </div>
 

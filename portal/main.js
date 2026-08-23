@@ -207,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-        // Confirm the payment
         var result = await stripe.confirmCardPayment(intentData.client_secret, {
           payment_method: {
             card: cardElement,
@@ -712,7 +711,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (chargeRow) chargeRow.style.display = "none";
       }
 
-      // Smooth scroll to confirmation
       confirmation.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

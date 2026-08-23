@@ -53,7 +53,6 @@ if (!is_dir($logDir)) {
 function indexnow_log(string $msg): void
 {
     $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n";
-    echo $line;
     @file_put_contents(__DIR__ . '/logs/indexnow_submit_' . date('Y-m-d') . '.log', $line, FILE_APPEND);
 }
 

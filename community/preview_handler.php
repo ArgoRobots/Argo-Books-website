@@ -69,7 +69,6 @@ function formatPreviewContent($text)
     // Use the existing formatting function
     $formatted = render_formatted_text($text);
 
-    // Process mentions if function exists
     if (function_exists('process_mentions')) {
         $formatted = process_mentions($formatted);
     }

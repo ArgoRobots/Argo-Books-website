@@ -252,6 +252,22 @@
     color: var(--primary-blue);
 }
 
+.cron-summary {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .cron-summary {
+    background: var(--gray-800);
+    color: var(--gray-300);
+}
+
 .cron-error {
     margin: 10px 0 0;
     padding: 10px 12px;

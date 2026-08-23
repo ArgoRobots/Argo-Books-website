@@ -1,0 +1,76 @@
+/* shared/styles/craft-calculator.css
+   Styling specific to the batch-to-unit craft calculators (candle, soap,
+   tumbler, cake). Loads after shared/styles/calculator.css, which supplies the
+   .calc-* component; this file only adds what the craft surface needs on top.
+
+   See partials/craft-calculator.php and read-me/Tool page standards.md. */
+
+.craft-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.craft-legend {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tool-muted);
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--tool-border);
+}
+
+.craft-batch {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+}
+
+.craft-batch .calc-breakdown-row {
+  padding: 5px 0;
+}
+
+.calc-subtitle {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blue-700);
+}
+
+.craft-channel-table {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--tool-border);
+}
+
+.craft-channel-table .calc-table {
+  font-size: 14px;
+}
+
+.craft-channel-table .calc-table td,
+.craft-channel-table .calc-table th {
+  padding: 8px 10px;
+}
+
+/* The row matching the markup currently in the box, so the table reads as a
+   comparison against the seller's own choice. */
+.craft-channel-table tr.is-current {
+  background: var(--blue-50);
+}
+
+.craft-channel-table tr.is-current td {
+  font-weight: 700;
+  color: var(--blue-700);
+}
+
+@media (max-width: 860px) {
+  .craft-channel-table .calc-table {
+    font-size: 13px;
+  }
+}

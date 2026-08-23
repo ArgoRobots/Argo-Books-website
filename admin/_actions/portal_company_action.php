@@ -108,7 +108,7 @@ switch ($action) {
             . "<p>Reason: $reasonSafe</p>", 'blue');
         send_styled_email($row['new_email'], 'Email change reverted by support',
             "<p>The change to <strong>$newSafe</strong> was reverted by support.</p>"
-            . "<p>Reason: $reasonSafe</p>", 'purple');
+            . "<p>Reason: $reasonSafe</p>", 'blue');
 
         header('Location: /admin/payments/index.php?msg=email_reverted#companies');
         break;

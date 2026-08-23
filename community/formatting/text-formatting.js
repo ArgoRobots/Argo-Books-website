@@ -49,10 +49,8 @@ function initFormatting(textarea) {
   // Create the formatting toolbar
   const toolbar = createToolbar(textarea);
 
-  // Insert toolbar before the textarea
   textarea.parentNode.insertBefore(toolbar, textarea);
 
-  // Set up keyboard shortcuts
   setupKeyboardShortcuts(textarea);
 
   // Mark as initialized
@@ -218,7 +216,6 @@ function insertLink(textarea) {
   const end = textarea.selectionEnd;
   const selectedText = textarea.value.substring(start, end);
 
-  // If text is selected, use it as the link text
   const linkText = selectedText ? selectedText : prompt("Enter the link text:");
   if (!linkText) return; // User cancelled
 
@@ -247,7 +244,6 @@ function insertLink(textarea) {
   textarea.selectionStart = start + markdownLink.length;
   textarea.selectionEnd = start + markdownLink.length;
 
-  // Focus the textarea
   textarea.focus();
 
   // Trigger input event to notify any listeners (like auto-resize or preview)

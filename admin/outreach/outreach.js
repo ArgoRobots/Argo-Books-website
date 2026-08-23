@@ -11,7 +11,7 @@ function getFilterParams() {
 }
 
 function updateUrlParams() {
-    // Start from the current URL so non-filter params (tab, test_id, etc.) survive.
+    // Start from the current URL so non-filter params (tab, etc.) survive.
     const params = new URLSearchParams(window.location.search);
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
@@ -395,7 +395,11 @@ async function runBulkDrafts(opts) {
         ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
         : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
     if (progressText) progressText.textContent = doneMsg;
-    if (progressEl) setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+    // Hide the progress bar as soon as the batch finishes. The same message is
+    // shown as a toast by notify() below, so holding the bar on screen only
+    // made a fast batch (creator/editorial leads use a fixed template and no
+    // AI call, so they finish near-instantly) feel slower than it was.
+    if (progressEl) progressEl.style.display = 'none';
 
     if (draftBtn) draftBtn.disabled = false;
     notify(doneMsg, success ? 'success' : 'error');
@@ -605,7 +609,6 @@ async function openLeadDetail(id) {
         // Reset to info tab (scope to the modal, since the page now has its own .tab bar)
         switchTab('tabInfo', document.querySelector('#leadDetailModal .tab'));
 
-        // Load activity
         loadActivity(id);
 
         showModal('leadDetailModal');
@@ -1311,7 +1314,6 @@ function renderFollowupRow(r, view) {
     const scheduledStr = r.scheduled_for ? formatScheduled(r.scheduled_for) : '';
     const sentStr = r.sent_at ? formatScheduled(r.sent_at) : '';
     const haltReason = r.halt_reason ? ' · Reason: ' + escapeHtml(r.halt_reason) : '';
-    const abLabel = r.ab_variant_label ? ' · A/B: ' + escapeHtml(r.ab_variant_label) : '';
 
     let actions = '';
     let bodyEditor = '';
@@ -1346,7 +1348,6 @@ function renderFollowupRow(r, view) {
             '</div>' +
             (bodyEditor ? '<div style="margin-bottom:8px;">' + bodyEditor + '</div>' :
                 (r.draft_subject ? '<div style="font-size:13px; color:#666;">Subject: ' + escapeHtml(r.draft_subject) + '</div>' : '')) +
-            '<div style="font-size:12px; color:#999; margin-top:6px;">' + abLabel + '</div>' +
             (actions ? '<div style="margin-top:10px;">' + actions + '</div>' : '') +
         '</div>' +
     '</div>';
@@ -1473,7 +1474,7 @@ window.loadLeadFollowups = async function() {
         list.innerHTML = '<p class="empty-state-text">No follow-ups scheduled for this lead. Sequence is configured in Settings; rows are created when the first-touch email sends.</p>';
         return;
     }
-    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th><th>A/B variant</th></tr></thead><tbody>' +
+    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th></tr></thead><tbody>' +
         data.rows.map(r =>
             '<tr>' +
                 '<td>' + r.touch_number + '</td>' +
@@ -1481,7 +1482,6 @@ window.loadLeadFollowups = async function() {
                 '<td>' + (r.scheduled_for || '—') + '</td>' +
                 '<td>' + (r.sent_at || '—') + '</td>' +
                 '<td>' + (r.halt_reason ? escapeHtml(r.halt_reason) : '—') + '</td>' +
-                '<td>' + (r.ab_variant_label ? escapeHtml(r.ab_variant_label) : '—') + '</td>' +
             '</tr>'
         ).join('') +
     '</tbody></table>';
@@ -2436,30 +2436,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Reddit outreach
+// Channel switching (Email | Editorial Partners | Creator Partners)
 // ═══════════════════════════════════════════════════════════════════════════
 
-let redditCurrentThread = null; // {id, ...} when the detail modal is open
-
-// ─── Init ───
 document.addEventListener('DOMContentLoaded', function () {
-    // Channel-tab switching (Email | Reddit)
     document.querySelectorAll('.channel-tab[data-channel]').forEach(btn => {
         btn.addEventListener('click', function () {
-            const channel = btn.dataset.channel;
-            switchChannel(channel);
+            switchChannel(btn.dataset.channel);
         });
     });
-
-    // Update safety meter bar colors from data-attributes set server-side
-    updateRedditSafetyMeterColors();
-
-    // If Reddit channel is active on initial load, kick off thread + stats loads
-    if (document.querySelector('.channel-pane[data-channel-pane="reddit"].active')) {
-        loadRedditThreads();
-        loadRedditStats();
-        startRedditProgressPolling();
-    }
 });
 
 function switchChannel(channel) {
@@ -2474,11 +2459,8 @@ function switchChannel(channel) {
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('channel', channel);
-        if (channel === 'email' && /^(reddit|editorial|creator)-/.test(url.searchParams.get('tab') || '')) {
+        if (channel === 'email' && /^(editorial|creator)-/.test(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'leads');
-        }
-        if (channel === 'reddit' && !['reddit-threads', 'reddit-settings'].includes(url.searchParams.get('tab') || '')) {
-            url.searchParams.set('tab', 'reddit-threads');
         }
         if (channel === 'editorial') {
             url.searchParams.set('tab', 'editorial-discovery');
@@ -2499,11 +2481,6 @@ function switchChannel(channel) {
         if (sectionTab && !sectionTab.classList.contains('active')) sectionTab.click();
     }
 
-    if (channel === 'reddit') {
-        loadRedditThreads();
-        loadRedditStats();
-        startRedditProgressPolling();
-    }
     if (channel === 'editorial') {
         loadEditorialStatus();
     }
@@ -2511,477 +2488,3 @@ function switchChannel(channel) {
         loadCreatorStatus();
     }
 }
-
-// ─── Safety meter color ───
-
-function updateRedditSafetyMeterColors() {
-    ['redditDailyFill', 'redditWeeklyFill'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const used = parseInt(el.dataset.used || '0', 10);
-        const limit = parseInt(el.dataset.limit || '0', 10);
-        const pct = limit > 0 ? (used / limit) * 100 : 0;
-        el.style.width = Math.min(100, pct) + '%';
-        el.classList.remove('safety-green', 'safety-yellow', 'safety-red');
-        if (pct >= 100) el.classList.add('safety-red');
-        else if (pct >= 75) el.classList.add('safety-yellow');
-        else el.classList.add('safety-green');
-    });
-}
-
-// ─── Threads list ───
-
-async function loadRedditThreads() {
-    const tbody = document.getElementById('redditThreadsTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Loading…</td></tr>';
-
-    const status = document.getElementById('redditFilterStatus')?.value || 'actionable';
-    const subreddit = document.getElementById('redditFilterSubreddit')?.value || '';
-    const source = document.getElementById('redditFilterSource')?.value || '';
-    const days = document.getElementById('redditFilterDays')?.value || '30';
-
-    const data = await api('reddit_get_threads', { params: { status, subreddit, source, days } });
-    if (!data || !data.success) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Failed to load threads.</td></tr>';
-        return;
-    }
-
-    if (!data.threads || data.threads.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No threads match this filter.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = data.threads.map(t => renderRedditThreadRow(t)).join('');
-}
-
-function renderRedditThreadRow(t) {
-    const ai = t.ai_relevance === null ? '<span class="text-muted">—</span>' : `<span class="reddit-ai-score reddit-ai-${aiBucket(t.ai_relevance)}">${t.ai_relevance}/10</span>`;
-    const statusBadge = redditStatusBadge(t.status);
-    const replyBadge = t.reply_status ? redditReplyStatusBadge(t.reply_status) : '<span class="text-muted">—</span>';
-    const upvotes = t.reply_upvotes !== null && t.reply_upvotes !== undefined ? t.reply_upvotes : '—';
-    const discovered = t.discovered_at ? new Date(t.discovered_at.replace(' ', 'T')).toLocaleString() : '';
-    const title = (t.title || '').length > 100 ? t.title.slice(0, 100) + '…' : (t.title || '');
-
-    return `<tr onclick="openRedditThreadDetail(${t.id})">
-        <td>r/${escapeHtml(t.subreddit)}</td>
-        <td class="reddit-title-cell">${escapeHtml(title)}</td>
-        <td>${ai}</td>
-        <td>${statusBadge}</td>
-        <td>${replyBadge}</td>
-        <td>${upvotes}</td>
-        <td class="text-muted" style="font-size:12px;">${escapeHtml(discovered)}</td>
-        <td class="row-actions" onclick="event.stopPropagation();">
-            <a href="${escapeAttr(t.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-neutral">View</a>
-        </td>
-    </tr>`;
-}
-
-function aiBucket(n) {
-    if (n >= 8) return 'high';
-    if (n >= 6) return 'mid';
-    return 'low';
-}
-
-function redditStatusBadge(s) {
-    const map = {
-        drafted: ['badge-green', 'Drafted'],
-        drafted_pending: ['badge-yellow', 'Drafted-pending'],
-        replied: ['badge-blue', 'Replied'],
-        skipped: ['badge-gray', 'Skipped'],
-        expired: ['badge-gray', 'Expired'],
-        new: ['badge-yellow', 'New'],
-    };
-    const [cls, label] = map[s] || ['badge-gray', s];
-    return `<span class="badge ${cls}">${escapeHtml(label)}</span>`;
-}
-
-function redditReplyStatusBadge(s) {
-    const map = {
-        pending: ['badge-yellow', 'Checking…'],
-        live: ['badge-green', 'Live'],
-        removed: ['badge-red', 'Removed'],
-        removed_or_shadowbanned: ['badge-red', 'Removed/Shadow'],
-        deleted_by_user: ['badge-gray', 'You deleted'],
-    };
-    const [cls, label] = map[s] || ['badge-gray', s];
-    return `<span class="badge ${cls}">${escapeHtml(label)}</span>`;
-}
-
-// ─── Stats ───
-
-async function loadRedditStats() {
-    const data = await api('reddit_get_stats');
-    if (!data || !data.success) return;
-    const s = data.stats;
-
-    setText('redditStatTotal', s.total);
-    setText('redditStatDrafted', s.drafted);
-    setText('redditStatPending', s.drafted_pending);
-    setText('redditStatReplied7d', s.replied_7d);
-    setText('redditStatSurvival', s.survival_pct === null ? '—' : `${s.survival_pct}% (n=${s.survival_n})`);
-    setText('redditStatAvgUpvotes', s.avg_upvotes === null ? '—' : s.avg_upvotes);
-    setText('redditStatProfileClicks', s.profile_clicks_30d);
-
-    // Safety meter
-    const dailyFill = document.getElementById('redditDailyFill');
-    const weeklyFill = document.getElementById('redditWeeklyFill');
-    if (dailyFill) {
-        dailyFill.dataset.used = s.daily_used;
-        dailyFill.dataset.limit = s.daily_limit;
-    }
-    if (weeklyFill) {
-        weeklyFill.dataset.used = s.weekly_used;
-        weeklyFill.dataset.limit = s.weekly_limit;
-    }
-    setText('redditDailyUsed', s.daily_used);
-    setText('redditDailyLimit', s.daily_limit);
-    setText('redditWeeklyUsed', s.weekly_used);
-    setText('redditWeeklyLimit', s.weekly_limit);
-    updateRedditSafetyMeterColors();
-}
-
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el && value !== undefined && value !== null) el.textContent = String(value);
-}
-
-// ─── Pipeline status ───
-
-let redditProgressPollTimer = null;
-let redditDiscoveryWasRunning = false;
-
-async function loadRedditPipelineProgress() {
-    const data = await api('reddit_pipeline_progress');
-    if (!data || !data.success) return;
-
-    const banner = document.getElementById('redditPipelineBanner');
-    const btn = document.getElementById('redditRunNowBtn');
-    const progress = data.progress || {};
-    const running = !!data.running;
-
-    if (banner) {
-        if (running) {
-            const msg = progress.message || 'Reddit discovery running…';
-            const found = progress.found ?? 0;
-            const drafted = progress.drafted ?? 0;
-            const startedAt = progress.started_at ? new Date(progress.started_at.replace(' ', 'T')) : null;
-            const elapsed = startedAt ? Math.max(0, Math.floor((Date.now() - startedAt.getTime()) / 1000)) : null;
-            const elapsedStr = elapsed === null ? '' : ` · ${elapsed}s elapsed`;
-            const counts = (found || drafted)
-                ? `<span class="reddit-progress-counts">${found} found · ${drafted} drafted${elapsedStr}</span>`
-                : `<span class="reddit-progress-counts">${elapsedStr.replace(/^ · /, '')}</span>`;
-            banner.innerHTML = `<span class="bulk-draft-spinner"></span> <span class="reddit-progress-msg">${escapeHtml(msg)}</span> ${counts}`;
-            banner.style.display = 'flex';
-        } else if (progress.completed && redditDiscoveryWasRunning) {
-            // Just finished. Show the summary briefly, then refresh and hide.
-            const msg = progress.error
-                ? `Discovery failed: ${progress.error}`
-                : (progress.message || `Discovery complete. Found ${progress.found ?? 0}, drafted ${progress.drafted ?? 0}.`);
-            banner.innerHTML = `<span class="reddit-progress-msg">${escapeHtml(msg)}</span>`;
-            banner.style.display = 'flex';
-            banner.classList.add(progress.error ? 'banner-error' : 'banner-success');
-            setTimeout(() => {
-                banner.style.display = 'none';
-                banner.classList.remove('banner-success', 'banner-error');
-            }, 6000);
-        } else {
-            banner.style.display = 'none';
-        }
-    }
-
-    if (btn) btn.disabled = running;
-
-    // Stop polling and refresh data when the run ends
-    if (!running && redditProgressPollTimer) {
-        clearInterval(redditProgressPollTimer);
-        redditProgressPollTimer = null;
-        if (redditDiscoveryWasRunning) {
-            loadRedditThreads();
-            loadRedditStats();
-        }
-    }
-    redditDiscoveryWasRunning = running;
-}
-
-function startRedditProgressPolling() {
-    if (redditProgressPollTimer) return;
-    loadRedditPipelineProgress(); // immediate first poll
-    redditProgressPollTimer = setInterval(loadRedditPipelineProgress, 2000);
-}
-
-async function runRedditDiscoveryNow() {
-    if (!confirm('Trigger the Reddit discovery cron now? It will run in the background and pull fresh threads.')) return;
-    const data = await api('reddit_run_now', { method: 'POST' });
-    if (!data || !data.success) {
-        notify(data?.message || 'Failed to start cron');
-        return;
-    }
-    startRedditProgressPolling();
-}
-
-// ─── Manually add a thread ───
-
-function showAddRedditThreadModal() {
-    document.getElementById('addRedditUrl').value = '';
-    document.getElementById('addRedditSubreddit').value = '';
-    document.getElementById('addRedditTitle').value = '';
-    document.getElementById('addRedditBody').value = '';
-    showModal('addRedditThreadModal');
-}
-
-async function addRedditThread() {
-    const url = document.getElementById('addRedditUrl').value.trim();
-    if (!url) { notify('Reddit post URL is required', 'error'); return; }
-
-    const data = {
-        url,
-        subreddit: document.getElementById('addRedditSubreddit').value.trim(),
-        title: document.getElementById('addRedditTitle').value.trim(),
-        body: document.getElementById('addRedditBody').value.trim(),
-    };
-
-    try {
-        const result = await api('reddit_add_thread', { method: 'POST', body: data });
-        if (result.success) {
-            closeModal('addRedditThreadModal');
-            notify('Thread added to the queue', 'success');
-            loadRedditThreads();
-            loadRedditStats();
-        } else {
-            notify(result.message, 'error');
-        }
-    } catch (e) {
-        notify(e.message, 'error');
-    }
-}
-
-// ─── Thread detail modal ───
-
-async function openRedditThreadDetail(id) {
-    const data = await api('reddit_get_thread', { params: { id } });
-    if (!data || !data.success) {
-        notify(data?.message || 'Failed to load thread');
-        return;
-    }
-    redditCurrentThread = data.thread;
-    fillRedditThreadModal(data.thread);
-    showModal('redditThreadModal');
-}
-
-function fillRedditThreadModal(t) {
-    document.getElementById('redditThreadTitle').textContent = t.title || '(no title)';
-    document.getElementById('redditThreadSubreddit').textContent = 'r/' + (t.subreddit || '');
-    document.getElementById('redditThreadAi').textContent = t.ai_relevance === null ? '—' : `${t.ai_relevance}/10`;
-    document.getElementById('redditThreadStatus').textContent = t.status || '';
-    document.getElementById('redditThreadPosted').textContent = t.posted_at || '';
-    document.getElementById('redditThreadUrl').href = t.url || '#';
-    document.getElementById('redditThreadBody').textContent = t.body || '(link post, no self-text)';
-    document.getElementById('redditThreadReason').textContent = t.ai_relevance_reason || '(no AI reasoning recorded)';
-    document.getElementById('redditDraftBody').value = t.draft_body || '';
-
-    // Show "Generate draft" only for drafted_pending
-    document.getElementById('redditDraftGenerateBtn').style.display = t.status === 'drafted_pending' ? '' : 'none';
-
-    // Reply status section
-    const replySection = document.getElementById('redditReplyStatusSection');
-    const replyBody = document.getElementById('redditReplyStatusBody');
-    if (t.status === 'replied') {
-        replySection.style.display = '';
-        const upvotes = (t.reply_upvotes !== null && t.reply_upvotes !== undefined) ? t.reply_upvotes : '—';
-        const replies = (t.reply_replies_count !== null && t.reply_replies_count !== undefined) ? t.reply_replies_count : '—';
-        replyBody.innerHTML =
-            `Reply status: ${redditReplyStatusBadge(t.reply_status || 'pending')} · ` +
-            `Upvotes: ${upvotes} · Replies: ${replies} · ` +
-            `<a href="${escapeAttr(t.reply_permalink || '#')}" target="_blank" rel="noopener noreferrer">Open your reply ↗</a>`;
-    } else {
-        replySection.style.display = 'none';
-    }
-}
-
-async function saveRedditDraft() {
-    if (!redditCurrentThread) return;
-    const body = document.getElementById('redditDraftBody').value.trim();
-    if (!body) { notify('Draft cannot be empty'); return; }
-    const data = await api('reddit_save_draft', { method: 'POST', body: { id: redditCurrentThread.id, draft_body: body } });
-    if (!data || !data.success) { notify(data?.message || 'Save failed'); return; }
-}
-
-function openRedditRegenerateFeedback() {
-    if (!redditCurrentThread) return;
-    const panel = document.getElementById('redditRegenerateFeedback');
-    const ta = document.getElementById('redditRegenerateFeedbackText');
-    if (!panel || !ta) return;
-    ta.value = '';
-    panel.style.display = 'block';
-    ta.focus();
-}
-
-function cancelRedditRegenerate() {
-    const panel = document.getElementById('redditRegenerateFeedback');
-    if (panel) panel.style.display = 'none';
-}
-
-async function submitRedditRegenerate(btn) {
-    if (!redditCurrentThread) return;
-    const feedback = (document.getElementById('redditRegenerateFeedbackText')?.value || '').trim();
-    if (btn) { btn.disabled = true; btn.textContent = 'Regenerating…'; }
-    const data = await api('reddit_regenerate_draft', {
-        method: 'POST',
-        body: { id: redditCurrentThread.id, feedback },
-    });
-    if (btn) { btn.disabled = false; btn.textContent = 'Regenerate'; }
-    if (!data || !data.success) { notify(data?.message || 'Regeneration failed'); return; }
-    document.getElementById('redditDraftBody').value = data.draft_body;
-    cancelRedditRegenerate();
-}
-
-async function generatePendingRedditDraft() {
-    if (!redditCurrentThread) return;
-    const btn = document.getElementById('redditDraftGenerateBtn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
-    const data = await api('reddit_generate_pending_draft', { method: 'POST', body: { id: redditCurrentThread.id } });
-    if (btn) { btn.disabled = false; btn.textContent = 'Generate draft'; }
-    if (!data || !data.success) { notify(data?.message || 'Generation failed'); return; }
-    document.getElementById('redditDraftBody').value = data.draft_body;
-    btn.style.display = 'none';
-    loadRedditThreads();
-}
-
-function copyRedditDraft(btn) {
-    const body = document.getElementById('redditDraftBody').value;
-    if (!body) return;
-
-    const copied = () => {
-        const original = btn.textContent;
-        btn.textContent = 'Copied';
-        setTimeout(() => btn.textContent = original, 1000);
-    };
-
-    navigator.clipboard.writeText(body).then(copied).catch(() => {
-        // Fallback for browsers without clipboard API (or insecure contexts)
-        const ta = document.createElement('textarea');
-        ta.value = body;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        copied();
-    });
-}
-
-async function markRedditSkipped() {
-    if (!redditCurrentThread) return;
-    const data = await api('reddit_mark_skipped', { method: 'POST', body: { id: redditCurrentThread.id } });
-    if (!data || !data.success) { notify('Failed'); return; }
-    closeModal('redditThreadModal');
-    loadRedditThreads();
-    loadRedditStats();
-}
-
-// ─── Mark Replied flow ───
-
-function openMarkRedditRepliedModal() {
-    if (!redditCurrentThread) return;
-    document.getElementById('redditReplyPermalink').value = '';
-    document.getElementById('redditMentionedProduct').checked = true;
-    showModal('redditMarkRepliedModal');
-}
-
-async function confirmMarkRedditReplied() {
-    if (!redditCurrentThread) return;
-    const permalink = document.getElementById('redditReplyPermalink').value.trim();
-    const mentioned = document.getElementById('redditMentionedProduct').checked ? 1 : 0;
-
-    if (!permalink) { notify('Permalink is required'); return; }
-    if (!/^https?:\/\/(www\.|old\.|new\.)?reddit\.com\/r\/[^\/]+\/comments\/[a-z0-9]+\/[^\/]*\/[a-z0-9]+\/?/i.test(permalink)) {
-        notify('That doesn\'t look like a Reddit comment permalink');
-        return;
-    }
-
-    const btn = document.getElementById('redditConfirmMarkRepliedBtn');
-
-    const submit = async (override) => {
-        btn.disabled = true;
-        try {
-            return await api('reddit_mark_replied', {
-                method: 'POST',
-                body: { id: redditCurrentThread.id, permalink, mentioned_product: mentioned, override_limit: override }
-            });
-        } finally {
-            btn.disabled = false;
-        }
-    };
-
-    let data;
-    try {
-        data = await submit(0);
-
-        if (data && !data.success && data.requires_override) {
-            const ok = confirm(
-                `You're at the post limit (daily ${data.daily_used}/${data.daily_limit}, weekly ${data.weekly_used}/${data.weekly_limit}). ` +
-                `Post anyway? This increases shadowban risk.`
-            );
-            if (!ok) return;
-            data = await submit(1);
-        }
-    } catch (e) {
-        notify(e?.message || 'Failed to mark replied');
-        return;
-    }
-
-    if (!data || !data.success) {
-        notify(data?.message || 'Failed to mark replied');
-        return;
-    }
-
-    closeModal('redditMarkRepliedModal');
-    closeModal('redditThreadModal');
-    loadRedditThreads();
-    loadRedditStats();
-}
-
-// ─── Settings tab: account info ───
-
-async function loadRedditAccountInfo() {
-    const container = document.getElementById('redditAccountInfo');
-    if (!container) return;
-    container.innerHTML = '<span class="text-muted">Loading…</span>';
-
-    let data;
-    try {
-        data = await api('reddit_get_account_info');
-    } catch (e) {
-        // api() throws on non-200 (e.g. 500 when REDDIT_USERNAME isn't configured).
-        // Show the error inline instead of leaving the spinner stuck.
-        container.innerHTML = `<span class="text-muted" style="color:#c00;">${escapeHtml(e.message || 'Failed to load account info')}</span>`;
-        return;
-    }
-    if (!data || !data.success) {
-        container.innerHTML = `<span class="text-muted" style="color:#c00;">${escapeHtml(data?.message || 'Failed to load account info')}</span>`;
-        return;
-    }
-    const a = data.account;
-    const ageDays = a.account_age_days;
-    const ageStr = ageDays !== null && ageDays !== undefined ? `${ageDays} days old` : 'age unknown';
-    let suggestion = '';
-    if (ageDays !== null && ageDays !== undefined && a.total_karma !== null) {
-        if (ageDays < 30 || a.total_karma < 100) {
-            suggestion = 'Suggested limits at your account maturity: 2/day, 8/week (new/low-karma).';
-        } else {
-            suggestion = 'Suggested limits at your account maturity: 5/day, 15/week (established).';
-        }
-    }
-    container.innerHTML = `
-        <div><strong>u/${escapeHtml(a.username)}</strong> · ${escapeHtml(ageStr)} · karma: ${a.total_karma} (link ${a.link_karma}, comment ${a.comment_karma})</div>
-        ${suggestion ? `<div class="text-muted" style="margin-top:6px;">${escapeHtml(suggestion)}</div>` : ''}
-    `;
-}
-
-// ─── HTML escape helpers (used by Reddit row rendering) ───
-
-function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeAttr(s) { return escapeHtml(s); }
-

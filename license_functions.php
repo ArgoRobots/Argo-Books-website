@@ -10,7 +10,14 @@ require_once __DIR__ . '/track_referral_event.php';
  */
 function generate_license_key($type = 'premium')
 {
-    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // Alphabet excludes ambiguous characters (no 0 1 I L O U), matching
+    // generate_pairing_short_code() in api/sync/sync-helper.php. Keys get read off
+    // a screen and retyped by hand, most of all the batches sold through resellers,
+    // and a key rejected over an O that was really a 0 is a support ticket at best
+    // and a chargeback at worst. Keys issued before this change still contain the
+    // full set and still validate: lookup is an exact match on the stored string,
+    // so nothing here is applied on the way in.
+    $chars = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
 
     $prefix = 'PREM';
 
@@ -85,6 +92,46 @@ function validate_premium_key($key) {
 }
 
 /**
+ * Whether we still have no way to contact whoever redeemed this key.
+ *
+ * Keys sold through a reseller are handed over as a pre-generated batch and the reseller does
+ * not pass buyer details back, so redemption in the app is the only moment their address can be
+ * asked for. Keys issued through the website already carry one and must never be asked again.
+ *
+ * Reads BOTH columns on purpose. `email` is the redemption restriction set when a key is issued
+ * to a named buyer; `customer_email` is contact detail captured afterwards. Either one means we
+ * can reach them, and neither is worth a second prompt.
+ *
+ * @param string $key The subscription key
+ * @return bool True when nothing on record identifies the buyer
+ */
+function license_key_needs_email($key) {
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT email, customer_email
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$key]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return false;
+        }
+
+        return trim((string) ($row['email'] ?? '')) === ''
+            && trim((string) ($row['customer_email'] ?? '')) === '';
+    } catch (PDOException $e) {
+        // Never let this decide the redemption. A failure here means we skip the prompt and
+        // lose one address; throwing would fail an activation the customer already paid for.
+        error_log('license_key_needs_email failed: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Redeem a free/promo premium subscription key (device-based).
  * On first redemption: validates the key, creates a premium subscription, and marks the key as redeemed.
  * On re-redemption: allows transferring the key to a new device by updating device_id.
@@ -118,7 +165,6 @@ function redeem_premium_key($key, $device_id) {
     try {
         $pdo->beginTransaction();
 
-        // Generate a subscription ID for the new subscription
         $subscriptionId = generate_license_key('premium');
 
         // Calculate subscription dates
@@ -212,7 +258,8 @@ function redeem_premium_key($key, $device_id) {
             'message' => 'License activated successfully!',
             'subscription_id' => $subscriptionId,
             'end_date' => $endDate,
-            'duration_months' => $duration_months
+            'duration_months' => $duration_months,
+            'needs_email' => license_key_needs_email($key)
         ];
 
     } catch (PDOException $e) {
@@ -291,6 +338,7 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
             'message' => 'License activated successfully!',
             'subscription_id' => $subscription['subscription_id'],
             'end_date' => $subscription['end_date'],
+            'needs_email' => license_key_needs_email($key)
         ];
 
     } catch (PDOException $e) {
@@ -362,7 +410,6 @@ function _recreate_subscription_for_key($key, $device_id) {
 
         $pdo->beginTransaction();
 
-        // Generate a new subscription ID
         $newSubscriptionId = generate_license_key('premium');
 
         // Create the premium subscription
@@ -406,7 +453,8 @@ function _recreate_subscription_for_key($key, $device_id) {
             'message' => 'License activated successfully!',
             'subscription_id' => $newSubscriptionId,
             'end_date' => $endDate,
-            'duration_months' => $duration_months
+            'duration_months' => $duration_months,
+            'needs_email' => license_key_needs_email($key)
         ];
 
     } catch (PDOException $e) {

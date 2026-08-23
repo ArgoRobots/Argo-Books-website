@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
+require_once __DIR__ . '/../partials/feature-demo.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../track_referral.php';
@@ -27,7 +30,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows, Mac, and Linux.">
+        content="Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows and Linux.">
     <meta name="keywords"
         content="accounting software for cleaning companies, cleaning business bookkeeping, janitorial accounting software, residential cleaning invoicing, recurring invoice software cleaning">
 
@@ -53,16 +56,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
     <link rel="canonical" href="https://argorobots.com/for-cleaning-companies/">
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "For Cleaning Companies", "item": "https://argorobots.com/for-cleaning-companies/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "For Cleaning Companies" => "/for-cleaning-companies/"]) ?></script>
 
     <script type="application/ld+json">
         {
@@ -111,6 +105,14 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 },
                 {
                     "@type": "Question",
+                    "name": "Can I run payroll for my cleaners?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books. Cleaners on different schedules can go on the same pay run, and at year end it prepares your T4 slips and the file the CRA needs. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada."
+                    }
+                },
+                {
+                    "@type": "Question",
                     "name": "Is it really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
@@ -125,15 +127,26 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <title>Argo Books for Cleaning Companies: Recurring Invoices and Real Numbers</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <!-- Drives the mockup in the hero. -->
+    <script src="../resources/scripts/feature-tour.js" defer></script>
 
     <link rel="stylesheet" href="../compare/style.css">
-    <link rel="stylesheet" href="../for/style.css">
+    <link rel="stylesheet" href="../resources/styles/for-pages.css">
+    <link rel="stylesheet" href="../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
+    <link rel="stylesheet" href="../features/feature-page.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/styles/faq.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>
@@ -142,115 +155,90 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     </header>
     <main>
 
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Accounting software for cleaning companies</h1>
-            <p class="hero-subtitle animate-fade-in">Built for recurring invoices, supply costs, and the difference between a profitable client and one that's quietly losing you money.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
-                    <span>Download Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="#features" class="btn-cta btn-cta-outline">
-                    <span>See What's Included</span>
-                </a>
+    <!-- Hero. Split, with the live mockup beside the copy rather than centred
+         text on a gradient. Same demo markup and loop the landing page uses. -->
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Accounting software for cleaning companies</h1>
+                    <p class="fp-hero-sub">Built for recurring invoices, supply costs, and the difference between a profitable client and one that's quietly losing you money.</p>
+                    <div class="fp-hero-act">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="fp-btn fp-btn-primary js-direct-download">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="#features" class="fp-textlink">See What's Included</a>
+                    </div>
+                    <p class="fp-hero-facts">Free desktop app for Windows and Linux. No account, no credit card.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="customers">
+                    <?= argo_feature_demo('customers') ?>
+                </div>
             </div>
-            <p class="hero-reassurance animate-fade-in">Free desktop app for Windows, Mac, and Linux. No account, no credit card.</p>
         </div>
     </section>
 
-    <section class="made-for-intro">
+    <!-- SmartScreen walkthrough, revealed by lp-direct-download.php after a
+         Windows direct-download click. -->
+    <div class="container">
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+    </div>
+
+    <section id="features" class="feature-blocks">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Made for Cleaning Companies</span>
                 <h2>Recurring clients, real numbers, no spreadsheet</h2>
                 <p class="section-desc">A cleaning business is one client at 9 AM, three more in the afternoon, the same houses next week, and a stack of supply receipts on the dashboard of the car. Residential or commercial, solo or with a crew, the work that pays the bills is the recurring contract that's billed on time, every time. Argo Books handles the books so you can keep cleaning.</p>
             </div>
-        </div>
-    </section>
-
-    <section id="features" class="feature-blocks">
-        <div class="container">
-            <div class="feature-block-grid">
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon">
-                        <?= svg_icon('refresh', 28, '', 1.5) ?>
+            <div class="fp-benefits">
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('refresh', 20) ?>
                     </div>
                     <h3>Recurring invoices for the same client every week or month</h3>
                     <p>Set the client, the amount, and the frequency once. Argo Books builds the invoice on schedule, every week or every month, with the same line items and the same total. You stop forgetting to bill the residential routes, and the commercial accounts come in clean every cycle.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon green">
-                        <?= svg_icon('receipt-scan-detail', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('receipt-scan-detail', 20) ?>
                     </div>
                     <h3>Snap a receipt from Costco, the chemical supplier, or the equipment store</h3>
                     <p>Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Chemicals, Paper Goods, Equipment, or Vehicle so when you raise your rates next year, you can show the customer where the cost actually went up.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon purple">
-                        <?= svg_icon('send', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('send', 20) ?>
                     </div>
                     <h3>Send the one-time deep clean invoice from the driveway</h3>
                     <p>Finish the move-out clean, sit in the truck for two minutes, open Argo Books, hit send. Customers can pay through Stripe or Square, and the deposit on next week's recurring is already on autopilot.</p>
                 </div>
 
-                <div class="feature-block animate-on-scroll">
-                    <div class="feature-block-icon amber">
-                        <?= svg_icon('shield-check', 28, '', 1.5) ?>
+                <div class="fp-benefit animate-on-scroll">
+                    <div class="fp-benefit-ic">
+                        <?= svg_icon('user-focused', 20) ?>
                     </div>
-                    <h3>Works offline, free tier covers solo cleaners and small crews</h3>
-                    <p>Argo Books runs natively on Windows, Mac, and Linux. No internet needed in the truck or at the office, no monthly subscription climbing every year, no website to load when you're trying to close out the day. The free tier covers most cleaning businesses forever.</p>
+                    <h3>Pay your cleaners without a separate payroll service</h3>
+                    <p>Enter the hours and Argo Books works out CPP, EI and income tax from the CRA's own tables, prints the pay stubs, and puts the wages straight into your books. Staff on different schedules or in different provinces can go on the same run, and your T4s are ready in January. Payroll is on Premium and covers Canadian staff.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="screenshot-strip">
+    <section class="honest-take">
         <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">In the App</span>
-                <h2>What it actually looks like</h2>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of recurring invoice setup. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/features/invoice-preview.svg" alt="A recurring cleaning invoice in Argo Books with weekly frequency set">
+            <div class="honest-card animate-on-scroll">
+                <div class="honest-icon">
+                    <?= svg_icon('info', 28) ?>
                 </div>
-                <p class="screenshot-caption">A recurring weekly invoice for a residential client.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of receipt-scan UI on a supply receipt. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/ai-receipt-scanner.webp" alt="The Argo Books receipt scanner extracting fields from a Costco supply receipt">
-                </div>
-                <p class="screenshot-caption">A supply receipt from Costco scanned and tagged.</p>
-            </div>
-
-            <!-- PLACEHOLDER: replace with fresh capture of main dashboard. -->
-            <div class="screenshot-item animate-on-scroll">
-                <div class="screenshot-frame">
-                    <img src="../resources/images/dashboard.webp" alt="The Argo Books dashboard showing revenue, expenses, and outstanding invoices">
-                </div>
-                <p class="screenshot-caption">Your dashboard with revenue, expenses, and what's outstanding.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="honest-take-alt">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">An Honest Take</span>
-                <h2>What Argo Books isn't</h2>
-                <p class="section-desc">Argo Books is bookkeeping software, not field-service software. It does not run a cleaning calendar, dispatch crews to addresses, send "on the way" texts to clients, or run a per-property profit-and-loss. If you need Jobber, ZenMaid, or Maidily for scheduling and crew routing, run them alongside Argo Books: those for the schedule, Argo Books for the books. It also doesn't do payroll yet. If those are dealbreakers, that's fair. If they're not, the desktop app is free, the recurring invoices run themselves, and your data stays on your computer.</p>
-                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary honest-take-cta">
+                <h3>What Argo Books isn't</h3>
+                <p>Argo Books is bookkeeping software, not field-service software. It does not run a cleaning calendar, dispatch crews to addresses, send "on the way" texts to clients, or run a per-property profit-and-loss. If you need Jobber, ZenMaid, or Maidily for scheduling and crew routing, run them alongside Argo Books: those for the schedule, Argo Books for the books. Payroll covers Canadian staff only, so a crew outside Canada needs a separate payroll service. If those are dealbreakers, that's fair. If they're not, the desktop app is free, it works offline, the recurring invoices run themselves, and your data stays on your computer.</p>
+                <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download honest-take-cta">
                     <span>Download Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
@@ -265,49 +253,42 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 <h2>Start free, upgrade only if you need more</h2>
                 <p class="pricing-strip-intro">Most cleaning businesses stay on the free tier. Premium adds predictive analytics for slow-month planning, unlimited invoicing for larger commercial routes, and priority support.</p>
             </div>
-            <div class="pricing-grid">
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Free</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Free</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$0</span>
-                                    <span class="tier-period">forever</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['free']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box argo-box">
-                        <div class="pricing-box-header">
-                            <span class="pricing-brand">Argo Premium</span>
-                        </div>
-                        <div class="pricing-tiers">
-                            <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
-                                    <span class="tier-period">CAD / month</span>
-                                </div>
-                                <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <?php
+            // The real cards, the same ones the landing and pricing pages use.
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
+        </div>
+    </section>
+
+    <!-- The for- pages did not link to each other, which wastes the internal
+         linking they exist to earn. -->
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c animate-on-scroll">
+                <div class="fp-eyebrow fp-eyebrow-c">More trades</div>
+                <h2 class="fp-h2">Argo Books for your line of work</h2>
+            </div>
+            <div class="fp-related animate-on-scroll">
+                <a href="../for-contractors/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('hard-hat', 20) ?></div>
+                    <h3>Contractors</h3>
+                    <p>Deposits, mid-job draws, materials and change orders.</p>
+                </a>
+                <a href="../for-landscapers/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('leaf', 20) ?></div>
+                    <h3>Landscapers</h3>
+                    <p>Seasonal cash flow, materials at cost, recurring maintenance.</p>
+                </a>
+                <a href="../for-solo-operators/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('user', 20) ?></div>
+                    <h3>Solo operators</h3>
+                    <p>One person, one price, books that need no bookkeeper.</p>
+                </a>
+                <a href="../for-auto-detailing/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('car', 20) ?></div>
+                    <h3>Auto detailing</h3>
+                    <p>Per-vehicle jobs, products used, and repeat customers.</p>
+                </a>
             </div>
         </div>
     </section>
@@ -315,85 +296,57 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I set up a recurring invoice for the same client every week or month?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>Can I set up a recurring invoice for the same client every week or month?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes. Set the client, the amount, and the frequency once, and Argo Books generates the invoice on schedule.</p>
                             <p>The client gets the same clean invoice every time, you get a payment record every time, and you stop forgetting to bill the recurring residential.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I bill supplies as a line on the invoice?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I bill supplies as a line on the invoice?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. List supplies as their own line, either at cost or with a small markup for sourcing and handling.</p>
                             <p>Many commercial cleaners build supplies into the base rate and never itemize. Residential one-offs sometimes itemize for transparency. Both work in Argo Books.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I see which clients or properties are most profitable?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I see which clients or properties are most profitable?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>You can see total revenue per customer, and total spend per category. Argo Books does not run a per-property profit-and-loss the way a dedicated job-costing tool does, so a ten-house route gets one combined view.</p>
                             <p>If knowing the margin on a single property is critical, a job-costing tool is a better fit.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does it work without internet?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does it work without internet?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. The desktop app runs natively on your computer and does not need an internet connection to log a cleaning, scan a receipt, or build an invoice.</p>
                             <p>You only need internet when you actually send the invoice or take a payment.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Does Argo Books schedule cleanings or send arrival texts?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Does Argo Books schedule cleanings or send arrival texts?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>No. Argo Books does not run a scheduling calendar, dispatch crews, or send "on the way" texts.</p>
                             <p>Jobber, ZenMaid, and Maidily are built for that side. Run them alongside Argo Books: those for the schedule, Argo Books for the books.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I run payroll for my cleaners?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is it really free?</h3>
-                        <div class="faq-icon"><?= svg_icon('chevron-down') ?></div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+                            <p>Yes, for Canadian staff. Enter each person's hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA's own tables, for every province and territory, then prints the pay stubs and records the wages in your books.</p>
+                            <p>Cleaners on different schedules can go on the same pay run, and at year end it prepares your T4 slips and the file the CRA needs. Payroll is part of Premium at $<?= $argo_monthly ?> CAD/month, with no per-employee fee. It does not cover staff outside Canada.</p>
+
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is it really free?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Yes, forever. The free tier covers all core features and <?= $free_invoices ?> invoices per month.</p>
                             <p>Premium ($<?= $argo_monthly ?> CAD/month) adds predictive analytics, unlimited invoicing, and priority support. No credit card to start.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -410,7 +363,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                     <h2>Ready to put the recurring routes on autopilot?</h2>
                     <p>Download Argo Books for free. Set up your first client, build a recurring weekly invoice, and scan a supply receipt in under ten minutes.</p>
                     <div class="cta-buttons">
-                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary">
+                        <a href="<?= htmlspecialchars($download_url) ?>" class="btn-cta btn-cta-primary js-direct-download">
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
@@ -439,17 +392,9 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
             }, observerOptions);
             document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(otherItem => otherItem.classList.remove('active'));
-                    if (!isActive) item.classList.add('active');
-                });
-            });
         });
     </script>
+<?php include __DIR__ . '/../resources/smartscreen-guide/lp-direct-download.php'; ?>
 </body>
 
 </html>

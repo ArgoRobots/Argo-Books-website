@@ -138,5 +138,4 @@ try {
 }
 
 if (php_sapi_name() === 'cli') {
-    echo "marketing_broadcast: sent {$sentThisRun} email(s) this run.\n";
 }

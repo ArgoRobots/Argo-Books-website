@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,16 +31,7 @@
     <link rel="canonical" href="https://argorobots.com/legal/privacy.php">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Privacy Policy", "item": "https://argorobots.com/legal/privacy.php"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Privacy Policy" => "/legal/privacy.php"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Privacy Policy - Argo Books</title>
@@ -100,7 +92,7 @@
             </ul>
 
             <h4>Subscription Information</h4>
-            <p>When you subscribe to Argo Premium, we store:</p>
+            <p>When you subscribe to Argo Books Premium, we store:</p>
             <ul>
                 <li>Subscription status and billing cycle</li>
                 <li>Payment method type (Stripe, PayPal, or Square)</li>
@@ -179,42 +171,78 @@
                 if you do not accept cookies, you may not be able to use some portions of our Website.</p>
 
             <h2>Argo Books Desktop Application Data</h2>
-            <p>Anonymous usage data is collected to help us improve Argo Books. We use it to understand how the
+            <p>Usage data is collected to help us improve Argo Books. We use it to understand how the
                 <strong>desktop software</strong> is used, identify and fix bugs, diagnose performance issues,
-                prioritize new features, and optimize the app for different regions. This data is completely
-                anonymous and cannot be used to identify you personally. Anonymous usage data is collected by all
-                installations of Argo Books and is uploaded to our servers when you close the application. You
-                remain in control of your data: you can view what has been collected on your device at any time,
-                and delete it at any time.</p>
+                prioritize new features, and optimize the app for different regions. Usage data is collected by all
+                installations of Argo Books and is uploaded to our servers while the application runs and when you
+                close it. You remain in control of your data: you can view what has been collected on your device at
+                any time, and delete it at any time.</p>
 
-            <h3>Anonymous Data We Collect in the Desktop Software</h3>
-            <p>The desktop application collects the following anonymous usage statistics:</p>
+            <p>Most of what we collect describes how the application behaves and cannot be traced back to you.
+                Two things are exceptions, and we would rather be plain about them than describe the whole
+                system as anonymous when it is not:</p>
+            <ul>
+                <li>Each installation is given a random device identifier so we can tell one installation's
+                    sessions apart from another's. It is not derived from your name, your email, your hardware, or
+                    anything else about you, and it is not linked to your Argo Books account. It does mean the
+                    activity from a single installation can be grouped together</li>
+                <li>If you create or open a company, we collect the business profile described below, which
+                    includes the company name you entered</li>
+            </ul>
+
+            <h3>Data We Collect in the Desktop Software</h3>
+            <p>The desktop application collects the following:</p>
             <ul>
                 <li><strong>Export data</strong>: Type of export (Excel, Google Sheets, backup, etc.), duration of
                     export operation, and file size</li>
                 <li><strong>API usage</strong>: API type (Google Sheets, Google Gemini, Open Exchange Rates, and
                     receipt scanning), operation duration, and whether the call succeeded</li>
                 <li><strong>Error data</strong>: Error category, exception type name, source filename, line number,
-                    and method name so we can identify and fix software issues. The error message text itself is
-                    never sent</li>
+                    and method name so we can identify and fix software issues. For expected conditions that we
+                    record as warnings, we also collect a short description that we wrote ourselves. The text of an
+                    error produced by your computer or by another program is never sent</li>
                 <li><strong>Session data</strong>: Session start/end times, session duration, application version, and
                     operating system (Windows, macOS, or Linux)</li>
+                <li><strong>Startup timing</strong>: How long the application took to open, so we can find out how
+                    slow it is on hardware we do not have</li>
                 <li><strong>Geographic data</strong>: Country, region, and timezone to understand our global user base</li>
-                <li><strong>Feature usage</strong>: Which features are used (e.g., receipts scanned, reports generated) so 
+                <li><strong>Feature usage</strong>: Which features are used (e.g., receipts scanned, reports generated) so
                     we can prioritize improvements</li>
+                <li><strong>Business profile</strong>: See the section immediately below</li>
                 <li><strong>Timestamp</strong>: When the action occurred</li>
             </ul>
 
-            <p>We never collect financial data, transaction data, customer names, vendor names, company names, file
-                paths, or document contents. The anonymous usage data uploaded to our servers does not include
-                city-level location or any per-user identifier. Your IP address is visible to our server during the
-                upload itself (as with any web request) and is used to derive your country and region, but the IP
-                address itself is not stored alongside the collected data. The data collected describes how the
-                application is used, not what you use it for.</p>
+            <h3>Business Profile Data</h3>
+            <p>When you create or open a company in the desktop application, we collect the details you entered
+                describing that business:</p>
+            <ul>
+                <li>Company name</li>
+                <li>Business type (sole proprietorship, partnership, corporation, and so on)</li>
+                <li>Industry</li>
+                <li>Country the business operates in</li>
+                <li>Currency the books are kept in</li>
+                <li>Language the application is displayed in</li>
+            </ul>
+            <p>We collect this to understand what kinds of businesses use Argo Books, which industries,
+                currencies and languages to prioritize, and which markets to build for. We do not sell it, share it with
+                advertisers, or use it to contact you. If you use the built-in sample company, none of this is
+                sent: its details ship with the demo file and are the same on every install.</p>
+            <p>We recognize that for a sole trader a company name is often a personal name. If you would rather
+                this was not collected, use a business name that is not your own when you create the company, or
+                email us at <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a> and we
+                will delete what has already been collected for your installation.</p>
+
+            <h3>What We Never Collect</h3>
+            <p>We never collect financial data, transaction data, customer names, vendor names, file
+                paths, or document contents. We do not collect city-level location. Your IP address is visible to
+                our server during the upload itself (as with any web request) and is used to derive your country
+                and region, but the IP address itself is not stored alongside the collected data. Apart from the
+                business profile above, the data collected describes how the application is used, not what you use
+                it for.</p>
 
             <p>This data is separate from any standard web analytics we use on our Website.</p>
 
-            <h3>How We Use Anonymous Data</h3>
+            <h3>How We Use This Data</h3>
             <p>We use this data to:</p>
             <ul>
                 <li>Understand how users interact with our desktop software globally</li>
@@ -222,21 +250,26 @@
                 <li>Identify performance issues and bottlenecks in different regions</li>
                 <li>Prioritize feature development based on actual usage patterns</li>
                 <li>Optimize the software for different geographic regions and network conditions</li>
+                <li>Understand which kinds of businesses use Argo Books, so we build for the right ones</li>
                 <li>Improve the overall user experience</li>
             </ul>
+            <p>We do not sell this data, share it with advertisers, or use it to build advertising profiles.</p>
 
-            <h3>Managing Your Anonymous Data</h3>
-            <p>Anonymous usage data is collected automatically and cannot be disabled, but you remain in control of the
-                copy on your device:</p>
+            <h3>Managing Your Data</h3>
+            <p>Usage data is collected automatically and cannot be turned off in the application, but you remain in
+                control of it:</p>
             <ul>
                 <li><strong>View your data</strong>: Open the telemetry folder on your device from
-                    <em>Settings &gt; General &gt; Privacy</em> to see exactly which anonymous events have been
+                    <em>Settings &gt; General &gt; Privacy</em> to see exactly which events have been
                     recorded. The files are plain JSON that you can read or copy</li>
-                <li><strong>Delete your data</strong>: You can delete all anonymous data stored on your device at any
+                <li><strong>Delete your data</strong>: You can delete all usage data stored on your device at any
                     time from the same panel. Deleting clears the local copy. To also remove data that has already
                     been uploaded to our servers, email
                     <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a> and we will
                     delete it</li>
+                <li><strong>Ask what we hold</strong>: Email us from the same address and we will tell you what has
+                    been collected for your installation, and delete it on request. Depending on where you live you
+                    may have a legal right to this, and we will honour it regardless of where you live</li>
             </ul>
 
             <h2>Google API Services</h2>
@@ -268,7 +301,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: July 8, 2026</p>
+            <p class="last-updated">Last updated: August 9, 2026</p>
         </div>
     </div>
 

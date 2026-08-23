@@ -61,46 +61,86 @@ function get_or_set_visitor_id(): string
 }
 
 /**
- * Look up the country code for an IP, reusing prior lookups when possible.
- * Checks referral_visits and referral_events first so we don't burn ipinfo.io
- * quota for an IP we've already resolved.
+ * 8-char HMAC token tying an installer download to a visitor_id.
+ *
+ * The ONLY place this recipe may live. get_avalonia_installer.php embeds the
+ * token in the served installer filename; api/track-app-event.php recomputes
+ * it per candidate visitor to resolve the install back to the original click.
+ * Any change here (length, algorithm, casing) must ship to both sides at once,
+ * which is exactly why they share this function.
+ *
+ * Returns '' when REFERRAL_TOKEN_SECRET is not configured.
  */
-function lookup_country_for_ip(?string $ip): ?string
+function referral_install_token(string $visitor_id): string
 {
+    $secret = $_ENV['REFERRAL_TOKEN_SECRET'] ?? '';
+    if ($secret === '') {
+        return '';
+    }
+    return substr(hash_hmac('sha256', $visitor_id, $secret), 0, 8);
+}
+
+/**
+ * Look up country + region + city for an IP, reusing prior lookups when
+ * possible so we don't burn ipinfo.io quota for an IP we've already resolved.
+ *
+ * Returns ['country' => ?string, 'region' => ?string, 'city' => ?string].
+ * Any field may be null when it can't be resolved.
+ *
+ * Cache order: a prior referral_events row for this IP that already has a
+ * city (full geo), then a country-only row from referral_events /
+ * referral_visits, then a single ipinfo.io/json call.
+ */
+function lookup_geo_for_ip(?string $ip): array
+{
+    $empty = ['country' => null, 'region' => null, 'city' => null];
     if (empty($ip)) {
-        return null;
+        return $empty;
     }
     global $pdo;
     if (!$pdo) {
-        return null;
+        return $empty;
     }
 
     try {
-        $stmt = $pdo->prepare('SELECT country_code FROM referral_visits
-                               WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
+        // Prefer a prior row that already resolved the full geo for this IP.
+        $stmt = $pdo->prepare('SELECT country_code, region, city FROM referral_events
+                               WHERE ip_address = ? AND city IS NOT NULL AND city != ""
                                LIMIT 1');
         $stmt->execute([$ip]);
         $row = $stmt->fetch();
         if ($row !== false) {
-            return $row['country_code'];
+            return [
+                'country' => $row['country_code'] ?: null,
+                'region'  => $row['region'] ?: null,
+                'city'    => $row['city'] ?: null,
+            ];
         }
 
+        // Fall back to a country-only cache hit (older rows, or referral_visits).
         $stmt = $pdo->prepare('SELECT country_code FROM referral_events
                                WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
                                LIMIT 1');
         $stmt->execute([$ip]);
-        $row = $stmt->fetch();
-        if ($row !== false) {
-            return $row['country_code'];
+        $cached_country = $stmt->fetchColumn();
+        if ($cached_country === false) {
+            $stmt = $pdo->prepare('SELECT country_code FROM referral_visits
+                                   WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != ""
+                                   LIMIT 1');
+            $stmt->execute([$ip]);
+            $cached_country = $stmt->fetchColumn();
         }
+        // A country-only cache hit still means we've never resolved region/city
+        // for this IP, so fall through to a live lookup to backfill them.
     } catch (PDOException $e) {
-        return null;
+        return $empty;
     }
 
     if (!function_exists('curl_init')) {
-        return null;
+        return ['country' => $cached_country ?: null, 'region' => null, 'city' => null];
     }
-    $ch = curl_init("https://ipinfo.io/{$ip}/country");
+
+    $ch = curl_init("https://ipinfo.io/{$ip}/json");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
     curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
@@ -109,9 +149,25 @@ function lookup_country_for_ip(?string $ip): ?string
     curl_close($ch);
 
     if ($http_code === 200 && !empty($response)) {
-        return trim($response);
+        $data = json_decode($response, true);
+        if (is_array($data)) {
+            return [
+                'country' => !empty($data['country']) ? substr(trim($data['country']), 0, 2) : ($cached_country ?: null),
+                'region'  => !empty($data['region']) ? substr(trim($data['region']), 0, 100) : null,
+                'city'    => !empty($data['city']) ? substr(trim($data['city']), 0, 100) : null,
+            ];
+        }
     }
-    return null;
+    return ['country' => $cached_country ?: null, 'region' => null, 'city' => null];
+}
+
+/**
+ * Backwards-compatible country-only lookup. Kept for callers that only need
+ * the country code (api/data/upload.php, api/data/crash.php).
+ */
+function lookup_country_for_ip(?string $ip): ?string
+{
+    return lookup_geo_for_ip($ip)['country'];
 }
 
 /**
@@ -171,20 +227,33 @@ function track_referral_event(string $event_type, array $opts = []): bool
     $ip_address  = $_SERVER['REMOTE_ADDR'] ?? null;
     $page_url    = $opts['page_url'] ?? ($_SERVER['REQUEST_URI'] ?? null);
 
-    $country_code = lookup_country_for_ip($ip_address);
+    $geo = lookup_geo_for_ip($ip_address);
+
+    // Campaign/search keyword: caller override, else ?utm_term on this request.
+    $keyword = $opts['keyword'] ?? null;
+    if ($keyword === null && !empty($_GET['utm_term'])) {
+        $keyword = trim((string)$_GET['utm_term']);
+    }
+    $keyword = ($keyword !== null && $keyword !== '') ? substr($keyword, 0, 150) : null;
 
     $event_data_json = null;
     if (!empty($opts['event_data']) && is_array($opts['event_data'])) {
         $event_data_json = json_encode($opts['event_data'], JSON_UNESCAPED_SLASHES);
     }
 
+    // Page-view events (fired server-side on every page load) start unconfirmed
+    // and are promoted to confirmed by a client-side JS beacon, so headless bots
+    // that never run JS are excluded from the funnel. Real action / webhook
+    // events aren't page views, so they're confirmed on insert.
+    $js_confirmed = in_array($event_type, ['landing', 'downloads_page'], true) ? 0 : 1;
+
     try {
         $stmt = $pdo->prepare(
             'INSERT INTO referral_events
                 (visitor_id, source_code, event_type, event_data,
                  subscription_id, user_id, page_url, ip_address,
-                 user_agent, country_code, environment)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                 user_agent, country_code, region, city, keyword, js_confirmed, environment)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         return $stmt->execute([
             $visitor_id,
@@ -196,7 +265,11 @@ function track_referral_event(string $event_type, array $opts = []): bool
             $page_url,
             $ip_address,
             substr($user_agent, 0, 255),
-            $country_code,
+            $geo['country'],
+            $geo['region'],
+            $geo['city'],
+            $keyword,
+            $js_confirmed,
             current_environment(),
         ]);
     } catch (PDOException $e) {
@@ -255,6 +328,49 @@ function get_referral_source_for_visitor(string $visitor_id): ?string
     } catch (PDOException $e) {
         error_log('get_referral_source_for_visitor failed: ' . $e->getMessage());
         return null;
+    }
+}
+
+/**
+ * Fire a subscription-keyed funnel event (premium_paid / premium_churned) from
+ * a webhook, cron, or portal handler.
+ *
+ * Wraps the resolve-attribution + track + log dance those call sites used to
+ * copy-paste. Attribution (visitor_id / source_code / user_id) is resolved
+ * from the subscription's premium_signup event; $fallbacks fills any field
+ * that resolves to null (browser contexts pass their cookie/session values so
+ * a missing signup event still attributes).
+ *
+ * Never throws: funnel logging must not break payment processing. Failures go
+ * to error_log unless $opts['log'] provides a callable (crons pass their own
+ * logger so failures land in the cron log).
+ *
+ * $opts:
+ *   - allow_bot (bool, default true): crons and webhooks have no browser UA,
+ *     so the bot/IP filters must be bypassed. Browser contexts (portal cancel,
+ *     payment retry) pass false to keep them.
+ *   - log (callable(string):void): custom failure logger.
+ */
+function track_subscription_event(string $event_type, string $subscription_id, array $event_data, array $fallbacks = [], array $opts = []): bool
+{
+    try {
+        $attr = find_visitor_for_subscription($subscription_id);
+        return track_referral_event($event_type, [
+            'visitor_id'      => $attr['visitor_id'] ?? ($fallbacks['visitor_id'] ?? null),
+            'source_code'     => $attr['source_code'] ?? ($fallbacks['source_code'] ?? null),
+            'subscription_id' => $subscription_id,
+            'user_id'         => $attr['user_id'] ?? ($fallbacks['user_id'] ?? null),
+            'event_data'      => $event_data,
+            'allow_bot'       => $opts['allow_bot'] ?? true,
+        ]);
+    } catch (Throwable $e) {
+        $msg = "$event_type funnel event failed for $subscription_id: " . $e->getMessage();
+        if (isset($opts['log']) && is_callable($opts['log'])) {
+            ($opts['log'])($msg);
+        } else {
+            error_log($msg);
+        }
+        return false;
     }
 }
 

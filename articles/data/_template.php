@@ -72,6 +72,28 @@ return [
   // Example: 'PT15M' for fifteen minutes.
   'total_time_iso8601' => null,
 
+  // Optional. A single headline statistic, rendered as a large highlighted
+  // block between the byline and the intro. Use it only when the article
+  // exists to answer one numeric question ("what does X cost", "how long
+  // does Y take"). Omit the whole key on every other article.
+  //
+  //   label    Short line above the number. Plain text.
+  //   value    The number itself. Plain text. Required, or the block is
+  //            skipped. Keep it short, it renders very large.
+  //   unit     Optional suffix rendered smaller beside the value, e.g.
+  //            'CAD per year'.
+  //   footnote Optional line beneath. Trusted HTML, so it may include <a>
+  //            and <strong>.
+  //
+  // All four run through pricing_substitute(), so {quickbooks_plus} and the
+  // other pricing placeholders work here too.
+  'hero_stat' => [
+    'label' => 'Canadian small businesses pay',
+    'value' => '$360 to $2,640',
+    'unit' => 'CAD per year',
+    'footnote' => 'Most land around <strong>$1,320</strong>.',
+  ],
+
   // Trusted HTML for the intro. 100 to 200 words. Hook the reader and
   // tell them what they will learn. Counts toward the 1500-word floor.
   'intro_html' => '<p>Replace this with 100 to 200 words of intro.</p>',

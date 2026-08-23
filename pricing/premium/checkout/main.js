@@ -1,32 +1,181 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Get payment method from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const paymentMethod = urlParams.get("method");
-
-  // Get subscription details from PHP
+  // Get subscription details from PHP. The method is whitelisted server-side;
+  // an empty string means the buyer has not picked one yet.
   const subscription = window.AI_SUBSCRIPTION;
 
   // Update the form based on payment method
   const formTitle = document.querySelector(".checkout-form h2");
 
-  // Customize checkout form based on payment method
-  switch (paymentMethod) {
-    case "paypal":
-      formTitle.textContent = "PayPal Checkout";
-      setupPayPalCheckout();
-      break;
-    case "stripe":
-      formTitle.textContent = "Stripe Checkout";
-      setupStripeCheckout();
-      break;
-    case "square":
-      formTitle.textContent = "Square Checkout";
-      setupSquareCheckout();
-      break;
-    default:
-      formTitle.textContent = "PayPal Checkout";
-      setupPayPalCheckout();
+  const METHOD_LABELS = { paypal: "PayPal", stripe: "Stripe", square: "Square" };
+  const METHOD_SETUP = {
+    paypal: setupPayPalCheckout,
+    stripe: setupStripeCheckout,
+    square: setupSquareCheckout,
+  };
+  const METHOD_CONTAINER_IDS = {
+    paypal: "paypal-button-container",
+    stripe: "stripe-container",
+    square: "square-container",
+  };
+
+  // Each setup function injects its provider's SDK <script> and mounts a card
+  // element, so calling one twice would load the script twice and double-mount.
+  // Initialise each at most once; after that, switching is only show/hide, which
+  // is what lets the picker work without a page reload.
+  const initialised = {};
+
+  function hideAllPaymentForms() {
+    Object.values(METHOD_CONTAINER_IDS).forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = "none";
+      }
+    });
   }
+
+  // Show a payment form. Pass updateUrl on user-driven switches so a manual
+  // refresh (or a copied link) lands back on the same method.
+  function activateMethod(method, updateUrl) {
+    if (!METHOD_SETUP[method]) {
+      return;
+    }
+
+    formTitle.textContent = METHOD_LABELS[method] + " Checkout";
+
+    document.querySelectorAll(".payment-btn").forEach((btn) => {
+      btn.classList.toggle("is-selected", btn.dataset.method === method);
+    });
+
+    hideAllPaymentForms();
+
+    if (initialised[method]) {
+      // The setup functions reveal their own container on first run; on a
+      // repeat visit we just undo hideAllPaymentForms().
+      const el = document.getElementById(METHOD_CONTAINER_IDS[method]);
+      if (el) {
+        el.style.display = "block";
+      }
+    } else {
+      initialised[method] = true;
+      METHOD_SETUP[method]();
+    }
+
+    subscription.method = method;
+
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("method", method);
+      history.replaceState(null, "", url);
+    }
+  }
+
+  document.querySelectorAll(".payment-btn").forEach((btn) => {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      activateMethod(this.dataset.method, true);
+    });
+  });
+
+  // Billing cycle switching, also without a reload. Every figure below was
+  // computed server-side into window.CHECKOUT_CYCLES; nothing here does money
+  // math, and process-subscription.php recomputes the real charge from the
+  // posted billing cycle anyway ("never trust client amount").
+  const CYCLES = window.CHECKOUT_CYCLES || {};
+
+  // The PayPal SDK is loaded with intent=subscription only when a plan ID
+  // exists for the cycle in play. If the two cycles disagree (one plan ID
+  // configured, the other not) the loaded SDK is wrong for the target cycle and
+  // the buttons cannot simply be re-rendered, so fall back to a reload.
+  function paypalSubscriptionMode(cycle) {
+    const cfg = window.PAYMENT_CONFIG.paypal;
+    const planId = cycle === "yearly" ? cfg.yearlyPlanId : cfg.monthlyPlanId;
+    return !!(planId && planId.length > 0);
+  }
+
+  function applyCycle(cycle, href) {
+    const figures = CYCLES[cycle];
+    if (!figures || cycle === subscription.billing) {
+      return false;
+    }
+
+    // PayPal binds its plan ID at render time, so its buttons must be rebuilt
+    // for the new cycle. setupPayPalCheckout() re-renders in place once the SDK
+    // is loaded (it early-returns past the script injection), but it cannot
+    // change the SDK's intent, hence the mode check.
+    const paypalActive = subscription.method === "paypal";
+    if (paypalActive && paypalSubscriptionMode(cycle) !== paypalSubscriptionMode(subscription.billing)) {
+      window.location.href = href;
+      return true;
+    }
+
+    subscription.billing = cycle;
+    subscription.basePrice = figures.base;
+    subscription.finalPrice = figures.base;
+    subscription.processingFee = figures.fee;
+    subscription.totalCharge = figures.total;
+
+    const setAll = (attr, value) => {
+      document.querySelectorAll("[" + attr + "]").forEach((el) => {
+        el.textContent = value;
+      });
+    };
+    setAll("data-cycle-label", figures.label);
+    setAll("data-cycle-base", figures.baseDisplay);
+    setAll("data-cycle-fee", figures.feeDisplay);
+    setAll("data-cycle-total", figures.totalDisplay);
+    setAll("data-cycle-renewal", figures.totalDisplay);
+    setAll("data-cycle-period", figures.period);
+
+    document.querySelectorAll("[data-cycle-fee-row]").forEach((row) => {
+      row.style.display = figures.fee > 0 ? "" : "none";
+    });
+
+    // Submit button labels are owned by JS (it rewrites them on submit and on
+    // error), so they get set here rather than via data-cycle spans. Square's
+    // button is built by setupSquareCheckout and would otherwise keep the
+    // amount it was rendered with.
+    const submitLabel = subscription.isMonthlyWithCredit
+      ? "Subscribe - $0.00 Today (Credit Applied)"
+      : "Subscribe - $" + figures.totalDisplay + " CAD/" + figures.period;
+    ["stripe-submit-btn", "square-submit-btn"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.textContent = submitLabel;
+      }
+    });
+
+    document.querySelectorAll(".cycle-switcher-btn").forEach((btn) => {
+      const isActive = btn.dataset.cycle === cycle;
+      btn.classList.toggle("active", isActive);
+      if (isActive) {
+        btn.setAttribute("aria-current", "true");
+      } else {
+        btn.removeAttribute("aria-current");
+      }
+    });
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("billing", cycle);
+    history.replaceState(null, "", url);
+
+    if (paypalActive) {
+      setupPayPalCheckout();
+    }
+    return false;
+  }
+
+  document.querySelectorAll(".cycle-switcher-btn").forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      applyCycle(this.dataset.cycle, this.href);
+    });
+  });
+
+  // PHP always resolves a method (Stripe unless the URL or the cycle-switch
+  // flow says otherwise), so this normally mounts the preselected form on load.
+  // Guarded anyway so an unexpected value initialises nothing rather than
+  // throwing.
+  activateMethod(subscription.method, false);
 
   function setupPayPalCheckout() {
     // Create or clear PayPal button container
@@ -170,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return actions.order.create({
             purchase_units: [
               {
-                description: `Argo Premium Subscription (${subscription.billing})`,
+                description: `Argo Books Premium Subscription (${subscription.billing})`,
                 amount: {
                   value: subscription.totalCharge.toFixed(2),
                   currency_code: "CAD",
@@ -288,7 +437,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const email = document.getElementById("email").value;
 
         try {
-          // Create payment method
           const { paymentMethod, error } = await stripe.createPaymentMethod({
             type: "card",
             card: cardElement,

@@ -24,10 +24,10 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Recording an Expense Return</h2>
             <p>To return items from an expense transaction back to a supplier:</p>
             <ol class="steps-list">
-                <li>Go to "Expenses" in the navigation menu (under Transactions)</li>
+                <li>Go to "Expenses" in the navigation menu, under Expenses</li>
                 <li>Find the expense transaction containing the items to return</li>
                 <li>Click "Mark as Returned" in the action buttons</li>
-                <li>Select a return reason (Defective, Wrong Item, Not as Described, Changed Mind, or Other)</li>
+                <li>Select a return reason: Wrong item received, Quality issues, Not as Described, Duplicate order, Changed Mind, Better price elsewhere, or Other</li>
                 <li>Enter the return details and refund amount</li>
                 <li>Save the return</li>
             </ol>
@@ -35,10 +35,11 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Recording a Customer Return</h2>
             <p>To process a return from a customer:</p>
             <ol class="steps-list">
-                <li>Go to "Revenue" in the navigation menu (under Transactions)</li>
+                <li>Go to "Revenue" in the navigation menu, under Revenue</li>
                 <li>Find the revenue transaction containing the items being returned</li>
                 <li>Click "Mark as Returned" in the action buttons</li>
-                <li>Select a return reason and enter the refund amount</li>
+                <li>Select a return reason: Customer return, Wrong item sent, Quality issues, Not as Described, Changed Mind, Defective, or Other</li>
+                <li>Enter the refund amount</li>
                 <li>Save the return</li>
             </ol>
 

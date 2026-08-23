@@ -19,32 +19,26 @@
 // Cap on live (uncached) historical-rate fetches per analysis, so a file
 // spanning hundreds of distinct dates can't fan out into hundreds of API calls.
 // Past the cap, the most recent successfully-fetched rate set is reused.
+require_once __DIR__ . '/../../../shared/currencies.php';
+
 const PA_FX_MAX_LIVE_FETCHES = 40;
 
-// ── CurrencyInfo: port of ArgoBooks.Core/Models/Common/CurrencyInfo.cs ─────────
-// The same 29-currency table the desktop app uses, so symbol/code resolution and
-// ambiguity match the app exactly.
+// ── CurrencyInfo: symbol / code resolution ──────────────────────────────
+// Reads shared/currencies.php, the website's single source of truth, which
+// itself mirrors the desktop app's CurrencyInfo.cs. This module used to carry
+// its own copy of the table, which is how INR ended up supported here and
+// nowhere else on the site.
 
-/** code => [symbol, name, decimals]. Mirrors CurrencyInfo.All. */
+/** code => [symbol, name, decimals]. Positional, matching CurrencyInfo.All. */
 function pa_currency_all(): array
 {
-    static $all = [
-        'ALL' => ['L', 'Albanian Lek', 2],     'AUD' => ['$', 'Australian Dollar', 2],
-        'BAM' => ['KM', 'Bosnia-Herzegovina Mark', 2], 'BGN' => ['лв', 'Bulgarian Lev', 2],
-        'BRL' => ['R$', 'Brazilian Real', 2],   'BYN' => ['Br', 'Belarusian Ruble', 2],
-        'CAD' => ['$', 'Canadian Dollar', 2],   'CHF' => ['CHF', 'Swiss Franc', 2],
-        'CNY' => ['¥', 'Chinese Yuan', 2],      'CZK' => ['Kč', 'Czech Koruna', 2],
-        'DKK' => ['kr', 'Danish Krone', 2],     'EUR' => ['€', 'Euro', 2],
-        'GBP' => ['£', 'British Pound', 2],     'HUF' => ['Ft', 'Hungarian Forint', 0],
-        'INR' => ['₹', 'Indian Rupee', 2],      'ISK' => ['kr', 'Icelandic Króna', 0],
-        'JPY' => ['¥', 'Japanese Yen', 0],      'KRW' => ['₩', 'South Korean Won', 0],
-        'MKD' => ['ден', 'Macedonian Denar', 2],'NOK' => ['kr', 'Norwegian Krone', 2],
-        'PLN' => ['zł', 'Polish Zloty', 2],     'RON' => ['lei', 'Romanian Leu', 2],
-        'RSD' => ['дин', 'Serbian Dinar', 2],   'RUB' => ['₽', 'Russian Ruble', 2],
-        'SEK' => ['kr', 'Swedish Krona', 2],    'TRY' => ['₺', 'Turkish Lira', 2],
-        'TWD' => ['NT$', 'Taiwan Dollar', 2],   'UAH' => ['₴', 'Ukrainian Hryvnia', 2],
-        'USD' => ['$', 'US Dollar', 2],
-    ];
+    static $all = null;
+    if ($all === null) {
+        $all = [];
+        foreach (argo_currencies_all() as $code => $c) {
+            $all[$code] = [$c['symbol'], $c['name'], $c['decimals']];
+        }
+    }
     return $all;
 }
 

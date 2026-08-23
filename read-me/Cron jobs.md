@@ -2,6 +2,26 @@
 
 All cron scripts live in `/cron/` and must be run via CLI only. Each script writes daily logs to `/cron/logs/`.
 
+## Run history retention
+
+`cron_runs` is pruned by `cron_runs_prune()` in `cron/lib/run_tracker.php`, called
+from `cron_run_finish()` on roughly one run in five hundred. Retention is 90 days,
+well beyond the 30 day maximum the admin page displays.
+
+It lives in the tracker rather than in any single cron because that file is what
+writes the rows, so every cron contributes to the cleanup regardless of which one
+happens to fire.
+
+Two rows are never deleted, whatever their age:
+
+- The newest run of each cron. Without that, a cron that has not fired in months
+  would disappear from `/admin/crons/` and read as "never run", which is the one
+  question that page exists to answer.
+- Anything still marked `running`, since that is a stuck run worth seeing.
+
+The table had no cleanup at all before this. A cron on a one minute schedule adds
+around 525,000 rows a year on its own, and two of them are on that schedule.
+
 ---
 
 ## 1. Subscription Renewal
@@ -226,85 +246,7 @@ Refreshes `refund_velocity_baselines` per company so the established-account har
 
 ---
 
-## 9. Reddit Discovery
-
-**Script:** `cron/reddit_monitor.php`
-**Schedule:** Daily at 8:00 AM
-
-```bash
-0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_monitor.php
-```
-
-### What It Does
-
-1. Pulls fresh threads (last 24h) from each enabled watchlist subreddit
-2. Runs global Reddit search for each enabled keyword
-3. Deduplicates by thread ID and applies rules-based scoring
-4. Runs a neutral AI relevance check (Gemini) on threads above the rules floor
-5. Pre-generates a draft reply for threads scoring ≥ 8 on AI relevance
-6. Marks borderline (6–7) threads as `drafted_pending` for on-demand drafting in the admin UI
-7. Auto-expires drafted threads older than 3 days
-
-Manual posting only. The cron does NOT post anything to Reddit. Drafts are reviewed and copy-pasted manually by the founder.
-
-### Environment Variables
-
-Default mode is **unauthenticated**: no app, no OAuth, no policy gate. Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
-
-| Variable | Required | Description |
-|---|---|---|
-| `GEMINI_API_KEY` | yes | Reused from the email pipeline for AI relevance + draft generation |
-| `REDDIT_CLIENT_ID` | optional | From a personal-use script app at https://www.reddit.com/prefs/apps/. Required only for OAuth mode. |
-| `REDDIT_CLIENT_SECRET` | optional | App secret. Required only for OAuth mode. |
-| `REDDIT_USERNAME` | optional | Reddit account that will post. If set without the OAuth pair, used purely as the User-Agent identifier and for the admin "your account stats" card. |
-| `REDDIT_PASSWORD` | optional | Account password. Required only for OAuth mode. |
-
-**Endpoint behaviour (unauth mode):** Reddit's JSON endpoints are aggressively IP-blocked from datacenter hosts (returns 403). To work around this, the helpers fetch discovery-shaped paths (`/r/X/new`, `/search`) via Reddit's RSS feed at the `.rss` suffix and parse the Atom XML back into the JSON listing shape; those endpoints are typically not IP-blocked. Endpoints with no RSS counterpart (`/api/info`, `/user/X/about`) still go to JSON and will silently 403 from blocked IPs, meaning the **reply-status check** and **account-info card** require OAuth to function. Discovery + drafting work either way.
-
-When all four `REDDIT_*` vars are set, the helpers switch to OAuth (`oauth.reddit.com`) and all endpoints work normally. No code change required.
-
-Per-channel tuning (scoring floors, post limits, auto-disable thresholds, subreddit / keyword lists) lives in the database and is editable in the admin UI under **Outreach → Reddit → Settings**.
-
-### CLI Flags
-
-```bash
-php reddit_monitor.php             # Full pipeline
-php reddit_monitor.php --dry-run   # Log what would happen; don't write threads/drafts
-php reddit_monitor.php --verbose   # Stream progress to stdout
-```
-
-### Logs
-
-A lock file (`/cron/logs/reddit_monitor.lock`) prevents overlapping runs.
-
-### Manual Trigger
-
-The admin Reddit → Threads tab has a **"Run discovery now"** button that triggers this cron in the background.
-
----
-
-## 10. Reddit Status Check
-
-**Script:** `cron/reddit_status_check.php`
-**Schedule:** Every 2 hours
-
-```bash
-0 */2 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_status_check.php
-```
-
-### What It Does
-
-For each thread marked `replied`, re-checks the posted Reddit comment via the Reddit API on a staggered schedule (30min / 2h / 6h / 24h / 72h after posting). Classifies the reply as `live`, `removed`, `removed_or_shadowbanned`, or `deleted_by_user`, captures upvote + reply engagement, and rolls up per-subreddit removal rates. Applies the auto-disable rule: any subreddit with ≥ N replies in the last 30 days and ≥ X% removal rate is automatically removed from the watchlist (N and X configurable in admin Settings).
-
-Idempotent: each row tracks its own check count and last-checked timestamp; the cron never over-checks. After 5 checks, a reply's status is treated as final and dropped from the worklist.
-
-### Logs
-
-A lock file (`/cron/logs/reddit_status_check.lock`) prevents overlapping runs.
-
----
-
-## 11. Marketing Broadcast Sender
+## 9. Marketing Broadcast Sender
 
 **Script:** `cron/marketing_broadcast.php`
 **Schedule:** Every 5 minutes
@@ -337,7 +279,7 @@ A lock file (`/cron/logs/marketing_broadcast.lock`) prevents overlapping runs.
 
 ---
 
-## 12. IndexNow Submit
+## 10. IndexNow Submit
 
 **Script:** `cron/indexnow_submit.php`
 **Schedule:** Daily at 5:00 AM
@@ -383,36 +325,143 @@ A lock file (`/cron/logs/indexnow_submit.lock`) prevents overlapping runs.
 
 ---
 
-## 13. Reddit Run Dispatcher
+## 11. Portal Invoice Reminders
 
-**Script:** `cron/reddit_run_dispatcher.php`
-**Schedule:** Every 2 minutes
+**Script:** `cron/portal_invoice_reminders.php`
+**Schedule:** Daily at 9:00 AM
 
 ```bash
-*/2 * * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_run_dispatcher.php
+0 9 * * * /usr/bin/php /home/argorobots/public_html/cron/portal_invoice_reminders.php
 ```
 
 ### What It Does
 
-Bridges the admin **"Run discovery now"** button to a real CLI run of `reddit_monitor.php`.
+Emails a merchant's customers when a portal invoice goes unpaid, so chasing payment keeps happening while Argo Books is closed.
 
-The production host disables `exec` / `shell_exec` / `proc_open`, so the admin button cannot spawn a background process, and running discovery inline in the web request is killed by PHP-FPM's `request_terminate_timeout` (~30s) long before it finishes. So the button only records a request (`reddit_settings.manual_run_requested_at = NOW()`); this cron polls for that flag and runs discovery via CLI, which has no time limit.
+1. Selects overdue invoices belonging to companies with `portal_companies.reminders_enabled = 1`, skipping any company that is inactive or locked.
+2. Works out which reminder stage is due: 3, 7 or 14 days past the due date. The highest eligible stage wins, so a run that was missed for a week sends one reminder rather than three.
+3. Claims the stage by inserting into `portal_invoice_reminders` before sending. `UNIQUE (portal_invoice_id, stage)` means a duplicate insert fails, which is the entire defence against sending the same reminder twice.
+4. Re-reads the invoice immediately before sending and skips it if it was paid or cancelled in the meantime, or if the customer sits in `email_suppressions` under the `portal` or `all_marketing` context.
+5. Sends a white-label reminder from the merchant's name via `send_invoice_reminder()`, with a reply-to pointing at the merchant when their owner email is verified.
 
-1. Reads `reddit_settings.manual_run_requested_at`. If unset, exits immediately (one cheap SELECT).
-2. Claims the request by clearing the flag, so a second tick can't double-fire it.
-3. Ignores requests older than 15 minutes (a stale click can't trigger a surprise run later).
-4. Runs `reddit_monitor.php` via CLI with `REDDIT_FORCE_RUN` defined, which makes discovery run even when the master enable toggle is off (a manual request is an explicit override).
+Stops permanently once an invoice is paid, cancelled, or has been chased three times.
 
-This cron does not write to `cron_runs`; `reddit_monitor` records its own run when fired. Discovery starts within ~2 minutes of clicking the button; progress shows in the Reddit threads tab as usual.
+### Behaviour Worth Knowing
 
-### Setup (one time)
+- **Enabling never releases a backlog.** `portal_companies.reminders_enabled_at` is re-stamped on every off-to-on transition, and only invoices whose due date falls after it are ever chased. A merchant switching this on for the first time will not blast months of old overdue invoices at their customers.
+- **Environment is filtered.** Sandbox and production share a database, so the run only ever touches invoices matching `current_environment()`. Without that filter a sandbox test invoice would email a real customer.
+- **A failed send is never retried.** The next stage still fires on schedule, so a transient SMTP failure costs one touch. Retrying is how you end up sending four reminders.
+- **Caps.** 200 reminders per run across all companies, 50 per company. Anything deferred is picked up first on the next run, since selection is ordered by due date.
+- **Invoices more than 45 days overdue are ignored**, so a long outage cannot fire a "final reminder" at something from months ago.
 
-Add the column the button writes to (run in HeidiSQL):
+### CLI Flags
 
-```sql
-ALTER TABLE reddit_settings
-  ADD COLUMN manual_run_requested_at DATETIME DEFAULT NULL
-  COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI.';
+```bash
+php portal_invoice_reminders.php            # Normal run
+php portal_invoice_reminders.php --dry-run  # Log what would be sent; send nothing, write no rows
 ```
 
-Then add the crontab line above on the server.
+### Logs
+
+`/cron/logs/portal_invoice_reminders_YYYY-MM-DD.log`
+
+A lock file (`/cron/logs/portal_invoice_reminders.lock`) prevents overlapping runs.
+
+---
+
+## 12. Payroll Rate Reminder
+
+**Script:** `cron/payroll_rate_reminder.php`  
+**Frequency:** daily
+
+```
+0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/payroll_rate_reminder.php
+```
+
+### What It Does
+
+Emails a reminder that CRA is about to publish new payroll deduction tables. CRA changes them
+twice a year, effective 1 January and 1 July, and Argo Books ships no tax numbers in the app,
+so a new rate file has to be prepared and uploaded before each changeover.
+
+Runs daily but does nothing outside the two windows: the 10th to the 20th of December, which
+warns about the January edition, and the same days in June for July's.
+
+### Behaviour Worth Knowing
+
+Sends **once per window**, not once per day. It checks `cron_runs` for a successful send
+naming the same edition in the last 30 days, so a daily schedule produces one email rather
+than eleven.
+
+**Cannot be disabled.** There is no notification preference for it. The whole point is that it
+arrives in a month when payroll is not on anyone's mind, and missing a changeover means every
+pay run calculated afterwards uses the wrong rates.
+
+December warns about `YYYY+1-01`, June about `YYYY-07`.
+
+### Logs
+
+No daily log file. Activity is visible on `/admin/crons/`, and failures go to `error_log`.
+
+Full instructions for actually doing the update are in `docs/Payroll rate updates.md` in the
+desktop repository.
+
+---
+
+## 13. API Webhook Delivery
+
+**Script:** `cron/api_webhook_delivery.php`
+**Schedule:** Every minute
+
+```bash
+* * * * * /usr/bin/php /home/argorobots/public_html/cron/api_webhook_delivery.php
+```
+
+### What It Does
+
+Delivers Argo Books public API events to the webhook endpoints developers have registered.
+
+Events fire when a merchant acts on data a developer pushed: `<object>.imported`,
+`<object>.rejected`, `import_batch.completed`, `import_batch.reverted`. There is deliberately
+no `<object>.created` event, since the developer who created it already knows.
+
+1. Claims up to 200 due deliveries, oldest first
+2. POSTs each one with an `Argo-Signature: t=<unix>,v1=<hmac-sha256>` header
+3. Treats 2xx as success, everything else as retryable
+4. Backs off across six attempts spanning about 15 hours
+5. Auto-disables an endpoint whose last 20 deliveries all failed
+6. Prunes `api_events` rows older than 90 days
+
+### Why It Is a Cron
+
+Delivery is not inline with the request that creates the event, because a developer's slow or
+hanging server would otherwise become a merchant's slow import. The cost is up to a minute of
+latency, which is nothing next to a queue whose next step is a person opening an app.
+
+### Behaviour Worth Knowing
+
+Takes a `flock` on `cron/logs/api_webhook_delivery.lock`. Overlapping runs would double-POST the
+same delivery, so a run that cannot get the lock records an `ok` result saying it skipped, rather
+than exiting silently and looking like a missed cron.
+
+A 410 is retried like any other failure. Guessing "this endpoint is gone" from a status code
+would drop events during a bad deploy on the developer's side; the attempt limit catches a
+genuinely dead URL soon enough.
+
+Redirects are never followed. The signature is for the URL the merchant approved.
+
+The destination is re-checked against the private-address rules immediately before
+every POST, not just when the endpoint was registered. Checking only at registration
+would leave DNS rebinding open: a name that resolved publicly then can resolve to an
+internal address by delivery time. A destination that fails the re-check is counted
+under "Refused, destination not public".
+
+**This is the one cron that does not filter on `environment`,** and it is on purpose.
+Only production runs crons, so filtering would queue sandbox webhooks and never deliver
+them. The trade is that its metrics count both environments together.
+
+Supports `--dry-run`, which resolves everything and logs what would be sent without sending it.
+
+### Logs
+
+No daily log file. Metrics are on `/admin/crons/`, and failures go to `error_log`.

@@ -37,7 +37,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>Charts from the Analytics Dashboard can also be exported to Excel with full data:</p>
             <ol class="steps-list">
                 <li>Right-click any chart in the Analytics Dashboard</li>
-                <li>Select "Export to Microsoft Excel"</li>
+                <li>Select "Export to Excel"</li>
                 <li>Choose a save location</li>
             </ol>
 

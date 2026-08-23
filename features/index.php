@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
 ?>
@@ -13,14 +14,14 @@ require_once __DIR__ . '/../track_referral.php';
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, Canadian payroll, and more.">
     <meta name="keywords"
         content="Argo Books features, AI receipt scanning, expense tracking software, predictive analytics, inventory management, invoicing software, rental management, customer management, spreadsheet import">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta property="og:description"
-        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, Canadian payroll, and more.">
     <meta property="og:url" content="https://argorobots.com/features/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -33,7 +34,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta name="twitter:description"
-        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, Canadian payroll, and more.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -44,27 +45,23 @@ require_once __DIR__ . '/../track_referral.php';
     <link rel="canonical" href="https://argorobots.com/features/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Features: AI-Powered Business Tools | Argo Books</title>
 
     <script src="../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../resources/styles/marketing-sections.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>
@@ -200,6 +197,16 @@ require_once __DIR__ . '/../track_referral.php';
                     </div>
                     <h3>Report Builder</h3>
                     <p>Build Income Statements, Balance Sheets, tax summaries, and more from your own data. Design each report your way and export a clean, branded PDF. Free to use.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
+
+                <!-- Payroll -->
+                <a href="payroll/" class="feature-card animate-on-scroll">
+                    <div class="feature-card-icon green">
+                        <?= svg_icon('user-focused', 24) ?>
+                    </div>
+                    <h3>Payroll</h3>
+                    <p>Pay Canadian staff without a separate payroll service. CPP, EI and income tax from the CRA's own tables, pay stubs for your people, and T4s ready in January.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
             </div>

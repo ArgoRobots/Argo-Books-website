@@ -12,7 +12,6 @@ require_once __DIR__ . '/portal-helper.php';
 set_portal_headers();
 require_method(['GET']);
 
-// Authenticate the request
 $company = authenticate_portal_request();
 if (!$company) {
     send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
@@ -67,6 +66,7 @@ send_json_response(200, [
     'company' => [
         'name' => $company['company_name'],
         'logo_url' => $company['company_logo_url'],
+        'owner_email' => $company['owner_email'] ?? null,
     ],
     'payment_methods' => $paymentMethods,
     'connectedProviders' => [
@@ -76,6 +76,16 @@ send_json_response(200, [
         'paypalEmail' => $company['paypal_email'] ?? null,
         'squareConnected' => !empty($company['square_merchant_id']),
         'squareEmail' => $company['square_email'] ?? null,
+    ],
+    // The server is authoritative for these: the cron and the payment webhooks
+    // read them while Argo Books is closed, so the desktop treats its copy as a
+    // cache and converges on this block. That is also what restores the
+    // settings after a reinstall or on a second machine.
+    'preferences' => [
+        'sendPaymentReminders' => (bool)($company['reminders_enabled'] ?? false),
+        'remindersEnabledAt' => $company['reminders_enabled_at'] ?? null,
+        'emailOwnerOnPayment' => (bool)($company['notify_owner_on_payment'] ?? false),
+        'ownerEmailVerified' => !empty($company['email_verified_at']),
     ],
     'statistics' => [
         'total_invoices' => (int) $invoiceStats['total_invoices'],

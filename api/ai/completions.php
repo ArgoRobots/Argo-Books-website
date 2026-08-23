@@ -74,7 +74,7 @@ if (empty($data['systemPrompt']) && empty($data['userPrompt'])) {
 $systemPrompt = $data['systemPrompt'] ?? '';
 $userPrompt = $data['userPrompt'] ?? '';
 $requestedModel = $data['model'] ?? '';
-$maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-16k
+$maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 32000)); // Clamp 1-32k
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 $base64Image = $data['base64Image'] ?? null;
 $mimeType = $data['mimeType'] ?? 'image/jpeg';
@@ -85,6 +85,25 @@ $mimeType = $data['mimeType'] ?? 'image/jpeg';
 $operation = isset($data['operation']) ? (string) $data['operation'] : 'completion';
 $sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ? (int) $data['sizeFeature'] : null;
 $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
+
+// Receipt scans on the gemini-3.x thinking models spend a large, variable chunk of
+// maxOutputTokens on hidden reasoning before writing the JSON answer, so budgets that
+// were fine on the old model now truncate mid-JSON. The receipt budget is authoritative
+// from .env (RECEIPT_SCAN_MAX_OUTPUT_TOKENS) and ignores whatever the client sent, so it
+// can be tuned for all client versions instantly (older builds still send 16000) without
+// an app release. Overrides the generic clamp above for this operation only.
+// Two flags, not one, because the second pass of a scan needs everything a first pass needs
+// EXCEPT the charge. The app re-sends the image when the extracted amounts do not reconcile
+// against the printed total; that is the app deciding to look again, not the user asking for a
+// second scan, and billing it meant ten receipts could cost twelve and the last be refused.
+$isReceiptWork = (($operation === 'receipt_scan' || $operation === 'receipt_verify') && !empty($base64Image));
+
+// Only the first pass is metered.
+$isReceiptExtraction = ($operation === 'receipt_scan' && !empty($base64Image));
+
+if ($isReceiptWork) {
+    $maxTokens = max(1, (int)($_ENV['RECEIPT_SCAN_MAX_OUTPUT_TOKENS'] ?? 32000));
+}
 
 // Installed desktop builds pin a model id that Google has since retired (e.g.
 // gemini-2.5-flash); empty requests also need a default. Remap both to a current
@@ -107,6 +126,75 @@ if (!in_array($requestedModel, $geminiModels, true)) {
 $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
 if (empty($geminiKey)) {
     send_error_response(500, 'Gemini AI service not configured on server.', 'CONFIG_ERROR');
+}
+
+// ---- Receipt-scan quota -----------------------------------------------------
+// Taken here, before a single byte goes to Gemini, because this is the request that
+// spends the money. It used to be enforced only by the client calling
+// api/receipt/usage.php's increment after a scan succeeded, which meant a client that
+// sent more requests than it reported, or skipped the call entirely, was unmetered.
+// The take is a conditional UPDATE, so a parallel batch cannot overrun the cap.
+//
+// Only receipt extraction is metered. Other AI operations (spreadsheet analysis, bank
+// categorization, plain completions) are covered by the rate limits above and have no
+// monthly allowance of their own.
+//
+// receipt_verify sits with those: it is the same billable receipt looked at twice, so it is
+// bounded by the rate limits rather than the monthly allowance. That does leave a caller able
+// to spend vision calls under receipt_verify without touching its allowance, capped by the
+// 60-per-15-minutes limiter above. Accepted deliberately: the alternative is charging a user
+// twice for one receipt, and the cap is the same one already trusted for every other unmetered
+// AI operation on this endpoint.
+$scanQuotaIdentifier = null;
+$scanQuotaSettled = false;
+if ($isReceiptExtraction) {
+    require_once __DIR__ . '/../receipt/scan_quota.php';
+
+    // The raw key, not the hash: usage.php keys premium rows on the key itself, and
+    // both endpoints have to land on the same row. Read the same headers
+    // authenticate_license_request() does, since it only hands back a hash.
+    $rawLicenseKey = '';
+    if (!empty($_SERVER['HTTP_X_LICENSE_KEY'])) {
+        $rawLicenseKey = (string) $_SERVER['HTTP_X_LICENSE_KEY'];
+    } elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])
+        && preg_match('/Bearer\s+(.+)/i', (string) $_SERVER['HTTP_AUTHORIZATION'], $m)) {
+        $rawLicenseKey = $m[1];
+    }
+
+    $identity = receipt_scan_quota_identity($pdo, $rawLicenseKey, $deviceIdHash);
+    if ($identity === null) {
+        send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
+    }
+
+    $take = receipt_scan_quota_consume($pdo, $identity['identifier'], $identity['limit']);
+    if (!$take['allowed']) {
+        send_error_response(
+            429,
+            sprintf(
+                'Monthly scan limit reached (%d of %d used). Your limit resets on %s.',
+                $take['scan_count'],
+                $identity['limit'],
+                date('Y-m-01', strtotime('first day of next month'))
+            ),
+            'SCAN_LIMIT_REACHED'
+        );
+    }
+
+    $scanQuotaIdentifier = $identity['identifier'];
+
+    // The scan is paid for up front, so anything that stops a result reaching the user
+    // has to hand it back. A shutdown hook rather than a refund at each of the seven
+    // failure exits below: those all exit() immediately, and this also covers a fatal
+    // or a timeout, which no amount of call-site editing would.
+    register_shutdown_function(static function () use (&$scanQuotaSettled, &$scanQuotaIdentifier) {
+        if ($scanQuotaSettled || $scanQuotaIdentifier === null) {
+            return;
+        }
+        global $pdo;
+        if ($pdo instanceof PDO) {
+            receipt_scan_quota_refund($pdo, $scanQuotaIdentifier);
+        }
+    });
 }
 
 $model = $requestedModel;
@@ -227,13 +315,73 @@ if (!empty($userParts)) {
     $contents[] = ['role' => 'user', 'parts' => $userParts];
 }
 
+$generationConfig = [
+    'temperature' => $temperature,
+    'maxOutputTokens' => $maxTokens,
+    'responseMimeType' => 'application/json',
+];
+
+if ($isReceiptExtraction) {
+    // Cap thinking to "low": gemini-3.x defaults to dynamic thinking that draws from
+    // maxOutputTokens; extraction is a structured OCR task, not a reasoning task.
+    $generationConfig['thinkingConfig'] = ['thinkingLevel' => 'low'];
+
+    // Constrain generation to a strict schema. Without it, gemini-3.5-flash intermittently
+    // emits invalid JSON even in JSON mode (extra brackets, objects cut off mid-field) with
+    // finishReason=STOP - the model thinks it finished but the payload won't parse. A
+    // responseSchema forces constrained decoding, so the output is always well-formed JSON
+    // matching this shape. Fields are optional/nullable so the "not a receipt" error path and
+    // any missing values still work; the app reads every field defensively.
+    $numberOrNull = ['type' => 'number', 'nullable' => true];
+    $stringOrNull = ['type' => 'string', 'nullable' => true];
+    $nameAmountItem = [
+        'type' => 'object',
+        'properties' => [
+            'name' => ['type' => 'string'],
+            'amount' => ['type' => 'number'],
+        ],
+        'propertyOrdering' => ['name', 'amount'],
+    ];
+    $generationConfig['responseSchema'] = [
+        'type' => 'object',
+        'properties' => [
+            'supplierName' => $stringOrNull,
+            'transactionDate' => $stringOrNull,
+            'subtotal' => $numberOrNull,
+            'taxes' => ['type' => 'array', 'items' => $nameAmountItem, 'nullable' => true],
+            'discounts' => ['type' => 'array', 'items' => $nameAmountItem, 'nullable' => true],
+            'shipping' => $numberOrNull,
+            'totalAmount' => $numberOrNull,
+            'currencyCode' => $stringOrNull,
+            'paymentMethod' => $stringOrNull,
+            'confidence' => $numberOrNull,
+            'lineItems' => [
+                'type' => 'array',
+                'nullable' => true,
+                'items' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'description' => ['type' => 'string'],
+                        'quantity' => ['type' => 'number'],
+                        'unitPrice' => ['type' => 'number'],
+                        'totalPrice' => ['type' => 'number'],
+                        'confidence' => ['type' => 'number'],
+                    ],
+                    'propertyOrdering' => ['description', 'quantity', 'unitPrice', 'totalPrice', 'confidence'],
+                ],
+            ],
+            'error' => $stringOrNull,
+        ],
+        'propertyOrdering' => [
+            'supplierName', 'transactionDate', 'subtotal', 'taxes', 'discounts', 'shipping',
+            'totalAmount', 'currencyCode', 'paymentMethod', 'confidence', 'lineItems', 'error',
+        ],
+    ];
+}
+
 $geminiPayload = [
     'contents' => $contents,
-    'generationConfig' => [
-        'temperature' => $temperature,
-        'maxOutputTokens' => $maxTokens,
-        'responseMimeType' => 'application/json',
-    ],
+    'generationConfig' => $generationConfig,
 ];
 if ($systemInstruction) {
     $geminiPayload['system_instruction'] = $systemInstruction;
@@ -294,9 +442,28 @@ if (!empty($uploadedFileName)) {
     curl_exec($ch);
 }
 
-// Extract content + finish reason from the Gemini response.
+// Extract content + finish reason from the Gemini response. The gemini-3.x models can
+// split the answer across several parts (and emit separate "thought" parts), so read only
+// the earlier parts[0] would drop the tail and yield truncated JSON. Concatenate every
+// non-thought text part instead.
 $candidate = $responseData['candidates'][0] ?? [];
-$content = $candidate['content']['parts'][0]['text'] ?? null;
+$content = null;
+$parts = $candidate['content']['parts'] ?? [];
+if (is_array($parts)) {
+    $textSegments = [];
+    foreach ($parts as $part) {
+        if (!empty($part['thought'])) {
+            continue; // reasoning trace, not part of the answer
+        }
+        if (isset($part['text']) && is_string($part['text'])) {
+            $textSegments[] = $part['text'];
+        }
+    }
+    if (!empty($textSegments)) {
+        $content = implode('', $textSegments);
+    }
+}
+$partCount = is_array($parts) ? count($parts) : 0;
 $finishReason = $candidate['finishReason'] ?? null;
 
 $usage = null;
@@ -332,6 +499,36 @@ if ($content === null) {
     send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
 }
 
+// TEMPORARY DIAGNOSTIC: for receipt extraction, verify the JSON parses server-side. When it
+// doesn't, surface the real cause (finishReason, token usage, part count, and the tail of the
+// content where it cut off) as a normal {"error": ...} 200 response, which is the only shape the
+// desktop app displays verbatim. This replaces the cryptic client-side "truncated JSON" parse
+// error with something we can actually read, and confirms whether this deploy is even live.
+$receiptContentUsable = true;
+if ($isReceiptExtraction) {
+    json_decode($content);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        // A scan whose JSON never parsed is a failed scan as far as the user is
+        // concerned, so it must not cost them one. Left unsettled for the refund hook.
+        $receiptContentUsable = false;
+        $diag = sprintf(
+            'DIAG truncated: finishReason=%s model=%s budget=%d tokens(p/o/t)=%d/%d/%d parts=%d len=%d err=%s tail=[%s]',
+            $finishReason ?? 'null',
+            $model,
+            $maxTokens,
+            $usage['prompt_tokens'] ?? 0,
+            $usage['completion_tokens'] ?? 0,
+            $usage['total_tokens'] ?? 0,
+            $partCount,
+            strlen($content),
+            json_last_error_msg(),
+            substr($content, -140)
+        );
+        error_log('[gemini] ' . $diag);
+        $content = json_encode(['error' => $diag]);
+    }
+}
+
 // Record the server-measured timing (best-effort; never breaks the response).
 ai_timing_record([
     'operation' => $operation,
@@ -347,6 +544,10 @@ ai_timing_record([
     'success' => true,
     'app_platform' => $appPlatform,
 ]);
+
+// A consumed scan is only kept once a usable result is genuinely on its way back.
+// Anything else leaves this false and the shutdown hook returns it to the allowance.
+$scanQuotaSettled = $receiptContentUsable;
 
 send_json_response(200, [
     'success' => true,

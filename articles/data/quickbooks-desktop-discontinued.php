@@ -43,6 +43,19 @@ HTML,
 <li><strong>Each version has a support end date.</strong> Per Intuit's <a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/feature-preferences/quickbooks-desktop-service-discontinuation-policy/L17cXxlie_US_en_US" target="_blank" rel="noopener nofollow">discontinuation policy</a>, QuickBooks Desktop 2023 stops getting services and support after May 31, 2026. The 2024 version is supported into 2027.</li>
 <li><strong>Enterprise is the exception.</strong> QuickBooks Desktop Enterprise is still sold to new customers and is not part of this wind-down, though Intuit increasingly steers Enterprise users toward cloud hosting.</li>
 </ul>
+<p>Laid out version by version, here is the full schedule. Each release keeps working for roughly three years, then loses everything that depends on Intuit's servers.</p>
+<table>
+<thead>
+<tr><th>Version</th><th>Editions</th><th>Services end</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>QuickBooks Desktop 2022</strong></td><td>Pro Plus, Premier Plus, Mac Plus, Enterprise 22.0</td><td>May 31, 2025</td></tr>
+<tr><td><strong>QuickBooks Desktop 2023</strong></td><td>Pro Plus, Premier Plus, Mac Plus, Enterprise 23.0</td><td>May 31, 2026</td></tr>
+<tr><td><strong>QuickBooks Desktop 2024</strong></td><td>Pro Plus, Premier Plus, Mac Plus</td><td>September 30, 2027</td></tr>
+<tr><td><strong>2025 and later</strong></td><td>Never released</td><td>No further releases planned</td></tr>
+</tbody>
+</table>
+<p>Two dates in that table are already behind us, so if you are on the 2022 or 2023 release you are running unsupported software today. Dates verified July 29, 2026 against Intuit's <a href="https://quickbooks.intuit.com/learn-support/en-us/help-article/feature-preferences/quickbooks-desktop-service-discontinuation-policy/L17cXxlie_US_en_US" target="_blank" rel="noopener nofollow">service discontinuation policy</a>; Intuit has revised this schedule before, so check the source for the current dates.</p>
 <p>So the honest framing is not "QuickBooks Desktop is dead." It's being retired in stages. New people cannot buy it, existing users can renew for now, and the connected services behind it have a published expiry date. If your version is 2023, your date is the one to mark on the calendar. If you want a wider view of whether QuickBooks still fits your business at all, the guide on <a href="/is-quickbooks-worth-it-for-small-business/">whether QuickBooks is worth it</a> is a good companion to this one.</p>
 HTML,
     ],
@@ -85,8 +98,8 @@ HTML,
       'html' => <<<'HTML'
 <p>A lot of the frustration with the QuickBooks wind-down is not really about QuickBooks. It's about being told that the only way forward is to move your financial records to someone else's cloud and pay monthly forever. For some businesses that is fine. For others, privacy, speed, and not renting access to their own books matter, and that is a perfectly reasonable preference.</p>
 <p>Local-first software is the answer to that preference. The program runs on your computer, your data file lives on your machine, and it keeps working at full speed whether or not you are online. QuickBooks Desktop used to feel like this, which is part of why long-time users are unhappy about being pushed to the cloud.</p>
-<p>Argo Books is one local-first option, and since you are reading this on its site, treat the mention with that in mind. It's a desktop app for Windows, Linux, and macOS, with a free tier that has no time limit: {argo_free_invoice_limit} invoices a month, basic bookkeeping, and your data kept on your own machine. Premium is ${argo_premium_monthly} CAD a month for higher volumes and more features.</p>
-<p>Be clear about what it isn't, because that honesty is the point. Argo Books does not have built-in payroll, so if you pay staff through QuickBooks you will need a separate payroll service. It has a smaller feature set than QuickBooks Desktop Enterprise and a smaller accountant ecosystem than the big names. What it does well is the core that most small businesses actually use every day: invoicing, expenses, receipts, basic inventory, and reports, all on your own computer. If you run payroll or need heavy multi-entity accounting, stay with a tool built for that. If you want simple, private, and local, it's worth a look.</p>
+<p>Argo Books is one local-first option, and since you are reading this on its site, treat the mention with that in mind. It's a desktop app for Windows and Linux, with a free tier that has no time limit: {argo_free_invoice_limit} invoices a month, basic bookkeeping, and your data kept on your own machine. Premium is ${argo_premium_monthly} CAD a month for higher volumes and more features.</p>
+<p>Be clear about what it isn't, because that honesty is the point. Argo Books has built-in payroll for Canada only, so if you pay staff elsewhere through QuickBooks you will need a separate payroll service. It has a smaller feature set than QuickBooks Desktop Enterprise and a smaller accountant ecosystem than the big names. What it does well is the core that most small businesses actually use every day: invoicing, expenses, receipts, basic inventory, and reports, all on your own computer. If you run payroll outside Canada or need heavy multi-entity accounting, stay with a tool built for that. If you want simple, private, and local, it's worth a look.</p>
 HTML,
     ],
 
@@ -153,7 +166,7 @@ HTML,
     ],
     [
       'q' => 'Does Argo Books have payroll?',
-      'a' => 'No, Argo Books does not have built-in payroll. If you currently run payroll through QuickBooks, you would need a separate payroll service alongside it. This is the main reason some businesses should not switch: if payroll inside your accounting software matters to you, stay with a tool that offers it. Argo Books is aimed at the core that most small businesses use daily, invoicing, expenses, receipts, basic inventory, and reports, on your own machine.',
+      'a' => 'For Canadian staff, yes: payroll is on the Premium plan, covering CPP, EI and income tax for every province and territory, with T4 slips at year end. For staff anywhere else you would need a separate payroll service alongside it, and that is a real reason some businesses should not switch: if payroll for your own region inside your accounting software matters to you, stay with a tool that offers it. Argo Books is aimed at the core that most small businesses use daily, invoicing, expenses, receipts, basic inventory, and reports, on your own machine.',
     ],
   ],
 

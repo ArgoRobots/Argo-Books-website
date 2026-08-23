@@ -365,11 +365,11 @@ new Chart(document.getElementById('mrrChart').getContext('2d'), {
         datasets: [{
             label: 'MRR',
             data: <?php echo json_encode($mrr_data); ?>,
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
             fill: true,
             tension: 0.3,
-            pointBackgroundColor: '#6366f1',
+            pointBackgroundColor: '#3b82f6',
             pointRadius: 4,
             pointHoverRadius: 6
         }]
@@ -404,11 +404,11 @@ new Chart(document.getElementById('cumulativeChart').getContext('2d'), {
         datasets: [{
             label: 'Revenue (All Time)',
             data: <?php echo json_encode($cumulative_data); ?>,
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.15)',
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14, 165, 233, 0.15)',
             fill: true,
             tension: 0.3,
-            pointBackgroundColor: '#8b5cf6',
+            pointBackgroundColor: '#0ea5e9',
             pointRadius: 4,
             pointHoverRadius: 6
         }]

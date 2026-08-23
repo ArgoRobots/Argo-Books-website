@@ -120,6 +120,14 @@ a:hover {
     background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
 }
 
+/* Premium subscription header. Separate from .header-purple because that one
+   is a generic second accent shared by affiliate, portal and refund mail;
+   only Premium moved to the blue brand ramp. Literal hex for the same reason
+   as .button-premium below. */
+.header-premium {
+    background: #3f63e8;
+}
+
 /* header-blue is the default, defined in .header */
 
 /* Tables */
@@ -198,9 +206,9 @@ a:hover {
     margin-top: 0;
 }
 
-/* Credit display */
+/* Credit display. Premium subscription credit, so blue. */
 .credit-display {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    background: #3f63e8;
     color: var(--white);
     padding: 30px;
     border-radius: 12px;
@@ -221,12 +229,16 @@ a:hover {
 }
 
 /* Button variations */
-.button-purple {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+/* Premium subscription accents. Literal hex, not var(--premium-*): this file
+   is inlined into a bare <style> block with no :root, so custom properties
+   never resolve in a mail client. Values match --premium-500/600 in
+   resources/styles/custom-colors.css. */
+.button-premium {
+    background: #3f63e8;
 }
 
-.button-purple:hover {
-    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
+.button-premium:hover {
+    background: #2f4fd6;
 }
 
 /* Status badges */

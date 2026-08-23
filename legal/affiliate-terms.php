@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <?php require_once __DIR__ . '/../community/affiliate/affiliate_functions.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,16 +32,7 @@
     <link rel="canonical" href="https://argorobots.com/legal/affiliate-terms.php">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Affiliate Program Terms", "item": "https://argorobots.com/legal/affiliate-terms.php"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Affiliate Program Terms" => "/legal/affiliate-terms.php"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Affiliate Program Terms - Argo Books</title>

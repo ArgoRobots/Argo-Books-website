@@ -56,7 +56,7 @@ HTML,
 <ul>
 <li><strong>Wave.</strong> The best-known free pick. Core invoicing and accounting are genuinely free with no time limit, and you only pay if you want card payments, payroll, or the Pro tier (around ${wave_pro} CAD a month). For a sole proprietor who invoices and tracks income and expenses, the free side does the job. The trade-offs: support is thinner, development has slowed compared to its early years, and a few features have drifted from free to Pro over time.</li>
 <li><strong>ZipBooks.</strong> Lighter and simpler than the big names, with a free starter tier and a clean interface. Good for someone who wants the basics without a busy, crowded screen. Paid plans start around ${zipbooks_smarter} CAD a month when you need more. The trade-off: fewer advanced features and a smaller ecosystem than the larger players.</li>
-<li><strong>Argo Books.</strong> Freemium, with a free tier of {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} free receipt scans a month, no time limit. It's a desktop app for Windows, macOS, and Linux, so your data lives on your own machine rather than in someone else's cloud, which some self-employed people prefer. Premium is ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year if you outgrow the free limits. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older tools, and no built-in payroll.</li>
+<li><strong>Argo Books.</strong> Freemium, with a free tier of {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} free receipt scans a month, no time limit. It's a desktop app for Windows and Linux, so your data lives on your own machine rather than in someone else's cloud, which some self-employed people prefer. Premium is ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year if you outgrow the free limits. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older tools, and built-in payroll that covers Canada only.</li>
 <li><strong>Zoho Books.</strong> Has a real free tier for the smallest businesses, though it's limited to those under an annual revenue threshold (around US$50,000 a year, varying by region), with full accounting and strong automation. It shines if you already use other Zoho products. The trade-off: it's at its best inside the wider Zoho world, and the suite has its own learning curve.</li>
 </ul>
 {{illustration:coins}}
@@ -96,7 +96,7 @@ HTML,
 <tr><td>ZipBooks Smarter</td><td>~${zipbooks_smarter}/mo</td><td>Outgrowing the free starter</td><td>Smaller ecosystem</td></tr>
 <tr><td>Xero Starter</td><td>~${xero_starter}/mo</td><td>Wanting strong bank feeds</td><td>Monthly invoice cap</td></tr>
 <tr><td>FreshBooks Lite</td><td>~${freshbooks_lite}/mo</td><td>Freelancers who bill time</td><td>Billable-client cap</td></tr>
-<tr><td>Argo Books Premium</td><td>~${argo_premium_monthly}/mo</td><td>Higher volume, data on your machine</td><td>No built-in payroll</td></tr>
+<tr><td>Argo Books Premium</td><td>~${argo_premium_monthly}/mo</td><td>Higher volume, data on your machine</td><td>Payroll is Canada only</td></tr>
 </tbody>
 </table>
 <p>Notice that four of the cheapest options are free. For a self-employed person, the real question usually isn't "which paid plan is cheapest" but "do I need a paid plan at all yet." For a lot of one-person businesses, the honest answer is no.</p>

@@ -136,6 +136,10 @@ function get_plan_features() {
         '{receipt_scan_monthly_limit}'      => (string) $cfg['receipt_scan_monthly_limit'],
     ]);
     $plans = json_decode($json, true);
+    // plans.json carries its editing rules in a "_comment" key, since JSON has
+    // no comment syntax. Drop it here so it never reaches callers or the
+    // /api/pricing/plans.php payload the desktop app consumes.
+    unset($plans['_comment']);
     return $plans;
 }
 

@@ -68,11 +68,99 @@ $tools = [
         'icon_class'  => 'indigo',
     ],
     [
+        'name'        => 'Free Etsy Fee Calculator',
+        'description' => 'See every fee Etsy takes from a sale and what you actually keep. Or enter the profit you want and get the price to list at. US, Canada, UK, and Australia.',
+        'href'        => '../etsy-fee-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'tag',
+        'icon_class'  => 'purple',
+    ],
+    [
         'name'        => 'Free Craft Pricing Calculator',
         'description' => 'Price your handmade products to actually pay you. Add materials, labour, and markup to get a selling price, profit, and margin.',
         'href'        => '../craft-pricing-calculator/',
         'cta'         => 'Open the calculator',
         'icon'        => 'shopping-bag',
+        'icon_class'  => 'cyan',
+    ],
+    [
+        'name'        => 'Free Candle Pricing Calculator',
+        'description' => 'Price candles from what a batch really costs in wax, wicks, jars, and fragrance. Get cost per candle, a selling price, and your margin.',
+        'href'        => '../candle-pricing-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'bolt',
+        'icon_class'  => 'amber',
+    ],
+    [
+        'name'        => 'Free Soap Pricing Calculator',
+        'description' => 'Cost a whole batch of handmade soap and get your true cost per bar, a price, and your real margin. Not a lye calculator.',
+        'href'        => '../soap-pricing-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'spray-bottle',
+        'icon_class'  => 'cyan',
+    ],
+    [
+        'name'        => 'Free Tumbler Pricing Calculator',
+        'description' => 'Sublimation, vinyl, or epoxy. Work out what a custom tumbler costs once your time is counted, then what to charge.',
+        'href'        => '../tumbler-pricing-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'shopping-bag',
+        'icon_class'  => 'purple',
+    ],
+    [
+        'name'        => 'Free Cake Pricing Calculator',
+        'description' => 'Ingredients, decorating time, board and box, delivery. What a cake really costs you, and what to charge for it.',
+        'href'        => '../cake-pricing-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'star',
+        'icon_class'  => 'indigo',
+    ],
+    [
+        'name'        => 'Free Craft Fair Calculator',
+        'description' => 'How many sales cover your booth fee and fuel, and whether the market day actually paid you once your hours are counted.',
+        'href'        => '../craft-fair-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'map-pin',
+        'icon_class'  => 'green',
+    ],
+    [
+        'name'        => 'Free Hourly Rate Calculator',
+        'description' => 'What to charge when self-employed, once unbillable time, business costs, and tax are all covered. Most people undercharge by half.',
+        'href'        => '../hourly-rate-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'clock',
+        'icon_class'  => '',
+    ],
+    [
+        'name'        => 'Free Mileage Deduction Calculator',
+        'description' => 'What your business driving is worth at tax time. Handles the 2026 US mid-year rate change and the tiered rates in Canada and the UK.',
+        'href'        => '../mileage-deduction-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'car',
+        'icon_class'  => 'green',
+    ],
+    [
+        'name'        => 'Free Late Fee Calculator',
+        'description' => 'Interest and fees owed on an overdue invoice, simple or compounding, and what the total comes to today.',
+        'href'        => '../late-fee-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'clock',
+        'icon_class'  => 'amber',
+    ],
+    [
+        'name'        => 'Free Markup vs Margin Calculator',
+        'description' => 'Enter any two of cost, price, markup, or margin and get the rest. They are not the same number, and mixing them up costs money.',
+        'href'        => '../markup-margin-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'trending-up',
+        'icon_class'  => 'indigo',
+    ],
+    [
+        'name'        => 'Free Break-Even Calculator',
+        'description' => 'How many sales it takes before you stop losing money, and what each one is worth after that point.',
+        'href'        => '../break-even-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'bar-chart',
         'icon_class'  => 'cyan',
     ],
     [
@@ -139,6 +227,11 @@ $tools = [
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>

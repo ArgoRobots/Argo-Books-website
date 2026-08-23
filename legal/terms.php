@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,16 +31,7 @@
     <link rel="canonical" href="https://argorobots.com/legal/terms.php">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Terms of Service", "item": "https://argorobots.com/legal/terms.php"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Terms of Service" => "/legal/terms.php"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Terms of Service - Argo Books</title>
@@ -78,14 +70,15 @@
             <p>You must immediately notify us of any unauthorized uses of your account or any other breaches of
                 security. We will not be liable for any acts or omissions by you, including any damages of any kind
                 incurred as a result of such acts or omissions.</p>
-            <p>The Argo Books desktop application collects anonymous usage data to help us improve Argo Books. We
+            <p>The Argo Books desktop application collects usage data to help us improve Argo Books. We
                 use it to understand how the software is used, identify and fix bugs, diagnose performance issues,
                 prioritize new features, and optimize the app for different regions. This includes operational data,
-                API usage, error tracking, session information, and geographic data (country, region, and timezone).
-                The data is uploaded to our servers when the application is closed. You can view the data collected
-                on your device and delete it from your device at any time through the Settings panel. This data
-                collection is separate from any standard web analytics used on our website. For more information
-                about what data is collected and how it is used, please see our
+                API usage, error tracking, session information, startup timing, geographic data (country, region,
+                and timezone), and the profile of the business you keep books for (company name, business type,
+                industry, country, currency, and language). It does not include your transactions, customers, suppliers, or 
+                documents. The data is uploaded to our servers while the application runs and when it is closed.
+                This data collection is separate from any standard web analytics used on our
+                website. For more information about what data is collected and how it is used, please see our
                 <a class="link" href="privacy.php">Privacy Policy</a>.</p>
 
             <h2>User Content</h2>
@@ -123,8 +116,12 @@
             <p>License keys may not be shared, distributed, or used on more instances than permitted by the license
                 terms. We reserve the right to revoke license keys that are used in violation of these Terms.</p>
 
-            <h2>Argo Premium Subscription</h2>
-            <p>Argo Premium is an optional subscription service that provides invoices and AI-powered features. By subscribing, you agree to the following:</p>
+            <h2>Argo Books Premium Subscription</h2>
+            <p>Argo Books Premium is an optional subscription that raises the monthly usage limits of the free version,
+                including invoicing, receipt scanning, and spreadsheet and bank statement imports, and unlocks
+                additional features such as revenue forecasting, biometric sign-in, and priority support. The current
+                limits and full feature list for each plan are published on our <a href="../pricing/">pricing page</a>.
+                By subscribing, you agree to the following:</p>
             <ul>
 <?php
                     require_once __DIR__ . '/../config/pricing.php';
@@ -137,7 +134,6 @@
                 <li><strong>Plan Changes (Downgrade)</strong>: When downgrading from yearly to monthly billing, the prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. Any leftover value remains as account credit and is automatically applied to future monthly renewals until depleted.</li>
                 <li><strong>Account Credit</strong>: Account credit is non-refundable, has no cash value, and is forfeited upon cancellation. Credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
                 <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square. PayPal plan changes are refunded to your PayPal account; Stripe and Square plan changes apply credits or partial charges directly.</li>
-                <li><strong>Usage Limits</strong>: AI Receipt Scanning is limited to 500 scans per month.</li>
             </ul>
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>
 
@@ -231,7 +227,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: July 8, 2026</p>
+            <p class="last-updated">Last updated: August 13, 2026</p>
         </div>
     </div>
 

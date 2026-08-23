@@ -9,7 +9,7 @@
 .success-icon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    background: linear-gradient(135deg, var(--premium-500), var(--premium-600));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@ h1 {
 
 .subscription-details {
     background: var(--white);
-    border: 2px solid var(--purple-500);
+    border: 2px solid var(--premium-500);
     border-radius: 16px;
     padding: 30px;
     margin-bottom: 30px;
@@ -47,7 +47,7 @@ h1 {
 }
 
 .subscription-details h2 {
-    color: var(--purple-500);
+    color: var(--premium-500);
     font-size: 20px;
     margin-bottom: 20px;
     text-align: center;
@@ -74,8 +74,8 @@ h1 {
 }
 
 .subscription-id-box {
-    background: var(--purple-100);
-    border: 1px solid var(--purple-300);
+    background: var(--premium-100);
+    border: 1px solid var(--premium-300);
     border-radius: 8px;
     padding: 16px;
     margin: 20px 0;
@@ -92,13 +92,13 @@ h1 {
 .subscription-id {
     font-family: monospace;
     font-size: 20px;
-    color: var(--purple-600);
+    color: var(--premium-600);
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .copy-btn {
-    background: var(--purple-500);
+    background: var(--premium-500);
     color: var(--white);
     border: none;
     padding: 8px 16px;
@@ -110,7 +110,7 @@ h1 {
 }
 
 .copy-btn:hover {
-    background: var(--purple-600);
+    background: var(--premium-600);
 }
 
 .copy-btn.copied {
@@ -148,8 +148,8 @@ h1 {
     flex-wrap: wrap;
 }
 
-.btn-purple,
-.btn-outline-purple {
+.btn-premium,
+.btn-outline-premium {
     padding: 12px 20px;
     width: auto;
 }

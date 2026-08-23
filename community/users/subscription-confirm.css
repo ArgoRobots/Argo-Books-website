@@ -33,11 +33,11 @@
 }
 
 .reactivate-icon {
-    background: var(--purple-50);
+    background: var(--premium-50);
 }
 
 .reactivate-icon svg {
-    stroke: var(--purple-500);
+    stroke: var(--premium-500);
 }
 
 .confirm-card h1 {
@@ -171,13 +171,13 @@
 }
 
 .payment-provider-btn:hover {
-    border-color: var(--purple-500);
-    background: var(--purple-50);
+    border-color: var(--premium-500);
+    background: var(--premium-50);
 }
 
 .payment-provider-btn.current {
-    border-color: var(--purple-500);
-    background: var(--purple-100);
+    border-color: var(--premium-500);
+    background: var(--premium-100);
     position: relative;
 }
 
@@ -201,13 +201,13 @@
 }
 
 .billing-cycle-btn:hover {
-    border-color: var(--purple-500);
-    background: var(--purple-50);
+    border-color: var(--premium-500);
+    background: var(--premium-50);
 }
 
 .billing-cycle-btn.current {
-    border-color: var(--purple-500);
-    background: var(--purple-100);
+    border-color: var(--premium-500);
+    background: var(--premium-100);
 }
 
 .billing-cycle-name {
@@ -223,7 +223,7 @@
 }
 
 .billing-cycle-btn.current .billing-cycle-name {
-    color: var(--purple-600);
+    color: var(--premium-600);
 }
 
 /* Action Buttons */
@@ -261,14 +261,14 @@
     box-shadow: 0 4px 12px var(--shadow-default);
 }
 
-.btn-purple {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+.btn-premium {
+    background: linear-gradient(135deg, var(--premium-500), var(--premium-600));
     color: var(--white);
     border: none;
 }
 
-.btn-purple:hover {
-    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
+.btn-premium:hover {
+    background: linear-gradient(135deg, var(--premium-600), var(--premium-700));
 }
 
 /* Responsive */

@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="pyBg" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="pyShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="500" rx="24" fill="url(#pyBg)"/>
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+  <circle cx="545" cy="440" r="45" fill="#16a34a" opacity="0.04"/>
+  <circle cx="58" cy="70" r="34" fill="#3b82f6" opacity="0.04"/>
+
+  <g filter="url(#pyShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Header -->
+  <circle cx="66" cy="56" r="18" fill="#f0fdf4"/>
+  <g stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M60 47h9l4 4v13a1.5 1.5 0 0 1-1.5 1.5h-11.5a1.5 1.5 0 0 1-1.5-1.5V48.5A1.5 1.5 0 0 1 60 47z"/>
+    <path d="M69 47v4.5h4"/>
+    <line x1="62" y1="57" x2="70" y2="57"/>
+    <line x1="62" y1="61" x2="68" y2="61"/>
+  </g>
+  <text x="92" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#1e293b">Year End 2026</text>
+  <text x="92" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">3 employees &#183; slips built from your pay runs</text>
+
+  <rect x="470" y="42" width="82" height="26" rx="13" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="511" y="55" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#16a34a" text-anchor="middle" dominant-baseline="central">Balanced</text>
+
+  <line x1="48" y1="88" x2="552" y2="88" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- T4 slip -->
+  <rect x="48" y="104" width="296" height="244" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="68" y="132" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#1e293b">T4 &#183; Remuneration Paid</text>
+
+  <g font-family="system-ui, -apple-system, sans-serif">
+    <rect x="68" y="146" width="126" height="62" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="82" y="167" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#94a3b8">BOX 14 &#183; INCOME</text>
+    <text x="82" y="192" font-size="15" font-weight="700" fill="#1e293b">62,400.00</text>
+
+    <rect x="204" y="146" width="126" height="62" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="218" y="167" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#94a3b8">BOX 16 &#183; CPP</text>
+    <text x="218" y="192" font-size="15" font-weight="700" fill="#1e293b">3,504.55</text>
+
+    <rect x="68" y="220" width="126" height="62" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="82" y="241" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#94a3b8">BOX 18 &#183; EI</text>
+    <text x="82" y="266" font-size="15" font-weight="700" fill="#1e293b">1,017.12</text>
+
+    <rect x="204" y="220" width="126" height="62" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="218" y="241" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#94a3b8">BOX 22 &#183; TAX</text>
+    <text x="218" y="266" font-size="15" font-weight="700" fill="#1e293b">10,955.10</text>
+  </g>
+
+  <line x1="68" y1="300" x2="324" y2="300" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="68" y="324" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">D. Okafor &#183; SIN &#8226;&#8226;&#8226; &#8226;&#8226;&#8226; 123 &#183; Ontario</text>
+
+  <!-- What comes out -->
+  <text x="364" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" letter-spacing="0.06em" fill="#94a3b8">READY TO FILE</text>
+
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600">
+    <rect x="364" y="146" width="188" height="40" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <circle cx="386" cy="166" r="9" fill="#16a34a"/>
+    <path d="M382.2 166l2.6 2.6 4.8-4.8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="404" y="166" fill="#166534" dominant-baseline="central">T4 slips (PDF)</text>
+
+    <rect x="364" y="194" width="188" height="40" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <circle cx="386" cy="214" r="9" fill="#16a34a"/>
+    <path d="M382.2 214l2.6 2.6 4.8-4.8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="404" y="214" fill="#166534" dominant-baseline="central">T4 Summary</text>
+
+    <rect x="364" y="242" width="188" height="40" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <circle cx="386" cy="262" r="9" fill="#16a34a"/>
+    <path d="M382.2 262l2.6 2.6 4.8-4.8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="404" y="262" fill="#166534" dominant-baseline="central">XML file for the CRA</text>
+
+    <rect x="364" y="290" width="188" height="40" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+    <circle cx="386" cy="310" r="9" fill="#3b82f6"/>
+    <path d="M382.2 310l2.6 2.6 4.8-4.8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="404" y="310" fill="#1d4ed8" dominant-baseline="central">RL-1 slips (Quebec)</text>
+  </g>
+
+  <!-- The file itself -->
+  <rect x="48" y="370" width="504" height="62" rx="12" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <g stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M74 386h10l5 5v18a2 2 0 0 1-2 2H74a2 2 0 0 1-2-2v-21a2 2 0 0 1 2-2z"/>
+    <path d="M84 386v5h5"/>
+  </g>
+  <text x="104" y="392" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#1e293b">T4-2026.xml</text>
+  <text x="104" y="411" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">Transmittal record included &#183; upload it to CRA yourself</text>
+  <rect x="452" y="389" width="76" height="24" rx="12" fill="#3b82f6"/>
+  <text x="490" y="401" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">Export</text>
+</svg>

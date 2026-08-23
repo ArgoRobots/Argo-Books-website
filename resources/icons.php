@@ -419,5 +419,62 @@ function _svg_icon_definitions() {
         'info' => [
             'body' => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4" stroke-linecap="round"/><circle cx="12" cy="8" r="1.25" fill="currentColor" stroke="none"/>',
         ],
+
+        // ── Industries ─────────────────────────────────────────────────
+        // Trade-specific icons for the /who-its-for/ cards. Rounded joins are
+        // set on a wrapping <g> because the <svg> root doesn't apply them.
+        'leaf' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></g>',
+        ],
+        'hard-hat' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><path d="M14 6a6 6 0 0 1 6 6v3"/></g>',
+        ],
+        'wrench' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></g>',
+        ],
+        'package-clock' => [
+            // Isometric crate with a clock badge: rentals go out and come back.
+            // Drawn at final size rather than scaled, so the stroke stays even.
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10 7.75 6.5 14 10v7.5L7.75 21 1.5 17.5z"/><path d="M1.5 10 7.75 13.5 14 10"/><path d="M7.75 13.5V21"/><circle cx="18.5" cy="6" r="4.5"/><path d="M18.5 3.9V6l1.6 1.1"/></g>',
+        ],
+        'spray-bottle' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 8H16a3 3 0 0 1 3 3v8.5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V11a3 3 0 0 1 3-3z"/><path d="M11.5 8V5.5H16V8"/><path d="M11.5 6.5H7.5L5.8 4.8"/><path d="M4.6 3 3.3 1.7M3.6 6.2H2M4.6 9.4 3.3 10.7"/></g>',
+        ],
+        'truck' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="14" height="12" rx="1.5"/><path d="M15 8h4.5l3.5 3.5V16H15z"/><circle cx="6" cy="18.5" r="2.3"/><circle cx="18" cy="18.5" r="2.3"/></g>',
+        ],
+        'tag' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.1"/></g>',
+        ],
+        'car' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12.4V16c0 .6.4 1 1 1h2"/><path d="M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></g>',
+        ],
+        'user-package' => [
+            // One person plus a taped carton: solo operators carrying stock.
+            // The lid line stops short of a full cross so it reads as a box,
+            // not a 2x2 grid.
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><path d="M11 21v-1.5A3.5 3.5 0 0 0 7.5 16h-3A3.5 3.5 0 0 0 1 19.5V21"/><circle cx="6" cy="8" r="3.5"/><rect x="13.5" y="11" width="9.5" height="10" rx="1.5"/><path d="M13.5 15h9.5"/><path d="M18.25 11v4"/></g>',
+        ],
+        'code-window' => [
+            'body' => '<g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 8h20"/><path d="M10.5 12.5 8 15l2.5 2.5"/><path d="M13.5 12.5 16 15l-2.5 2.5"/></g>',
+        ],
     ];
+}
+
+/**
+ * Raw SVG path data for an OS logo, for the download and system-requirements
+ * pages. These are filled brand marks on a 24x24 box, so they are kept apart
+ * from the stroked set above and returned as a bare `d` attribute rather than
+ * a whole <svg> element.
+ *
+ * Returns an empty string for an unknown platform.
+ */
+function getPlatformIconPath($platform)
+{
+    $icons = [
+        'windows' => 'M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801',
+        'macos' => 'M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z',
+        'linux' => 'M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z'
+    ];
+    return $icons[$platform] ?? '';
 }

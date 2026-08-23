@@ -95,7 +95,6 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
             }
         }
 
-        // Send notification email
         send_notification_email('new_post', [
             'id' => $post_id,
             'user_name' => $user_name,
@@ -240,7 +239,6 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
         $stmt->execute([$comment_id]);
         $new_comment = $stmt->fetch();
 
-        // Send notification email
         send_notification_email('new_comment', [
             'id' => $comment_id,
             'post_id' => $post_id,
@@ -289,7 +287,6 @@ function vote_post($post_id, $user_email, $vote_type)
 
             $user_vote = 0;
         } else {
-            // Update the vote
             $stmt = $pdo->prepare('UPDATE community_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
                                  WHERE post_id = ? AND user_email = ?');
             $stmt->execute([$vote_type, $post_id, $user_email]);
@@ -367,7 +364,6 @@ function vote_comment($comment_id, $user_email, $vote_type)
 
             $user_vote = 0;
         } else {
-            // Update the vote
             $stmt = $pdo->prepare('UPDATE comment_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
                                  WHERE comment_id = ? AND user_email = ?');
             $stmt->execute([$vote_type, $comment_id, $user_email]);

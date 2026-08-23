@@ -29,6 +29,7 @@ function getBasePath() {
                    '/for-rental-businesses/', '/for-cleaning-companies/',
                    '/for-local-wholesalers/', '/for-resellers/',
                    '/for-auto-detailing/', '/for-solo-operators/',
+                   '/for-software-companies/',
                    '/who-its-for/'];
 
   var isRootPath = sitePaths.some(function(p) { return path.startsWith(p); }) || path === '/' || path === '/index.php';
@@ -78,10 +79,37 @@ function loadAvatar() {
     });
 }
 
+// Header dropdown hover intent: open on hover, and keep the menu open for a
+// short grace period after the pointer leaves, so the user can move across the
+// small gap between the button and the menu without it closing on them. Uses
+// the .dropdown-open class the header CSS already supports; mouseenter/leave on
+// the whole .has-dropdown (the button + the menu) so moving into the menu keeps
+// it open, and a cancellable timer bridges the gap in between.
+function initHeaderDropdowns() {
+  var CLOSE_DELAY = 280; // ms
+
+  document.querySelectorAll(".has-dropdown").forEach(function (dd) {
+    var closeTimer = null;
+
+    dd.addEventListener("mouseenter", function () {
+      clearTimeout(closeTimer);
+      dd.classList.add("dropdown-open");
+    });
+
+    dd.addEventListener("mouseleave", function () {
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(function () {
+        dd.classList.remove("dropdown-open");
+      }, CLOSE_DELAY);
+    });
+  });
+}
+
 // The header and footer are now rendered server-side (PHP includes), so they
 // are already in the DOM. On ready we just load the avatar and the cursor orb.
 document.addEventListener("DOMContentLoaded", function () {
   loadAvatar();
+  initHeaderDropdowns();
 
   // Load cursor orb script
   var cursorOrbScript = document.createElement('script');

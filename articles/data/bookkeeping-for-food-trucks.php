@@ -105,7 +105,7 @@ HTML,
 <li><strong>Pay traceably and keep records.</strong> Pay by transfer or through proper payroll rather than untracked cash where you can, and keep a record of every payment. Cash wages with no paperwork are both a lost deduction and a problem if anyone asks.</li>
 <li><strong>Collect details up front.</strong> Whether it's payroll details for an employee or a contractor's business name and tax number, get them before the first payday, not chased down later.</li>
 </ul>
-<p>Argo Books, for the record, doesn't include built-in payroll, so a truck with employees will run payroll through a separate payroll service or an accountant and bring the totals into the books. That's a normal setup, and it's worth knowing up front when you're choosing tools.</p>
+<p>Argo Books, for the record, includes payroll for Canadian staff on its Premium plan. A truck with employees outside Canada will run payroll through a separate payroll service or an accountant and bring the totals into the books, which is a normal setup and worth knowing up front when you're choosing tools.</p>
 HTML,
     ],
 
@@ -143,7 +143,7 @@ HTML,
     ],
     [
       'q' => 'Does Argo Books handle payroll for my staff?',
-      'a' => 'No, Argo Books does not include built-in payroll, and that is worth knowing up front if your truck has employees. Payroll is region-specific and involves tax withholding and other obligations that vary by country, so a truck with staff typically runs payroll through a dedicated payroll service or an accountant, then brings the wage totals into the books as a cost. That is a normal and common setup. If built-in payroll is a must-have for you, factor that into your choice of accounting tool. Either way, get the employee-versus-contractor classification right first, since that is set by your local rules and getting it wrong can be expensive.',
+      'a' => 'For a Canadian truck, yes. Payroll is part of the Premium plan and covers CPP, EI and income tax for every province and territory, with pay stubs for your staff and T4 slips at year end. Payroll is region-specific, though, so a truck with staff outside Canada runs payroll through a dedicated payroll service or an accountant, then brings the wage totals into the books as a cost. That is a normal and common setup. If built-in payroll for your own region is a must-have, factor that into your choice of accounting tool. Either way, get the employee-versus-contractor classification right first, since that is set by your local rules and getting it wrong can be expensive.',
     ],
     [
       'q' => 'Do I need accounting software, or is a spreadsheet enough?',
@@ -151,7 +151,7 @@ HTML,
     ],
     [
       'q' => 'Is this article just trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned in a callout you can ignore, and yes, this is the Argo Books site, so read it with that in mind. We have also said plainly that Argo Books has no built-in payroll, which matters if you have staff. The advice in this guide does not depend on our tool. Recording cash daily, tracking food cost and waste, keeping fuel and permit receipts, and setting tax money aside are habits that work with a spreadsheet, a notebook, or any accounting app. If you take only the habits and never look at Argo Books, the guide did its job. On a thin margin, what matters is that you can see your numbers, not which software shows them to you.',
+      'a' => 'Argo Books is mentioned in a callout you can ignore, and yes, this is the Argo Books site, so read it with that in mind. We have also said plainly that its payroll covers Canada only, which matters if your staff are elsewhere. The advice in this guide does not depend on our tool. Recording cash daily, tracking food cost and waste, keeping fuel and permit receipts, and setting tax money aside are habits that work with a spreadsheet, a notebook, or any accounting app. If you take only the habits and never look at Argo Books, the guide did its job. On a thin margin, what matters is that you can see your numbers, not which software shows them to you.',
     ],
   ],
 

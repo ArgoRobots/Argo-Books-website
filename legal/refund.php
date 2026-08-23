@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../partials/schema.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,16 +31,7 @@
     <link rel="canonical" href="https://argorobots.com/legal/refund.php">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Refund Policy", "item": "https://argorobots.com/legal/refund.php"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Refund Policy" => "/legal/refund.php"]) ?></script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Refund Policy - Argo Books</title>
@@ -71,7 +63,7 @@
                 understand that sometimes a purchase may not work out as expected.</p>
 
             <h2>Premium Subscription Cancellations</h2>
-            <p>For Argo Premium subscriptions:</p>
+            <p>For Argo Books Premium subscriptions:</p>
             <ul>
                 <li>You can cancel your subscription at any time from your account settings.</li>
                 <li>After cancellation, you retain access to Premium features until the end of your current billing period.</li>
@@ -80,13 +72,29 @@
             </ul>
 
             <h2>Plan Changes</h2>
-            <p>You may switch your Argo Premium subscription between monthly and yearly billing at any time from your account settings. Plan changes are not refunds; they are handled automatically:</p>
+            <p>You may switch your Argo Books Premium subscription between monthly and yearly billing at any time from your account settings. Plan changes are not refunds; they are handled automatically:</p>
             <ul>
                 <li><strong>Upgrade (monthly to yearly)</strong>: You are charged the yearly amount immediately, less the prorated value of your current unused monthly period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
                 <li><strong>Downgrade (yearly to monthly)</strong>: The prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. If the prorated value exceeds one month, the leftover remains as account credit and is automatically applied to future monthly renewals until depleted. No cash refund is issued.</li>
                 <li><strong>Account credit</strong>: Account credit is non-refundable, has no cash value, and cannot be transferred. It is forfeited if you cancel your subscription. Account credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
                 <li><strong>Plan changes for PayPal subscribers</strong>: The new subscription is billed by PayPal on activation, and the prorated value of your unused old period (plus any account credit) is refunded to your PayPal account within 5&ndash;10 business days.</li>
             </ul>
+
+            <h2>Refund Eligibility</h2>
+            <p>We offer refunds in the following situations:</p>
+            <ul>
+                <li><strong>First payment</strong>: You may request a full refund for any reason within 30 days of your first Premium payment.</li>
+                <li><strong>Automatic renewals</strong>: If a subscription renews and you did not intend to continue, you may request a full refund of that renewal charge within 7 days of the charge.</li>
+                <li><strong>Unresolved technical issues</strong>: If a problem with Argo Books cannot be resolved after reasonable attempts by our support team, we may offer a refund regardless of how long you have been subscribed.</li>
+            </ul>
+            <p>The following are not refundable:</p>
+            <ul>
+                <li>Requests made outside the windows above, except for unresolved technical issues.</li>
+                <li>Account credit, which has no cash value and is forfeited on cancellation.</li>
+                <li>Subscriptions where the licence has been revoked for a breach of our <a class="link" href="terms.php">Terms of Service</a>.</li>
+            </ul>
+            <p>When a refund is issued, your subscription is cancelled, Premium features end immediately, and the associated licence key is deactivated.</p>
+            <p>Purchases made through a third-party marketplace are covered by that marketplace's refund policy, not this one. Please contact them directly.</p>
 
             <h2>How to Request a Refund</h2>
             <p>To request a refund, please contact our support team with the following information:</p>
@@ -124,8 +132,6 @@
             </ol>
             <p>Many issues can be resolved with proper guidance, and we are committed to helping you get the most out of
                 our software.</p>
-            <p>If technical issues cannot be resolved after reasonable attempts by our support team, we may offer a
-                refund at our discretion.</p>
 
             <h2>Changes to This Policy</h2>
             <p>We reserve the right to modify this Refund Policy at any time. Changes will be effective immediately upon
@@ -138,7 +144,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: April 30, 2026</p>
+            <p class="last-updated">Last updated: August 13, 2026</p>
         </div>
     </div>
 

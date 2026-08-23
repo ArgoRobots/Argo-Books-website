@@ -40,7 +40,6 @@ if (!$invoice) {
     exit;
 }
 
-// Available payment methods
 $paymentMethods = get_available_payment_methods($invoice);
 $singleMethod = count($paymentMethods) === 1 ? $paymentMethods[0] : null;
 

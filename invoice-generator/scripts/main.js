@@ -6,6 +6,7 @@ import { loadDraft, saveDraft, emptyState } from './state.js';
 import { renderTotals, renderLineItemAmount } from './render.js';
 import { applyTemplate } from './templates.js';
 import { formatMoney } from './currency.js';
+import { symbolFor as currencySymbolFor } from '../../shared/scripts/currency-format.js';
 import { resizeImageDataUrl } from './image-helpers.js';
 import { trackEvent } from './tracker.js';
 
@@ -453,30 +454,11 @@ function wireLogoUpload() {
 
 // Locale fallback per currency so Intl.NumberFormat picks a sensible default
 // (decimal separators, symbol placement) when the user changes currency.
-// List mirrors ArgoBooks/Data/Currencies.cs in the desktop app.
-const LOCALE_FOR_CURRENCY = {
-  ALL: 'sq-AL', AUD: 'en-AU', BAM: 'bs-BA', BGN: 'bg-BG',
-  BRL: 'pt-BR', BYN: 'be-BY', CAD: 'en-CA', CHF: 'de-CH',
-  CNY: 'zh-CN', CZK: 'cs-CZ', DKK: 'da-DK', EUR: 'en-IE',
-  GBP: 'en-GB', HUF: 'hu-HU', ISK: 'is-IS', JPY: 'ja-JP',
-  KRW: 'ko-KR', MKD: 'mk-MK', NOK: 'nb-NO', PLN: 'pl-PL',
-  RON: 'ro-RO', RSD: 'sr-RS', RUB: 'ru-RU', SEK: 'sv-SE',
-  TRY: 'tr-TR', TWD: 'zh-TW', UAH: 'uk-UA', USD: 'en-US',
-};
-
-function currencySymbolFor(code, locale) {
-  try {
-    const parts = new Intl.NumberFormat(locale || 'en-US', {
-      style: 'currency',
-      currency: code || 'USD',
-      currencyDisplay: 'narrowSymbol',
-    }).formatToParts(0);
-    const sym = parts.find((p) => p.type === 'currency');
-    return sym ? sym.value : '$';
-  } catch (_e) {
-    return '$';
-  }
-}
+// Emitted by _fragment.php from shared/currencies.php, which is the website's
+// single source of truth for the list. Kept as a lookup with an en-US fallback
+// rather than a second copy of the table: if the global is ever missing, every
+// currency still formats, just with US separators.
+const LOCALE_FOR_CURRENCY = window.ARGO_CURRENCY_LOCALES || {};
 
 // Update the visible currency symbol in every input affix that was a "$"
 // prefix (tax / shipping / discount / amount paid / line-item rate).
@@ -862,7 +844,7 @@ async function init() {
   state = loadDraft(nicheDefaults);
 
   // If we landed on a niche page with defaults AND localStorage had no draft,
-  // the niche defaults won. Fire an event so the admin Reddit/conversion dashboard
+  // the niche defaults won. Fire an event so the admin conversion dashboard
   // can attribute niche-page hydration distinctly from generic visits.
   if (!hadLocalDraftBefore && nicheDefaults && typeof nicheDefaults === 'object') {
     const slug = (typeof window !== 'undefined' && window.INVOICE_NICHE_SLUG)

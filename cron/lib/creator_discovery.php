@@ -124,6 +124,31 @@ function youtube_channel_name_from_html(string $html): ?string
     return null;
 }
 
+/**
+ * Derive a human-readable creator name from a URL when no real channel/creator
+ * name could be extracted (YouTube fetches are frequently blocked). Prefer the
+ * @handle or channel slug that is already in the URL over the bare domain, so a
+ * lead never shows as just "youtube.com". Falls back to the domain only when the
+ * URL carries no usable identity.
+ */
+function creator_name_from_url(string $url): string
+{
+    $parts = parse_url($url);
+    $host  = strtolower((string) ($parts['host'] ?? ''));
+    $path  = (string) ($parts['path'] ?? '');
+
+    if (str_contains($host, 'youtube.com') || str_contains($host, 'youtu.be')) {
+        if (preg_match('~/(@[^/?#]+)~', $path, $m)) {
+            return $m[1];                       // @handle, e.g. @paperandspark
+        }
+        if (preg_match('~/(?:channel|c|user)/([^/?#]+)~', $path, $m)) {
+            return $m[1];                       // legacy channel slug
+        }
+    }
+
+    return editorial_domain_from_url($url);
+}
+
 /** True if a URL's host is on the never-recruit blocklist above. */
 function creator_host_excluded(string $url): bool
 {
@@ -350,7 +375,7 @@ PROMPT;
     }
 
     $isRelevant   = !empty($parsed['is_relevant']);
-    $creatorName  = trim((string) ($parsed['creator_name'] ?? '')) ?: ($serpTitle !== '' ? $serpTitle : ucfirst($domain));
+    $creatorName  = trim((string) ($parsed['creator_name'] ?? '')) ?: ($serpTitle !== '' ? $serpTitle : creator_name_from_url($url));
     // For YouTube, prefer the real channel name off the page over the AI's guess
     // or the SERP video title (which is what was making leads show a video headline).
     if ($platform === 'youtube') {

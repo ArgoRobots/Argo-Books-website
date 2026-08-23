@@ -58,6 +58,11 @@ $pricing = get_pricing_config();
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>
@@ -89,6 +94,89 @@ $pricing = get_pricing_config();
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.12 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.12</span>
+                        <span class="date-tag">August 18 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Payroll for Canadian businesses:</strong> Pay your staff without a separate payroll service. Argo Books works out CPP, EI and income tax using the CRA's own figures, for every province and territory, then produces pay stubs for your employees. At year end it prepares your T4 slips and the file the CRA needs, plus RL-1 slips if you have Quebec staff. When someone leaves, it gathers the figures for their Record of Employment.</li>
+                                <li><strong>Automatic payment reminders:</strong> Argo Books can now chase overdue invoices for you, emailing the customer a payment link 3, 7 and 14 days after the due date and stopping as soon as they pay. The reminders are sent by our servers, so they keep going even when Argo Books is closed. Turn it on in the Payment Portal settings; only invoices that fall due after you switch it on are chased.</li>
+                                <li><strong>Know the moment you get paid:</strong> Choose to be emailed whenever a customer pays an invoice online, so you find out without having the app open.</li>
+                                <li><strong>Send an invoice again:</strong> Resend any invoice straight from the invoice list, for the customer who says it never arrived.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Payments live on the invoice:</strong> Record a cash or cheque payment on the invoice it belongs to, and edit or remove it from the same place. No more hopping to a separate page and picking the invoice back out of a list.</li>
+                                <li><strong>A menu that follows the money:</strong> The sidebar is now split into Expenses and Revenue, so suppliers sit alongside what you buy and customers alongside what you sell.</li>
+                                <li><strong>Spreadsheet exports carry more:</strong> Every row now names the supplier or customer name instead of only showing an ID. Invoices bring their line items with them, amounts carry their quantity and currency, and there are new sheets for your employees and your pay runs.</li>
+                                <li><strong>Loading screen for exports</strong> A loading screen now appears while a spreadsheet is being exported, instead of freezing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Timestamps show the local time</strong> Some timestamps were showing UTC instead of the local time.</li>
+                                <li><strong>Invoices show partial payments</strong> If an invoice was published on the payment portal, then marked as partially payed, the invoice now updates and shows the new amount.</li>
+                                <li><strong>Rendering issue</strong> Fixed a rendering issue that could sometimes appear when opening a search box during the tutorial.</li>
+                                <li>The usual round of polish and performance work across the app.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version 2.0.11 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.11</span>
+                        <span class="date-tag">July 27 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Password recovery:</strong> If you forget the password to a company file, our support team can now unlock it for you. Until now a forgotten password meant the file stayed closed for good. Your password itself is still private and cannot be read by anyone, including us.</li>
+                                <li><strong>Stripe integration:</strong> Connect your Stripe account and bring your payments straight into Argo Books. Sales, tax, discounts, processing fees, and refunds all come across. Argo Books also remembers your Stripe payouts, so when you later import your bank statement it skips the matching deposit instead of counting that income twice.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Much faster startup:</strong> Argo Books opens around 40% faster on Windows, and a loading screen now appears right away so you can see it starting.</li>
+                                <li><strong>Setup starts with a receipt scan:</strong> The getting-started guide now begins by scanning a sample receipt, so you can see what Argo Books does within seconds of opening it for the first time.</li>
+                                <li><strong>Better with long receipts:</strong> Receipt scanning now handles longer, more detailed receipts with many line items.</li>
+                                <li><strong>Clearer settings layout:</strong> Settings tabs have moved to the side, so all the sections are visible at once.</li>
+                                <li><strong>Text in dark theme</strong> The text in dark theme is now white instead of gray, improving contrast and making it easier to read.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Multiple company workflows:</strong> Working in several company files side by side in different instances of the app is smoother.</li>
+                                <li>The usual round of polish and performance work across the app.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.10 -->
             <div class="version-card">
                 <div class="version-header">
@@ -105,7 +193,7 @@ $pricing = get_pricing_config();
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
                                 <li><strong>Redesigned invoice editor:</strong> Build invoices right on the invoice itself, so what you see on screen is exactly what your customer receives. Click any part of the invoice to edit line items, dates, or notes, and pick products and services from a dropdown as you type. No more filling out a separate form and hoping the layout looks right.</li>
-                                <li><strong>Recurring invoices, expenses, and revenue:</strong> Set any invoice, expense, or revenue entry to repeat on a schedule you choose. Perfect for retainers, subscriptions, rent, and any regular bill or income. Argo Books creates each one automatically, so your books stay up to date without the repeat data entry.</li>
+                                <li><strong>Recurring invoices:</strong> Set any invoice to repeat on a schedule you choose. Perfect for subscriptions, rent, and any regular income.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -511,7 +599,7 @@ $pricing = get_pricing_config();
 
                         <h3>A New Foundation: Cross-Platform and Modern</h3>
                         <p>
-                            We've rebuilt Argo Books using Avalonia UI and .NET 10, replacing the old Windows-only WinForms architecture. This means you can now run Argo Books natively on <strong>Windows, macOS, and Linux</strong>. The interface has been completely redesigned with a fresh, modern look that's more intuitive and responsive than ever before.
+                            We've rebuilt Argo Books using Avalonia UI and .NET 10, replacing the old Windows-only WinForms architecture. This means you can now run Argo Books natively on <strong>Windows and Linux</strong>. The interface has been completely redesigned with a fresh, modern look that's more intuitive and responsive than ever before.
                         </p>
 
                         <h3>AI-Powered Receipt Scanning</h3>

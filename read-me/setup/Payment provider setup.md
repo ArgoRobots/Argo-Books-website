@@ -39,7 +39,7 @@ sections below.
    `process-payment.php`; the webhook covers the case where the customer
    closes their browser before the success page loads.
 3. **SaaS subscription billing**: argorobots.com customers paying for
-   Argo Premium subscriptions.
+   Argo Books Premium subscriptions.
 
 ---
 

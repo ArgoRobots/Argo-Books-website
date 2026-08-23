@@ -738,6 +738,52 @@ body {
   margin: 0 6px;
 }
 
+/* Optional headline statistic (data field `hero_stat`), for articles that
+   exist to answer one numeric question. Sits between the byline and the
+   intro. Deliberately loud: this is the answer the reader came for. */
+.article-hero-stat {
+  margin: 0 0 28px;
+  padding: 22px 26px;
+  border: 1px solid var(--gray-border);
+  border-left: 4px solid var(--primary-blue);
+  border-radius: 10px;
+  background: var(--gray-50);
+}
+
+.article-hero-stat-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--gray-500);
+}
+
+.article-hero-stat-value {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.article-hero-stat-unit {
+  display: block;
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--gray-600);
+}
+
+.article-hero-stat-footnote {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gray-600);
+}
+
 .article-intro p:first-child {
   font-size: 19px;
   line-height: 1.55;
@@ -1078,6 +1124,19 @@ body {
   }
   .article-section h2 {
     font-size: 26px;
+  }
+  .article-hero-stat {
+    padding: 18px 18px;
+  }
+  .article-hero-stat-value {
+    font-size: 34px;
+  }
+  /* Wide pricing tables scroll inside the article column rather than
+     forcing the page body to scroll sideways. */
+  .article-section table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 }
 

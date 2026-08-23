@@ -34,10 +34,6 @@ function logPurge($message, $type = 'INFO') {
         mkdir(__DIR__ . '/logs', 0755, true);
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-
-    if (php_sapi_name() === 'cli') {
-        echo $logEntry;
-    }
 }
 
 logPurge('Starting account purge check...');

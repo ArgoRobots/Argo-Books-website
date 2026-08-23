@@ -294,6 +294,17 @@ body {
   text-align: center;
   box-shadow: 0 4px 20px var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* These are anchors now. The card already lifted on hover, which promised a
+     click it could not deliver; the heading and body keep their own colours so
+     linking changes nothing visually. */
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.feature-item:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 3px;
 }
 
 .feature-item:hover {

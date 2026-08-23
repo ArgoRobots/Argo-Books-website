@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../resources/icons.php';
@@ -90,7 +91,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Do I need to install anything?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
+                        "text": "Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
                     }
                 },
                 {
@@ -126,7 +127,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <script src="../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="../features/style.css">
+    <link rel="stylesheet" href="../resources/styles/marketing-sections.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -134,6 +135,11 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>
@@ -332,149 +338,67 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         </div>
     </section>
 
-    <!-- Inline CTA -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Ready to unlock Premium?</h3>
-                <p>Cancel anytime. No lock-in.</p>
-                <div class="inline-cta-buttons">
-                    <a href="premium/" class="btn-cta btn-cta-primary">
-                        <span>Get Premium</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../downloads/" class="btn-cta btn-cta-outline">
-                        <span>Download Free</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does the Free plan work?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
+            <?php $faqs = [];
+            ob_start(); ?>How does the Free plan work?<?php $q = ob_get_clean();
+            ob_start(); ?>
+
                             <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month.</p>
                             <p>You can use it for as long as you like. When your business needs more, upgrading to Premium takes just a few clicks.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What does Premium unlock?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What does Premium unlock?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
                             <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong>. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>I have multiple companies. Do I need to pay extra?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>I have multiple companies. Do I need to pay extra?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>No. Argo Books supports an unlimited number of companies, even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized.</p>
                             <p>There's no per-company fee, no upgrade required, and no cap on how many businesses you can run.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Can I cancel or change my plan anytime?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I cancel or change my plan anytime?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Yes. You can cancel your Premium subscription at any time from your <a href="../portal/">customer portal</a>. No phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period.</p>
                             <p>You can also switch between monthly and yearly billing whenever it suits you. If you believe you're entitled to a refund, <a href="../contact.php">get in touch</a> and we'll review your request. <a href="../legal/refund.php">View full refund policy</a></p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Do I need to install anything?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Do I need to install anything?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
+                            <p>Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
                             <p>You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import. <a href="../downloads/">Download Argo Books</a></p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Is my payment information secure?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is my payment information secure?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>Absolutely. All payments are processed through Stripe, PayPal, or Square. We never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide.</p>
                             <p>Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>Do I still need an accountant?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Do I still need an accountant?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books. It keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare.</p>
                             <p>If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in <a href="../documentation/pages/features/report-generator.php">report generator</a> can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries: everything an accountant typically asks for.</p>
-                        </div>
-                    </div>
-                </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            ob_start(); ?>What if I need help getting started?<?php $q = ob_get_clean();
+            ob_start(); ?>
 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What if I need help getting started?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
                             <p>We've got you covered. All users have access to our <a href="../documentation/">documentation</a> and <a href="../community/">community forum</a>. Premium subscribers get priority support with faster response times.</p>
                             <p>You can also reach us through our <a href="../contact.php">contact page</a>. We're a small team and we personally read every message.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        
+            <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];
+            echo argo_faq_grid($faqs); ?>
         </div>
     </section>
 
@@ -508,22 +432,22 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 document.querySelectorAll('[data-active-cycle]').forEach(c => {
                     c.dataset.activeCycle = cycle;
                 });
+                // Carry the chosen cycle through so /pricing/premium/ can hand it
+                // straight to checkout instead of asking a second time.
+                document.querySelectorAll('[data-premium-cta]').forEach(a => {
+                    a.href = a.dataset.baseUrl + '?billing=' + cycle;
+                });
+                // Slide the new price in from the side the toggle moved toward.
+                // Only the Premium card animates; the free card's $0 doesn't change.
+                const from = cycle === 'yearly' ? 'price-swap-right' : 'price-swap-left';
+                document.querySelectorAll('.pcard-premium .pcard-price').forEach(p => {
+                    p.classList.remove('price-swap-right', 'price-swap-left');
+                    void p.offsetWidth; // reflow, so the animation restarts on repeat switches
+                    p.classList.add(from);
+                });
             });
         });
 
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            question.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                faqItems.forEach(otherItem => {
-                    otherItem.classList.remove('active');
-                });
-                if (!isActive) {
-                    item.classList.add('active');
-                }
-            });
-        });
     });
     </script>
 

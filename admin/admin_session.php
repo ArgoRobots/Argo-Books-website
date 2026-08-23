@@ -18,8 +18,7 @@
  *   3. Using a dedicated cookie name, so the public site's session (a community
  *      login regenerating its id, for example) can't disturb an admin session.
  *
- * Include this before any output. Replaces the inline cookie-params + start
- * block that admin/login.php used to carry.
+ * Include this before any output.
  */
 
 // Never double-start (some endpoints may be reached more than one way).

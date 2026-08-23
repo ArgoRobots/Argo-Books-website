@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
-require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
+require_once __DIR__ . '/../date-range.php';
+require_once __DIR__ . '/telemetry-dedupe.php'; // telemetry_is_duplicate_event()
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -25,15 +28,37 @@ if (!in_array($tierFilter, ['all', 'free', 'premium'], true)) {
     $tierFilter = 'all';
 }
 
+// Date range (shared presets: admin/date-range.php). It scopes the charts and
+// detail tables only. The Active Users KPI cards below are fixed-window metrics
+// by definition (DAU / WAU / MAU are always measured against today), so they are
+// computed from every event regardless of what is selected here.
+//
+// "All Time" can't resolve a floor up front the way the SQL pages do, since the
+// earliest telemetry event isn't known until the files are parsed. It's treated
+// as "no lower bound" during the parse and the display date is backfilled from
+// the oldest event afterwards.
+$presets = date_range_presets();
+$selectedRange = selected_date_range_preset();
+$customStartRaw = $_GET['start'] ?? null;
+$customEndRaw   = $_GET['end'] ?? null;
+
+$range      = resolve_date_range($selectedRange, $customStartRaw, $customEndRaw);
+$rangeStart = $range['start'];
+$rangeEnd   = $range['end'];
+
+$rangeStartTs = $selectedRange === 'All Time' ? null : $rangeStart->getTimestamp();
+$rangeEndTs   = $rangeEnd->getTimestamp();
+$earliestEventTs = null;
+
 $aggregatedData = [
     'dataPoints' => [
         'Export' => [],
         'Gemini' => [],
         'OpenExchangeRates' => [],
-        'GoogleSheets' => [],
         'ReceiptScanning' => [],
         'Session' => [],
         'Error' => [],
+        'Warning' => [],
         'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
@@ -43,6 +68,10 @@ $aggregatedData = [
         'free' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
         'premium' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
     ],
+    // Active Users KPI cards. Respect the tier filter, ignore the date range.
+    'fixedKpis' => ['totalUsers' => 0, 'dau' => 0, 'wau' => 0, 'mau' => 0],
+    // Selected range, so the charts can build their axes from it instead of "today".
+    'range' => ['preset' => $selectedRange, 'start' => null, 'end' => null],
 ];
 $fileInfo = [];
 
@@ -97,6 +126,9 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
         case 'Session':
             $normalized['action'] = $event['action'] ?? 'Unknown';
             $normalized['duration'] = $event['durationSeconds'] ?? 0;
+            // Null on SessionStart and on ends uploaded by builds before the flag
+            // existed, so only an explicit false counts as an unclean exit.
+            $normalized['clean'] = $event['clean'] ?? null;
             return ['category' => 'Session', 'data' => $normalized];
 
         case 'Export':
@@ -117,9 +149,6 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
                 case 'OpenExchangeRates':
                     return ['category' => 'OpenExchangeRates', 'data' => $normalized];
 
-                case 'GoogleSheets':
-                    return ['category' => 'GoogleSheets', 'data' => $normalized];
-
                 case 'ReceiptScanProxy':
                     return ['category' => 'ReceiptScanning', 'data' => $normalized];
 
@@ -134,7 +163,27 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             $normalized['SourceFile'] = $event['sourceFile'] ?? '';
             $normalized['LineNumber'] = $event['lineNumber'] ?? null;
             $normalized['MethodName'] = $event['methodName'] ?? '';
-            return ['category' => 'Error', 'data' => $normalized];
+            // The app stamps severity from its own LogLevel. Warnings are expected,
+            // handled conditions, so they get their own bucket and never reach the
+            // Errors tab's charts or details table. Events uploaded before the field
+            // existed carry no severity and stay errors; we don't infer it from the
+            // error code. Either way the event still counts toward DAU and tier users,
+            // because that accounting happens before this bucket is used.
+            $severity = strcasecmp((string)($event['severity'] ?? ''), 'Warning') === 0
+                ? 'Warning'
+                : 'Error';
+            return ['category' => $severity, 'data' => $normalized];
+
+        case 'Startup':
+            // ToReadyMs already contains ToFirstPaintMs rather than continuing from
+            // it, so the two are nested, not additive. Null on either means the app
+            // never reached that milestone (or predates the field), and null is kept
+            // rather than coerced to 0 so a missing measurement cannot pull an
+            // average down as though the launch were instant.
+            $normalized['ToFirstPaintMs'] = isset($event['toFirstPaintMs']) ? (int)$event['toFirstPaintMs'] : null;
+            $normalized['ToReadyMs']      = isset($event['toReadyMs']) ? (int)$event['toReadyMs'] : null;
+            $normalized['ColdStart']      = !empty($event['coldStart']);
+            return ['category' => 'Startup', 'data' => $normalized];
 
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
@@ -178,12 +227,23 @@ if (empty($dataDirs)) {
         $processedFiles = 0;
         $failedFiles = 0;
 
+        // Shared across every file: the same event can appear in several of them when
+        // an upload was retried or its "uploaded" flag was lost. See telemetry-dedupe.php.
+        $seenEventIds = [];
+
         // Track per-tier unique users (from ALL files, regardless of $tierFilter)
         $tierUsers = [
             'free' => ['all' => [], 'mau' => []],
             'premium' => ['all' => [], 'mau' => []],
         ];
         $mauThreshold = time() - 30 * 86400;
+
+        // Last-seen per user for the Active Users KPI cards: tier-filtered like the
+        // rest of the page, but never date-range filtered, so DAU/WAU/MAU keep
+        // measuring against today no matter which range is selected.
+        $kpiLastSeen = [];
+        $dauThreshold = strtotime('today');
+        $wauThreshold = time() - 7 * 86400;
 
         // Process all JSON files and aggregate the data
         foreach ($dataFiles as $file) {
@@ -211,10 +271,19 @@ if (empty($dataDirs)) {
                 }
                 $fileAuthId = $fileData['authId'] ?? '';
 
-                // Never let the founder's own installs count toward app stats, even
-                // for files that reached disk before their id was added to
-                // EXCLUDED_AUTH_IDS. Skips the whole file: tier counts, DAU, geo.
-                if (is_excluded_auth_id($fileAuthId)) {
+                // Never let the founder's own installs count toward app stats. This one
+                // skip covers the whole file, so it keeps them out of tier counts, DAU,
+                // geo, versions, features, usage, API and errors in a single place. The
+                // User Activity tab reads the same files separately and does show them.
+                if (is_founder_auth_id($fileAuthId)) {
+                    continue;
+                }
+
+                // Nor an install whose premium came from another environment. The upload
+                // endpoint authenticates a license without checking which environment its
+                // subscription belongs to, so a sandbox test redemption would otherwise sit
+                // in production's charts as a real premium user.
+                if (is_other_environment_auth_id($fileAuthId)) {
                     continue;
                 }
 
@@ -235,6 +304,13 @@ if (empty($dataDirs)) {
                 $includeFile = $tierFilter === 'all' || $tierFilter === $fileTier;
 
                 foreach ($fileData['events'] as $event) {
+                    // Collapse re-uploads before any accounting: a duplicate must not
+                    // reach tier stats or DAU either, or one launch reads as several
+                    // users' worth of activity.
+                    if (telemetry_is_duplicate_event($event, $fileAuthId, $seenEventIds)) {
+                        continue;
+                    }
+
                     $result = processEvent($event, $sourceFile, $sessionMeta);
                     if ($result === null) {
                         continue;
@@ -254,6 +330,30 @@ if (empty($dataDirs)) {
 
                     // Per-category dataPoints respect the tier filter
                     if (!$includeFile) {
+                        continue;
+                    }
+
+                    // An event with no readable timestamp can't be placed on any axis.
+                    $eventTs = strtotime($data['timestamp'] ?? '');
+                    if ($eventTs === false) {
+                        continue;
+                    }
+
+                    if ($earliestEventTs === null || $eventTs < $earliestEventTs) {
+                        $earliestEventTs = $eventTs;
+                    }
+
+                    // KPI cards: filled before the date-range gate below, so they stay
+                    // range-independent. Keyed like main.js (events with a hashedIP).
+                    if (!empty($data['hashedIP'])) {
+                        $kpiKey = $data['hashedIP'];
+                        if (!isset($kpiLastSeen[$kpiKey]) || $eventTs > $kpiLastSeen[$kpiKey]) {
+                            $kpiLastSeen[$kpiKey] = $eventTs;
+                        }
+                    }
+
+                    // Charts and detail tables respect the selected date range.
+                    if ($eventTs > $rangeEndTs || ($rangeStartTs !== null && $eventTs < $rangeStartTs)) {
                         continue;
                     }
 
@@ -279,6 +379,19 @@ if (empty($dataDirs)) {
         foreach (['free', 'premium'] as $t) {
             $aggregatedData['tierStats'][$t]['totalUsers'] = count($tierUsers[$t]['all']);
             $aggregatedData['tierStats'][$t]['mauUsers'] = count($tierUsers[$t]['mau']);
+        }
+
+        // Finalize the fixed-window Active Users KPIs
+        $aggregatedData['fixedKpis']['totalUsers'] = count($kpiLastSeen);
+        foreach ($kpiLastSeen as $lastSeen) {
+            if ($lastSeen >= $dauThreshold) $aggregatedData['fixedKpis']['dau']++;
+            if ($lastSeen >= $wauThreshold) $aggregatedData['fixedKpis']['wau']++;
+            if ($lastSeen >= $mauThreshold) $aggregatedData['fixedKpis']['mau']++;
+        }
+
+        // "All Time" had no lower bound during the parse; show the real oldest event.
+        if ($selectedRange === 'All Time' && $earliestEventTs !== null) {
+            $rangeStart = (new DateTime())->setTimestamp($earliestEventTs)->setTime(0, 0, 0);
         }
 
         // Store file processing information
@@ -307,6 +420,10 @@ if (empty($dataDirs)) {
         }
     }
 }
+
+$rangeDisplay = format_date_range($rangeStart, $rangeEnd);
+$aggregatedData['range']['start'] = $rangeStart->format('Y-m-d');
+$aggregatedData['range']['end']   = $rangeEnd->format('Y-m-d');
 
 // Convert aggregated data to JSON for JavaScript. Escape HTML-meaningful characters
 // (<, >, &, ', ") as \u00xx so a telemetry string containing "</script>" cannot break
@@ -375,6 +492,19 @@ include __DIR__ . '/../admin_header.php';
     color: var(--black);
     font-size: 1.5rem;
     font-weight: 600;
+}
+
+/* Groups a set of stat cards under a named heading inside a tab that already
+   has a .section-title, so Usage can hold more than one topic. */
+.section-subtitle {
+    margin: 0.5rem 0 1rem;
+    color: var(--gray-700);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .section-subtitle {
+    color: var(--gray-300);
 }
 
 @media (max-width: 768px) {
@@ -455,10 +585,10 @@ include __DIR__ . '/../admin_header.php';
         count($aggregatedData['dataPoints']['Export']) > 0 ||
         count($aggregatedData['dataPoints']['Gemini']) > 0 ||
         count($aggregatedData['dataPoints']['OpenExchangeRates']) > 0 ||
-        count($aggregatedData['dataPoints']['GoogleSheets']) > 0 ||
         count($aggregatedData['dataPoints']['ReceiptScanning']) > 0 ||
         count($aggregatedData['dataPoints']['Session']) > 0 ||
         count($aggregatedData['dataPoints']['Error']) > 0 ||
+        count($aggregatedData['dataPoints']['Warning']) > 0 ||
         count($aggregatedData['dataPoints']['FeatureUsage']) > 0
     );
     ?>
@@ -483,6 +613,12 @@ include __DIR__ . '/../admin_header.php';
                             $isActive = $tierFilter === $tierKey;
                             $pillHref = '?tier=' . urlencode($tierKey);
                             if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
+                            // Carry the date range across a tier switch, the same way the tab is carried.
+                            $pillHref .= '&range=' . urlencode($selectedRange);
+                            if ($selectedRange === 'Custom Range') {
+                                $pillHref .= '&start=' . urlencode($rangeStart->format('Y-m-d'))
+                                           . '&end=' . urlencode($rangeEnd->format('Y-m-d'));
+                            }
                     ?>
                         <a href="<?= htmlspecialchars($pillHref) ?>"
                            class="control-pill <?= $isActive ? 'active' : '' ?>">
@@ -491,6 +627,35 @@ include __DIR__ . '/../admin_header.php';
                     <?php endforeach; ?>
                 </div>
             </div>
+
+            <!-- Date range: scopes the charts and detail tables. The Active Users KPI
+                 cards are fixed-window metrics and deliberately ignore it. -->
+            <form method="get" id="rangeForm" class="range-controls">
+                <input type="hidden" name="tier" value="<?= htmlspecialchars($tierFilter) ?>">
+                <input type="hidden" name="tab" id="rangeTabInput" value="<?= htmlspecialchars($currentTab) ?>">
+                <div class="control-group">
+                    <span class="control-label">Date Range:</span>
+                    <select name="range" id="rangePreset" class="control-select" onchange="onRangeChange()">
+                        <?php foreach ($presets as $presetOption): ?>
+                            <option value="<?= htmlspecialchars($presetOption) ?>" <?= $presetOption === $selectedRange ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($presetOption) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="range-display"><?= htmlspecialchars($rangeDisplay) ?></span>
+                    <span class="info-tip" tabindex="0" role="button" aria-label="What does the date range affect?" aria-describedby="range-tip">
+                        <span class="info-tip-icon" aria-hidden="true">i</span>
+                        <span class="info-tip-tooltip" id="range-tip" role="tooltip">Scopes the charts and detail tables. The Active Users cards (today, this week, this month) always measure against today, so they don't follow this range.</span>
+                    </span>
+                </div>
+
+                <div class="control-group range-custom" id="rangeCustom" style="display: <?= $selectedRange === 'Custom Range' ? 'flex' : 'none' ?>;">
+                    <input type="date" name="start" id="rangeStart" class="control-input" value="<?= htmlspecialchars($rangeStart->format('Y-m-d')) ?>" <?= $selectedRange === 'Custom Range' ? '' : 'disabled' ?>>
+                    <span>to</span>
+                    <input type="date" name="end" id="rangeEnd" class="control-input" value="<?= htmlspecialchars($rangeEnd->format('Y-m-d')) ?>" <?= $selectedRange === 'Custom Range' ? '' : 'disabled' ?>>
+                    <button type="submit" class="control-pill">Apply</button>
+                </div>
+            </form>
         </div>
     <?php endif; ?>
 
@@ -503,7 +668,12 @@ include __DIR__ . '/../admin_header.php';
     <?php elseif (!$currentViewHasData): ?>
         <div class="no-data">
             <h3>No Data Available</h3>
-            <?php if ($tierFilter !== 'all'): ?>
+            <?php if ($hasAnyData): ?>
+                <p>
+                    No <?= $tierFilter !== 'all' ? htmlspecialchars($tierFilter) . '-tier ' : '' ?>data
+                    for <?= htmlspecialchars($rangeDisplay) ?>. Widen the date range<?= $tierFilter !== 'all' ? ' or switch tier' : '' ?> above.
+                </p>
+            <?php elseif ($tierFilter !== 'all'): ?>
                 <p>No <?= htmlspecialchars($tierFilter) ?>-tier data has been collected yet. Switch to a different tier above.</p>
             <?php else: ?>
                 <p>No anonymous data has been collected yet. Data will appear here once users start using the application and uploading their analytics.</p>
@@ -563,6 +733,38 @@ include __DIR__ . '/../admin_header.php';
                         <h3>Premium Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['premium']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['premium']['totalUsers']) ?> total · last 30 days</p>
+                    </div>
+                    <?php
+                    // Share of sessions the app didn't shut down normally: force-quit, OS
+                    // restart, power loss. Deliberately NOT counted as crashes (those have
+                    // their own tab and an actual stack trace); most of these are the user
+                    // or the OS, not a fault. The signal worth watching is the rate moving,
+                    // and short unclean sessions in particular, which read as a hang.
+                    //
+                    // Denominator is ends, not starts: only an end can carry the flag, and
+                    // ends from builds predating it have clean === null and so count as
+                    // clean rather than skewing the rate.
+                    $sessionEnds = array_filter(
+                        $aggregatedData['dataPoints']['Session'],
+                        fn($s) => ($s['action'] ?? '') === 'SessionEnd'
+                    );
+                    $uncleanEnds = array_filter($sessionEnds, fn($s) => ($s['clean'] ?? null) === false);
+                    $endCount = count($sessionEnds);
+                    $uncleanCount = count($uncleanEnds);
+                    $uncleanPct = $endCount > 0 ? ($uncleanCount / $endCount) * 100 : 0;
+                    // A hang or a broken install shows up as a kill within a couple of
+                    // minutes of launch, which the overall rate alone would hide.
+                    $uncleanShort = count(array_filter($uncleanEnds, fn($s) => (int)($s['duration'] ?? 0) < 120));
+                    ?>
+                    <div class="stat-card">
+                        <h3>Unclean Exits</h3>
+                        <div class="value"><?= $endCount > 0 ? number_format($uncleanPct, 1) . '%' : '—' ?></div>
+                        <p class="subtext">
+                            <?= number_format($uncleanCount) ?> of <?= number_format($endCount) ?> sessions
+                            <?php if ($uncleanShort > 0): ?>
+                                · <?= number_format($uncleanShort) ?> under 2 min
+                            <?php endif; ?>
+                        </p>
                     </div>
                 </div>
 
@@ -716,6 +918,41 @@ include __DIR__ . '/../admin_header.php';
             <div id="usage" class="tab-content">
                 <h2 class="section-title">Usage Analytics</h2>
 
+                <h3 class="section-subtitle">Startup Performance</h3>
+                <div class="stats-grid" id="startupKpiGrid">
+                    <div class="stat-card">
+                        <h3>Time to Loading Screen (median)</h3>
+                        <div class="value" id="kpiFirstPaintP50">—</div>
+                        <p class="subtext">Cold launches, nothing on screen yet</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time to Loading Screen (90th pct)</h3>
+                        <div class="value" id="kpiFirstPaintP90">—</div>
+                        <p class="subtext">1 in 10 waits at least this long</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time to Ready (median)</h3>
+                        <div class="value" id="kpiReadyP50">—</div>
+                        <p class="subtext">Cold launches, to usable window</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time to Ready (90th pct)</h3>
+                        <div class="value" id="kpiReadyP90">—</div>
+                        <p class="subtext" id="kpiStartupSample">—</p>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Cold Launch Time to Ready</h2>
+                        <canvas id="startupDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Startup: Cold vs Warm (median)</h2>
+                        <canvas id="startupColdWarmChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="chart-row">
                     <div class="chart-container">
                         <h2>Average Session Duration (minutes)</h2>
@@ -858,20 +1095,22 @@ include __DIR__ . '/../admin_header.php';
     <?php endif; ?>
 </div>
 
+<?php if (!$errorMessage && $currentViewHasData): ?>
 <script>
 // Tab switching is handled centrally by admin/section-tabs.js
 // Pass PHP data to JavaScript
 window.dashboardData = <?= $jsonData ?>;
 </script>
+<!-- Only loaded when the tabs above were rendered: every chart generator in
+     main.js assumes its canvas exists, so running it against the empty-state
+     page (no data for the selected range or tier) would throw. -->
 <script src="main.js?v=<?= filemtime(__DIR__ . '/main.js') ?>"></script>
+<?php endif; ?>
 
 <script>
 // Preserve scroll position when switching tier filter (shared admin pattern; see CLAUDE.md)
 document.addEventListener('DOMContentLoaded', function () {
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
     document.querySelectorAll('.control-bar a.control-pill').forEach(function (link) {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
@@ -892,4 +1131,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// Date range control. Mirrors admin/website-stats: presets submit immediately,
+// "Custom Range" reveals the date inputs and waits for Apply.
+function onRangeChange() {
+    var preset = document.getElementById('rangePreset').value;
+    var custom = document.getElementById('rangeCustom');
+    var start = document.getElementById('rangeStart');
+    var end = document.getElementById('rangeEnd');
+
+    if (preset === 'Custom Range') {
+        custom.style.display = 'flex';
+        start.disabled = false;
+        end.disabled = false;
+        // Wait for the user to pick dates and press Apply.
+    } else {
+        custom.style.display = 'none';
+        // Disable so stale custom dates aren't appended to the URL.
+        start.disabled = true;
+        end.disabled = true;
+        submitRangeForm();
+    }
+}
+
+// The hidden tab field is rendered server-side at load; section-tabs.js only
+// updates the URL, so refresh it here to keep the active tab across a reload.
+function submitRangeForm() {
+    var activeBtn = document.querySelector('.section-tab.active[data-tab]');
+    var currentTab = activeBtn
+        ? activeBtn.dataset.tab
+        : new URLSearchParams(window.location.search).get('tab');
+    document.getElementById('rangeTabInput').value = currentTab || '';
+    sessionStorage.setItem('scrollPosition', window.scrollY);
+    document.getElementById('rangeForm').submit();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    var rangeForm = document.getElementById('rangeForm');
+    if (rangeForm) {
+        // Apply button (custom range) goes through the same tab-preserving path.
+        rangeForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitRangeForm();
+        });
+    }
+});
 </script>
+<script src="../preserve-scroll.js" defer></script>

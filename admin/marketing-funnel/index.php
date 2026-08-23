@@ -1,6 +1,231 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../country_names.php';
+require_once __DIR__ . '/analytics.php';
+
+/**
+ * ISO 3166-1 alpha-2 code -> flag emoji (regional indicator symbols).
+ * Returns an empty string for non-two-letter / unknown codes.
+ */
+function funnel_flag_emoji(?string $code): string
+{
+    $code = strtoupper((string)$code);
+    if (!preg_match('/^[A-Z]{2}$/', $code)) {
+        return '';
+    }
+    $a = 0x1F1E6 + (ord($code[0]) - ord('A'));
+    $b = 0x1F1E6 + (ord($code[1]) - ord('A'));
+    return mb_convert_encoding('&#' . $a . ';&#' . $b . ';', 'UTF-8', 'HTML-ENTITIES');
+}
+
+/**
+ * Render a Plausible-style breakdown list: each row is tinted by a blue visits
+ * bar with an orange revenue underline, the label on the left and the visit
+ * count (plus revenue) on the right. Rows beyond $limit collapse into "Other".
+ *
+ * @param list<array{key:string,label:string,visits:int,revenue:float}> $rows
+ * @param array{revenue?:bool,flag?:bool,icon?:bool,limit?:int,empty?:string} $opts
+ */
+function funnel_render_bar_list(array $rows, array $opts = []): string
+{
+    $show_revenue = $opts['revenue'] ?? true;
+    $with_flag    = $opts['flag']    ?? false;
+    $with_icon    = $opts['icon']    ?? false;
+    $limit        = $opts['limit']   ?? 9;
+    $empty_msg    = $opts['empty']   ?? 'No data for this period yet.';
+
+    if (empty($rows)) {
+        return '<div class="bd-empty">' . htmlspecialchars($empty_msg) . '</div>';
+    }
+
+    $shown = array_slice($rows, 0, $limit);
+    $rest  = array_slice($rows, $limit);
+    if (!empty($rest)) {
+        $shown[] = [
+            'key'     => '__other__',
+            'label'   => 'Other',
+            'visits'  => array_sum(array_map(fn($r) => (int)$r['visits'], $rest)),
+            'revenue' => array_sum(array_map(fn($r) => (float)$r['revenue'], $rest)),
+        ];
+    }
+
+    $max_v = max(1, max(array_map(fn($r) => (int)$r['visits'], $shown)));
+    $max_r = max(array_map(fn($r) => (float)$r['revenue'], $shown));
+
+    // Muted globe icon (data URI, CSP-safe) for referrer/campaign rows.
+    $globe = 'data:image/svg+xml;utf8,' . rawurlencode(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#9098a3' stroke-width='1.6'>"
+        . "<circle cx='12' cy='12' r='9'/><path d='M3 12h18'/><path d='M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18'/></svg>");
+
+    $html = '<ul class="bd-list">';
+    foreach ($shown as $r) {
+        $v   = (int)$r['visits'];
+        $rev = (float)$r['revenue'];
+        $vw  = round(($v / $max_v) * 100, 2);
+        $rw  = ($max_r > 0) ? round(($rev / $max_r) * 100, 2) : 0;
+
+        $flag = ($with_flag && $r['key'] !== '__other__' && $r['key'] !== 'Unknown')
+            ? funnel_flag_emoji($r['key']) : '';
+
+        $tip = $r['label'] . ' — ' . number_format($v) . ' visit' . ($v === 1 ? '' : 's');
+        if ($show_revenue) {
+            $tip .= ' · $' . number_format($rev, 2) . ' revenue';
+        }
+
+        $icon = '';
+        if ($with_flag) {
+            $icon = '<span class="bd-flag">' . ($flag !== '' ? $flag : '&#127987;&#65039;') . '</span>';
+        } elseif ($with_icon && $r['key'] !== '__other__') {
+            $icon = '<img class="bd-icon" src="' . htmlspecialchars($globe) . '" alt="">';
+        }
+
+        $html .= '<li class="bd-row" data-tip="' . htmlspecialchars($tip) . '">';
+        $html .= '<span class="bd-bar bd-bar-visits" style="width:' . $vw . '%"></span>';
+        if ($show_revenue) {
+            $html .= '<span class="bd-bar bd-bar-revenue" style="width:' . $rw . '%"></span>';
+        }
+        $html .= $icon;
+        $html .= '<span class="bd-label">' . htmlspecialchars($r['label']) . '</span>';
+        $html .= '<span class="bd-value">' . funnel_kfmt($v) . '</span></li>';
+    }
+    $html .= '</ul>';
+    return $html;
+}
+
+/**
+ * Full-list "See all details" modal, matching the Referrer modal. Rendered once
+ * per breakdown that wants a searchable overflow list (referrer / country /
+ * region / city). $rows are the same rows fed to funnel_render_bar_list. Returns
+ * '' when there's nothing to show, so callers can echo unconditionally.
+ */
+function funnel_render_details_modal(
+    string $id,
+    string $title,
+    array $rows,
+    bool $show_revenue = true,
+    string $name_heading = 'Source'
+): string {
+    if (empty($rows)) {
+        return '';
+    }
+    // Only breakdowns that carry first-touch attribution (referrer, entry page)
+    // have the free/paid counts. Detecting them rather than taking another
+    // parameter keeps the country/region/city call sites unchanged.
+    $show_users = false;
+    foreach ($rows as $r) {
+        if (!empty($r['free']) || !empty($r['paid'])) {
+            $show_users = true;
+            break;
+        }
+    }
+
+    $h  = '<div id="' . htmlspecialchars($id) . '" class="modal bd-details-modal" style="display:none;">';
+    $h .= '<div class="modal-content">';
+    $h .= '<span class="modal-close bd-details-close">&times;</span>';
+    $h .= '<h2>' . htmlspecialchars($title) . '</h2>';
+    $h .= '<input type="text" class="bd-details-search" placeholder="Search&hellip;" autocomplete="off" spellcheck="false">';
+    $h .= '<div class="bd-details-list' . ($show_users ? ' bd-details-list-users' : '') . '">';
+
+    if ($show_users) {
+        $h .= '<div class="bd-details-row bd-details-head">';
+        $h .= '<span class="bd-details-name">' . htmlspecialchars($name_heading) . '</span>';
+        $h .= '<span class="bd-details-visits">Visits</span>';
+        $h .= '<span class="bd-details-free">Free users</span>';
+        $h .= '<span class="bd-details-paid">Paid users</span>';
+        if ($show_revenue) {
+            $h .= '<span class="bd-details-revenue">Revenue</span>';
+        }
+        $h .= '</div>';
+    }
+
+    foreach ($rows as $r) {
+        $h .= '<div class="bd-details-row" data-name="' . htmlspecialchars(strtolower($r['label'])) . '">';
+        $h .= '<span class="bd-details-name">' . htmlspecialchars($r['label']) . '</span>';
+        $h .= '<span class="bd-details-visits">' . number_format((int)$r['visits']) . '</span>';
+        if ($show_users) {
+            $h .= '<span class="bd-details-free">' . number_format((int)($r['free'] ?? 0)) . '</span>';
+            $h .= '<span class="bd-details-paid">' . number_format((int)($r['paid'] ?? 0)) . '</span>';
+        }
+        if ($show_revenue) {
+            $h .= '<span class="bd-details-revenue">$' . number_format((float)$r['revenue'], 0) . '</span>';
+        }
+        $h .= '</div>';
+    }
+    $h .= '</div></div></div>';
+    return $h;
+}
+
+/**
+ * "See all details" trigger button, targeting a modal rendered by
+ * funnel_render_details_modal(). Returns '' when the list is empty.
+ */
+function funnel_render_details_btn(string $target_id, array $rows): string
+{
+    if (empty($rows)) {
+        return '';
+    }
+    return '<button type="button" class="bd-details-btn" data-details-target="'
+        . htmlspecialchars($target_id) . '">See all details</button>';
+}
+
+/**
+ * Turns a breakdown row list into a labelled dataset for the CSV export.
+ */
+function funnel_export_dataset(string $title, array $rows, bool $revenue = false, bool $users = false): array
+{
+    $cols = ['Name', 'Visits'];
+    if ($users)   { $cols[] = 'Free users'; $cols[] = 'Paid users'; }
+    if ($revenue) { $cols[] = 'Revenue'; }
+
+    $out = [];
+    foreach ($rows as $r) {
+        $line = [(string)$r['label'], (int)$r['visits']];
+        if ($users) {
+            $line[] = (int)($r['free'] ?? 0);
+            $line[] = (int)($r['paid'] ?? 0);
+        }
+        if ($revenue) {
+            $line[] = round((float)($r['revenue'] ?? 0), 2);
+        }
+        $out[] = $line;
+    }
+    return ['title' => $title, 'columns' => $cols, 'rows' => $out];
+}
+
+/**
+ * "Download" button for an analytics card. Carries every tab's rows in a data
+ * attribute so the export runs client-side, with no extra endpoint to secure.
+ */
+function funnel_render_download_btn(string $filename, array $datasets): string
+{
+    $payload = json_encode(
+        ['filename' => $filename, 'datasets' => $datasets],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    );
+    return '<button type="button" class="bd-download-btn" title="Download every tab in this card as CSV"'
+        . ' data-download="' . htmlspecialchars($payload, ENT_QUOTES) . '">Download</button>';
+}
+
+/**
+ * Short explanatory line shown under a tab's content.
+ */
+function funnel_render_panel_desc(string $text): string
+{
+    return '<p class="bd-panel-desc">' . htmlspecialchars($text) . '</p>';
+}
+
+/**
+ * Compact visitor-count formatting: 1900 -> "1.9k", 782 -> "782".
+ */
+function funnel_kfmt(int $n): string
+{
+    if (abs($n) >= 1000) {
+        $k = $n / 1000;
+        return (fmod($k, 1.0) === 0.0 ? number_format($k, 0) : number_format($k, 1)) . 'k';
+    }
+    return number_format($n);
+}
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
@@ -76,6 +301,43 @@ function get_active_referral_links(): array
 }
 
 /**
+ * SQL fragment: TRUE when a referral_events row's visitor also has a
+ * JS-confirmed page view. Used to bot-filter download_click, which is a
+ * server-side file-request event with no JS beacon, so js_confirmed can't
+ * filter it directly. The check is deliberately not period-scoped: a real
+ * user's landing may predate the selected period. Bots fetching the installer
+ * URL directly mint a fresh cookieless visitor_id per request and never
+ * produce a confirmed page view, so this drops them.
+ *
+ * $alias is how the outer query refers to referral_events (table name or alias).
+ * Shared by the all-traffic funnel and the per-source table so the bot rule
+ * can never drift between the two.
+ */
+function funnel_confirmed_visitor_sql(string $alias): string
+{
+    return "EXISTS (
+        SELECT 1 FROM referral_events pv
+         WHERE pv.visitor_id = {$alias}.visitor_id
+           AND pv.event_type IN ('landing', 'downloads_page')
+           AND pv.js_confirmed = 1
+           AND pv.environment = {$alias}.environment)";
+}
+
+/**
+ * SQL fragment: dedupe key for app_first_run rows. Rows can have
+ * visitor_id = NULL (install token missing or outside the 14-day attribution
+ * window); COUNT(DISTINCT visitor_id) would silently drop those real installs,
+ * so fall back to the per-machine UUID the desktop reporter stamps into
+ * event_data, then the row id.
+ */
+function funnel_first_run_key_sql(): string
+{
+    return "COALESCE(visitor_id,
+        JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')),
+        CONCAT('row-', id))";
+}
+
+/**
  * Returns the start datetime for the active period filter. Periods:
  *   '30d' (default) | '90d' | 'all'
  */
@@ -95,6 +357,13 @@ function funnel_period_start(string $period): ?string
  * Top-of-funnel stages (landing through premium_signup) count distinct
  * visitors so a user firing the same event twice doesn't double-count.
  *
+ * download_click only counts visitors who also have a JS-confirmed page view,
+ * since bots that fetch the installer URL directly bypass the js_confirmed
+ * filter (see the inline comment on $confirmed_visitor_exists).
+ *
+ * app_first_run counts unattributed installs too (visitor_id NULL) by falling
+ * back to the machine_uuid recorded in event_data.
+ *
  * premium_paid and premium_churned count distinct subscription_id instead:
  * they're subscription-keyed events that can fire for visitors we never
  * resolved (webhook context), and premium_paid is restricted to the initial
@@ -104,8 +373,13 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
 {
     global $pdo;
 
-    $where_clauses = ['environment = ?'];
+    // js_confirmed = 1 filters bots out of the page-view stages (landing,
+    // downloads_page); non-page-view stages are inserted already-confirmed.
+    $where_clauses = ['environment = ?', 'js_confirmed = 1'];
     $params = [current_environment()];
+
+    $confirmed_visitor_exists = funnel_confirmed_visitor_sql('referral_events');
+    $first_run_key = funnel_first_run_key_sql();
 
     if ($period_start !== null) {
         $where_clauses[] = 'created_at >= ?';
@@ -121,8 +395,10 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
         SELECT
           COUNT(DISTINCT CASE WHEN event_type='landing'        THEN visitor_id END) AS landing,
           COUNT(DISTINCT CASE WHEN event_type='downloads_page' THEN visitor_id END) AS downloads_page,
-          COUNT(DISTINCT CASE WHEN event_type='download_click' THEN visitor_id END) AS download_click,
-          COUNT(DISTINCT CASE WHEN event_type='app_first_run'  THEN visitor_id END) AS app_first_run,
+          COUNT(DISTINCT CASE WHEN event_type='download_click'
+                               AND $confirmed_visitor_exists
+                              THEN visitor_id END) AS download_click,
+          COUNT(DISTINCT CASE WHEN event_type='app_first_run' THEN $first_run_key END) AS app_first_run,
           COUNT(DISTINCT CASE WHEN event_type='premium_signup' THEN visitor_id END) AS premium_signup,
           COUNT(DISTINCT CASE WHEN event_type='premium_paid'
                                 AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.payment_type')) = 'initial'
@@ -153,6 +429,11 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
 function get_funnel_per_source(?string $period_start, string $environment): array
 {
     global $pdo;
+
+    // Same bot-filter + first-run dedupe rules as get_funnel_stage_counts(),
+    // via the shared fragment helpers ('re' is this query's table alias).
+    $confirmed_click = funnel_confirmed_visitor_sql('re');
+    $first_run_key   = funnel_first_run_key_sql();
 
     $params = [$environment];
     $event_period_clause = '';
@@ -196,15 +477,18 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
               source_code,
               COUNT(DISTINCT CASE WHEN event_type='landing'        THEN visitor_id END) AS landings,
               COUNT(DISTINCT CASE WHEN event_type='downloads_page' THEN visitor_id END) AS dl_pages,
-              COUNT(DISTINCT CASE WHEN event_type='download_click' THEN visitor_id END) AS dl_clicks,
-              COUNT(DISTINCT CASE WHEN event_type='app_first_run'  THEN visitor_id END) AS first_runs,
+              COUNT(DISTINCT CASE WHEN event_type='download_click'
+                                   AND {$confirmed_click}
+                                  THEN visitor_id END) AS dl_clicks,
+              COUNT(DISTINCT CASE WHEN event_type='app_first_run'
+                                  THEN {$first_run_key} END) AS first_runs,
               COUNT(DISTINCT CASE WHEN event_type='premium_signup' THEN visitor_id END) AS signups,
               COUNT(DISTINCT CASE WHEN event_type='premium_paid'
                                    AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.payment_type')) = 'initial'
                                   THEN subscription_id END) AS paying,
               COUNT(DISTINCT CASE WHEN event_type='premium_churned' THEN subscription_id END) AS churned
             FROM referral_events re
-            WHERE re.environment = ? $event_period_clause
+            WHERE re.environment = ? AND re.js_confirmed = 1 $event_period_clause
             GROUP BY source_code
         ) ev ON ev.source_code = rl.source_code
         LEFT JOIN (
@@ -230,88 +514,6 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
     $bind = array_merge($params, $params_spend, [$environment], $params_rev_extra);
     $stmt = $pdo->prepare($sql);
     $stmt->execute($bind);
-    return $stmt->fetchAll();
-}
-
-/**
- * Paying customers grouped by the source they were attributed to, for the
- * "where paying customers came from" pie. A subscription counts as paying once
- * it has any completed payment. Its source is the source_code captured on its
- * premium_signup referral event; subscriptions with no such event fall into the
- * "Direct / untracked" bucket (organic, or a returning visitor we couldn't tie
- * back to a campaign). The inner GROUP BY collapses each subscription to a
- * single row so a customer is only counted once.
- */
-function get_paying_customers_by_source(?string $period_start, string $environment): array
-{
-    global $pdo;
-
-    $pay_period_clause = $period_start !== null ? ' AND p.created_at >= ?' : '';
-
-    $sql = "
-        SELECT lbl AS label, COUNT(*) AS payers
-        FROM (
-            SELECT ps.subscription_id,
-                   COALESCE(MAX(rl.name), MAX(re.source_code), 'Direct / untracked') AS lbl
-              FROM premium_subscriptions ps
-              JOIN premium_subscription_payments p
-                ON p.subscription_id = ps.subscription_id
-               AND p.status = 'completed'
-               $pay_period_clause
-              LEFT JOIN referral_events re
-                ON re.subscription_id = ps.subscription_id
-               AND re.event_type = 'premium_signup'
-               AND re.environment = ?
-              LEFT JOIN referral_links rl ON rl.source_code = re.source_code
-             WHERE ps.environment = ?
-               AND ps.payment_method != 'free_key'
-             GROUP BY ps.subscription_id
-        ) t
-        GROUP BY lbl
-        ORDER BY payers DESC, lbl ASC";
-
-    // Bind order matches placeholder order: [period?], re.environment, ps.environment
-    $bind = [];
-    if ($period_start !== null) {
-        $bind[] = $period_start;
-    }
-    $bind[] = $environment;
-    $bind[] = $environment;
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($bind);
-    return $stmt->fetchAll();
-}
-
-/**
- * Top landing pages by distinct-visitor count, for the All-traffic funnel
- * breakdown. Trailing query/hash strings are stripped server-side via a
- * SUBSTRING_INDEX so `/?ref=foo` and `/` collapse into the same bucket.
- */
-function get_landing_page_breakdown(?string $period_start, string $environment): array
-{
-    global $pdo;
-
-    $where = ['environment = ?', "event_type = 'landing'"];
-    $params = [$environment];
-    if ($period_start !== null) {
-        $where[] = 'created_at >= ?';
-        $params[] = $period_start;
-    }
-    $where_sql = implode(' AND ', $where);
-
-    $sql = "
-        SELECT
-            SUBSTRING_INDEX(SUBSTRING_INDEX(page_url, '?', 1), '#', 1) AS clean_path,
-            COUNT(DISTINCT visitor_id) AS visitors
-        FROM referral_events
-        WHERE $where_sql
-        GROUP BY clean_path
-        ORDER BY visitors DESC
-        LIMIT 20";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
     return $stmt->fetchAll();
 }
 
@@ -385,21 +587,6 @@ function get_unattributed_survey_breakdown(?string $period_start, string $enviro
     ];
 }
 
-/**
- * Map a request path to a human-readable label for the landing-pages chart.
- */
-function friendly_landing_label(?string $path): string
-{
-    $p = strtolower(trim((string)$path));
-    if ($p === '' || $p === '/' || $p === '/index.php') return 'Home';
-    if ($p === '/downloads/' || $p === '/downloads') return 'Downloads page';
-
-    if (preg_match('#^/compare/argo-books-vs-([a-z0-9-]+)/?$#', $p, $m)) {
-        return ucwords(str_replace('-', ' ', $m[1])) . ' comparison';
-    }
-    return $path;
-}
-
 function get_campaign_spend_rows(): array
 {
     global $pdo;
@@ -409,6 +596,136 @@ function get_campaign_spend_rows(): array
           ORDER BY period_start DESC, source_code ASC'
     );
     return $stmt->fetchAll();
+}
+
+/**
+ * Anonymous in-app activation + early retention, read from the desktop app's
+ * telemetry uploads (admin/data-logs/telemetry/). Powers the info popover on the
+ * "App first run" funnel stage: of users whose app sent telemetry, how many did a
+ * real bookkeeping action and how many came back on a later day.
+ *
+ * Keyed by the app's anonymous per-device / per-subscription id, so it can't be
+ * joined to individual website funnel visitors: it's a separate aggregate view of
+ * "what happens after install." Telemetry carries no environment or source, so
+ * these counts are all-environment and all-source.
+ *
+ * Scoped to the same period as the funnel via $period_start (only events on/after
+ * it count; null = all time). Note this counts ACTIVE app users in the window
+ * (new + returning), which is a different population from the "App first run"
+ * install count above, so the two intentionally won't match.
+ *
+ * @param ?string $period_start 'Y-m-d H:i:s' lower bound, or null for all time.
+ * @return array{seen:int, activated:int, returned:int, onboarded:int, skipped:int, activated_pct:float, returned_pct:float, onboarded_pct:float, skipped_pct:float, has_data:bool}
+ */
+function get_app_activation_stats(?string $period_start = null): array
+{
+    require_once __DIR__ . '/../../founder_identity.php'; // is_founder_auth_id()
+
+    // "Activation" = the user did a real bookkeeping action (got value from the
+    // app), as opposed to setup/scaffolding (creating a customer, supplier,
+    // product, or rentable item), cosmetic changes (theme/language), or backups.
+    // DataImported covers both bank-statement and spreadsheet imports: the app
+    // tags which kind in a field it doesn't send to the server, so they can't be
+    // told apart here, but either one counts as a real action.
+    $activationFeatures = [
+        'InvoiceCreated', 'ExpenseCreated', 'RevenueCreated', 'PaymentRecorded',
+        'ReceiptScanned', 'DataImported', 'ReportGenerated',
+        'PurchaseOrderCreated', 'StockAdjusted', 'RentalRecordCreated',
+    ];
+    $dirs = [__DIR__ . '/../data-logs/telemetry/', __DIR__ . '/../data-logs/'];
+    $period_ts = ($period_start !== null) ? strtotime($period_start) : null;
+
+    $seenFiles = [];
+    $users = [];
+
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            continue;
+        }
+        foreach (glob($dir . '*.json') ?: [] as $file) {
+            $name = basename($file);
+            if (isset($seenFiles[$name])) {
+                continue; // same file in both dirs: count once
+            }
+            $seenFiles[$name] = true;
+
+            $raw = @file_get_contents($file);
+            if ($raw === false || trim($raw) === '') {
+                continue;
+            }
+            $data = json_decode($raw, true);
+            if (!is_array($data) || empty($data['events']) || !is_array($data['events'])) {
+                continue;
+            }
+
+            $authId = (string)($data['authId'] ?? '');
+            if ($authId === '' || is_founder_auth_id($authId)) {
+                continue; // unattributable or the founder's own machine
+            }
+
+            foreach ($data['events'] as $ev) {
+                if (!is_array($ev)) {
+                    continue;
+                }
+                $ts = isset($ev['timestamp']) ? strtotime((string)$ev['timestamp']) : false;
+                if ($ts === false) {
+                    continue;
+                }
+                // Scope to the funnel's period: skip events before the window.
+                // A user only counts if they have at least one in-window event.
+                if ($period_ts !== null && $ts < $period_ts) {
+                    continue;
+                }
+                if (!isset($users[$authId])) {
+                    $users[$authId] = ['days' => [], 'activated' => false, 'onboarded' => false, 'skipped' => false];
+                }
+                $users[$authId]['days'][gmdate('Y-m-d', $ts)] = true;
+                if (($ev['dataType'] ?? '') === 'FeatureUsage') {
+                    $fn = $ev['featureName'] ?? '';
+                    if (in_array($fn, $activationFeatures, true)) {
+                        $users[$authId]['activated'] = true;
+                    } elseif ($fn === 'OnboardingCompleted') {
+                        $users[$authId]['onboarded'] = true;
+                    } elseif ($fn === 'OnboardingSkipped') {
+                        $users[$authId]['skipped'] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    $seen = count($users);
+    $activated = 0;
+    $returned = 0;
+    $onboarded = 0;
+    $skipped = 0;
+    foreach ($users as $u) {
+        if ($u['activated']) {
+            $activated++;
+        }
+        if (count($u['days']) >= 2) {
+            $returned++;
+        }
+        if ($u['onboarded']) {
+            $onboarded++;
+        }
+        if ($u['skipped']) {
+            $skipped++;
+        }
+    }
+
+    return [
+        'seen'          => $seen,
+        'activated'     => $activated,
+        'returned'      => $returned,
+        'onboarded'     => $onboarded,
+        'skipped'       => $skipped,
+        'activated_pct' => $seen > 0 ? round($activated / $seen * 100, 1) : 0.0,
+        'returned_pct'  => $seen > 0 ? round($returned / $seen * 100, 1) : 0.0,
+        'onboarded_pct' => $seen > 0 ? round($onboarded / $seen * 100, 1) : 0.0,
+        'skipped_pct'   => $seen > 0 ? round($skipped / $seen * 100, 1) : 0.0,
+        'has_data'      => $seen > 0,
+    ];
 }
 
 /**
@@ -426,112 +743,71 @@ function get_campaign_spend_rows(): array
  * environment-scoped. statistics.track_event() also dedupes by IP per day,
  * which means counts are unique-visitor-per-day rather than raw events.
  */
-function get_tool_sessions_per_day(?string $period_start): array
+
+/**
+ * Run one tool-metric query with the optional period filter spliced in.
+ * $sql must contain a {PERIOD} placeholder inside its WHERE clause; it becomes
+ * " AND created_at >= ?" when a period is set and '' for all-time.
+ */
+function tool_stat_rows(string $sql, ?string $period_start): array
 {
     global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_%'
-                AND created_at >= ?
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_%'
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-    }
+    $sql = str_replace('{PERIOD}', $period_start !== null ? ' AND created_at >= ?' : '', $sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($period_start !== null ? [$period_start] : []);
     return $stmt->fetchAll();
+}
+
+function get_tool_sessions_per_day(?string $period_start): array
+{
+    return tool_stat_rows(
+        "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_%'{PERIOD}
+       GROUP BY day
+       ORDER BY day ASC",
+        $period_start
+    );
 }
 
 function get_tool_downloads_per_day(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT DATE(created_at) AS day,
-                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
-                    SUM(event_type = 'invgen_docx_downloaded') AS docx
-               FROM statistics
-              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
-                AND created_at >= ?
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT DATE(created_at) AS day,
-                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
-                    SUM(event_type = 'invgen_docx_downloaded') AS docx
-               FROM statistics
-              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
-           GROUP BY day
-           ORDER BY day ASC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT DATE(created_at) AS day,
+                SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
+                SUM(event_type = 'invgen_docx_downloaded') AS docx
+           FROM statistics
+          WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded'){PERIOD}
+       GROUP BY day
+       ORDER BY day ASC",
+        $period_start
+    );
 }
 
 function get_cta_ctr_by_placement(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS placement, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_cta_clicked'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS placement, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_cta_clicked'
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS placement, COUNT(*) AS clicks
+           FROM statistics
+          WHERE event_type = 'invgen_cta_clicked'{PERIOD}
+       GROUP BY event_data
+       ORDER BY clicks DESC",
+        $period_start
+    );
 }
 
 function get_niche_traffic(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_niche\\_%'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_niche\\_%'
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_niche\\_%'{PERIOD}
+       GROUP BY event_data
+       ORDER BY views DESC",
+        $period_start
+    );
 }
 
 /**
@@ -545,79 +821,39 @@ function get_niche_traffic(?string $period_start): array
  */
 function get_template_page_views(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_template\\_%'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
-               FROM statistics
-              WHERE event_type = 'page_view'
-                AND event_data LIKE 'invgen\\_template\\_%'
-           GROUP BY event_data
-           ORDER BY views DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
+           FROM statistics
+          WHERE event_type = 'page_view'
+            AND event_data LIKE 'invgen\\_template\\_%'{PERIOD}
+       GROUP BY event_data
+       ORDER BY views DESC",
+        $period_start
+    );
 }
 
 function get_template_cta_clicks(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS style_format, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_template_cta_clicked'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS style_format, COUNT(*) AS clicks
-               FROM statistics
-              WHERE event_type = 'invgen_template_cta_clicked'
-           GROUP BY event_data
-           ORDER BY clicks DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS style_format, COUNT(*) AS clicks
+           FROM statistics
+          WHERE event_type = 'invgen_template_cta_clicked'{PERIOD}
+       GROUP BY event_data
+       ORDER BY clicks DESC",
+        $period_start
+    );
 }
 
 function get_template_downloads(?string $period_start): array
 {
-    global $pdo;
-    if ($period_start !== null) {
-        $stmt = $pdo->prepare(
-            "SELECT event_data AS style_format, COUNT(*) AS downloads
-               FROM statistics
-              WHERE event_type = 'invgen_template_download'
-                AND created_at >= ?
-           GROUP BY event_data
-           ORDER BY downloads DESC"
-        );
-        $stmt->execute([$period_start]);
-    } else {
-        $stmt = $pdo->query(
-            "SELECT event_data AS style_format, COUNT(*) AS downloads
-               FROM statistics
-              WHERE event_type = 'invgen_template_download'
-           GROUP BY event_data
-           ORDER BY downloads DESC"
-        );
-    }
-    return $stmt->fetchAll();
+    return tool_stat_rows(
+        "SELECT event_data AS style_format, COUNT(*) AS downloads
+           FROM statistics
+          WHERE event_type = 'invgen_template_download'{PERIOD}
+       GROUP BY event_data
+       ORDER BY downloads DESC",
+        $period_start
+    );
 }
 
 // Resolve which tab is active. Default to funnel.
@@ -644,6 +880,7 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="vendor/jsvectormap.min.css">
 
 <div class="container">
     <?php if (isset($_SESSION['success_message'])): ?>
@@ -671,49 +908,22 @@ include __DIR__ . '/../admin_header.php';
         // always reflects "users we couldn't attribute by token".
         $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 
-        // Where paying customers came from: one slice per attributed source, plus
-        // a "Direct / untracked" slice for payers we couldn't tie to a campaign.
-        $payer_source_rows   = get_paying_customers_by_source($funnel_period_start_dt, current_environment());
-        $payer_source_total  = array_sum(array_map(fn($r) => (int)$r['payers'], $payer_source_rows));
-        $payer_source_labels = array_map(fn($r) => $r['label'], $payer_source_rows);
-        $payer_source_counts = array_map(fn($r) => (int)$r['payers'], $payer_source_rows);
-
-        // Landing-page breakdown: only meaningful for "All traffic" since a
-        // specific tracked source usually points at a single destination page.
-        $landing_breakdown = [];
-        $landing_chart_labels = [];
-        $landing_chart_counts = [];
-        if ($funnel_source_filter === '') {
-            $rows = get_landing_page_breakdown($funnel_period_start_dt, current_environment());
-            $top = array_slice($rows, 0, 14);
-            $rest = array_slice($rows, 14);
-            $other_total = array_sum(array_map(fn($r) => (int)$r['visitors'], $rest));
-            foreach ($top as $r) {
-                $landing_breakdown[] = [
-                    'label'    => friendly_landing_label($r['clean_path']),
-                    'visitors' => (int)$r['visitors'],
-                ];
-            }
-            if ($other_total > 0) {
-                $landing_breakdown[] = ['label' => 'Other', 'visitors' => $other_total];
-            }
-            foreach ($landing_breakdown as $r) {
-                $landing_chart_labels[] = $r['label'];
-                $landing_chart_counts[] = $r['visitors'];
-            }
-        }
+        // Plausible-style breakdowns for the channel donut, the referrer /
+        // campaign bar lists, and the map / country / region / city
+        // lists. Each row carries visits + attributed revenue.
+        $analytics = build_funnel_analytics($funnel_period_start_dt, $funnel_source_filter ?: null, $referral_links);
 
         $total_spend = 0.0;
         $total_revenue = 0.0;
-        $total_paying = 0;
         foreach ($per_source as $row) {
             if ($funnel_source_filter !== '' && $row['source_code'] !== $funnel_source_filter) {
                 continue;
             }
             $total_spend   += (float)$row['spend'];
             $total_revenue += (float)$row['revenue'];
-            $total_paying  += (int)$row['paying'];
         }
+
+        $total_paying = $funnel_counts['premium_paid'];
         $cac = $total_paying > 0 ? $total_spend / $total_paying : null;
         $ltv = $total_paying > 0 ? $total_revenue / $total_paying : null;
         $ltv_cac = ($cac !== null && $cac > 0 && $ltv !== null) ? $ltv / $cac : null;
@@ -745,6 +955,28 @@ include __DIR__ . '/../admin_header.php';
             ['key' => 'premium_paid',    'label' => 'Premium paid'],
         ];
 
+        // Per-stage top sources / countries for the funnel hover tooltip.
+        $stage_countries = $analytics['stage_countries'];
+        $stage_sources   = $analytics['stage_sources'];
+        $name_by_source_code = [];
+        foreach ($referral_links as $rl) {
+            $name_by_source_code[$rl['source_code']] = $rl['name'];
+        }
+        $fmt_stage_rows = function (array $bucket, bool $is_country) use ($name_by_source_code): array {
+            $out = [];
+            foreach (($bucket['rows'] ?? []) as $r) {
+                if ($is_country) {
+                    $label = ($r['k'] === null || $r['k'] === '') ? 'Unknown' : (country_name($r['k']) ?: $r['k']);
+                    $flag  = ($r['k'] === null || $r['k'] === '') ? '' : funnel_flag_emoji($r['k']);
+                } else {
+                    $label = ($r['k'] === null || $r['k'] === '') ? FUNNEL_DIRECT_LABEL : ($name_by_source_code[$r['k']] ?? $r['k']);
+                    $flag  = '';
+                }
+                $out[] = ['label' => $label, 'flag' => $flag, 'pct' => $r['pct']];
+            }
+            return $out;
+        };
+
         $top_count = max(1, $funnel_counts[$stage_defs[0]['key']]);
         $funnel_stages = [];
         $prev_count = null;
@@ -756,9 +988,17 @@ include __DIR__ . '/../admin_header.php';
             $funnel_stages[] = [
                 'key' => $sd['key'], 'label' => $sd['label'], 'count' => $c,
                 'pct_of_top' => $pct_of_top, 'retained' => $retained, 'lost' => $lost,
+                'dropoff'    => ($prev_count !== null) ? ($prev_count - $c) : null,
+                'step_value' => $c > 0 ? round($total_revenue / $c, 2) : 0,
+                'top_countries' => $fmt_stage_rows($stage_countries[$sd['key']] ?? [], true),
+                'top_sources'   => $fmt_stage_rows($stage_sources[$sd['key']] ?? [], false),
             ];
             $prev_count = $c;
         }
+
+        // Anonymous in-app activation/retention for the "App first run" info
+        // popover, scoped to the same period as the funnel.
+        $app_activation = get_app_activation_stats($funnel_period_start_dt);
 
         $biggest_drop_index = null;
         $biggest_drop_pct = 101;
@@ -846,91 +1086,189 @@ include __DIR__ . '/../admin_header.php';
         </div>
     </div>
 
-    <div class="funnel-container">
-        <h2>
-            Conversion Funnel
-            <?php if ($funnel_source_filter !== ''): ?>
-                <span class="source-tag"><?php echo htmlspecialchars($funnel_source_filter); ?></span>
-            <?php else: ?>
-                <span class="source-tag">all traffic, including visitors with no referral link</span>
-            <?php endif; ?>
-        </h2>
-
-        <div class="funnel funnel-bars">
-            <?php foreach ($funnel_stages as $i => $stage): ?>
-                <div class="funnel-row" data-stage="<?php echo htmlspecialchars($stage['key']); ?>">
-                    <div class="funnel-label"><?php echo htmlspecialchars($stage['label']); ?></div>
-                    <div class="funnel-bar-wrap">
-                        <div class="funnel-bar funnel-bar-<?php echo htmlspecialchars($stage['key']); ?>"
-                             style="--target-pct: <?php echo $stage['pct_of_top']; ?>%"></div>
-                    </div>
-                    <div class="funnel-count"><?php echo number_format($stage['count']); ?></div>
-                </div>
-                <?php if ($i + 1 < count($funnel_stages) && $funnel_stages[$i+1]['retained'] !== null):
-                    $next = $funnel_stages[$i+1];
-                    $is_biggest = ($biggest_drop_index === $i + 1);
-                ?>
-                    <div class="funnel-dropoff <?php echo $is_biggest ? 'biggest' : ''; ?>">
-                        <span class="kept"><?php echo $next['retained']; ?>% retained</span>
-                        <span class="sep">·</span>
-                        <span class="lost"><?php echo $next['lost']; ?>% left</span>
-                        <?php if ($is_biggest): ?>
-                            <span class="sep">·</span>
-                            <span class="kept">biggest drop-off</span>
-                        <?php endif; ?>
-                    </div>
+    <?php
+        // Date-range label for the funnel header, e.g. "Jun 15 → Jul 15".
+        $range_start_label = $funnel_period_start_dt !== null
+            ? date('M j', strtotime($funnel_period_start_dt))
+            : 'All time';
+        $range_end_label = date('M j');
+        $range_label = $funnel_period_start_dt !== null
+            ? ($range_start_label . ' → ' . $range_end_label)
+            : 'All time';
+    ?>
+    <div class="funnel-card">
+        <div class="funnel-card-head">
+            <h2>
+                Conversion Funnel
+                <?php if ($funnel_source_filter !== ''): ?>
+                    <span class="source-tag"><?php echo htmlspecialchars($funnel_source_filter); ?></span>
+                <?php else: ?>
+                    <span class="source-tag">all traffic</span>
                 <?php endif; ?>
-            <?php endforeach; ?>
+            </h2>
+            <div class="funnel-conv">
+                <span class="funnel-conv-range"><?php echo htmlspecialchars($range_label); ?></span>
+            </div>
+        </div>
+        <div class="funnel-stream" id="funnelStream"
+             data-biggest="<?php echo $biggest_drop_index === null ? -1 : (int)$biggest_drop_index; ?>"></div>
+        <div class="funnel-tip" id="funnelTip" role="tooltip" aria-hidden="true"></div>
+    </div>
+
+    <?php
+        // Server-rendered breakdown lists (dual blue/orange bars). The Channel
+        // donut and the world map are drawn client-side from the JSON below.
+        $bd_ref      = funnel_render_bar_list($analytics['referrers'], ['revenue' => true,  'limit' => 9, 'icon' => true]);
+        $bd_campaign = funnel_render_bar_list($analytics['campaigns'], ['revenue' => true,  'limit' => 9, 'icon' => true, 'empty' => 'No tracked source categories in this period yet.']);
+        $bd_country  = funnel_render_bar_list($analytics['countries'], ['revenue' => true,  'limit' => 9, 'flag' => true]);
+        $bd_region   = funnel_render_bar_list($analytics['regions'],   ['revenue' => false, 'limit' => 9, 'empty' => 'No region data yet. Collecting going forward.']);
+        $bd_city     = funnel_render_bar_list($analytics['cities'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No city data yet. Collecting going forward.']);
+
+        // Page breakdowns (popular / entry / exit) come from the site-wide
+        // page_view stream, not the referral funnel, so they ignore the source
+        // pill and only honor the period window.
+        $pages       = funnel_page_breakdowns($funnel_period_start_dt);
+
+        // Entry pages come from the referral funnel, not the page_view stream.
+        // track_page_view() stores a page *name* ("invgen_tool"), so those rows
+        // cannot be joined to the funnel and would show zero installs against
+        // every page. Sourcing all three columns from referral_events keeps
+        // visits, installs and payments on one definition of a visitor.
+        $entry_rows = $analytics['entry_pages'] ?? [];
+
+        $bd_popular  = funnel_render_bar_list($pages['popular'], ['revenue' => false, 'limit' => 9, 'empty' => 'No page views in this period yet.']);
+        $bd_entry    = funnel_render_bar_list($entry_rows,       ['revenue' => false, 'limit' => 9, 'empty' => 'No entry pages in this period yet.']);
+        $bd_exit     = funnel_render_bar_list($pages['exit'],    ['revenue' => false, 'limit' => 9, 'empty' => 'No exit pages in this period yet.']);
+
+        $channel_total_visits = array_sum(array_map(fn($r) => (int)$r['visits'], $analytics['channels']));
+    ?>
+    <div class="analytics-row">
+        <!-- Traffic sources: channel / referrer / campaign -->
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="channel">Channel</button>
+                <button class="bd-tab" data-bd="referrer">Referrer</button>
+                <button class="bd-tab" data-bd="campaign">Category</button>
+                <?php echo funnel_render_download_btn('traffic-sources', [
+                    funnel_export_dataset('Channel',  $analytics['channels'],  true),
+                    funnel_export_dataset('Referrer', $analytics['referrers'], true, true),
+                    funnel_export_dataset('Category', $analytics['campaigns'], true),
+                ]); ?>
+            </div>
+
+            <div class="bd-panel active" data-bd-panel="channel">
+                <?php echo funnel_render_panel_desc('Visits grouped into broad acquisition channels, worked out from the referring site and the tracked source code.'); ?>
+                <?php if ($channel_total_visits > 0): ?>
+                    <div class="donut-wrap">
+                        <div class="donut-canvas">
+                            <canvas id="channelDonut"></canvas>
+                            <div class="donut-center">
+                                <span class="dc-num"><?php echo funnel_kfmt($channel_total_visits); ?></span>
+                                <span class="dc-lbl">visitors</span>
+                            </div>
+                        </div>
+                        <ul class="donut-legend" id="channelLegend"></ul>
+                    </div>
+                <?php else: ?>
+                    <div class="bd-empty">No traffic in this period yet.</div>
+                <?php endif; ?>
+            </div>
+
+            <div class="bd-panel" data-bd-panel="referrer">
+                <?php echo funnel_render_panel_desc('The site each visitor arrived from, with the installs and payments they went on to produce. "Direct / None" means no referrer was sent, which includes bookmarks, typed URLs and most clicks from outside a browser.'); ?>
+                <?php echo $bd_ref; ?>
+                <?php echo funnel_render_details_btn('referrerDetailsModal', $analytics['referrers']); ?>
+            </div>
+
+            <div class="bd-panel" data-bd-panel="campaign">
+                <?php echo funnel_render_panel_desc('Visits grouped by the category of the tracked referral link they used. Untracked and direct traffic is excluded.'); ?>
+                <?php echo $bd_campaign; ?>
+            </div>
         </div>
 
-        <?php if ($payer_source_total > 0): ?>
-            <div class="landing-breakdown">
-                <h3>Where paying customers came from</h3>
-                <p class="muted-note">
-                    Each paying customer attributed to the source captured at signup. "Direct / untracked"
-                    means we couldn't tie them to a campaign (organic, or a returning visitor).
-                </p>
-                <div class="landing-breakdown-body">
-                    <div class="landing-breakdown-chart">
-                        <canvas id="payerSourcesChart"></canvas>
-                    </div>
-                    <ul class="landing-breakdown-list">
-                        <?php foreach ($payer_source_rows as $i => $row):
-                            $pct = $payer_source_total > 0 ? round(((int)$row['payers'] / $payer_source_total) * 100, 1) : 0;
-                        ?>
-                            <li>
-                                <span class="swatch" data-payer-swatch-idx="<?php echo $i; ?>"></span>
-                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
-                                <span class="pct"><?php echo (int)$row['payers']; ?> &middot; <?php echo $pct; ?>%</span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
+        <!-- Geography: map / country / region / city -->
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="map">Map</button>
+                <button class="bd-tab" data-bd="country">Country</button>
+                <button class="bd-tab" data-bd="region">Region</button>
+                <button class="bd-tab" data-bd="city">City</button>
+                <?php echo funnel_render_download_btn('geography', [
+                    funnel_export_dataset('Country', $analytics['countries'], true),
+                    funnel_export_dataset('Region',  $analytics['regions']),
+                    funnel_export_dataset('City',    $analytics['cities']),
+                ]); ?>
             </div>
-        <?php endif; ?>
 
-        <?php if (!empty($landing_breakdown)): ?>
-            <div class="landing-breakdown">
-                <h3>Where landings come from</h3>
-                <div class="landing-breakdown-body">
-                    <div class="landing-breakdown-chart">
-                        <canvas id="landingPagesChart"></canvas>
-                    </div>
-                    <ul class="landing-breakdown-list landing-breakdown-list--two-col">
-                        <?php $total_landings = array_sum($landing_chart_counts); ?>
-                        <?php foreach ($landing_breakdown as $i => $row):
-                            $pct = $total_landings > 0 ? round(($row['visitors'] / $total_landings) * 100, 1) : 0;
-                        ?>
-                            <li>
-                                <span class="swatch" data-swatch-idx="<?php echo $i; ?>"></span>
-                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
-                                <span class="pct"><?php echo $pct; ?>%</span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+            <div class="bd-panel active" data-bd-panel="map">
+                <?php echo funnel_render_panel_desc('Visitor counts by country, shaded darker for more visits. Hover a country for its total.'); ?>
+                <div class="world-map" id="worldMap"></div>
+                <div class="map-legend">
+                    <span class="map-legend-label">Fewer</span>
+                    <span class="map-legend-gradient"></span>
+                    <span class="map-legend-label">More visits</span>
                 </div>
             </div>
-        <?php endif; ?>
+            <div class="bd-panel" data-bd-panel="country">
+                <?php echo funnel_render_panel_desc('Visitors and attributed revenue by country, resolved from IP address. Useful for spotting spend reaching places you do not sell to.'); ?>
+                <?php echo $bd_country; ?>
+                <?php echo funnel_render_details_btn('countryDetailsModal', $analytics['countries']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="region">
+                <?php echo funnel_render_panel_desc('Province or state, resolved from IP address. Best-effort, and often unknown.'); ?>
+                <?php echo $bd_region; ?>
+                <?php echo funnel_render_details_btn('regionDetailsModal', $analytics['regions']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="city">
+                <?php echo funnel_render_panel_desc('City, resolved from IP address. Best-effort, and often unknown.'); ?>
+                <?php echo $bd_city; ?>
+                <?php echo funnel_render_details_btn('cityDetailsModal', $analytics['cities']); ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pages: most popular / entry / exit (site-wide page_view stream) -->
+    <div class="analytics-row analytics-row-full">
+        <div class="analytics-card">
+            <div class="bd-tabs" role="tablist">
+                <button class="bd-tab active" data-bd="popular">Popular pages</button>
+                <button class="bd-tab" data-bd="entry">Entry page</button>
+                <button class="bd-tab" data-bd="exit">Exit page</button>
+                <?php echo funnel_render_download_btn('pages', [
+                    funnel_export_dataset('Popular pages', $pages['popular']),
+                    funnel_export_dataset('Entry pages',   $entry_rows, false, true),
+                    funnel_export_dataset('Exit pages',    $pages['exit']),
+                ]); ?>
+            </div>
+
+            <div class="bd-panel active" data-bd-panel="popular">
+                <?php echo funnel_render_panel_desc('Every page view in the period, counted once per visitor per day. Shows what gets read, not what converts.'); ?>
+                <?php echo $bd_popular; ?>
+                <?php echo funnel_render_details_btn('popularPagesDetailsModal', $pages['popular']); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="entry">
+                <?php echo funnel_render_panel_desc('The first page each visitor landed on, with the installs and payments that visitor later produced. This is the tab that shows which pages earn, rather than which get read.'); ?>
+                <?php echo $bd_entry; ?>
+                <?php echo funnel_render_details_btn('entryPagesDetailsModal', $entry_rows); ?>
+            </div>
+            <div class="bd-panel" data-bd-panel="exit">
+                <?php echo funnel_render_panel_desc('The last page a visitor saw before leaving. A high count is normal for pages that end a journey, such as the downloads page.'); ?>
+                <?php echo $bd_exit; ?>
+                <?php echo funnel_render_details_btn('exitPagesDetailsModal', $pages['exit']); ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full breakdown lists (opened from each tab's "See all details") -->
+    <?php
+        echo funnel_render_details_modal('referrerDetailsModal', 'Referrer', $analytics['referrers'], true);
+        echo funnel_render_details_modal('countryDetailsModal',  'Country',  $analytics['countries'], true);
+        echo funnel_render_details_modal('regionDetailsModal',   'Region',   $analytics['regions'],   false);
+        echo funnel_render_details_modal('cityDetailsModal',     'City',     $analytics['cities'],    false);
+        echo funnel_render_details_modal('popularPagesDetailsModal', 'Most popular pages', $pages['popular'], false, 'Page');
+        echo funnel_render_details_modal('entryPagesDetailsModal',   'Entry pages',        $entry_rows,       false, 'Page');
+        echo funnel_render_details_modal('exitPagesDetailsModal',    'Exit pages',         $pages['exit'],    false, 'Page');
+    ?>
 
         <?php
             $survey_by_answer = $survey_breakdown['by_answer'];
@@ -1005,72 +1343,6 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             </div>
         <?php endif; ?>
-    </div>
-
-    <div class="table-container">
-        <div class="table-header-actions">
-            <h2>Compare all sources</h2>
-        </div>
-        <div class="table-responsive">
-            <table class="compare-table" data-paginate="25">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Landings</th>
-                        <th>Pages</th>
-                        <th>Clicks</th>
-                        <th>Signups</th>
-                        <th>Paying</th>
-                        <th>Spend</th>
-                        <th>Revenue</th>
-                        <th>CAC</th>
-                        <th>LTV</th>
-                        <th>LTV:CAC</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($per_source as $r):
-                        $rspend = (float)$r['spend'];
-                        $rrev   = (float)$r['revenue'];
-                        $rpaying = (int)$r['paying'];
-                        $rcac = $rpaying > 0 ? $rspend / $rpaying : null;
-                        $rltv = $rpaying > 0 ? $rrev / $rpaying : null;
-                        $rratio = ($rcac !== null && $rcac > 0 && $rltv !== null) ? $rltv / $rcac : null;
-                        $rclass = 'organic';
-                        if ($rspend > 0) {
-                            if ($rratio === null) $rclass = 'losing';
-                            elseif ($rratio < 1.0) $rclass = 'losing';
-                            elseif ($rratio < 3.0) $rclass = 'marginal';
-                            else $rclass = 'profitable';
-                        }
-                        $row_href = 'index.php?' . http_build_query([
-                            'tab' => 'funnel', 'funnel_period' => $funnel_period_key, 'source' => $r['source_code']
-                        ]);
-                    ?>
-                        <tr onclick="window.location.href='<?php echo htmlspecialchars($row_href); ?>'">
-                            <td><code><?php echo htmlspecialchars($r['source_code']); ?></code></td>
-                            <td><?php echo number_format((int)$r['landings']); ?></td>
-                            <td><?php echo number_format((int)$r['dl_pages']); ?></td>
-                            <td><?php echo number_format((int)$r['dl_clicks']); ?></td>
-                            <td><?php echo number_format((int)$r['signups']); ?></td>
-                            <td><?php echo number_format($rpaying); ?></td>
-                            <td>$<?php echo number_format($rspend, 2); ?></td>
-                            <td>$<?php echo number_format($rrev, 2); ?></td>
-                            <td><?php echo $rcac !== null ? '$' . number_format($rcac, 2) : '—'; ?></td>
-                            <td><?php echo $rltv !== null ? '$' . number_format($rltv, 2) : '—'; ?></td>
-                            <td class="ratio-cell <?php echo $rclass; ?>">
-                                <?php
-                                    if ($rspend == 0 && $rpaying > 0) echo '∞';
-                                    elseif ($rratio !== null) echo number_format($rratio, 2) . '×';
-                                    else echo '—';
-                                ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
     </div><!-- /#funnel -->
 
     <div id="spend" class="tab-content <?php echo $current_tab === 'spend' ? 'active' : ''; ?>">
@@ -1486,6 +1758,11 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
+<!-- World map for the geography card (choropleth by visits). Self-hosted so it
+     loads under the admin CSP, which only allows scripts from 'self' + cdnjs. -->
+<script src="vendor/jsvectormap.min.js"></script>
+<script src="vendor/world.min.js"></script>
+
 <script>
     const csrfToken = <?php echo json_encode($_SESSION['csrf_token']); ?>;
 
@@ -1560,20 +1837,6 @@ include __DIR__ . '/../admin_header.php';
         if (sModal && event.target === sModal && modalMouseDownTarget === sModal) {
             closeSpendModal();
         }
-    });
-
-    // Restore scroll position
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
-
-    // Save scroll position when clicking funnel filter pills so the page
-    // reload doesn't jump back to the top.
-    document.querySelectorAll('.control-pill').forEach(link => {
-        link.addEventListener('click', function() {
-            sessionStorage.setItem('scrollPosition', window.scrollY);
-        });
     });
 
     // Searchable source filter (combobox). Type to filter the source list,
@@ -1651,70 +1914,6 @@ include __DIR__ . '/../admin_header.php';
         document.addEventListener('click', (e) => { if (!box.contains(e.target)) close(); });
     })();
 
-    // Landing-page breakdown doughnut (only rendered on All-traffic funnel).
-    (function () {
-        const canvas = document.getElementById('landingPagesChart');
-        if (!canvas || typeof Chart === 'undefined') return;
-
-        const labels = <?php echo json_encode($landing_chart_labels, JSON_UNESCAPED_SLASHES); ?>;
-        const counts = <?php echo json_encode($landing_chart_counts); ?>;
-        if (!labels.length) return;
-
-        // Reuse the palette other admin charts use so themes stay consistent.
-        // Expanded to 14 distinct hues now that the legend shows up to 14 pages;
-        // gray is reserved for the "Other" bucket so it always reads as the catch-all.
-        const palette = [
-            'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
-            'rgba(16, 185, 129, 0.85)',   // emerald
-            'rgba(245, 158, 11, 0.85)',   // amber
-            'rgba(239, 68, 68, 0.85)',    // red
-            'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
-            'rgba(236, 72, 153, 0.85)',   // pink
-            'rgba(20, 184, 166, 0.85)',   // teal
-            'rgba(132, 204, 22, 0.85)',   // lime
-            'rgba(249, 115, 22, 0.85)',   // orange
-            'rgba(99, 102, 241, 0.85)',   // indigo
-            'rgba(6, 182, 212, 0.85)',    // cyan
-            'rgba(217, 70, 239, 0.85)',   // fuchsia
-        ];
-        const GRAY = 'rgba(107, 114, 128, 0.85)';
-        const colors = labels.map((lbl, i) => lbl === 'Other' ? GRAY : palette[i % palette.length]);
-
-        document.querySelectorAll('.landing-breakdown-list .swatch').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-swatch-idx'), 10);
-            if (!Number.isNaN(idx) && colors[idx]) {
-                el.style.backgroundColor = colors[idx];
-            }
-        });
-
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '55%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    })();
-
     // Source-survey breakdown doughnut (unattributed installs only).
     (function () {
         const canvas = document.getElementById('surveySourcesChart');
@@ -1728,12 +1927,12 @@ include __DIR__ . '/../admin_header.php';
         // Unanswered always lands on the gray slot (last in the palette).
         const palette = [
             'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
+            'rgba(30, 64, 175, 0.85)',    // navy
             'rgba(16, 185, 129, 0.85)',   // emerald
             'rgba(245, 158, 11, 0.85)',   // amber
             'rgba(239, 68, 68, 0.85)',    // red
             'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
+            'rgba(147, 197, 253, 0.85)',  // light blue
             'rgba(107, 114, 128, 0.85)',  // gray
         ];
         const GRAY = palette[palette.length - 1];
@@ -1772,59 +1971,396 @@ include __DIR__ . '/../admin_header.php';
         });
     })();
 
-    // Where paying customers came from (pie).
+    // ---------------------------------------------------------------------
+    // Plausible-style dashboard: streamgraph funnel, channel donut, world map,
+    // dual-bar breakdown tooltips, inner tab switching, referrer details modal.
+    // ---------------------------------------------------------------------
+    <?php
+        // Country map values keyed by uppercase ISO-2, for the choropleth.
+        $map_values = [];
+        foreach ($analytics['countries'] as $mr) {
+            if (!preg_match('/^[A-Za-z]{2}$/', (string)$mr['key'])) continue;
+            $map_values[strtoupper($mr['key'])] = [
+                'visits'  => (int)$mr['visits'],
+                'revenue' => round((float)$mr['revenue'], 2),
+            ];
+        }
+        $channels_js = array_map(fn($r) => [
+            'label'   => $r['label'],
+            'visits'  => (int)$r['visits'],
+            'revenue' => round((float)$r['revenue'], 2),
+        ], $analytics['channels']);
+    ?>
     (function () {
-        const canvas = document.getElementById('payerSourcesChart');
-        if (!canvas || typeof Chart === 'undefined') return;
+        const FUNNEL      = <?php echo json_encode($funnel_stages, JSON_UNESCAPED_SLASHES); ?>;
+        const APP_ACTIVATION = <?php echo json_encode($app_activation, JSON_UNESCAPED_SLASHES); ?>;
+        const CHANNELS    = <?php echo json_encode($channels_js, JSON_UNESCAPED_SLASHES); ?>;
+        const MAP_VALUES  = <?php echo json_encode($map_values ?: new stdClass(), JSON_UNESCAPED_SLASHES); ?>;
 
-        const labels = <?php echo json_encode($payer_source_labels ?? [], JSON_UNESCAPED_SLASHES); ?>;
-        const counts = <?php echo json_encode($payer_source_counts ?? []); ?>;
-        if (!labels.length) return;
-
-        // Same palette as the other breakdown charts; "Direct / untracked" always
-        // takes the gray slot (last in the palette).
-        const palette = [
-            'rgba(59, 130, 246, 0.85)',   // blue
-            'rgba(139, 92, 246, 0.85)',   // purple
-            'rgba(16, 185, 129, 0.85)',   // emerald
-            'rgba(245, 158, 11, 0.85)',   // amber
-            'rgba(239, 68, 68, 0.85)',    // red
-            'rgba(14, 165, 233, 0.85)',   // sky
-            'rgba(168, 85, 247, 0.85)',   // violet
-            'rgba(107, 114, 128, 0.85)',  // gray
-        ];
-        const GRAY = palette[palette.length - 1];
-        const colors = labels.map((lbl, i) => lbl === 'Direct / untracked' ? GRAY : palette[i % (palette.length - 1)]);
-
-        document.querySelectorAll('.landing-breakdown-list .swatch[data-payer-swatch-idx]').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-payer-swatch-idx'), 10);
-            if (!Number.isNaN(idx) && colors[idx]) {
-                el.style.backgroundColor = colors[idx];
+        const nf = new Intl.NumberFormat('en-US');
+        const money = v => '$' + nf.format(Math.round(v));
+        const escapeHtml = s => String(s).replace(/[&<>"']/g, c => (
+            {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const fmtCount = n => {
+            n = Number(n) || 0;
+            if (Math.abs(n) >= 1000) {
+                const k = n / 1000;
+                return (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + 'k';
             }
+            return nf.format(n);
+        };
+        const isDark = () =>
+            (document.documentElement.getAttribute('data-theme') === 'dark') ||
+            (document.body.getAttribute('data-theme') === 'dark');
+
+        // ----- Inner tab switching (sources + geo cards) -----
+        document.querySelectorAll('.bd-tabs').forEach(tabs => {
+            const card = tabs.closest('.analytics-card');
+            tabs.addEventListener('click', e => {
+                const btn = e.target.closest('.bd-tab');
+                if (!btn) return;
+                const key = btn.getAttribute('data-bd');
+                tabs.querySelectorAll('.bd-tab').forEach(b => b.classList.toggle('active', b === btn));
+                card.querySelectorAll('.bd-panel').forEach(p =>
+                    p.classList.toggle('active', p.getAttribute('data-bd-panel') === key));
+                if (key === 'map' && window.__argoMap && typeof window.__argoMap.updateSize === 'function') {
+                    window.__argoMap.updateSize();
+                }
+            });
         });
 
-        new Chart(canvas, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function (ctx) {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
-                            }
-                        }
+        // ----- Shared tooltip for the dual-bar breakdown lists -----
+        const barTip = document.createElement('div');
+        barTip.className = 'bd-tip';
+        document.body.appendChild(barTip);
+        document.querySelectorAll('.bd-list').forEach(list => {
+            list.addEventListener('mousemove', e => {
+                const row = e.target.closest('.bd-row');
+                if (!row) { barTip.classList.remove('show'); return; }
+                barTip.textContent = row.getAttribute('data-tip') || '';
+                barTip.classList.add('show');
+                barTip.style.left = (e.clientX + 14) + 'px';
+                barTip.style.top  = (e.clientY + 16) + 'px';
+            });
+            list.addEventListener('mouseleave', () => barTip.classList.remove('show'));
+        });
+
+        // ----- Streamgraph funnel -----
+        (function renderFunnel() {
+            const host = document.getElementById('funnelStream');
+            if (!host || !FUNNEL.length) return;
+            const W = 1000, H = 300, cy = H / 2, pad = 18;
+            const n = FUNNEL.length;
+            const colW = W / n;
+            const maxCount = Math.max(1, ...FUNNEL.map(s => s.count));
+            const halfMax = cy - pad;
+            // Section centres (labels + waist points sit here); the shape flows
+            // flat from the left edge, through each centre, off the right edge.
+            const cxs = FUNNEL.map((s, i) => (i + 0.5) * colW);
+            const hs = FUNNEL.map(s => Math.max(6, Math.sqrt(s.count / maxCount) * halfMax));
+            const px = [0, ...cxs, W];
+            const ph = [hs[0], ...hs, hs[n - 1]];
+
+            // Per-section blue ramp, dark blue -> light blue (matches Funnel.png).
+            const c0 = [44, 70, 140], c1 = [176, 209, 246];
+            const hx2 = v => ('0' + Math.max(0, Math.min(255, Math.round(v))).toString(16)).slice(-2);
+            const sectionColor = i => {
+                const t = n === 1 ? 0 : i / (n - 1);
+                return '#' + hx2(c0[0] + (c1[0] - c0[0]) * t) + hx2(c0[1] + (c1[1] - c0[1]) * t) + hx2(c0[2] + (c1[2] - c0[2]) * t);
+            };
+
+            const edge = sign => {
+                let d = `M ${px[0].toFixed(1)} ${(cy + sign * ph[0]).toFixed(1)}`;
+                for (let i = 0; i < px.length - 1; i++) {
+                    const x0 = px[i], x1 = px[i + 1], y0 = cy + sign * ph[i], y1 = cy + sign * ph[i + 1], dx = (x1 - x0) / 2;
+                    d += ` C ${(x0 + dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 - dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+                }
+                return d;
+            };
+            let bottom = `L ${px[px.length - 1].toFixed(1)} ${(cy + ph[ph.length - 1]).toFixed(1)}`;
+            for (let i = px.length - 1; i > 0; i--) {
+                const x0 = px[i], x1 = px[i - 1], y0 = cy + ph[i], y1 = cy + ph[i - 1], dx = (x0 - x1) / 2;
+                bottom += ` C ${(x0 - dx).toFixed(1)} ${y0.toFixed(1)}, ${(x1 + dx).toFixed(1)} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+            }
+            const pathD = edge(-1) + ' ' + bottom + ' Z';
+
+            // Each section: the full shape clipped to its column, own colour.
+            let defs = '<defs>', sections = '', dividers = '', segs = '';
+            for (let i = 0; i < n; i++) {
+                defs += `<clipPath id="fseg${i}"><rect x="${(i * colW).toFixed(1)}" y="0" width="${colW.toFixed(1)}" height="${H}"/></clipPath>`;
+                sections += `<path d="${pathD}" fill="${sectionColor(i)}" clip-path="url(#fseg${i})"/>`;
+                if (i > 0) dividers += `<line x1="${(i * colW).toFixed(1)}" y1="0" x2="${(i * colW).toFixed(1)}" y2="${H}" class="funnel-divider" vector-effect="non-scaling-stroke"/>`;
+                segs += `<rect class="funnel-seg" data-i="${i}" x="${(i * colW).toFixed(1)}" y="0" width="${colW.toFixed(1)}" height="${H}"></rect>`;
+            }
+            defs += '</defs>';
+
+            const svg =
+                `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="funnel-svg">` +
+                defs + dividers +
+                `<g class="funnel-body">${sections}<path d="${pathD}" fill="none" class="funnel-border" vector-effect="non-scaling-stroke"/></g>` +
+                segs + `</svg>`;
+
+            let pills = '<div class="funnel-pills">';
+            for (let i = 0; i < n - 1; i++) {
+                const midX = ((i + 1) * colW) / W * 100;
+                // Drop-off is undefined when the previous stage had 0 (nothing to
+                // drop from) — show a dash rather than a null percentage.
+                const lost = FUNNEL[i + 1].lost;
+                const lostLabel = (lost === null || lost === undefined) ? '&ndash;' : `-${lost}%`;
+                pills += `<span class="funnel-pill" style="left:${midX}%">${lostLabel} <span class="arw">&rarr;</span></span>`;
+            }
+            pills += '</div>';
+
+            // Labels centred under each section. The "App first run" label always
+            // gets an info button opening the anonymous in-app activation popover.
+            let labels = '<div class="funnel-labels">';
+            FUNNEL.forEach((s, i) => {
+                const left = ((i + 0.5) * colW) / W * 100;
+                const info = (s.key === 'app_first_run')
+                    ? ` <button type="button" class="fl-info" aria-label="After install: activation and retention"></button>`
+                    : '';
+                labels += `<div class="funnel-lbl" style="left:${left.toFixed(2)}%;transform:translateX(-50%);text-align:center"><span class="fl-count">${fmtCount(s.count)}</span><span class="fl-name">${escapeHtml(s.label)}${info}</span></div>`;
+            });
+            labels += '</div>';
+
+            host.innerHTML = svg + pills + labels;
+
+            // ----- "After install" activation popover on the App-first-run stage -----
+            const actBtn = host.querySelector('.fl-info');
+            if (actBtn) {
+                const a = APP_ACTIVATION || {};
+                const pop = document.createElement('div');
+                pop.className = 'funnel-activation-pop';
+                pop.hidden = true;
+                pop.innerHTML = a.has_data
+                    ? (`<div class="fap-title">After install &middot; anonymous app data</div>` +
+                       `<div class="fap-row"><span>Active app users</span><b>${fmtCount(a.seen)}</b></div>` +
+                       `<div class="fap-row"><span>Finished setup tutorial</span><b>${fmtCount(a.onboarded)} &middot; ${a.onboarded_pct}%</b></div>` +
+                       `<div class="fap-row"><span>Skipped setup tutorial</span><b>${fmtCount(a.skipped)} &middot; ${a.skipped_pct}%</b></div>` +
+                       `<div class="fap-row"><span>Did a bookkeeping action</span><b>${fmtCount(a.activated)} &middot; ${a.activated_pct}%</b></div>` +
+                       `<div class="fap-row"><span>Came back another day</span><b>${fmtCount(a.returned)} &middot; ${a.returned_pct}%</b></div>` +
+                       `<div class="fap-note">Active app users in this period (new and returning), so it won't match the install count above. Anonymous in-app usage, not tied to individual visitors. Activated = a real bookkeeping action: invoice, expense, revenue, payment, receipt scan, bank/spreadsheet import, report, purchase order, stock change, or rental record. Setup-tutorial figures need app 2.0.11+.</div>`)
+                    : (`<div class="fap-title">After install &middot; anonymous app data</div>` +
+                       `<div class="fap-note">No in-app usage data for this period yet. Once people run the app and it uploads anonymous telemetry, this shows how many finished setup, did a bookkeeping action (invoice, receipt, or expense), and came back another day.</div>`);
+                document.body.appendChild(pop);
+
+                const closePop = () => { pop.hidden = true; };
+                actBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (pop.hidden) {
+                        const r = actBtn.getBoundingClientRect();
+                        pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 300)) + 'px';
+                        pop.style.top = (r.bottom + window.scrollY + 8) + 'px';
+                        pop.hidden = false;
+                    } else {
+                        closePop();
+                    }
+                });
+                document.addEventListener('click', (e) => {
+                    if (e.target !== actBtn && !pop.contains(e.target)) closePop();
+                });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+            }
+
+            const tip = document.getElementById('funnelTip');
+            const showTip = (e, i) => {
+                const s = FUNNEL[i], prev = i > 0 ? FUNNEL[i - 1] : null;
+                let h = '';
+                if (prev) {
+                    h += `<div class="ft-line"><span>${escapeHtml(prev.label)}</span><b>${fmtCount(prev.count)}</b></div>`;
+                    h += `<div class="ft-line ft-drop"><span>Dropoff</span><b>-${fmtCount(s.dropoff)}</b></div>`;
+                }
+                h += `<div class="ft-line ft-cur"><span>${escapeHtml(s.label)}</span><b>${fmtCount(s.count)}</b></div>`;
+                h += `<div class="ft-sep"></div>`;
+                h += `<div class="ft-line"><span>Conversion</span><b>${s.retained === null ? '100%' : s.retained + '%'}</b></div>`;
+                h += `<div class="ft-line ft-sub"><span>from start</span><b>${s.pct_of_top}%</b></div>`;
+                h += `<div class="ft-line"><span>Step value</span><b>${money(s.step_value)}/visitor</b></div>`;
+                if ((s.top_sources && s.top_sources.length) || (s.top_countries && s.top_countries.length)) {
+                    const col = (title, rows) => `<div class="ft-col"><div class="ft-h">${title}</div>` +
+                        rows.map(r => `<div class="ft-row"><span>${r.flag ? r.flag + ' ' : ''}${escapeHtml(r.label)}</span><em>${r.pct}%</em></div>`).join('') + `</div>`;
+                    h += `<div class="ft-cols">` + col('Top sources', s.top_sources || []) + col('Top countries', s.top_countries || []) + `</div>`;
+                }
+                tip.innerHTML = h;
+                tip.setAttribute('aria-hidden', 'false');
+                tip.classList.add('show');
+                let x = e.clientX + 16;
+                if (x + 250 > window.innerWidth) x = e.clientX - 250;
+                tip.style.left = Math.max(4, x) + 'px';
+                tip.style.top = Math.max(4, e.clientY + 14) + 'px';
+            };
+            host.querySelectorAll('.funnel-seg').forEach(seg => {
+                const i = parseInt(seg.getAttribute('data-i'), 10);
+                seg.addEventListener('mouseenter', () => host.classList.add('hovering'));
+                seg.addEventListener('mousemove', e => showTip(e, i));
+                seg.addEventListener('mouseleave', () => {
+                    host.classList.remove('hovering');
+                    tip.classList.remove('show');
+                    tip.setAttribute('aria-hidden', 'true');
+                });
+            });
+        })();
+
+        // ----- Channel donut -----
+        (function renderChannelDonut() {
+            const canvas = document.getElementById('channelDonut');
+            if (!canvas || typeof Chart === 'undefined' || !CHANNELS.length) return;
+            const palette = {
+                'Referral': '#3f63e8', 'Direct': '#8aa0e8', 'Organic search': '#2740b5',
+                'Organic social': '#6f8fe6', 'Newsletter': '#c2cffb', 'AI': '#9db4f5'
+            };
+            const colors = CHANNELS.map(c => palette[c.label] || '#8aa0e8');
+            const total = CHANNELS.reduce((a, c) => a + c.visits, 0);
+            const donutBorder = isDark() ? '#1e232b' : '#ffffff';
+            new Chart(canvas, {
+                type: 'doughnut',
+                data: { labels: CHANNELS.map(c => c.label), datasets: [{ data: CHANNELS.map(c => c.visits), backgroundColor: colors, borderWidth: 2, borderColor: donutBorder }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => {
+                            const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                            const rev = CHANNELS[ctx.dataIndex] ? CHANNELS[ctx.dataIndex].revenue : 0;
+                            let l = ctx.label + ': ' + nf.format(ctx.parsed) + ' (' + pct + '%)';
+                            if (rev > 0) l += ' · ' + money(rev);
+                            return l;
+                        } } }
                     }
                 }
+            });
+            const legend = document.getElementById('channelLegend');
+            if (legend) {
+                legend.innerHTML = CHANNELS.map((c, i) => {
+                    const pct = total > 0 ? Math.round(c.visits / total * 100) : 0;
+                    return `<li><span class="dot" style="background:${colors[i]}"></span>` +
+                           `<span class="dl">${escapeHtml(c.label)}</span>` +
+                           `<span class="dv">${nf.format(c.visits)} &middot; ${pct}%</span></li>`;
+                }).join('');
             }
-        });
+        })();
+
+        // ----- World map choropleth -----
+        (function renderMap() {
+            const el = document.getElementById('worldMap');
+            if (!el || typeof jsVectorMap === 'undefined') {
+                if (el) el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
+                return;
+            }
+            const dark = isDark();
+            // Use jsvectormap's top-level `visualizeData` (a linear colour scale)
+            // rather than the ordinal `series.scale`, and sqrt-spread the counts
+            // so low-traffic countries still read as blue. visualizeData updates
+            // each region's stored style, so hovering keeps the country's colour.
+            const codes = Object.keys(MAP_VALUES);
+            const maxV = Math.max(1, ...codes.map(c => MAP_VALUES[c].visits));
+            const vals = {};
+            codes.forEach(k => { vals[k] = Math.round(Math.sqrt(MAP_VALUES[k].visits / maxV) * 1000); });
+            const scale = dark ? ['#4d7ac9', '#a9d3f7'] : ['#9db4f5', '#2740b5'];
+            try {
+                window.__argoMap = new jsVectorMap({
+                    selector: '#worldMap',
+                    map: 'world',
+                    zoomButtons: true,
+                    zoomOnScroll: false,
+                    backgroundColor: 'transparent',
+                    regionStyle: {
+                        initial: { fill: dark ? '#2a2f38' : '#e6ebf3', stroke: dark ? '#13161c' : '#ffffff', strokeWidth: 0.4 },
+                        hover: { fillOpacity: 0.78 }
+                    },
+                    visualizeData: { scale: scale, values: vals },
+                    onRegionTooltipShow(event, tooltip, code) {
+                        const d = MAP_VALUES[code];
+                        let html = '<b>' + (tooltip.text() || code) + '</b>';
+                        if (d) {
+                            html += '<br>' + nf.format(d.visits) + ' visit' + (d.visits === 1 ? '' : 's');
+                            if (d.revenue > 0) html += ' &middot; ' + money(d.revenue);
+                        } else {
+                            html += '<br>No visits';
+                        }
+                        tooltip.text(html, true);
+                    }
+                });
+            } catch (err) {
+                el.innerHTML = '<div class="bd-empty">Map unavailable.</div>';
+            }
+        })();
+
+        // ----- "See all details" modals (referrer / country / region / city) -----
+        (function breakdownDetails() {
+            const close = modal => { modal.style.display = 'none'; };
+
+            document.querySelectorAll('.bd-details-modal').forEach(modal => {
+                const search = modal.querySelector('.bd-details-search');
+                const rows = Array.from(modal.querySelectorAll('.bd-details-row'));
+                const filter = () => {
+                    const q = (search.value || '').trim().toLowerCase();
+                    rows.forEach(r => { r.style.display = (!q || r.getAttribute('data-name').includes(q)) ? '' : 'none'; });
+                };
+                if (search) search.addEventListener('input', filter);
+                modal.querySelectorAll('.bd-details-close').forEach(x => x.addEventListener('click', () => close(modal)));
+                modal.addEventListener('mousedown', e => { if (e.target === modal) close(modal); });
+            });
+
+            document.querySelectorAll('.bd-details-btn[data-details-target]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modal = document.getElementById(btn.getAttribute('data-details-target'));
+                    if (!modal) return;
+                    modal.style.display = 'block';
+                    const search = modal.querySelector('.bd-details-search');
+                    if (search) { search.value = ''; search.dispatchEvent(new Event('input')); search.focus(); }
+                });
+            });
+
+            document.addEventListener('keydown', e => {
+                if (e.key !== 'Escape') return;
+                document.querySelectorAll('.bd-details-modal').forEach(m => {
+                    if (m.style.display === 'block') close(m);
+                });
+            });
+        })();
+
+        // Card "Download" buttons. Every tab in the card is written into one CSV,
+        // separated by a blank line and its own header row, which Excel and Sheets
+        // both open cleanly. Done client-side from the payload already in the DOM
+        // so there is no extra admin endpoint to authenticate.
+        (function () {
+            const escapeCell = value => {
+                const s = String(value ?? '');
+                return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+            };
+
+            document.querySelectorAll('.bd-download-btn[data-download]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    let payload;
+                    try {
+                        payload = JSON.parse(btn.getAttribute('data-download'));
+                    } catch (err) {
+                        return;
+                    }
+
+                    const lines = [];
+                    (payload.datasets || []).forEach((ds, i) => {
+                        if (i > 0) lines.push('');
+                        lines.push(escapeCell(ds.title));
+                        lines.push((ds.columns || []).map(escapeCell).join(','));
+                        (ds.rows || []).forEach(row => lines.push(row.map(escapeCell).join(',')));
+                    });
+
+                    // BOM so Excel reads UTF-8 rather than the system codepage.
+                    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const stamp = new Date().toISOString().slice(0, 10);
+                    a.href = url;
+                    a.download = (payload.filename || 'analytics') + '-' + stamp + '.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            });
+        })();
     })();
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['.control-pill'];</script>
+<script src="../preserve-scroll.js" defer></script>

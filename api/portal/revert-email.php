@@ -83,28 +83,54 @@ $new_safe = htmlspecialchars($row['new_email']);
 echo revert_layout('Revert email change?',
     "<p>Your portal owner email was changed to <strong>$new_safe</strong>.</p>"
     . "<p>Click below to revert it back to <strong>$old_safe</strong>.</p>"
-    . "<form method='post' style='margin-top:1.5rem;'>"
+    . "<form method='post'>"
     . "<input type='hidden' name='token' value='" . htmlspecialchars($token) . "'>"
-    . "<button type='submit' style='background:#dc2626;color:#fff;padding:.7rem 1.4rem;border:none;border-radius:6px;font-size:1rem;cursor:pointer;'>Revert email</button>"
+    . "<button type='submit' class='btn-danger'>Revert email</button>"
     . "</form>");
 
 function revert_layout(string $title, string $body): string {
     $titleSafe = htmlspecialchars($title);
     return <<<HTML
-        <!doctype html>
+        <!DOCTYPE html>
         <html lang="en">
         <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>$titleSafe | Argo Books</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="noindex, nofollow">
+            <title>$titleSafe - Argo Books</title>
+            <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
+            <link rel="stylesheet" href="/resources/styles/custom-colors.css">
+            <link rel="stylesheet" href="/portal/style.css">
             <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; max-width: 540px; margin: 4rem auto; padding: 2rem; color: #111; }
-                h2 { margin-top: 0; }
+                .callback-result { text-align: center; padding: 60px 20px; max-width: 480px; margin: 0 auto; }
+                .callback-title { font-size: 22px; font-weight: 600; color: var(--gray-900, #111); margin: 0 0 12px; }
+                .callback-result p { color: var(--gray-900, #111); font-size: 15px; line-height: 1.5; margin: 0 0 12px; }
+                .callback-result form { margin-top: 28px; }
+                .btn-danger { display: inline-block; padding: 14px 28px; background: var(--red-600); color: var(--white); border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+                .btn-danger:hover { background: var(--red-700); transform: translateY(-1px); box-shadow: 0 4px 12px var(--red-alpha-30); }
+                .callback-result code { background: var(--gray-bg-light); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
             </style>
         </head>
         <body>
-            <h2>$titleSafe</h2>
-            $body
+            <div class="portal-page">
+                <header class="portal-header">
+                    <div class="portal-header-inner">
+                        <div class="company-info">
+                            <h1 class="company-name">Payment Portal</h1>
+                            <span class="portal-subtitle">Powered by Argo Books</span>
+                        </div>
+                    </div>
+                </header>
+                <main class="portal-main">
+                    <div class="callback-result">
+                        <h2 class="callback-title">$titleSafe</h2>
+                        $body
+                    </div>
+                </main>
+                <footer class="portal-footer">
+                    <p>Secure payments powered by <a href="https://argorobots.com" target="_blank" rel="noopener">Argo Books</a></p>
+                </footer>
+            </div>
         </body>
         </html>
 HTML;

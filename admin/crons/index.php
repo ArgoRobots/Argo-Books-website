@@ -27,25 +27,65 @@ $rangeInterval = $rangeMap[$range]['interval'];
 // metric across all runs in the time range. Crons not yet writing to
 // cron_runs will show "No runs in range" with zeros across the board.
 $cronConfig = [
+    'api_webhook_delivery' => [
+        'label'     => 'API Webhook Delivery',
+        'frequency' => 'every minute',
+        'description' => "Delivers Argo Books API events to developer webhook endpoints. Events fire when a merchant imports, rejects, or undoes data a developer pushed, which is the only way an integration learns what happened to it. Delivery is signed and retried up to six times over about 15 hours; an endpoint whose last twenty deliveries all failed is switched off automatically and the merchant re-enables it once their receiver is fixed. A high 'Exhausted' count means somebody's integration has been broken long enough to lose events.",
+        'metrics'   => [
+            'due'                 => 'Deliveries due this run',
+            'delivered'           => 'Delivered successfully',
+            'retried'             => 'Failed, will retry',
+            'exhausted'           => 'Gave up after 6 attempts',
+            'blocked'             => 'Refused, destination not public',
+            'endpoints_disabled'  => 'Endpoints auto-disabled',
+            'events_pruned'       => 'Old events pruned',
+        ],
+        'expected_interval_hours' => 1,
+    ],
+    'payroll_rate_reminder' => [
+        'label'     => 'Payroll Rate Reminder',
+        'frequency' => 'daily',
+        'description' => 'Chases the twice yearly CRA rate update. Emails on the 10th to 20th of December and June to start the work, and again in the last three days before the changeover if the file still is not up. Both go quiet as soon as the edition appears in resources/downloads/payroll/, so the three day warning arriving means the upload has not happened. Missing a changeover stops payroll: the app refuses to calculate a pay run when it has no table for that pay date, rather than falling back to the previous edition, so nothing wrong is produced, but nobody can run payroll until the new file ships.',
+        'metrics'   => [
+            'in_window'    => 'Ran inside a reminder window',
+            'file_present' => 'Edition already uploaded, nothing to chase',
+            'email_sent'   => 'Reminder emails sent',
+            'already_sent' => 'Skipped, already sent this window',
+        ],
+    ],
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
         'frequency' => 'daily',
-        'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, schedules follow-ups, and runs A/B tests on the wording. This is the main engine that finds and contacts new leads.',
+        'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, and schedules follow-ups. This is the main engine that finds and contacts new leads.',
         'metrics'   => [
             'leads_discovered'          => 'Leads discovered',
             'first_emails_sent'         => 'First emails sent',
             'followups_sent'            => 'Follow-ups sent',
             'drafts_generated'          => 'Drafts generated',
             'followup_drafts_generated' => 'Follow-up drafts',
-            'ab_tests_promoted'         => 'A/B tests promoted',
             'shopify_rejected'          => 'Shopify stores rejected',
+        ],
+        'expected_interval_hours' => 48,
+    ],
+    'portal_invoice_reminders' => [
+        'label'     => 'Portal Invoice Reminders',
+        'frequency' => 'daily',
+        'description' => "Emails a merchant's customers when a portal invoice goes unpaid, at 3, 7 and 14 days past the due date, then stops. Opt-in per company from the Argo Books settings. Only chases invoices that fell due after the merchant switched reminders on, so enabling it never blasts a backlog of old overdue invoices. Stops immediately once an invoice is paid or cancelled.",
+        'metrics'   => [
+            'invoices_scanned'   => 'Invoices scanned',
+            'reminders_sent'     => 'Reminders sent',
+            'reminders_skipped'  => 'Skipped (paid/cancelled/suppressed)',
+            'reminders_failed'   => 'Send failures',
+            'stage1_sent'        => 'Stage 1 (3 days)',
+            'stage2_sent'        => 'Stage 2 (7 days)',
+            'stage3_sent'        => 'Stage 3 (14 days, final)',
         ],
         'expected_interval_hours' => 48,
     ],
     'subscription_renewal' => [
         'label'     => 'Subscription Renewal',
         'frequency' => 'daily',
-        'description' => "Charges every Argo Premium subscriber whose billing date is today, sends them a receipt, and emails anyone whose card just declined. After three failed attempts in a row, the subscription is suspended so we don't keep retrying a bad card.",
+        'description' => "Charges every Argo Books Premium subscriber whose billing date is today, sends them a receipt, and emails anyone whose card just declined. After three failed attempts in a row, the subscription is suspended so we don't keep retrying a bad card.",
         'metrics'   => [
             'renewals_succeeded'      => 'Renewals successful',
             'renewals_failed'         => 'Renewals failed',
@@ -120,26 +160,6 @@ $cronConfig = [
             'broadcasts_completed'  => 'Broadcasts completed',
         ],
         'expected_interval_hours' => 1,
-    ],
-    'reddit_monitor' => [
-        'label'     => 'Reddit Discovery',
-        'frequency' => 'daily',
-        'description' => "Pulls fresh Reddit threads from the watchlist subreddits and keyword searches, scores them for relevance with AI, and pre-writes a reply draft for the strongest matches. It never posts anything: drafts are reviewed and posted by hand.",
-        'metrics'   => [
-            'threads_found'    => 'Threads found',
-            'drafts_generated' => 'Drafts generated',
-        ],
-        'expected_interval_hours' => 36,
-    ],
-    'reddit_status_check' => [
-        'label'     => 'Reddit Status Check',
-        'frequency' => 'every 2 hours',
-        'description' => "Re-checks Reddit comments we've replied to, on a staggered schedule, to see if they're still live, removed, or shadowbanned. Tracks upvotes and replies, and auto-drops any subreddit with a high removal rate from the watchlist.",
-        'metrics'   => [
-            'replies_checked' => 'Replies checked',
-            'replies_removed' => 'Replies removed',
-        ],
-        'expected_interval_hours' => 4,
     ],
     'indexnow_submit' => [
         'label'     => 'IndexNow Submit',
@@ -300,7 +320,8 @@ include __DIR__ . '/../admin_header.php';
                 <details class="cron-detail">
                     <summary>Last run detail · <?= htmlspecialchars($latest['started_at']) ?> · <?= htmlspecialchars($latest['status']) ?></summary>
                     <?php if (!empty($latest['error_message'])): ?>
-                        <pre class="cron-error"><?= htmlspecialchars($latest['error_message']) ?></pre>
+                        <?php // The same column carries the summary line on a successful run, so only style it as an error when it is one. ?>
+                        <pre class="<?= $latest['status'] === 'ok' ? 'cron-summary' : 'cron-error' ?>"><?= htmlspecialchars($latest['error_message']) ?></pre>
                     <?php endif; ?>
                     <?php
                         $latestMetrics = !empty($latest['metrics']) ? json_decode($latest['metrics'], true) : null;
@@ -325,19 +346,14 @@ include __DIR__ . '/../admin_header.php';
 <?php endif; ?>
 
 <script>
-    // Preserve scroll position when clicking a range filter pill, so the
-    // page reload doesn't jump back to the top. Shared sessionStorage key
-    // 'scrollPosition', matches the pattern used in referral-links,
-    // website-stats, users, and license pages.
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
     document.querySelectorAll('a[href^="?range="]').forEach(link => {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });
     });
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['a[href^="?range="]'];</script>
+<script src="../preserve-scroll.js" defer></script>
 </body>
 </html>

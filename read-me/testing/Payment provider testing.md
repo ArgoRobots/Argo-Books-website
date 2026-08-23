@@ -5,7 +5,7 @@ and the **SaaS subscription billing**.
 
 Two completely separate flows go through each provider:
 
-- **SaaS subscription payments**: argorobots.com customers paying for Argo Premium.
+- **SaaS subscription payments**: argorobots.com customers paying for Argo Books Premium.
 - **Portal Connect**: Argo Books desktop users authorizing the website to accept invoice payments through their own provider account.
 
 All testing below runs against the sandbox environment of each provider. To

@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
   const rawData = window.dashboardData;
+  // The page omits the payload (and normally this script) when it renders its
+  // empty state: no data for the selected range or tier. Nothing to draw.
+  if (!rawData) {
+    return;
+  }
   const isGeoEnabled = rawData.geoLocationEnabled || false;
 
   const typeColors = {
@@ -7,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     GoogleSheetsChart: "#10b981",
     Backup: "#f59e0b",
     XLSX: "#ef4444",
-    Receipts: "#8b5cf6",
+    Receipts: "#1e40af",
   };
 
   const countryColors = {
@@ -15,27 +20,26 @@ document.addEventListener("DOMContentLoaded", function () {
     Canada: "#ef4444",
     "United Kingdom": "#10b981",
     Germany: "#f59e0b",
-    Australia: "#8b5cf6",
+    Australia: "#1e40af",
     France: "#06b6d4",
     Netherlands: "#84cc16",
     Japan: "#f97316",
     Brazil: "#ec4899",
-    India: "#6366f1",
+    India: "#60a5fa",
   };
 
   if (!rawData.dataPoints) {
-    console.log("No data points available");
     return;
   }
 
   const exportData = rawData.dataPoints.Export || [];
   const geminiData = rawData.dataPoints.Gemini || [];
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
-  const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
   const featureUsageData = rawData.dataPoints.FeatureUsage || [];
+  const startupData = rawData.dataPoints.Startup || [];
 
   // Initialize all charts
   if (isGeoEnabled) {
@@ -43,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -51,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -71,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData,
       geminiData,
       exchangeRatesData,
-      googleSheetsData,
       sessionData,
       errorData
     );
@@ -81,7 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   );
@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   );
@@ -127,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
   generateAIImportDurationChart(featureUsageData);
   generateAIImportDurationByTypeChart(featureUsageData);
 
+  generateStartupCharts(startupData);
   generateSessionDurationChart(sessionData);
   generateExportTypesBreakdown(exportData);
   generateExportDurationByTypeChart(exportData);
@@ -143,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -151,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -220,7 +218,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -228,7 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -268,12 +264,12 @@ document.addEventListener("DOMContentLoaded", function () {
               "#10b981",
               "#f59e0b",
               "#ef4444",
-              "#8b5cf6",
+              "#1e40af",
               "#06b6d4",
               "#84cc16",
               "#f97316",
               "#ec4899",
-              "#6366f1",
+              "#60a5fa",
             ],
           },
         ],
@@ -538,7 +534,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -546,7 +541,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -577,8 +571,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Operations",
             data: sortedTimezones.map(([, count]) => count),
-            backgroundColor: "#6366f1",
-            borderColor: "#4f46e5",
+            backgroundColor: "#3b82f6",
+            borderColor: "#2563eb",
             borderWidth: 1,
           },
         ],
@@ -614,7 +608,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -622,7 +615,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -654,12 +646,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#8b5cf6",
+      "#1e40af",
       "#06b6d4",
       "#84cc16",
       "#f97316",
       "#ec4899",
-      "#6366f1",
+      "#60a5fa",
     ];
 
     new Chart(document.getElementById("versionDistributionChart"), {
@@ -702,7 +694,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exportData,
     geminiData,
     exchangeRatesData,
-    googleSheetsData,
     sessionData,
     errorData
   ) {
@@ -710,7 +701,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exportData,
       ...geminiData,
       ...exchangeRatesData,
-      ...googleSheetsData,
       ...sessionData,
       ...errorData,
     ];
@@ -744,7 +734,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const datasets = topVersions.map((version, index) => ({
       label: `v${version}`,
       data: recentDates.map((date) => versionByDate[date]?.[version] || 0),
-      borderColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"][
+      borderColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#1e40af"][
         index
       ],
       backgroundColor: [
@@ -752,7 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "rgba(16, 185, 129, 0.1)",
         "rgba(245, 158, 11, 0.1)",
         "rgba(239, 68, 68, 0.1)",
-        "rgba(139, 92, 246, 0.1)",
+        "rgba(30, 64, 175, 0.1)",
       ][index],
       fill: true,
       tension: 0.4,
@@ -839,7 +829,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "#3b82f6",
           "#f59e0b",
           "#ef4444",
-          "#8b5cf6",
+          "#1e40af",
           "#06b6d4",
           "#84cc16",
           "#f97316",
@@ -1091,8 +1081,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "#84cc16",
       "#22c55e",
       "#06b6d4",
-      "#6366f1",
-      "#8b5cf6",
+      "#3b82f6",
+      "#1e40af",
     ];
 
     new Chart(document.getElementById("errorCategoryChart"), {
@@ -1154,8 +1144,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "#84cc16",
       "#22c55e",
       "#06b6d4",
-      "#6366f1",
-      "#8b5cf6",
+      "#3b82f6",
+      "#1e40af",
       "#ec4899",
       "#14b8a6",
     ];
@@ -1265,6 +1255,172 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Usage Charts
+  /**
+   * Startup timings. ToReadyMs contains ToFirstPaintMs rather than continuing
+   * from it, so the two are nested and must never be summed.
+   *
+   * Cold and warm are reported separately on purpose. A warm launch reads its
+   * files from the OS cache, so blending them pulls the average down exactly
+   * when a slow first launch is what we are trying to see.
+   */
+  function generateStartupCharts(startupData) {
+    const setText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+
+    // Percentile by nearest-rank on a sorted copy. Small samples are the norm
+    // here, so an interpolating percentile would invent precision we lack.
+    const percentile = (sorted, p) => {
+      if (sorted.length === 0) return null;
+      const rank = Math.ceil((p / 100) * sorted.length);
+      return sorted[Math.min(sorted.length - 1, Math.max(0, rank - 1))];
+    };
+
+    const fmtMs = (ms) =>
+      ms === null ? "—" : ms < 1000 ? ms + " ms" : (ms / 1000).toFixed(1) + " s";
+
+    const nums = (rows, key) =>
+      rows
+        .map((r) => r[key])
+        .filter((v) => typeof v === "number" && isFinite(v) && v >= 0)
+        .sort((a, b) => a - b);
+
+    const cold = startupData.filter((r) => r.ColdStart);
+    const warm = startupData.filter((r) => !r.ColdStart);
+
+    const coldPaint = nums(cold, "ToFirstPaintMs");
+    const coldReady = nums(cold, "ToReadyMs");
+
+    setText("kpiFirstPaintP50", fmtMs(percentile(coldPaint, 50)));
+    setText("kpiFirstPaintP90", fmtMs(percentile(coldPaint, 90)));
+    setText("kpiReadyP50", fmtMs(percentile(coldReady, 50)));
+    setText("kpiReadyP90", fmtMs(percentile(coldReady, 90)));
+    setText(
+      "kpiStartupSample",
+      coldReady.length === 0
+        ? "No cold launches recorded"
+        : "From " + coldReady.length + " cold launch" + (coldReady.length === 1 ? "" : "es")
+    );
+
+    if (startupData.length === 0) {
+      const dist = document.getElementById("startupDistributionChart");
+      const cw = document.getElementById("startupColdWarmChart");
+      if (dist)
+        dist.parentElement.innerHTML =
+          '<div class="chart-no-data">No startup data available</div>';
+      if (cw)
+        cw.parentElement.innerHTML =
+          '<div class="chart-no-data">No startup data available</div>';
+      return;
+    }
+
+    // Distribution, not a time series: the question this answers is "is nine
+    // seconds normal or an outlier", which an average over time cannot show.
+    const buckets = [
+      { label: "< 2s", min: 0, max: 2000 },
+      { label: "2-4s", min: 2000, max: 4000 },
+      { label: "4-6s", min: 4000, max: 6000 },
+      { label: "6-8s", min: 6000, max: 8000 },
+      { label: "8-10s", min: 8000, max: 10000 },
+      { label: "10-15s", min: 10000, max: 15000 },
+      { label: "15s+", min: 15000, max: Infinity },
+    ];
+    const bucketCounts = buckets.map(
+      (b) => coldReady.filter((v) => v >= b.min && v < b.max).length
+    );
+
+    const distCanvas = document.getElementById("startupDistributionChart");
+    if (distCanvas) {
+      if (coldReady.length === 0) {
+        distCanvas.parentElement.innerHTML =
+          '<div class="chart-no-data">No cold launches recorded</div>';
+      } else {
+        new Chart(distCanvas, {
+          type: "bar",
+          data: {
+            labels: buckets.map((b) => b.label),
+            datasets: [
+              {
+                label: "Cold launches",
+                data: bucketCounts,
+                backgroundColor: "#8b5cf6",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) =>
+                    ctx.parsed.y +
+                    " of " +
+                    coldReady.length +
+                    " launches (" +
+                    Math.round((ctx.parsed.y / coldReady.length) * 100) +
+                    "%)",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                title: { display: true, text: "Launches" },
+              },
+              x: { title: { display: true, text: "Time to ready" } },
+            },
+          },
+        });
+      }
+    }
+
+    const cwCanvas = document.getElementById("startupColdWarmChart");
+    if (cwCanvas) {
+      const toSec = (ms) => (ms === null ? 0 : Math.round((ms / 1000) * 10) / 10);
+      new Chart(cwCanvas, {
+        type: "bar",
+        data: {
+          labels: ["To loading screen", "To ready"],
+          datasets: [
+            {
+              label: "Cold (" + cold.length + ")",
+              data: [
+                toSec(percentile(coldPaint, 50)),
+                toSec(percentile(coldReady, 50)),
+              ],
+              backgroundColor: "#6366f1",
+            },
+            {
+              label: "Warm (" + warm.length + ")",
+              data: [
+                toSec(percentile(nums(warm, "ToFirstPaintMs"), 50)),
+                toSec(percentile(nums(warm, "ToReadyMs"), 50)),
+              ],
+              backgroundColor: "#a5b4fc",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ": " + ctx.parsed.y + " s" } },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Median seconds" },
+            },
+          },
+        },
+      });
+    }
+  }
+
   function generateSessionDurationChart(sessionData) {
     const sessionEndData = sessionData.filter(
       (s) => s.action === "SessionEnd" && s.duration > 0
@@ -1624,8 +1780,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Response Time (ms)",
             data: durations,
-            borderColor: "#8b5cf6",
-            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14, 165, 233, 0.1)",
             fill: true,
             tension: 0.4,
           },
@@ -1704,6 +1860,34 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================
   // Active Users Tab
   // =====================
+
+  // Total / DAU / WAU / MAU are counted server-side across every event, not just
+  // the ones inside the selected date range: "active today" has to mean today
+  // whatever range is being charted. See the fixedKpis note in index.php.
+  function setFixedKpis(rawData) {
+    const kpis = rawData.fixedKpis;
+    if (!kpis) return;
+    const cards = {
+      kpiTotalUsers: kpis.totalUsers,
+      kpiDAU: kpis.dau,
+      kpiWAU: kpis.wau,
+      kpiMAU: kpis.mau,
+    };
+    for (const id of Object.keys(cards)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = cards[id];
+    }
+  }
+
+  // End of the selected range as a local Date, for charts that draw a fixed
+  // number of trailing days. Falls back to today if the range is missing.
+  function rangeEndDate(rawData) {
+    const end = rawData.range && rawData.range.end;
+    if (!end) return new Date();
+    const d = new Date(end + "T00:00:00");
+    return isNaN(d.getTime()) ? new Date() : d;
+  }
+
   function generateActiveUsersTab(rawData) {
     // Collect all events from all categories
     const allEvents = [];
@@ -1712,12 +1896,14 @@ document.addEventListener("DOMContentLoaded", function () {
       events.forEach((e) => allEvents.push({ ...e, _category: category }));
     }
 
-    // Filter to events with a hashedIP
     const eventsWithUser = allEvents.filter((e) => e.hashedIP);
 
+    // The KPI cards are fixed-window and range-independent, so they're filled from
+    // the server's own count before any early return below: an empty date range
+    // must not blank out numbers that don't depend on the range.
+    setFixedKpis(rawData);
+
     if (eventsWithUser.length === 0) {
-      document.getElementById("activeUsersKpiGrid").innerHTML =
-        '<div class="chart-no-data" style="grid-column: 1 / -1;">No active user data available</div>';
       document.getElementById("dauChart").parentElement.innerHTML =
         '<div class="chart-no-data">No active user data available</div>';
       document.getElementById("platformBreakdownChart").parentElement.innerHTML =
@@ -1731,7 +1917,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const now = new Date();
     const msPerDay = 86400000;
 
     // Local date string YYYY-MM-DD (not UTC). This dashboard is read in the
@@ -1749,8 +1934,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // (T00:00:00) so it isn't shifted back a day.
     const fmtDayLabel = (d) =>
       new Date(d + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
-
-    const todayStr = toLocalDateStr(now);
 
     // Helper: date string YYYY-MM-DD from timestamp (local)
     function toDateStr(ts) {
@@ -1789,26 +1972,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const allUsers = Object.keys(userMap);
-    const totalUsers = allUsers.length;
-
-    // DAU / WAU / MAU
-    const todayUsers = new Set();
-    const weekUsers = new Set();
-    const monthUsers = new Set();
-    const sevenDaysAgo = now.getTime() - 7 * msPerDay;
-    const thirtyDaysAgo = now.getTime() - 30 * msPerDay;
-
-    allUsers.forEach((ip) => {
-      const u = userMap[ip];
-      if (u.lastSeen >= new Date(todayStr + "T00:00:00").getTime()) todayUsers.add(ip);
-      if (u.lastSeen >= sevenDaysAgo) weekUsers.add(ip);
-      if (u.lastSeen >= thirtyDaysAgo) monthUsers.add(ip);
-    });
-
-    document.getElementById("kpiTotalUsers").textContent = totalUsers;
-    document.getElementById("kpiDAU").textContent = todayUsers.size;
-    document.getElementById("kpiWAU").textContent = weekUsers.size;
-    document.getElementById("kpiMAU").textContent = monthUsers.size;
 
     // --- Daily Active Users line chart (last 30 days) ---
     const dailyUsers = {};
@@ -1818,10 +1981,16 @@ document.addEventListener("DOMContentLoaded", function () {
       dailyUsers[dateStr].add(e.hashedIP);
     });
 
-    // Build last 30 days labels
+    // Build last 30 days labels, anchored to the end of the selected range rather
+    // than to today, so a past range renders its own 30 days instead of an empty
+    // chart. With the default range the anchor is today and nothing changes.
+    const axisEnd = rangeEndDate(rawData);
+    // Cutoff for the trailing-30-day charts further down (platform breakdown,
+    // peak usage hours), from the same anchor as the axis above.
+    const thirtyDaysAgo = axisEnd.getTime() - 30 * msPerDay;
     const last30Dates = [];
     for (let i = 29; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * msPerDay);
+      const d = new Date(axisEnd.getTime() - i * msPerDay);
       last30Dates.push(toLocalDateStr(d));
     }
     const dauData = last30Dates.map((d) =>
@@ -1870,7 +2039,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const platformLabels = Object.keys(platformCounts);
     const platformData = platformLabels.map((l) => platformCounts[l]);
-    const platformColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+    const platformColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#1e40af", "#ec4899"];
 
     new Chart(document.getElementById("platformBreakdownChart"), {
       type: "doughnut",
@@ -1971,7 +2140,7 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Unique Users",
             data: hourData,
-            backgroundColor: "#8b5cf6",
+            backgroundColor: "#0ea5e9",
           },
         ],
       },
@@ -1992,7 +2161,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Avg Session Duration bar chart (last 30 days) ---
     const sessionDurations = {};
     const sessionEvents = (rawData.dataPoints.Session || []).filter(
-      (e) => e.hashedIP && e.action === "SessionStart" && e.duration > 0
+      // Duration only exists on the end event: processEvent() sets it from
+      // durationSeconds, which is null on SessionStart, so filtering on starts
+      // matched nothing and left every bar at zero.
+      (e) => e.hashedIP && e.action === "SessionEnd" && e.duration > 0
     );
     sessionEvents.forEach((e) => {
       const d = toDateStr(e.timestamp);
@@ -2086,14 +2258,14 @@ document.addEventListener("DOMContentLoaded", function () {
       "#f59e0b",
       "#3b82f6",
       "#10b981",
-      "#8b5cf6",
+      "#1e40af",
       "#ec4899",
       "#14b8a6",
       "#f97316",
-      "#6366f1",
+      "#60a5fa",
       "#06b6d4",
       "#84cc16",
-      "#a855f7",
+      "#93c5fd",
     ];
 
     // Rank categories by their total count over the shown window, so the most
@@ -2194,12 +2366,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#8b5cf6",
+      "#1e40af",
       "#06b6d4",
       "#84cc16",
       "#f97316",
       "#ec4899",
-      "#6366f1",
+      "#60a5fa",
     ];
 
     new Chart(document.getElementById("featureUsageChart"), {
@@ -2652,7 +2824,7 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [
           {
             data: [aiXlsx, aiCsv],
-            backgroundColor: ["#3b82f6", "#8b5cf6"],
+            backgroundColor: ["#3b82f6", "#0ea5e9"],
             borderWidth: 2,
           },
         ],
@@ -2775,11 +2947,11 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Avg Duration (ms)",
             data: avgDurations,
-            borderColor: "#8b5cf6",
-            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14, 165, 233, 0.1)",
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: "#8b5cf6",
+            pointBackgroundColor: "#0ea5e9",
           },
         ],
       },
@@ -2851,7 +3023,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const avgData = [];
     const minData = [];
     const maxData = [];
-    const colors = { "ai-xlsx": "#3b82f6", "ai-csv": "#8b5cf6" };
+    const colors = { "ai-xlsx": "#3b82f6", "ai-csv": "#0ea5e9" };
     const bgColors = [];
 
     for (const [type, durations] of Object.entries(byType)) {
@@ -2965,8 +3137,8 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "AI CSV",
             data: dates.map((d) => dailyByType[d]["ai-csv"]),
-            backgroundColor: "#8b5cf6",
-            borderColor: "#7c3aed",
+            backgroundColor: "#0ea5e9",
+            borderColor: "#0284c7",
             borderWidth: 1,
           },
         ],

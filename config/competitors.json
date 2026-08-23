@@ -1,63 +1,324 @@
 {
-  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. All prices are in CAD per month unless otherwise noted. Update a price here and every comparison page, FAQ schema, article paragraph, etc. that references it via {placeholder} will update on the next page load.",
-
+  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load.",
   "quickbooks": {
     "name": "QuickBooks",
     "currency": "CAD",
     "plans": {
-      "easystart": { "label": "EasyStart", "monthly": 30  },
-      "plus":      { "label": "Plus",      "monthly": 110 },
-      "advanced":  { "label": "Advanced",  "monthly": 220 }
+      "easystart": {
+        "label": "EasyStart",
+        "monthly": 30
+      },
+      "plus": {
+        "label": "Plus",
+        "monthly": 110
+      },
+      "advanced": {
+        "label": "Advanced",
+        "monthly": 220
+      }
     }
   },
-
   "freshbooks": {
     "name": "FreshBooks",
     "currency": "CAD",
     "plans": {
-      "lite":    { "label": "Lite",    "monthly": 26, "client_limit": 5 },
-      "plus":    { "label": "Plus",    "monthly": 42, "client_limit": 50 },
-      "premium": { "label": "Premium", "monthly": 72 }
+      "lite": {
+        "label": "Lite",
+        "monthly": 26,
+        "client_limit": 5
+      },
+      "plus": {
+        "label": "Plus",
+        "monthly": 42,
+        "client_limit": 50
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 72
+      }
     }
   },
-
   "wave": {
     "name": "Wave",
     "currency": "CAD",
     "plans": {
-      "starter":         { "label": "Starter", "monthly": 0  },
-      "pro":             { "label": "Pro",     "monthly": 25 },
-      "receipt_addon":   { "label": "Receipt scanning add-on (on Starter)", "monthly": 11, "yearly": 96 }
+      "starter": {
+        "label": "Starter",
+        "monthly": 0
+      },
+      "pro": {
+        "label": "Pro",
+        "monthly": 25
+      },
+      "receipt_addon": {
+        "label": "Receipt scanning add-on (on Starter)",
+        "monthly": 11,
+        "yearly": 96
+      }
     }
   },
-
   "xero": {
     "name": "Xero",
     "currency": "CAD",
     "plans": {
-      "starter":  { "label": "Starter",  "monthly": 25, "invoice_limit": 20 },
-      "standard": { "label": "Standard", "monthly": 60 },
-      "premium":  { "label": "Premium",  "monthly": 80 }
+      "starter": {
+        "label": "Starter",
+        "monthly": 25,
+        "invoice_limit": 20
+      },
+      "standard": {
+        "label": "Standard",
+        "monthly": 60
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 80
+      }
     }
   },
-
   "zipbooks": {
     "name": "ZipBooks",
     "currency": "CAD",
     "plans": {
-      "starter":       { "label": "Starter",       "monthly": 0  },
-      "smarter":       { "label": "Smarter",       "monthly": 20 },
-      "sophisticated": { "label": "Sophisticated", "monthly": 50 }
+      "starter": {
+        "label": "Starter",
+        "monthly": 0
+      },
+      "smarter": {
+        "label": "Smarter",
+        "monthly": 20
+      },
+      "sophisticated": {
+        "label": "Sophisticated",
+        "monthly": 50
+      }
     }
   },
-
   "odoo": {
     "name": "Odoo",
     "currency": "CAD",
     "plans": {
-      "one_app_free": { "label": "One App Free", "monthly": 0 },
-      "standard":     { "label": "Standard",     "monthly": 44, "per_user": true },
-      "custom":       { "label": "Custom",       "monthly": 69, "per_user": true }
+      "one_app_free": {
+        "label": "One App Free",
+        "monthly": 0
+      },
+      "standard": {
+        "label": "Standard",
+        "monthly": 44,
+        "per_user": true
+      },
+      "custom": {
+        "label": "Custom",
+        "monthly": 69,
+        "per_user": true
+      }
+    }
+  },
+  "honeybook": {
+    "name": "HoneyBook",
+    "currency": "CAD",
+    "_note": "VERIFY: converted from USD list prices (Starter $29 / Essentials $49 / Premium $109, billed-yearly rate) at ~1.37 USD->CAD. No free plan (7-day trial).",
+    "plans": {
+      "starter": {
+        "label": "Starter",
+        "monthly": 40
+      },
+      "essentials": {
+        "label": "Essentials",
+        "monthly": 67
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 149
+      }
+    }
+  },
+  "sage": {
+    "name": "Sage",
+    "currency": "CAD",
+    "_note": "VERIFY: Sage 50 (desktop app), billed annually; monthly = annual/12 rounded. Pro $814/yr (1 user), Premium $1,219/yr (2 users), Quantum $5,636/yr (5 users). No free plan (trial).",
+    "plans": {
+      "pro": {
+        "label": "Pro Accounting",
+        "monthly": 68,
+        "yearly": 814
+      },
+      "premium": {
+        "label": "Premium Accounting",
+        "monthly": 102,
+        "yearly": 1219
+      },
+      "quantum": {
+        "label": "Quantum Accounting",
+        "monthly": 470,
+        "yearly": 5636
+      },
+      "autoentry": {
+        "label": "AutoEntry document-capture add-on (500 credits)",
+        "monthly": 145
+      }
+    }
+  },
+  "zoho-books": {
+    "name": "Zoho Books",
+    "currency": "CAD",
+    "_note": "Zoho Books official Canadian pricing (billed-annually rate): Free $0 / Standard $15 / Professional $30 / Premium $40 / Elite $165 / Ultimate $290 CAD. Cloud-only. Free plan is capped to micro-businesses (low annual-revenue limit, 1 user).",
+    "plans": {
+      "free": {
+        "label": "Free",
+        "monthly": 0
+      },
+      "standard": {
+        "label": "Standard",
+        "monthly": 15
+      },
+      "professional": {
+        "label": "Professional",
+        "monthly": 30
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 40
+      },
+      "elite": {
+        "label": "Elite",
+        "monthly": 165
+      },
+      "ultimate": {
+        "label": "Ultimate",
+        "monthly": 290
+      }
+    }
+  },
+  "invoice2go": {
+    "name": "Invoice2Go",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD: invoice.2go.com prices in USD, not CAD. Starter and Professional cap invoices, so Premium is the only like-for-like tier.",
+    "plans": {
+      "starter": {
+        "label": "Starter",
+        "monthly": 11,
+        "yearly": 79.99,
+        "invoice_limit": 2,
+        "card_fee": "3.5%",
+        "usd_monthly": 7.99
+      },
+      "professional": {
+        "label": "Professional",
+        "monthly": 17,
+        "yearly": 119.99,
+        "invoice_limit": 5,
+        "card_fee": "3%",
+        "usd_monthly": 11.99
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 63,
+        "yearly": 449.99,
+        "card_fee": "2.9%",
+        "usd_monthly": 44.99
+      }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
+  },
+  "square-invoices": {
+    "name": "Square Invoices",
+    "currency": "CAD",
+    "_note": "squarepay.ca prices in CAD. Free tier has unlimited invoicing, so this comparison is not about price.",
+    "plans": {
+      "free": {
+        "label": "Free",
+        "monthly": 0
+      },
+      "plus": {
+        "label": "Plus",
+        "monthly": 30
+      }
+    }
+  },
+  "manager": {
+    "name": "Manager.io",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD. Desktop edition is free; only the cloud edition is paid.",
+    "plans": {
+      "desktop": {
+        "label": "Desktop Edition",
+        "monthly": 0
+      },
+      "cloud": {
+        "label": "Cloud Edition",
+        "monthly": 83,
+        "usd_monthly": 59
+      }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
+  },
+  "bonsai": {
+    "name": "Bonsai",
+    "currency": "CAD",
+    "_note": "Prices converted from USD at 2026-08-01 (1 USD = 1.40315 CAD, checked 2026-08-01) and rounded to the nearest dollar, so a Canadian reader compares like for like. The vendor publishes in USD; keep the usd_ fields as the source of truth and re-derive if the rate moves materially. USD assumed: no currency selector on the pricing page. Per user. Invoicing starts at Essentials, so Basic is not comparable.",
+    "plans": {
+      "basic": {
+        "label": "Basic",
+        "monthly": 21,
+        "yearly": 13,
+        "per_user": true,
+        "usd_monthly": 15,
+        "usd_yearly": 9
+      },
+      "essentials": {
+        "label": "Essentials",
+        "monthly": 35,
+        "yearly": 27,
+        "per_user": true,
+        "usd_monthly": 25,
+        "usd_yearly": 19
+      },
+      "premium": {
+        "label": "Premium",
+        "monthly": 55,
+        "yearly": 41,
+        "per_user": true,
+        "usd_monthly": 39,
+        "usd_yearly": 29
+      },
+      "elite": {
+        "label": "Elite",
+        "monthly": 83,
+        "yearly": 69,
+        "per_user": true,
+        "usd_monthly": 59,
+        "usd_yearly": 49
+      }
+    },
+    "converted_from": "USD",
+    "exchange_rate": 1.40315,
+    "rate_checked": "2026-08-01"
+  },
+  "gnucash": {
+    "name": "GnuCash",
+    "currency": "CAD",
+    "_note": "Free and open source (GPL), desktop, data stored locally. No paid tier exists, so there is no price to keep current.",
+    "plans": {
+      "free": {
+        "label": "Free",
+        "monthly": 0
+      }
+    }
+  },
+  "spreadsheet": {
+    "name": "Spreadsheets",
+    "currency": "CAD",
+    "_note": "Not a product. Represents Excel, Google Sheets or LibreOffice used as bookkeeping. No licence price quoted: most people already own one, and the real cost is time, not the spreadsheet.",
+    "plans": {
+      "free": {
+        "label": "Already owned",
+        "monthly": 0
+      }
     }
   }
 }

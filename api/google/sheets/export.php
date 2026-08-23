@@ -34,7 +34,6 @@ if (is_rate_limited($ip, 30, 900, $rateLimitId)) {
 }
 record_rate_limit_attempt($ip, $rateLimitId);
 
-// Get Google tokens
 $tokenRow = get_google_tokens($authContext);
 
 if (empty($tokenRow['google_refresh_token'])) {

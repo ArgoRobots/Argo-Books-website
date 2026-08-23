@@ -1,174 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none" role="img">
+  <!--
+    "Your data stays on your computer", shown as the thing itself: a folder on
+    a local disk, with a real path, real file sizes, and a status bar.
+
+    The previous version was the stock security-illustration kit: a tall glossy
+    shield with a padlock, ringed by floating "Encrypted / No Cloud / Offline OK"
+    pills. That reads as clip art and says nothing the caption beside it does not
+    already say. A file window is specific, is literally what the claim means,
+    and works on all eight pages that use this file.
+  -->
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f0fdf4"/>
+    <linearGradient id="plsBg" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f7f9fc"/>
+      <stop offset="100%" stop-color="#eef2f8"/>
     </linearGradient>
-    <linearGradient id="shieldGrad" x1="300" y1="60" x2="300" y2="320" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#2563eb"/>
-    </linearGradient>
-    <linearGradient id="shieldInner" x1="300" y1="90" x2="300" y2="290" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#60a5fa"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
-    </linearGradient>
-    <linearGradient id="laptopGrad" x1="170" y1="340" x2="430" y2="440" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#334155"/>
-    </linearGradient>
-    <filter id="shadowLg" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#3b82f6" flood-opacity="0.15"/>
+    <filter id="plsShadow" x="-12%" y="-12%" width="124%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.1"/>
     </filter>
-    <filter id="shadowSm" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.08"/>
-    </filter>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="20" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+    <clipPath id="plsWin">
+      <rect x="46" y="60" width="508" height="380" rx="14"/>
+    </clipPath>
   </defs>
 
-  <!-- Background -->
-  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+  <rect width="600" height="500" rx="24" fill="url(#plsBg)"/>
 
-  <!-- Subtle grid pattern -->
-  <g opacity="0.04" stroke="#3b82f6" stroke-width="1">
-    <line x1="0" y1="50" x2="600" y2="50"/><line x1="0" y1="100" x2="600" y2="100"/>
-    <line x1="0" y1="150" x2="600" y2="150"/><line x1="0" y1="200" x2="600" y2="200"/>
-    <line x1="0" y1="250" x2="600" y2="250"/><line x1="0" y1="300" x2="600" y2="300"/>
-    <line x1="0" y1="350" x2="600" y2="350"/><line x1="0" y1="400" x2="600" y2="400"/>
-    <line x1="0" y1="450" x2="600" y2="450"/>
-    <line x1="50" y1="0" x2="50" y2="500"/><line x1="100" y1="0" x2="100" y2="500"/>
-    <line x1="150" y1="0" x2="150" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
-    <line x1="250" y1="0" x2="250" y2="500"/><line x1="300" y1="0" x2="300" y2="500"/>
-    <line x1="350" y1="0" x2="350" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
-    <line x1="450" y1="0" x2="450" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/>
-    <line x1="550" y1="0" x2="550" y2="500"/>
+  <!-- faint desk grid -->
+  <g opacity="0.5" stroke="#dbe3ee" stroke-width="1">
+    <line x1="0" y1="125" x2="600" y2="125"/>
+    <line x1="0" y1="250" x2="600" y2="250"/>
+    <line x1="0" y1="375" x2="600" y2="375"/>
+    <line x1="150" y1="0" x2="150" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/>
+    <line x1="450" y1="0" x2="450" y2="500"/>
   </g>
 
-  <!-- Decorative circles -->
-  <circle cx="90" cy="80" r="40" fill="#3b82f6" opacity="0.05"/>
-  <circle cx="520" cy="120" r="55" fill="#10b981" opacity="0.05"/>
-  <circle cx="500" cy="420" r="35" fill="#3b82f6" opacity="0.04"/>
-  <circle cx="80" cy="400" r="28" fill="#10b981" opacity="0.04"/>
-
-  <!-- Laptop base -->
-  <g filter="url(#shadowSm)">
-    <!-- Screen bezel -->
-    <rect x="170" y="280" width="260" height="170" rx="12" fill="url(#laptopGrad)"/>
-    <!-- Screen -->
-    <rect x="182" y="292" width="236" height="146" rx="6" fill="#0f172a"/>
-    <!-- Screen content - file explorer look -->
-    <rect x="190" y="300" width="220" height="16" rx="3" fill="#1e293b"/>
-    <circle cx="200" cy="308" r="3" fill="#ef4444" opacity="0.8"/>
-    <circle cx="210" cy="308" r="3" fill="#eab308" opacity="0.8"/>
-    <circle cx="220" cy="308" r="3" fill="#10b981" opacity="0.8"/>
-
-    <!-- Folder icons and file rows -->
-    <g opacity="0.9">
-      <!-- Folder 1 - Receipts -->
-      <rect x="196" y="324" width="14" height="11" rx="2" fill="#60a5fa"/>
-      <rect x="196" y="322" width="8" height="4" rx="1" fill="#60a5fa"/>
-      <text x="216" y="333" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Receipts/</text>
-
-      <!-- Folder 2 - Expenses -->
-      <rect x="196" y="342" width="14" height="11" rx="2" fill="#60a5fa"/>
-      <rect x="196" y="340" width="8" height="4" rx="1" fill="#60a5fa"/>
-      <text x="216" y="351" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Expenses/</text>
-
-      <!-- File rows -->
-      <rect x="208" y="358" width="10" height="12" rx="1.5" fill="#334155"/>
-      <text x="222" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_001.jpg</text>
-      <text x="340" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">12 KB</text>
-
-      <rect x="208" y="374" width="10" height="12" rx="1.5" fill="#334155"/>
-      <text x="222" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_002.jpg</text>
-      <text x="340" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">8 KB</text>
-
-      <rect x="208" y="390" width="10" height="12" rx="1.5" fill="#334155"/>
-      <text x="222" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_003.jpg</text>
-      <text x="340" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">15 KB</text>
-
-      <rect x="208" y="406" width="10" height="12" rx="1.5" fill="#334155"/>
-      <text x="222" y="416" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">expenses_2025.db</text>
-      <text x="340" y="416" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">256 KB</text>
-    </g>
-
-    <!-- Keyboard base -->
-    <path d="M140 450 L170 450 L170 452 C170 456 174 460 178 460 L422 460 C426 460 430 456 430 452 L430 450 L460 450 L460 454 C460 460 455 466 448 466 L152 466 C145 466 140 460 140 454 Z" fill="#1e293b"/>
-    <!-- Trackpad -->
-    <rect x="262" y="452" width="76" height="8" rx="3" fill="#334155" opacity="0.5"/>
+  <!-- ===== the window ===== -->
+  <g filter="url(#plsShadow)">
+    <rect x="46" y="60" width="508" height="380" rx="14" fill="#ffffff"/>
   </g>
 
-  <!-- Shield - centered above laptop -->
-  <g filter="url(#shadowLg)">
-    <!-- Shield shape -->
-    <path d="M300 72 L368 100 C368 100 374 180 358 228 C342 276 300 308 300 308 C300 308 258 276 242 228 C226 180 232 100 232 100 Z" fill="url(#shieldGrad)" opacity="0.95"/>
-    <!-- Shield inner -->
-    <path d="M300 92 L354 114 C354 114 358 178 346 218 C334 258 300 284 300 284 C300 284 266 258 254 218 C242 178 246 114 246 114 Z" fill="url(#shieldInner)" opacity="0.3"/>
+  <g clip-path="url(#plsWin)">
+    <!-- title bar -->
+    <rect x="46" y="60" width="508" height="46" fill="#fbfcfe"/>
+    <line x1="46" y1="106" x2="554" y2="106" stroke="#e6ebf3" stroke-width="1"/>
 
-    <!-- Lock icon on shield -->
-    <g transform="translate(300, 180)">
-      <!-- Lock body -->
-      <rect x="-18" y="-6" width="36" height="30" rx="5" fill="white" opacity="0.95"/>
-      <!-- Lock shackle -->
-      <path d="M-10 -6 L-10 -18 C-10 -30 10 -30 10 -18 L10 -6" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
-      <!-- Keyhole -->
-      <circle cx="0" cy="8" r="5" fill="#3b82f6"/>
-      <rect x="-2" y="10" width="4" height="8" rx="1" fill="#3b82f6"/>
-    </g>
+    <!-- drive glyph -->
+    <rect x="68" y="75" width="17" height="16" rx="3" fill="none" stroke="#3f63e8" stroke-width="1.6"/>
+    <line x1="68" y1="84" x2="85" y2="84" stroke="#3f63e8" stroke-width="1.6"/>
+    <circle cx="80.5" cy="87.5" r="1.4" fill="#3f63e8"/>
+
+    <!-- breadcrumb: a local path, not a URL -->
+    <text x="95" y="88" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">Local Disk (C:)</text>
+    <path d="M180 78l4 5-4 5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="193" y="88" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" fill="#64748b">Documents</text>
+    <path d="M269 78l4 5-4 5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="282" y="88" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">Argo Books</text>
+
+    <!-- sidebar -->
+    <rect x="46" y="106" width="140" height="334" fill="#fafbfd"/>
+    <line x1="186" y1="106" x2="186" y2="440" stroke="#e6ebf3" stroke-width="1"/>
+
+    <text x="68" y="136" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.09em" fill="#94a3b8">THIS PC</text>
+
+    <rect x="58" y="148" width="118" height="30" rx="7" fill="#eef2fe"/>
+    <rect x="70" y="158" width="14" height="11" rx="2.5" fill="none" stroke="#3f63e8" stroke-width="1.5"/>
+    <line x1="70" y1="164" x2="84" y2="164" stroke="#3f63e8" stroke-width="1.5"/>
+    <text x="92" y="167" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#3f63e8">Local Disk (C:)</text>
+
+    <path d="M70 192h5.5l1.8 2.4H84a1.6 1.6 0 0 1 1.6 1.6v6.4A1.6 1.6 0 0 1 84 204H70a1.6 1.6 0 0 1-1.6-1.6v-9A1.6 1.6 0 0 1 70 192z" fill="#cbd5e1"/>
+    <text x="92" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b">Documents</text>
+
+    <path d="M70 224h5.5l1.8 2.4H84a1.6 1.6 0 0 1 1.6 1.6v6.4A1.6 1.6 0 0 1 84 236H70a1.6 1.6 0 0 1-1.6-1.6v-9A1.6 1.6 0 0 1 70 224z" fill="#cbd5e1"/>
+    <text x="92" y="234" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b">Downloads</text>
+
+    <!-- column headers -->
+    <text x="212" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.09em" fill="#94a3b8">NAME</text>
+    <text x="452" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.09em" fill="#94a3b8" text-anchor="end">SIZE</text>
+    <text x="534" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.09em" fill="#94a3b8" text-anchor="end">MODIFIED</text>
+    <line x1="206" y1="150" x2="534" y2="150" stroke="#eef2f7" stroke-width="1"/>
+
+    <!-- row 1 -->
+    <path d="M212 167h8l2.6 3.4h11.4a2.3 2.3 0 0 1 2.3 2.3v9.6a2.3 2.3 0 0 1-2.3 2.3H212a2.3 2.3 0 0 1-2.3-2.3v-13a2.3 2.3 0 0 1 2.3-2.3z" fill="#3f63e8" opacity="0.85"/>
+    <text x="246" y="183" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">Receipts</text>
+    <text x="452" y="183" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#94a3b8" text-anchor="end">342 files</text>
+    <text x="534" y="183" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">Mar 14, 2026</text>
+    <line x1="206" y1="199" x2="534" y2="199" stroke="#f1f5f9" stroke-width="1"/>
+
+    <!-- row 2 -->
+    <path d="M212 216h8l2.6 3.4h11.4a2.3 2.3 0 0 1 2.3 2.3v9.6a2.3 2.3 0 0 1-2.3 2.3H212a2.3 2.3 0 0 1-2.3-2.3v-13a2.3 2.3 0 0 1 2.3-2.3z" fill="#3f63e8" opacity="0.85"/>
+    <text x="246" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">Invoices</text>
+    <text x="452" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#94a3b8" text-anchor="end">118 files</text>
+    <text x="534" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">Mar 12, 2026</text>
+    <line x1="206" y1="248" x2="534" y2="248" stroke="#f1f5f9" stroke-width="1"/>
+
+    <!-- row 3: the database -->
+    <ellipse cx="221" cy="267" rx="10" ry="3.6" fill="none" stroke="#64748b" stroke-width="1.6"/>
+    <path d="M211 267v11c0 2 4.5 3.6 10 3.6s10-1.6 10-3.6v-11" fill="none" stroke="#64748b" stroke-width="1.6"/>
+    <path d="M211 273c0 2 4.5 3.6 10 3.6s10-1.6 10-3.6" fill="none" stroke="#64748b" stroke-width="1.6"/>
+    <text x="246" y="281" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">argo-books.db</text>
+    <text x="452" y="281" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">24.8 MB</text>
+    <text x="534" y="281" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">Mar 14, 2026</text>
+    <line x1="206" y1="297" x2="534" y2="297" stroke="#f1f5f9" stroke-width="1"/>
+
+    <!-- row 4: a backup -->
+    <path d="M213 313h11l7 6.5v14a2 2 0 0 1-2 2h-16a2 2 0 0 1-2-2v-18.5a2 2 0 0 1 2-2z" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M224 313v6.5h7" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linejoin="round"/>
+    <text x="246" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1e293b">backup-2026-03.zip</text>
+    <text x="452" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">8.4 MB</text>
+    <text x="534" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#64748b" text-anchor="end">Mar 01, 2026</text>
+
+    <!-- status bar carries the claim, inside the fiction of a real window -->
+    <line x1="46" y1="398" x2="554" y2="398" stroke="#e6ebf3" stroke-width="1"/>
+    <rect x="46" y="398" width="508" height="42" fill="#fbfcfe"/>
+    <circle cx="212" cy="419" r="7.5" fill="#dcfce7"/>
+    <path d="M208.6 419.2l2.4 2.4 4.5-4.8" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="229" y="423" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#475569">4 items &#183; 33.2 MB &#183; stored on this computer</text>
   </g>
 
-  <!-- Connection lines from shield to laptop (data stays local) -->
-  <g opacity="0.2">
-    <path d="M280 300 C280 330 240 330 240 350" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
-    <path d="M300 310 L300 348" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
-    <path d="M320 300 C320 330 360 330 360 350" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
-  </g>
-
-  <!-- Floating badge: "Encrypted", upper left -->
-  <g filter="url(#shadowSm)">
-    <rect x="44" y="130" width="118" height="36" rx="18" fill="white"/>
-    <circle cx="66" cy="148" r="10" fill="#3b82f6" opacity="0.15"/>
-    <!-- Small lock, centered at x=66 -->
-    <rect x="62" y="148" width="8" height="7" rx="1.5" fill="#3b82f6"/>
-    <path d="M63.5 148 L63.5 145 C63.5 141.5 68.5 141.5 68.5 145 L68.5 148" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
-    <text x="82" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Encrypted</text>
-  </g>
-
-  <!-- Floating badge: "No Cloud", upper right -->
-  <g filter="url(#shadowSm)">
-    <rect x="438" y="130" width="116" height="36" rx="18" fill="white"/>
-    <g transform="translate(460, 152)">
-      <!-- Cloud shape, centered vertically around origin -->
-      <path d="M-6 4 C-10 4 -12 1 -12 -2 C-12 -5 -10 -7 -7 -7 C-6 -10 -3 -12 0 -12 C4 -12 7 -9 7 -6 C10 -6 12 -4 12 -1 C12 2 10 4 7 4 Z" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
-      <!-- Strike through -->
-      <line x1="-14" y1="6" x2="14" y2="-12" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
-    </g>
-    <text x="478" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">No Cloud</text>
-  </g>
-
-  <!-- Floating badge: "Offline OK", lower left -->
-  <g filter="url(#shadowSm)">
-    <rect x="44" y="240" width="112" height="36" rx="18" fill="white"/>
-    <circle cx="66" cy="258" r="10" fill="#10b981" opacity="0.15"/>
-    <!-- Wifi icon -->
-    <g transform="translate(66, 258)">
-      <path d="M-6 -1 C-4 -4 4 -4 6 -1" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M-3 2 C-2 0.5 2 0.5 3 2" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="0" cy="4" r="1.5" fill="#10b981"/>
-    </g>
-    <text x="82" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Offline OK</text>
-  </g>
-
-  <!-- Floating badge: "Local Only", lower right -->
-  <g filter="url(#shadowSm)">
-    <rect x="438" y="240" width="120" height="36" rx="18" fill="white"/>
-    <circle cx="460" cy="258" r="10" fill="#10b981" opacity="0.15"/>
-    <path d="M456 258 L459 261 L465 255" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="474" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Local Only</text>
-  </g>
+  <rect x="46" y="60" width="508" height="380" rx="14" fill="none" stroke="#e2e8f0" stroke-width="1"/>
 </svg>

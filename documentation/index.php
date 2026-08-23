@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../resources/icons.php';
 $pageTitle = 'Documentation & User Guide';
-$pageDescription = 'Complete Argo Books documentation and user guide. Learn installation, features, tutorials for expense/revenue tracking, product management, analytics, Excel import/export, and security settings.';
+$pageDescription = 'Complete Argo Books documentation and user guide. Learn installation, expense and revenue tracking, invoicing, payroll, analytics, imports and exports, and security settings.';
 $currentPage = 'index';
 $isDocsLanding = true;
 ?>
@@ -54,6 +54,11 @@ $isDocsLanding = true;
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body class="docs-landing">
@@ -143,6 +148,13 @@ $isDocsLanding = true;
                     <h3>Free vs. Paid Version</h3>
                     <p>Compare features and choose wisely</p>
                 </a>
+                <a href="pages/getting-started/redeem-license-key.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('key', 20) ?>
+                    </div>
+                    <h3>Redeem a License Key</h3>
+                    <p>Activate Premium with your license key</p>
+                </a>
             </div>
         </section>
 
@@ -204,6 +216,20 @@ $isDocsLanding = true;
                     </div>
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
+                </a>
+                <a href="pages/features/payroll.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('users', 20) ?>
+                    </div>
+                    <h3>Payroll</h3>
+                    <p>Run Canadian payroll and post net pay to your books</p>
+                </a>
+                <a href="pages/features/payroll-year-end.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('clipboard-check', 20) ?>
+                    </div>
+                    <h3>Payroll Year-End</h3>
+                    <p>T4 slips, RL-1, ROE, and what you owe CRA</p>
                 </a>
                 <a href="pages/features/bank-statement-import.php" class="doc-card">
                     <div class="card-icon">
@@ -281,6 +307,13 @@ $isDocsLanding = true;
                     <h3>Returns</h3>
                     <p>Process and track product returns</p>
                 </a>
+                <a href="pages/features/lost-damaged.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('alert-triangle', 20) ?>
+                    </div>
+                    <h3>Lost &amp; Damaged Inventory</h3>
+                    <p>Record lost, stolen or damaged stock</p>
+                </a>
                 <a href="pages/features/receipts.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('document', 20) ?>
@@ -315,6 +348,85 @@ $isDocsLanding = true;
                     </div>
                     <h3>Version History</h3>
                     <p>Review, undo, and redo changes</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Integrations Section -->
+        <section class="docs-category" data-category="integrations">
+            <div class="category-header">
+                <div class="category-icon integrations">
+                    <?= svg_icon('credit-card', 24) ?>
+                </div>
+                <div class="category-info">
+                    <h2>Integrations</h2>
+                    <p>Bring the tools you already use into your books</p>
+                </div>
+            </div>
+            <div class="category-cards">
+                <a href="pages/integrations/stripe-integration.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('credit-card', 20) ?>
+                    </div>
+                    <h3>Stripe Integration</h3>
+                    <p>Import your Stripe sales, fees, tax, and customers</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Developer API Section -->
+        <section class="docs-category" data-category="api">
+            <div class="category-header">
+                <div class="category-icon api">
+                    <?= svg_icon('bolt', 24) ?>
+                </div>
+                <div class="category-info">
+                    <h2>Developer API</h2>
+                    <p>Send data into your books from your own systems</p>
+                </div>
+            </div>
+            <div class="category-cards">
+                <a href="pages/api/overview.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('book-open', 20) ?>
+                    </div>
+                    <h3>Overview</h3>
+                    <p>What the API is for and the conventions it follows</p>
+                </a>
+                <a href="pages/api/authentication.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('key', 20) ?>
+                    </div>
+                    <h3>Authentication</h3>
+                    <p>Keys, scopes, and keeping them safe</p>
+                </a>
+                <a href="pages/api/resources.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('database', 20) ?>
+                    </div>
+                    <h3>Resources</h3>
+                    <p>Every object and field the API accepts</p>
+                </a>
+                <a href="pages/api/imports.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('clipboard-check', 20) ?>
+                    </div>
+                    <h3>Imports</h3>
+                    <p>How your data reaches the books, and when</p>
+                </a>
+                <a href="pages/api/webhooks.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('bell', 20) ?>
+                    </div>
+                    <h3>Webhooks</h3>
+                    <p>Signed callbacks when an owner acts on what you sent</p>
+                </a>
+                <a href="pages/api/errors.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('alert-circle', 20) ?>
+                    </div>
+                    <h3>Errors</h3>
+                    <p>Every error code, its cause, and what to do</p>
                 </a>
             </div>
         </section>
@@ -397,13 +509,6 @@ $isDocsLanding = true;
                     </div>
                     <h3>Regular Backups</h3>
                     <p>Create backups to prevent data loss</p>
-                </a>
-                <a href="pages/security/anonymous-data.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('eye', 20) ?>
-                    </div>
-                    <h3>Anonymous Usage Data</h3>
-                    <p>Privacy and data collection settings</p>
                 </a>
             </div>
         </section>

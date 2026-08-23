@@ -16,6 +16,8 @@
 //   <h2>            Related guides
 //   <h2>            Related articles (when $data['related_article_slugs'] non-empty)
 
+require_once __DIR__ . '/../partials/schema.php';
+require_once __DIR__ . '/../partials/faq.php';
 require_once __DIR__ . '/../shared/_base.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/illustrations.php';
@@ -53,7 +55,7 @@ if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../track_referral.php';
     require_once __DIR__ . '/../statistics.php';
     $safe_slug_for_event = preg_replace('/[^a-z0-9_-]/', '', $slug);
-    track_page_view('invgen_article_' . $safe_slug_for_event);
+    defer_client_page_view('invgen_article_' . $safe_slug_for_event);
 }
 
 // Cap at 50: referral source_code columns are VARCHAR(50). Long slugs are
@@ -137,16 +139,11 @@ if ($schema_type === 'HowTo') {
 
 $page_schema_json = json_encode($base_schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-$breadcrumb_items = [
-  ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-  ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guides', 'item' => 'https://argorobots.com/guides/'],
-  ['@type' => 'ListItem', 'position' => 3, 'name' => $data['h1'], 'item' => $canonical_url],
-];
-$breadcrumb_schema_json = json_encode([
-  '@context' => 'https://schema.org',
-  '@type' => 'BreadcrumbList',
-  'itemListElement' => $breadcrumb_items,
-], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+$breadcrumb_schema_json = argo_breadcrumb_schema([
+  'Home' => '/',
+  'Guides' => '/guides/',
+  $data['h1'] => $canonical_url,
+]);
 
 // FAQPage schema, emitted only when the article defines FAQs. Built from the
 // same q/a pairs rendered in the body below so the structured data and the
@@ -274,6 +271,31 @@ ob_start();
     </div>
   </header>
 
+  <?php
+    // Optional headline statistic. Articles whose whole point is a single
+    // number (what something costs, how long something takes) can lead with
+    // it here instead of burying it in the intro prose. Absent on most
+    // articles, in which case nothing renders. `footnote` is trusted author
+    // HTML so it can carry links; the rest is escaped plain text.
+    $hero = is_array($data['hero_stat'] ?? null) ? $data['hero_stat'] : null;
+  ?>
+  <?php if ($hero !== null && !empty($hero['value'])): ?>
+    <aside class="article-hero-stat" role="complementary">
+      <?php if (!empty($hero['label'])): ?>
+        <p class="article-hero-stat-label"><?= htmlspecialchars(pricing_substitute($hero['label'])) ?></p>
+      <?php endif; ?>
+      <p class="article-hero-stat-value">
+        <?= htmlspecialchars(pricing_substitute($hero['value'])) ?>
+        <?php if (!empty($hero['unit'])): ?>
+          <span class="article-hero-stat-unit"><?= htmlspecialchars(pricing_substitute($hero['unit'])) ?></span>
+        <?php endif; ?>
+      </p>
+      <?php if (!empty($hero['footnote'])): ?>
+        <p class="article-hero-stat-footnote"><?= article_tag_source(pricing_substitute($hero['footnote']), $invgen_ref) ?></p>
+      <?php endif; ?>
+    </aside>
+  <?php endif; ?>
+
   <section class="article-intro">
     <?= article_tag_source(pricing_substitute($data['intro_html'] ?? ''), $invgen_ref) ?>
   </section>
@@ -327,26 +349,7 @@ ob_start();
   <?php if (!empty($data['faqs'])): ?>
     <section class="article-faqs">
       <h2>Frequently asked questions</h2>
-      <div class="faq-grid">
-        <?php foreach ($data['faqs'] as $faq): ?>
-          <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
-          <div class="faq-item">
-            <button type="button" class="faq-question" aria-expanded="false">
-              <h3><?= htmlspecialchars(pricing_substitute($faq['q'])) ?></h3>
-              <span class="faq-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="6,9 12,15 18,9"/>
-                </svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-content">
-                <p><?= htmlspecialchars(pricing_substitute($faq['a'])) ?></p>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
+      <?= argo_faq_grid(array_map(static fn($f) => ['q' => pricing_substitute($f['q'] ?? ''), 'a' => pricing_substitute($f['a'] ?? '')], $data['faqs'])) ?>
     </section>
   <?php endif; ?>
 

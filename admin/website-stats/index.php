@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../country_names.php';
+require_once __DIR__ . '/../date-range.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -14,116 +15,32 @@ $page_title = "Website Statistics";
 $page_description = "View comprehensive analytics, user statistics, and performance metrics";
 
 // ---------------------------------------------------------------------------
-// Date range + automatic bucketing.
+// Automatic bucketing.
 //
-// Mirrors the desktop app (ArgoBooks): a single date-range selection drives
-// everything, and the chart bucket (day / week / month) is derived from the
-// range length rather than chosen manually.
+// The date-range selection itself lives in admin/date-range.php, shared with
+// the other dashboards. What stays here is the SQL-side bucketing: the chart
+// bucket (day / week / month) is derived from the range length rather than
+// chosen manually.
 //   - range  < 90 days  -> daily buckets
 //   - range  < 365 days -> weekly buckets (Sunday-start)
 //   - range >= 365 days -> monthly buckets
-// See ReportChartDataService.GetTimeBucket and ChartSettingsService in the
-// Avalonia repo.
+// See ReportChartDataService.GetTimeBucket in the Avalonia repo.
 // ---------------------------------------------------------------------------
 
-/** Preset display names, in dropdown order (matches DateRangePreset.GetStandardOptions()). */
-function date_range_presets()
-{
-    return [
-        'This Month', 'Last Month', 'Last 30 Days', 'Last 100 Days', 'Last 365 Days',
-        'This Quarter', 'Last Quarter', 'This Year', 'Last Year', 'All Time', 'Custom Range',
-    ];
-}
-
 /**
- * Resolve a preset (plus optional custom start/end) to concrete [start, end]
- * DateTime bounds. Mirrors ChartSettingsService.UpdateDateRangeFromSelection():
- * the end is always end-of-day so rows saved later in the day aren't filtered out.
+ * Earliest record on this page, used as the floor for the "All Time" preset.
  */
-function resolve_date_range($preset, $custom_start = null, $custom_end = null)
+function website_stats_all_time_start()
 {
     global $pdo;
 
-    $now   = new DateTime('now');
-    $today = (new DateTime('now'))->setTime(0, 0, 0);
-    $year  = (int)$now->format('Y');
+    $row = $pdo->query("
+        SELECT LEAST(
+            COALESCE((SELECT MIN(created_at) FROM statistics), NOW()),
+            COALESCE((SELECT MIN(created_at) FROM community_users), NOW())
+        ) AS earliest")->fetch();
 
-    // Defaults (used as-is for "Custom Range" with missing/invalid input).
-    $start = clone $today;
-    $end   = (new DateTime('now'))->setTime(23, 59, 59);
-
-    switch ($preset) {
-        case 'This Month':
-            $start = (new DateTime('first day of this month'))->setTime(0, 0, 0);
-            break;
-
-        case 'Last Month':
-            $start = (new DateTime('first day of last month'))->setTime(0, 0, 0);
-            $end   = (new DateTime('last day of last month'))->setTime(23, 59, 59);
-            break;
-
-        case 'Last 30 Days':
-            $start = (clone $today)->modify('-29 days');
-            break;
-
-        case 'Last 100 Days':
-            $start = (clone $today)->modify('-99 days');
-            break;
-
-        case 'Last 365 Days':
-            $start = (clone $today)->modify('-364 days');
-            break;
-
-        case 'This Quarter':
-            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
-            $start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
-            break;
-
-        case 'Last Quarter':
-            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
-            $this_q_start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
-            $last_q_end   = (clone $this_q_start)->modify('-1 day')->setTime(23, 59, 59);
-            $lqm = intdiv((int)$last_q_end->format('n') - 1, 3) * 3 + 1;
-            $start = (new DateTime())->setDate((int)$last_q_end->format('Y'), $lqm, 1)->setTime(0, 0, 0);
-            $end   = $last_q_end;
-            break;
-
-        case 'This Year':
-            $start = (new DateTime())->setDate($year, 1, 1)->setTime(0, 0, 0);
-            break;
-
-        case 'Last Year':
-            $start = (new DateTime())->setDate($year - 1, 1, 1)->setTime(0, 0, 0);
-            $end   = (new DateTime())->setDate($year - 1, 12, 31)->setTime(23, 59, 59);
-            break;
-
-        case 'All Time':
-            $row = $pdo->query("
-                SELECT LEAST(
-                    COALESCE((SELECT MIN(created_at) FROM statistics), NOW()),
-                    COALESCE((SELECT MIN(created_at) FROM community_users), NOW())
-                ) AS earliest")->fetch();
-            $start = (!empty($row['earliest']))
-                ? (new DateTime($row['earliest']))->setTime(0, 0, 0)
-                : clone $today;
-            break;
-
-        case 'Custom Range':
-            $s = $custom_start ? DateTime::createFromFormat('Y-m-d', $custom_start) : false;
-            $e = $custom_end ? DateTime::createFromFormat('Y-m-d', $custom_end) : false;
-            if ($s && $e) {
-                if ($s > $e) {
-                    $tmp = $s;
-                    $s = $e;
-                    $e = $tmp;
-                }
-                $start = $s->setTime(0, 0, 0);
-                $end   = $e->setTime(23, 59, 59);
-            }
-            break;
-    }
-
-    return ['start' => $start, 'end' => $end];
+    return !empty($row['earliest']) ? new DateTime($row['earliest']) : null;
 }
 
 /** Choose the bucket granularity from the range length (mirrors GetTimeBucket). */
@@ -373,7 +290,6 @@ function bounce_by_bucket(DateTime $start, DateTime $end, $bucket)
     return $map;
 }
 
-// Function to get community post views
 function get_community_post_views()
 {
     global $pdo;
@@ -437,7 +353,6 @@ function get_user_countries($limit = 10)
     return $data;
 }
 
-// Function to get downloads by country
 function get_downloads_by_country($limit = 10)
 {
     global $pdo;
@@ -513,46 +428,14 @@ function get_conversion_data()
     ];
 }
 
-// Function to get most active users
-function get_most_active_users($limit = 5)
-{
-    global $pdo;
-    $query = "
-        SELECT
-            u.username,
-            u.email,
-            COUNT(DISTINCT p.id) as post_count,
-            COUNT(DISTINCT c.id) as comment_count,
-            SUM(p.views) as total_views,
-            (COUNT(DISTINCT p.id) + COUNT(DISTINCT c.id)) as activity_score
-        FROM community_users u
-        LEFT JOIN community_posts p ON u.id = p.user_id
-        LEFT JOIN community_comments c ON u.id = c.user_id
-        GROUP BY u.id, u.username, u.email
-        ORDER BY activity_score DESC
-        LIMIT ?";
-
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$limit]);
-
-    $data = [];
-    while ($row = $stmt->fetch()) {
-        $data[] = $row;
-    }
-
-    return $data;
-}
-
 // ---- Resolve the selected date range and derive the chart bucket ----
 $presets = date_range_presets();
-$selected_range = isset($_GET['range']) ? $_GET['range'] : 'Last 30 Days';
-if (!in_array($selected_range, $presets, true)) {
-    $selected_range = 'Last 30 Days';
-}
+$selected_range = selected_date_range_preset();
 $custom_start_raw = isset($_GET['start']) ? $_GET['start'] : null;
 $custom_end_raw   = isset($_GET['end']) ? $_GET['end'] : null;
 
-$range       = resolve_date_range($selected_range, $custom_start_raw, $custom_end_raw);
+$all_time_start = $selected_range === 'All Time' ? website_stats_all_time_start() : null;
+$range       = resolve_date_range($selected_range, $custom_start_raw, $custom_end_raw, $all_time_start);
 $range_start = $range['start'];
 $range_end   = $range['end'];
 $bucket      = pick_time_bucket($range_start, $range_end);
@@ -596,14 +479,13 @@ $user_countries      = get_user_countries();
 $downloads_by_country = get_downloads_by_country();
 $user_agents         = get_user_agents();
 $conversion_data     = get_conversion_data();
-$active_users        = get_most_active_users();
 
 // Range-scoped headline metrics for the stat cards.
 $bounce_overall   = get_bounce_rate_overall($range_start, $range_end);
 $visitor_overview = get_visitor_overview($range_start, $range_end);
 
 // Pretty range string for the toolbar pill (e.g. "Sep 14, 2025 – Oct 14, 2025").
-$range_display = $range_start->format('M j, Y') . ' – ' . $range_end->format('M j, Y');
+$range_display = format_date_range($range_start, $range_end);
 
 // Format post views numbers
 $total_post_views = isset($post_views['total_views']) ? number_format($post_views['total_views']) : 0;
@@ -751,36 +633,6 @@ include __DIR__ . '/../admin_header.php';
         </div>
     </div>
 
-    <!-- Most active users table -->
-    <div class="table-container">
-        <h2>Most Active Community Users</h2>
-        <div class="table-responsive">
-            <table data-paginate="25">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Posts</th>
-                        <th>Comments</th>
-                        <th>Total Views</th>
-                        <th>Activity Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($active_users as $user): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><?php echo $user['post_count']; ?></td>
-                            <td><?php echo $user['comment_count']; ?></td>
-                            <td><?php echo number_format($user['total_views']); ?></td>
-                            <td><?php echo $user['activity_score']; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -1028,13 +880,13 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.8)',
                         'rgba(245, 158, 11, 0.8)',
                         'rgba(16, 185, 129, 0.8)',
-                        'rgba(99, 102, 241, 0.8)'
+                        'rgba(14, 165, 233, 0.8)'
                     ],
                     borderColor: [
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)'
+                        'rgba(14, 165, 233, 1)'
                     ],
                     borderWidth: 1
                 }]
@@ -1074,13 +926,13 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.7)',
                         'rgba(245, 158, 11, 0.7)',
                         'rgba(16, 185, 129, 0.7)',
-                        'rgba(99, 102, 241, 0.7)'
+                        'rgba(14, 165, 233, 0.7)'
                     ],
                     borderColor: [
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)'
+                        'rgba(14, 165, 233, 1)'
                     ],
                     borderWidth: 1,
                     borderRadius: 5
@@ -1125,8 +977,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Page Views',
                     data: countryCounts,
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
@@ -1220,7 +1072,7 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 0.7)',
                         'rgba(245, 158, 11, 0.7)',
                         'rgba(16, 185, 129, 0.7)',
-                        'rgba(99, 102, 241, 0.7)',
+                        'rgba(14, 165, 233, 0.7)',
                         'rgba(239, 68, 68, 0.7)',
                         'rgba(107, 114, 128, 0.7)'
                     ],
@@ -1228,7 +1080,7 @@ include __DIR__ . '/../admin_header.php';
                         'rgba(37, 99, 235, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
-                        'rgba(99, 102, 241, 1)',
+                        'rgba(14, 165, 233, 1)',
                         'rgba(239, 68, 68, 1)',
                         'rgba(107, 114, 128, 1)'
                     ],
@@ -1258,11 +1110,7 @@ include __DIR__ . '/../admin_header.php';
         });
 
 
-        // Restore scroll position if it exists in sessionStorage
-        if (sessionStorage.getItem('scrollPosition')) {
-            window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-            sessionStorage.removeItem('scrollPosition');
-        }
+
 
         // Preserve scroll position across the date-range reload.
         const rangeForm = document.getElementById('rangeForm');
@@ -1295,3 +1143,4 @@ include __DIR__ . '/../admin_header.php';
         }
     }
 </script>
+<script src="../preserve-scroll.js" defer></script>

@@ -178,14 +178,14 @@
     box-shadow: 0 4px 12px var(--shadow-default);
 }
 
-.subscription-actions .btn-purple {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+.subscription-actions .btn-premium {
+    background: linear-gradient(135deg, var(--premium-500), var(--premium-600));
     color: var(--white);
     border: none;
 }
 
-.subscription-actions .btn-purple:hover {
-    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
+.subscription-actions .btn-premium:hover {
+    background: linear-gradient(135deg, var(--premium-600), var(--premium-700));
     box-shadow: 0 6px 16px rgba(124, 58, 237, 0.28);
 }
 
@@ -288,7 +288,7 @@
 .feature-item svg {
     width: 20px;
     height: 20px;
-    stroke: var(--purple-500);
+    stroke: var(--premium-500);
     flex-shrink: 0;
 }
 
@@ -301,7 +301,7 @@
 .no-subscription-card {
     text-align: center;
     padding: 40px 20px;
-    background: linear-gradient(135deg, var(--purple-50) 0%, var(--purple-100) 100%);
+    background: linear-gradient(135deg, var(--premium-50) 0%, var(--premium-100) 100%);
     border-radius: 12px;
 }
 
@@ -310,7 +310,7 @@
 }
 
 .no-subscription-icon svg {
-    stroke: var(--purple-500);
+    stroke: var(--premium-500);
 }
 
 .no-subscription-card h3 {
@@ -339,7 +339,7 @@
 .pricing-preview .price {
     font-size: 24px;
     font-weight: 700;
-    color: var(--purple-500);
+    color: var(--premium-500);
 }
 
 .pricing-preview .period {
@@ -426,8 +426,8 @@
 }
 
 .payment-type.renewal {
-    background: var(--purple-100);
-    color: var(--purple-600);
+    background: var(--premium-100);
+    color: var(--premium-600);
 }
 
 .payment-type.manual {
@@ -555,19 +555,19 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: var(--purple-500);
+    color: var(--premium-500);
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     padding: 6px 12px;
-    background: var(--purple-50);
+    background: var(--premium-50);
     border-radius: 6px;
     transition: all 0.2s;
 }
 
 .send-id-link:hover {
-    background: var(--purple-100);
-    color: var(--purple-600);
+    background: var(--premium-100);
+    color: var(--premium-600);
 }
 
 .send-id-link svg {
@@ -641,7 +641,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: var(--purple-100);
+    background: var(--premium-100);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -649,7 +649,7 @@
 }
 
 .modal-icon svg {
-    stroke: var(--purple-500);
+    stroke: var(--premium-500);
 }
 
 .modal-icon.success {
@@ -739,8 +739,8 @@
 .spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid var(--purple-100);
-    border-top-color: var(--purple-500);
+    border: 4px solid var(--premium-100);
+    border-top-color: var(--premium-500);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

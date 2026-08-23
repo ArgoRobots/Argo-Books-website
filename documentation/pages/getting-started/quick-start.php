@@ -23,21 +23,30 @@ include __DIR__ . '/../../docs-header.php';
                 <strong>Tip:</strong> Want to explore the app first? You can open the <strong>Sample Company</strong> from the welcome screen to see Argo Books populated with example data before setting up your own.
             </div>
 
-            <h2>2. Add Your Suppliers</h2>
-            <p>Navigate to "Suppliers" under the Management section in the sidebar. Add the businesses you purchase from, including their contact information and address details. Suppliers can be linked to your expense transactions later.</p>
+            <h2>2. Find Your Way Around the Sidebar</h2>
+            <p>Argo Books keeps the expense side and the revenue side of your business apart, and the sidebar reflects that:</p>
+            <ul>
+                <li><strong>Main:</strong> Dashboard, Analytics, Insights, Reports</li>
+                <li><strong>Expenses:</strong> Expenses, Expense categories, Expense products, Suppliers</li>
+                <li><strong>Revenue:</strong> Revenue, Invoices, Revenue categories, Revenue products, Customers</li>
+                <li><strong>Import:</strong> Bank Matching, Receipts</li>
+                <li><strong>Payroll:</strong> Employees, Pay Runs</li>
+                <li><strong>Inventory:</strong> Stock Levels, Adjustments, Locations, Purchase Orders</li>
+                <li><strong>Rentals:</strong> Rental Inventory, Rental Records</li>
+                <li><strong>Tracking:</strong> Returns, Lost / Damaged</li>
+            </ul>
 
-            <h2>3. Set Up Categories</h2>
-            <p>Go to "Categories" under Management to create categories for organizing your products and transactions. Categories help you group similar items together, making it easier to track spending and generate meaningful reports. For example, you might create categories like "Office Supplies," "Electronics," or "Raw Materials."</p>
+            <h2>3. Add Your Suppliers</h2>
+            <p>Go to "Suppliers" under the Expenses section. Add the businesses you purchase from, including their contact information and address details. Suppliers can be linked to your expense transactions later.</p>
 
-            <h2>4. Add Your Products</h2>
-            <p>Navigate to "Products / Services" under Management. Add the items your business sells or uses, assigning each one to a category. You can set pricing, supplier, and other details for each product.</p>
+            <h2>4. Set Up Categories</h2>
+            <p>Go to "Expense categories" or "Revenue categories" to create categories for organizing your products and transactions. Categories help you group similar items together, making it easier to track spending and generate meaningful reports. For example, you might create expense categories like "Office Supplies," "Electronics," or "Raw Materials."</p>
 
-            <div class="info-box">
-                <strong>Note:</strong> The free version supports unlimited products.
-            </div>
+            <h2>5. Add Your Products</h2>
+            <p>Go to "Expense products" for the things you buy, and "Revenue products" for the things you sell. Add each item, assign it to a category, and set pricing, supplier, and any other details.</p>
 
-            <h2>5. Start Tracking Expenses and Revenue</h2>
-            <p>You're ready to go. Navigate to "Expenses" or "Revenue" under the Transactions section to start recording your business transactions. Each entry can include multiple products, a receipt attachment, customer, and more.</p>
+            <h2>6. Start Tracking Expenses and Revenue</h2>
+            <p>You're ready to go. Go to "Expenses" or "Revenue" to start recording your business transactions. Each entry can include multiple products, a receipt attachment, customer, and more.</p>
 
             <h2>In-App Tutorials</h2>
             <p>Argo Books includes a built-in tutorial system that walks you through key features step by step, directly inside the app. When you open certain pages for the first time, a tutorial will appear explaining how to use the feature. You can also re-access tutorials at any time from the help menu.</p>

@@ -80,12 +80,12 @@ $base_path = $in_subdir ? '../' : '';
                         'payments' => 'Payment Portal',
                     ],
                     'Growth' => [
+                        'marketing-funnel' => 'Funnel',
                         'referral-links'   => 'Referrals',
                         'affiliates'       => 'Affiliates',
-                        'marketing-funnel' => 'Funnel',
-                        'marketing'        => 'Marketing',
                         'outreach'         => 'Outreach',
-                        'reviews'          => 'Reviews',
+                        'email-customers'  => 'Email customers',
+                        'mac-waitlist'     => 'Mac waitlist',
                     ],
                     'Analytics' => [
                         'app-stats'     => 'App Stats',
@@ -236,7 +236,6 @@ $base_path = $in_subdir ? '../' : '';
                         // Opening the menu
                         menu.classList.add('active');
 
-                        // Get the current scroll height
                         const currentMenuHeight = menu.scrollHeight;
                         menu.style.height = currentMenuHeight + 'px';
 

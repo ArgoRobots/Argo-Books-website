@@ -5,10 +5,8 @@ $currentPage = 'version-comparison';
 $pageCategory = 'getting-started';
 
 require_once __DIR__ . '/../../../config/pricing.php';
-require_once __DIR__ . '/../../../resources/icons.php';
 
 $pricing = get_pricing_config();
-$plans = get_plan_features();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
@@ -18,53 +16,22 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <p>Argo Books offers two tiers to match your business needs. Start with our free version,
-            perfect for small businesses just getting started with inventory tracking. As your business
-            grows, upgrade to Premium for unlimited products and AI-powered features.</p>
+            perfect for small businesses just getting started. As your business grows, upgrade to
+            Premium for unlimited invoicing, higher monthly limits, and the payroll and forecasting
+            tools.</p>
 
             <p>Not sure which version is right for you? <a href="../../../downloads/" class="link">Try our free
                 version first</a> – you can always <a href="../../../pricing/" class="link">upgrade
                 later</a> when you need more features.</p>
 
-            <div class="version-cards">
-                <!-- Free Version -->
-                <div class="version-card">
-                    <div class="card-header">
-                        <h3 class="version-title">Free</h3>
-                        <p class="version-subtitle">Perfect for getting started</p>
-                        <div class="version-price">$0</div>
-                    </div>
-                    <ul class="feature-list">
-                        <?php foreach ($plans['free']['features'] as $feature): ?>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="../../../downloads/" class="btn btn-gray">Get Started for Free</a>
-                </div>
+            <p>The free version costs nothing and never expires. Premium is
+                $<?php echo number_format($monthlyPrice, 0); ?> CAD/month, or
+                $<?php echo number_format($yearlyPrice, 0); ?> CAD/year which saves you
+                $<?php echo number_format($yearlySavings, 0); ?>. See the
+                <a href="../../../pricing/" class="link">pricing page</a> for payment options and
+                billing questions.</p>
 
-                <!-- Premium Version -->
-                <div class="version-card premium">
-                    <div class="card-header">
-                        <h3 class="version-title">Premium</h3>
-                        <p class="version-subtitle">Unlock the full power of Argo Books</p>
-                        <div class="version-price">$<?php echo number_format($monthlyPrice, 0); ?> <span class="price-period">CAD/month</span></div>
-                        <p class="price-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
-                    </div>
-                    <ul class="feature-list">
-                        <?php foreach ($plans['premium']['features'] as $feature): ?>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="../../../pricing/premium/" class="btn btn-purple">Subscribe to Premium</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 3rem;">Feature Comparison</h2>
+            <h2>Feature Comparison</h2>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -75,10 +42,47 @@ include __DIR__ . '/../../docs-header.php';
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Ordered by how much the tiers differ: metered features first,
+                             then premium-only, then everything included on both. -->
                         <tr>
-                            <td>Products</td>
-                            <td>Up to 10</td>
+                            <td>Invoices & Payments</td>
+                            <td><?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices / month</td>
                             <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td>Receipt Scanning</td>
+                            <td><?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipts / month</td>
+                            <td><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipts / month</td>
+                        </tr>
+                        <tr>
+                            <td>Spreadsheet Import</td>
+                            <td><?= (int) $pricing['ai_import_monthly_limit'] ?> imports / month</td>
+                            <td><?= (int) $pricing['premium_ai_import_monthly_limit'] ?> imports / month</td>
+                        </tr>
+                        <tr>
+                            <td>Bank Statement Import</td>
+                            <td><?= (int) $pricing['bank_import_monthly_limit'] ?> imports / month</td>
+                            <td><?= (int) $pricing['premium_bank_import_monthly_limit'] ?> imports / month</td>
+                        </tr>
+                        <tr>
+                            <td>Canadian Payroll</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Predictive Analytics</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Biometric Login (Windows)</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Support</td>
+                            <td>Standard</td>
+                            <td>Priority</td>
                         </tr>
                         <tr>
                             <td>Transactions</td>
@@ -86,7 +90,27 @@ include __DIR__ . '/../../docs-header.php';
                             <td>Unlimited</td>
                         </tr>
                         <tr>
-                            <td>Real-time Analytics</td>
+                            <td>Works Offline</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Inventory Management</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Customer Management</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Expense &amp; Revenue Tracking</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Rental Management</td>
                             <td>✓</td>
                             <td>✓</td>
                         </tr>
@@ -96,44 +120,19 @@ include __DIR__ . '/../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
+                            <td>Real-time Analytics</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Report Builder</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
                             <td>Excel Import/Export</td>
                             <td>✓</td>
                             <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>AI Spreadsheet Import</td>
-                            <td>✓</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Report Generator</td>
-                            <td>✓</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Biometric Login</td>
-                            <td>—</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Invoices & Payments</td>
-                            <td><?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices / month</td>
-                            <td>Unlimited</td>
-                        </tr>
-                        <tr>
-                            <td>AI Receipt Scanning</td>
-                            <td><?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipts / month</td>
-                            <td><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipts / month</td>
-                        </tr>
-                        <tr>
-                            <td>Predictive Analytics</td>
-                            <td>—</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Support</td>
-                            <td>Standard</td>
-                            <td>Priority</td>
                         </tr>
                     </tbody>
                 </table>
@@ -144,9 +143,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Quick Start Tutorial</span>
                 </a>
-                <a href="../features/dashboard.php" class="nav-button next">
+                <a href="redeem-license-key.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Dashboard &rarr;</span>
+                    <span class="nav-title">Redeem a License Key &rarr;</span>
                 </a>
             </div>
         </div>

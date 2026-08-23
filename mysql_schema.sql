@@ -385,9 +385,18 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device',
     subscription_id VARCHAR(50) DEFAULT NULL COMMENT 'Link to created subscription',
     notes TEXT DEFAULT NULL COMMENT 'Admin notes about this key',
+    customer_email VARCHAR(255) DEFAULT NULL COMMENT 'Buyer email captured in the app at redemption. Deliberately NOT the email column above: that one restricts who may redeem, this one is contact detail collected after the fact',
+    customer_email_captured_at DATETIME DEFAULT NULL,
+    customer_email_verified_at DATETIME DEFAULT NULL COMMENT 'Data quality flag only. Premium is never gated on this',
+    customer_email_token CHAR(64) DEFAULT NULL COMMENT 'One-click verification link token',
+    customer_email_source VARCHAR(30) DEFAULT NULL COMMENT 'Where the address came from, e.g. app_redemption',
+    batch_label VARCHAR(60) DEFAULT NULL COMMENT 'Reseller batch this key was minted for, e.g. StackSocial Aug 2026. NULL for a hand-issued promo key',
     INDEX idx_subscription_key (subscription_key),
     INDEX idx_email (email),
-    INDEX idx_redeemed (redeemed_at)
+    INDEX idx_redeemed (redeemed_at),
+    INDEX idx_psk_customer_email (customer_email),
+    INDEX idx_psk_batch_label (batch_label),
+    UNIQUE KEY uk_psk_customer_email_token (customer_email_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Add indexes for license_keys table
@@ -460,13 +469,25 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     locked TINYINT(1) DEFAULT 0 COMMENT 'Auto-locked by the refund velocity engine on hard-block; manual review required to unlock',
     lock_reason VARCHAR(255) DEFAULT NULL,
     locked_at DATETIME DEFAULT NULL,
+    -- Email preferences (set from Argo Books via PUT /api/portal/preferences)
+    reminders_enabled TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Merchant opted in to automatic overdue-invoice reminders to their customers. Opt-in: defaulting this on would start emailing every existing company''s customers on deploy day',
+    reminders_enabled_at DATETIME DEFAULT NULL COMMENT 'Re-stamped to NOW() on EVERY 0->1 transition of reminders_enabled. Only invoices whose due_date falls after this are ever chased, so enabling (or re-enabling after a long pause) never releases a backlog of old overdue invoices',
+    notify_owner_on_payment TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Email the owner when a customer pays a portal invoice. Defaults on, so existing rows inherit it without a backfill. Also requires a verified owner_email',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE INDEX idx_api_key_hash (api_key_hash),
     INDEX idx_is_active (is_active),
     INDEX idx_environment (environment),
-    INDEX idx_locked (locked)
+    INDEX idx_locked (locked),
+    INDEX idx_reminders_enabled (reminders_enabled)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the email preference columns:
+--   ALTER TABLE portal_companies
+--     ADD COLUMN reminders_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER locked_at,
+--     ADD COLUMN reminders_enabled_at DATETIME DEFAULT NULL AFTER reminders_enabled,
+--     ADD COLUMN notify_owner_on_payment TINYINT(1) NOT NULL DEFAULT 1 AFTER reminders_enabled_at,
+--     ADD INDEX idx_reminders_enabled (reminders_enabled);
 
 -- Google OAuth tokens (free feature, keyed by device ID)
 CREATE TABLE IF NOT EXISTS google_oauth_tokens (
@@ -519,6 +540,7 @@ CREATE TABLE IF NOT EXISTS portal_invoices (
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     due_date DATE DEFAULT NULL,
     pass_processing_fee TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether to add processing fee to online payments',
+    external_paid DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Total paid against this invoice OUTSIDE the portal (cash/cheque/bank, recorded in Argo Books). Stored server-side so POST /api/portal/invoices/balance can apply an idempotent relative delta instead of overwriting balance_due, which would race the atomic decrement in record_portal_payment()',
     environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -559,6 +581,42 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Overdue-invoice reminders sent to a merchant's customers by
+-- cron/portal_invoice_reminders.php. Fixed cadence, three touches, then stop.
+--
+-- UNIQUE (portal_invoice_id, stage) IS the idempotency mechanism: the cron
+-- claims a stage by INSERT IGNORE before sending, and a zero rowCount means
+-- another run already owns it. A counter column on portal_invoices would need
+-- read-modify-write plus a CAS guard and would still lose to an overlapping
+-- run in the window between the send and the counter bump.
+--
+-- Rows are created lazily at send time, not pre-seeded when an invoice is
+-- published: most invoices are paid on time and would never need their rows.
+CREATE TABLE IF NOT EXISTS portal_invoice_reminders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    portal_invoice_id INT NOT NULL,
+    company_id INT NOT NULL,
+    stage TINYINT UNSIGNED NOT NULL COMMENT '1 = due+3 days, 2 = due+7, 3 = due+14. Fixed cadence, not user-configurable',
+    status ENUM('sending', 'sent', 'failed', 'skipped') NOT NULL DEFAULT 'sending' COMMENT 'Claimed as sending, then finalized. A failed row is never retried: the next stage still fires on schedule, so a transient SMTP failure costs one touch rather than the whole sequence',
+    halt_reason VARCHAR(100) DEFAULT NULL COMMENT 'Why a claimed row was skipped at send time: paid, cancelled, zero_balance, no_email, suppressed',
+    error_message VARCHAR(255) DEFAULT NULL,
+    due_date_at_send DATE DEFAULT NULL COMMENT 'Frozen for support: what the customer was actually chased about',
+    balance_at_send DECIMAL(12,2) DEFAULT NULL,
+    recipient_email VARCHAR(255) DEFAULT NULL,
+    sent_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_invoice_stage (portal_invoice_id, stage),
+    INDEX idx_company_sent (company_id, sent_at),
+    FOREIGN KEY (portal_invoice_id) REFERENCES portal_invoices(id) ON DELETE CASCADE,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the external-payment column that the balance
+-- reconciliation endpoint needs, then create the table above:
+--   ALTER TABLE portal_invoices
+--     ADD COLUMN external_paid DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER pass_processing_fee;
 
 -- ============================================
 -- Refund Flow Tables
@@ -805,8 +863,6 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     notes TEXT DEFAULT NULL,
     feedback_summary TEXT DEFAULT NULL,
     draft_subject VARCHAR(500) DEFAULT NULL,
-    ab_test_id INT DEFAULT NULL,
-    ab_variant_id INT DEFAULT NULL,
     draft_body TEXT DEFAULT NULL,
     drafted_at DATETIME DEFAULT NULL,
     approved_at DATETIME DEFAULT NULL,
@@ -823,19 +879,8 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_approval (approval_status),
     INDEX idx_outreach_company_size (company_size),
     INDEX idx_unsubscribe_token (unsubscribe_token),
-    INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
-    INDEX idx_outreach_ab_variant (ab_variant_id),
     INDEX idx_outreach_followup_due (next_followup_due_at, status, followup_count)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- For existing installs, add the A/B columns:
---   ALTER TABLE outreach_leads
---     ADD COLUMN ab_test_id INT NULL AFTER draft_subject,
---     ADD COLUMN ab_variant_id INT NULL AFTER ab_test_id,
---     ADD INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
---     ADD INDEX idx_outreach_ab_variant (ab_variant_id);
--- (Existing installs that already added idx_outreach_ab need only:
---   ALTER TABLE outreach_leads ADD INDEX idx_outreach_ab_variant (ab_variant_id);)
 --
 -- Existing installs also need 'email_bounced' added to the status ENUM
 -- so the Resend webhook can flag bounced/complained recipients:
@@ -859,6 +904,10 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --   'community_digest'   - replies / activity digest
 --   'newsletter'         - opt-in list for no-account subscribers (marketing_subscribers)
 --   'all_marketing'      - blanket suppression of all marketing contexts
+--   'portal'             - a merchant's customer, suppressed from overdue-invoice
+--                          reminders (cron/portal_invoice_reminders.php). Read but
+--                          not yet written: wiring the Resend webhook to record hard
+--                          bounces here is the intended follow-up.
 CREATE TABLE IF NOT EXISTS email_suppressions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
@@ -972,41 +1021,6 @@ CREATE TABLE IF NOT EXISTS outreach_email_events (
     INDEX idx_email_events_occurred (occurred_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- A/B tests for outreach email variants. variant_type covers every test type
--- the framework supports: subject, body, sender, cta, preheader, format,
--- personalization, followup_sequence. One first-touch test (everything except followup_sequence)
--- and one follow-up test (followup_sequence) can be active concurrently; activating a test
--- pauses any other active test in the same phase only.
-CREATE TABLE IF NOT EXISTS outreach_ab_tests (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(120) NOT NULL,
-    variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject',
-    status ENUM('draft','active','paused','completed') NOT NULL DEFAULT 'draft',
-    notes TEXT DEFAULT NULL,
-    started_at DATETIME DEFAULT NULL,
-    completed_at DATETIME DEFAULT NULL,
-    winner_variant_id INT DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_ab_test_status (status),
-    INDEX idx_ab_test_type_status (variant_type, status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Variants that belong to an A/B test
-CREATE TABLE IF NOT EXISTS outreach_ab_variants (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    test_id INT NOT NULL,
-    label VARCHAR(60) NOT NULL,
-    content TEXT NOT NULL,
-    is_default TINYINT(1) NOT NULL DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (test_id) REFERENCES outreach_ab_tests(id) ON DELETE CASCADE,
-    INDEX idx_ab_variant_test (test_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- For existing installs, expand the variant_type ENUM:
---   ALTER TABLE outreach_ab_tests
---     MODIFY COLUMN variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject';
-
 -- ─────────────────────────────────────────────────────────────────────
 -- outreach_followups
 -- One row per scheduled follow-up touch (touch 1 = original first-touch
@@ -1018,10 +1032,6 @@ CREATE TABLE IF NOT EXISTS outreach_ab_variants (
 --      └─→ halted (replied/unsubscribed/bounced/manual/max_reached)
 --      └─→ skipped (admin clicked skip on the drafted row)
 --      └─→ failed  (Gemini call failed 3 times)
---
--- ab_test_id / ab_variant_id are copied from the lead's assignment at
--- creation time so the whole sequence shares one variant (we test
--- strategies, not arbitrary mixes).
 -- ─────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS outreach_followups (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -1034,8 +1044,6 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
     draft_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
     status ENUM('scheduled','drafted','approved','sent','halted','skipped','failed') NOT NULL DEFAULT 'scheduled',
     halt_reason VARCHAR(100) DEFAULT NULL,
-    ab_test_id INT DEFAULT NULL,
-    ab_variant_id INT DEFAULT NULL,
     sent_at DATETIME DEFAULT NULL,
     message_id VARCHAR(255) DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -1196,14 +1204,19 @@ CREATE TABLE IF NOT EXISTS referral_events (
     ip_address VARCHAR(45) DEFAULT NULL,
     user_agent VARCHAR(255) DEFAULT NULL,
     country_code VARCHAR(2) DEFAULT NULL,
+    region VARCHAR(100) DEFAULT NULL COMMENT 'Geo region/state resolved from IP via ipinfo.io (best-effort).',
+    city VARCHAR(100) DEFAULT NULL COMMENT 'Geo city resolved from IP via ipinfo.io (best-effort).',
+    keyword VARCHAR(150) DEFAULT NULL COMMENT 'Search/campaign keyword captured from ?utm_term on the landing event.',
     source_survey_answer VARCHAR(20) DEFAULT NULL COMMENT 'On app_first_run rows only: user answer to "Where did you hear about us?". One of: google, bing, youtube, reddit, friend, email, other.',
     source_survey_other_text VARCHAR(200) DEFAULT NULL COMMENT 'Freeform user input when source_survey_answer = "other".',
     source_survey_answered_at DATETIME DEFAULT NULL,
+    js_confirmed TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Page-view events (landing, downloads_page) start 0 and are set to 1 by a client-side JS beacon (api/referral/confirm.php), which filters out headless bots that never run JS. Non-page-view events are inserted as 1.',
     environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_visitor (visitor_id),
     INDEX idx_source_event_created (source_code, event_type, created_at),
     INDEX idx_event_created (event_type, created_at),
+    INDEX idx_visitor_confirm (visitor_id, event_type, js_confirmed),
     INDEX idx_subscription (subscription_id),
     INDEX idx_env_created (environment, created_at),
     INDEX idx_ip (ip_address),
@@ -1227,198 +1240,27 @@ CREATE TABLE IF NOT EXISTS campaign_spend (
     FOREIGN KEY (source_code) REFERENCES referral_links(source_code) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Reddit outreach channel ───
--- Threads discovered by the daily cron + the founder's manual reply tracking.
--- Manual posting only (no auto-posting); permalink is required to mark a
--- thread `replied`, which feeds the status-check cron's worklist.
-CREATE TABLE IF NOT EXISTS reddit_threads (
+-- Launch-notification waitlist for platforms we haven't shipped yet (today:
+-- the macOS build). Signups come from the downloads page via
+-- api/waitlist/subscribe.php; admin/mac-waitlist/ lists and exports them.
+-- visitor_id/source_code tie each signup back to referral_events attribution
+-- so Mac demand can be measured per traffic source. notified_at is reserved
+-- for the one-off launch announcement send.
+CREATE TABLE IF NOT EXISTS platform_waitlist (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    reddit_id VARCHAR(20) NOT NULL UNIQUE COMMENT 'Reddit t3_xxxxxx ID',
-    subreddit VARCHAR(64) NOT NULL,
-    title VARCHAR(500) NOT NULL,
-    body TEXT DEFAULT NULL,
-    url VARCHAR(500) NOT NULL,
-    author VARCHAR(64) DEFAULT NULL,
-    author_karma INT DEFAULT NULL,
-    post_score INT DEFAULT 0,
-    comment_count INT DEFAULT 0,
-    posted_at DATETIME DEFAULT NULL,
-    discovered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    discovery_source ENUM('watchlist','keyword','both','manual') NOT NULL DEFAULT 'watchlist',
-    matched_keywords JSON DEFAULT NULL,
-    rules_score INT DEFAULT 0,
-    ai_relevance TINYINT DEFAULT NULL COMMENT '0-10 or NULL if not checked',
-    ai_relevance_reason VARCHAR(500) DEFAULT NULL,
-    draft_body TEXT DEFAULT NULL,
-    draft_generated_at DATETIME DEFAULT NULL,
-    status ENUM('new','drafted','drafted_pending','replied','skipped','expired') NOT NULL DEFAULT 'new',
-    status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied; counts toward post-limit',
-    reply_permalink VARCHAR(500) DEFAULT NULL,
-    reply_comment_id VARCHAR(20) DEFAULT NULL COMMENT 'Base36 comment id (no t1_ prefix) extracted from the permalink; the t1_ prefix is prepended at query time',
-    reply_posted_at DATETIME DEFAULT NULL,
-    reply_status ENUM('pending','live','removed','removed_or_shadowbanned','deleted_by_user') DEFAULT NULL,
-    reply_status_checked_at DATETIME DEFAULT NULL,
-    reply_status_check_count TINYINT DEFAULT 0,
-    reply_upvotes INT DEFAULT NULL,
-    reply_replies_count INT DEFAULT NULL,
-    override_limit TINYINT(1) DEFAULT 0 COMMENT 'Founder explicitly went over the post-limit cap',
-    notes TEXT DEFAULT NULL,
-    INDEX idx_status (status),
-    INDEX idx_discovered (discovered_at),
-    INDEX idx_relevance_status (ai_relevance, status),
-    INDEX idx_reply_status (reply_status),
-    INDEX idx_subreddit (subreddit),
-    INDEX idx_reply_posted (reply_posted_at)
+    email VARCHAR(255) NOT NULL,
+    platform VARCHAR(20) NOT NULL DEFAULT 'macos',
+    visitor_id CHAR(36) DEFAULT NULL COMMENT 'argo_visitor_id cookie at signup, joins to referral_events',
+    source_code VARCHAR(50) DEFAULT NULL COMMENT 'First-touch referral source resolved for the visitor',
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent VARCHAR(255) DEFAULT NULL,
+    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
+    notified_at DATETIME DEFAULT NULL COMMENT 'Set when the launch announcement is sent',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_email_platform (email, platform, environment),
+    INDEX idx_platform_created (platform, created_at),
+    INDEX idx_ip_created (ip_address, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Watchlist of subreddits polled daily. Per-subreddit removal-rate stats
--- are rolled up by the status-check cron and used by the auto-disable rule.
-CREATE TABLE IF NOT EXISTS reddit_subreddits (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(64) NOT NULL UNIQUE,
-    enabled TINYINT(1) NOT NULL DEFAULT 1,
-    notes VARCHAR(255) DEFAULT NULL,
-    replies_30d INT NOT NULL DEFAULT 0,
-    removal_rate_30d DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    auto_disabled_at DATETIME DEFAULT NULL,
-    auto_disabled_reason VARCHAR(120) DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Search terms run against Reddit's global search each day. Use quoted
--- phrases for exact matching (e.g. "quickbooks alternative").
-CREATE TABLE IF NOT EXISTS reddit_keywords (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    keyword VARCHAR(120) NOT NULL UNIQUE,
-    enabled TINYINT(1) NOT NULL DEFAULT 1,
-    notes VARCHAR(255) DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Singleton settings row (id=1 enforced). Holds OAuth token cache,
--- diagnostics, and tunable thresholds.
-CREATE TABLE IF NOT EXISTS reddit_settings (
-    id TINYINT PRIMARY KEY,
-    enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Master switch for the Reddit discovery pipeline. 0 = cron exits immediately.',
-    access_token VARCHAR(255) DEFAULT NULL COMMENT 'Encrypted via portal_encrypt()',
-    access_token_expires_at DATETIME DEFAULT NULL,
-    last_run_at DATETIME DEFAULT NULL,
-    last_run_threads_found INT DEFAULT 0,
-    last_run_threads_drafted INT DEFAULT 0,
-    last_run_error TEXT DEFAULT NULL,
-    last_status_check_at DATETIME DEFAULT NULL,
-    rules_score_floor TINYINT NOT NULL DEFAULT 30,
-    ai_relevance_floor TINYINT NOT NULL DEFAULT 6,
-    daily_post_limit TINYINT NOT NULL DEFAULT 3,
-    weekly_post_limit TINYINT NOT NULL DEFAULT 12,
-    auto_disable_removal_rate TINYINT NOT NULL DEFAULT 60,
-    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3,
-    manual_run_requested_at DATETIME DEFAULT NULL COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI (host disables exec/proc_open).'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Seed the singleton row and a starter watchlist + keyword pool. Idempotent
--- via INSERT IGNORE so re-running the schema is safe.
-INSERT IGNORE INTO reddit_settings (id) VALUES (1);
-
-INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
-    ('smallbusiness', 'general small-business owners'),
-    ('EtsySellers', 'Etsy shop owners with high product-mention tolerance'),
-    ('Flipping', 'resellers and flippers'),
-    ('freelance', 'freelancers'),
-    ('sidehustle', 'side-hustle starters'),
-    ('juststart', 'brand-new entrepreneurs'),
-    ('Bookkeeping', 'small and heavily moderated, tune carefully'),
-    ('Entrepreneur', 'huge but bans self-promo aggressively'),
-    ('PersonalFinanceCanada', 'Canadian audience'),
-    ('ecommerce', 'general ecommerce: inventory + invoicing pain'),
-    ('shopify', 'Shopify store owners'),
-    ('Reselling', 'resellers: inventory + receipt tracking'),
-    ('Landlord', 'landlords: rental income tracking'),
-    ('realestateinvesting', 'real estate investors: rental bookkeeping'),
-    ('sweatystartup', 'service-business owners'),
-    ('microsaas', 'indie SaaS founders: invoicing + subscription accounting'),
-    ('graphic_design', 'designers with invoicing pain'),
-    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking'),
-    -- Expanded watchlist: more small-business owner / freelancer / service-biz
-    -- communities. Low-yield or high-removal subs auto-disable over time.
-    ('EntrepreneurRideAlong', 'early founders sharing the journey'),
-    ('startups', 'startup founders'),
-    ('smallbiz', 'small-business owners'),
-    ('selfemployed', 'self-employed / sole proprietors'),
-    ('Upwork', 'freelancers: client invoicing pain'),
-    ('Fiverr', 'freelancers / gig sellers'),
-    ('freelanceWriters', 'freelance writers: invoicing'),
-    ('WorkOnline', 'online earners / side income'),
-    ('digitalnomad', 'location-independent freelancers'),
-    ('SaaS', 'indie SaaS founders: subscription accounting'),
-    ('QuickBooks', 'QuickBooks users: strong switch-intent'),
-    ('Accounting', 'software-rec questions surface here, tune carefully'),
-    ('tax', 'US tax + software questions'),
-    ('cantax', 'Canadian tax: strong local fit'),
-    ('Contractor', 'contractors: invoicing + job costing'),
-    ('HVAC', 'HVAC business owners, tune carefully'),
-    ('lawncare', 'lawn-care operators'),
-    ('landscaping', 'landscaping businesses'),
-    ('pressurewashing', 'new service-biz owners'),
-    ('cleaningbusiness', 'cleaning-business owners'),
-    ('photography', 'photographers: client invoicing'),
-    ('WeddingPhotography', 'wedding pros: deposits + invoicing'),
-    ('videography', 'videographers: project invoicing'),
-    ('personaltraining', 'solo trainers: client billing'),
-    ('RealEstate', 'agents: expense tracking'),
-    ('realtors', 'realtors: expense + commission tracking'),
-    ('dropship', 'dropshippers: fees + bookkeeping'),
-    ('FulfillmentByAmazon', 'FBA sellers: fees + inventory'),
-    ('Etsy', 'broader Etsy community'),
-    ('Handmade', 'makers selling handmade'),
-    ('foodtrucks', 'food-truck owners'),
-    ('restaurateur', 'restaurant owners'),
-    ('nonprofit', 'nonprofit bookkeeping needs');
-
-INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
-    ('bookkeeping software', 'broad intent'),
-    ('quickbooks alternative', 'switch-intent'),
-    ('freshbooks alternative', 'switch-intent'),
-    ('wave accounting', 'often switch-intent from Wave bugs'),
-    ('freelancer taxes canada', 'Canadian freelancer pain'),
-    ('etsy bookkeeping', 'Etsy seller pain'),
-    ('side hustle taxes', 'side-hustler tax confusion'),
-    ('small business spreadsheet bookkeeping', 'spreadsheet-to-software transition'),
-    -- Receipt scanning
-    ('receipt scanning app', 'AI receipt scan'),
-    ('scan receipts for taxes', 'AI receipt scan'),
-    ('digitize receipts', 'AI receipt scan'),
-    ('track expenses receipts', 'expenses + receipts'),
-    -- Invoicing
-    ('invoice software for freelancers', 'invoicing'),
-    ('send invoices online', 'invoicing'),
-    ('best invoicing software', 'invoicing'),
-    ('invoice template app', 'invoicing'),
-    -- Rental / landlords
-    ('rental property bookkeeping', 'rental'),
-    ('landlord accounting software', 'rental'),
-    ('track rental income', 'rental'),
-    -- Inventory
-    ('small business inventory software', 'inventory'),
-    ('inventory tracking spreadsheet', 'inventory: spreadsheet pain'),
-    ('ecommerce inventory tracking', 'inventory: ecommerce'),
-    -- Customer / supplier
-    ('small business CRM', 'customer mgmt'),
-    ('track customers spreadsheet', 'customer mgmt: spreadsheet pain'),
-    ('vendor tracking software', 'supplier mgmt'),
-    -- General SMB / self-employed
-    ('self-employed accounting', 'self-employed broad intent'),
-    ('sole proprietor taxes', 'sole proprietor pain'),
-    -- Expanded keyword pool: switch-intent, price pain, and broad SMB intent
-    ('xero alternative', 'switch-intent from Xero'),
-    ('free accounting software', 'price-sensitive new businesses'),
-    ('best accounting software small business', 'broad SMB intent'),
-    ('quickbooks too expensive', 'price pain / switch-intent'),
-    ('quickbooks self employed', 'switch-intent from QBSE'),
-    ('mileage tracking app', 'expense tracking for self-employed'),
-    ('contractor invoicing app', 'trades invoicing'),
-    ('profit and loss small business', 'bookkeeping reporting need');
 
 
 -- ============================================================
@@ -1559,4 +1401,421 @@ CREATE TABLE IF NOT EXISTS mobile_sync_queue (
     ciphertext LONGTEXT NOT NULL COMMENT 'opaque base64 blob (scanned transaction + image), encrypted on the phone',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company_uid (company_uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Argo Books public API (v1)
+--
+-- An ingest store, NOT a mirror of anyone's books. Third-party developers push
+-- objects here with a merchant-issued key; the desktop app pulls them, shows the
+-- merchant a preview, and imports the approved ones into the local company file
+-- as a single undoable action (the same shape as the Stripe importer).
+--
+-- Consequences baked into these tables:
+--   * Every resource row carries an import lifecycle. A row is a proposal
+--     until the desktop says otherwise.
+--   * Public ids (cus_, exp_, ...) are API ids. They are NOT the ids the desktop
+--     assigns; local_ref carries that back once known.
+--   * Money is stored in integer minor units, like Stripe, so nothing rounds.
+--   * environment is the deploy split (sandbox = dev.argorobots.com), not a
+--     user-facing test mode. Every query MUST filter on it.
+-- ============================================================================
+
+-- One row per Argo Books company that has turned the API on.
+CREATE TABLE IF NOT EXISTS api_accounts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    public_id VARCHAR(40) NOT NULL COMMENT 'acct_<24 hex>, returned to callers',
+    owner_identity_hash CHAR(64) NOT NULL COMMENT 'Same identity as api/sync: sha256 of license key (premium) or device id (free)',
+    company_uid VARCHAR(64) NOT NULL COMMENT 'Which company file on the desktop this account feeds',
+    display_name VARCHAR(255) NOT NULL DEFAULT '',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_api_accounts_public_id (public_id),
+    UNIQUE KEY uk_api_accounts_owner_company (owner_identity_hash, company_uid, environment),
+    INDEX idx_api_accounts_env (environment)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Merchant-issued credentials. Multiple live keys per account so a merchant can
+-- hand a distinct one to each developer and revoke them independently.
+CREATE TABLE IF NOT EXISTS api_keys (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'key_<24 hex>',
+    key_hash CHAR(64) NOT NULL COMMENT 'sha256 of the secret. The secret itself is shown once at creation and never stored',
+    key_hint VARCHAR(24) NOT NULL COMMENT 'ab_1a2b...wxyz, safe to display in Settings and logs',
+    label VARCHAR(100) NOT NULL DEFAULT '',
+    scopes VARCHAR(255) NOT NULL DEFAULT 'read,write' COMMENT 'Comma-separated: read, write',
+    last_used_at DATETIME DEFAULT NULL,
+    revoked_at DATETIME DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_keys_hash (key_hash),
+    UNIQUE KEY uk_api_keys_public_id (public_id),
+    INDEX idx_api_keys_account (account_id, revoked_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A desktop import run. Groups the objects the merchant approved together so the
+-- app can undo the whole thing, and so a developer can see when their data landed.
+CREATE TABLE IF NOT EXISTS api_import_batches (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'imb_<24 hex>',
+    status ENUM('open','completed','reverted') NOT NULL DEFAULT 'open',
+    object_counts JSON DEFAULT NULL COMMENT 'Per-resource counts, e.g. {"expense":4,"customer":2}',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_batches_public_id (public_id),
+    INDEX idx_api_batches_account (account_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_customers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'cus_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    company VARCHAR(255) DEFAULT NULL,
+    tax_number VARCHAR(60) DEFAULT NULL,
+    address_line1 VARCHAR(255) DEFAULT NULL,
+    address_line2 VARCHAR(255) DEFAULT NULL,
+    city VARCHAR(120) DEFAULT NULL,
+    state VARCHAR(120) DEFAULT NULL,
+    postal_code VARCHAR(30) DEFAULT NULL,
+    country CHAR(2) DEFAULT NULL COMMENT 'ISO 3166-1 alpha-2',
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL COMMENT 'Id the desktop assigned after import. NULL until then',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_customers_public_id (public_id),
+    INDEX idx_api_customers_list (account_id, deleted_at, id),
+    INDEX idx_api_customers_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_suppliers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'sup_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    website VARCHAR(255) DEFAULT NULL,
+    tax_number VARCHAR(60) DEFAULT NULL,
+    address_line1 VARCHAR(255) DEFAULT NULL,
+    address_line2 VARCHAR(255) DEFAULT NULL,
+    city VARCHAR(120) DEFAULT NULL,
+    state VARCHAR(120) DEFAULT NULL,
+    postal_code VARCHAR(30) DEFAULT NULL,
+    country CHAR(2) DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_suppliers_public_id (public_id),
+    INDEX idx_api_suppliers_list (account_id, deleted_at, id),
+    INDEX idx_api_suppliers_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'cat_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    kind ENUM('expense','revenue') NOT NULL,
+    parent VARCHAR(40) DEFAULT NULL COMMENT 'public_id of another api_categories row',
+    description TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_categories_public_id (public_id),
+    INDEX idx_api_categories_list (account_id, deleted_at, id),
+    INDEX idx_api_categories_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'prd_<24 hex>',
+    name VARCHAR(255) NOT NULL,
+    sku VARCHAR(120) DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    unit VARCHAR(40) DEFAULT NULL COMMENT 'each, hour, kg, ...',
+    unit_amount BIGINT DEFAULT NULL COMMENT 'Minor units of currency, like Stripe. 1999 = 19.99 USD',
+    currency CHAR(3) DEFAULT NULL,
+    tax_rate DECIMAL(7,4) DEFAULT NULL COMMENT 'Percent, e.g. 13.0000',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_products_public_id (public_id),
+    INDEX idx_api_products_list (account_id, deleted_at, id),
+    INDEX idx_api_products_pending (account_id, import_status, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_expenses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'exp_<24 hex>',
+    description VARCHAR(500) NOT NULL,
+    amount BIGINT NOT NULL COMMENT 'Total including tax, in minor units',
+    currency CHAR(3) NOT NULL,
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    occurred_on DATE NOT NULL,
+    supplier VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_suppliers row',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    payment_method VARCHAR(40) DEFAULT NULL,
+    reference VARCHAR(120) DEFAULT NULL COMMENT 'Developer-side document number, shown to the merchant during review',
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_expenses_public_id (public_id),
+    INDEX idx_api_expenses_list (account_id, deleted_at, id),
+    INDEX idx_api_expenses_pending (account_id, import_status, id),
+    INDEX idx_api_expenses_occurred (account_id, occurred_on)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_revenue (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'rev_<24 hex>',
+    description VARCHAR(500) NOT NULL,
+    amount BIGINT NOT NULL COMMENT 'Gross including tax, in minor units',
+    currency CHAR(3) NOT NULL,
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    discount_amount BIGINT NOT NULL DEFAULT 0,
+    fee_amount BIGINT NOT NULL DEFAULT 0 COMMENT 'Processing fee withheld upstream, so the desktop can book it as an expense',
+    occurred_on DATE NOT NULL,
+    customer VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_customers row',
+    category VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_categories row',
+    payment_method VARCHAR(40) DEFAULT NULL,
+    reference VARCHAR(120) DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_revenue_public_id (public_id),
+    INDEX idx_api_revenue_list (account_id, deleted_at, id),
+    INDEX idx_api_revenue_pending (account_id, import_status, id),
+    INDEX idx_api_revenue_occurred (account_id, occurred_on)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A refund always points at a revenue row, so the desktop can book it as a return
+-- against the original sale rather than a free-floating negative amount.
+CREATE TABLE IF NOT EXISTS api_refunds (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 're_<24 hex>',
+    revenue VARCHAR(40) NOT NULL COMMENT 'public_id of the api_revenue row being refunded',
+    amount BIGINT NOT NULL COMMENT 'Positive minor units. The desktop applies the sign',
+    currency CHAR(3) NOT NULL,
+    reason VARCHAR(255) DEFAULT NULL,
+    occurred_on DATE NOT NULL,
+    reference VARCHAR(120) DEFAULT NULL,
+    metadata JSON DEFAULT NULL,
+    import_status ENUM('pending','imported','rejected') NOT NULL DEFAULT 'pending',
+    import_batch_id INT DEFAULT NULL,
+    imported_at DATETIME DEFAULT NULL,
+    local_ref VARCHAR(120) DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_refunds_public_id (public_id),
+    INDEX idx_api_refunds_list (account_id, deleted_at, id),
+    INDEX idx_api_refunds_pending (account_id, import_status, id),
+    INDEX idx_api_refunds_revenue (account_id, revenue)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Line detail for expenses and revenue. Separate table rather than a JSON column
+-- so it can be listed and expanded like any other sub-resource.
+CREATE TABLE IF NOT EXISTS api_line_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'li_<24 hex>',
+    parent_type ENUM('expense','revenue') NOT NULL,
+    parent_public_id VARCHAR(40) NOT NULL,
+    product VARCHAR(40) DEFAULT NULL COMMENT 'public_id of an api_products row',
+    description VARCHAR(500) NOT NULL,
+    quantity DECIMAL(15,4) NOT NULL DEFAULT 1.0000,
+    unit_amount BIGINT NOT NULL COMMENT 'Minor units, excluding tax',
+    tax_amount BIGINT NOT NULL DEFAULT 0,
+    discount_amount BIGINT NOT NULL DEFAULT 0,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_line_items_public_id (public_id),
+    INDEX idx_api_line_items_parent (account_id, parent_type, parent_public_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Idempotency-Key cache, same claim-then-run contract as refund_idempotency_cache
+-- but keyed on api_accounts instead of portal_companies.
+CREATE TABLE IF NOT EXISTS api_idempotency_cache (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    idempotency_key VARCHAR(128) NOT NULL,
+    body_hash CHAR(64) NOT NULL,
+    response_status SMALLINT UNSIGNED NOT NULL COMMENT '0 = claimed, handler still running',
+    response_body LONGTEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_idem_account_key (account_id, idempotency_key),
+    INDEX idx_api_idem_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Fixed-window rate limit counters, one row per (key, minute).
+CREATE TABLE IF NOT EXISTS api_rate_limits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    api_key_id INT NOT NULL,
+    window_started_at DATETIME NOT NULL,
+    request_count INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_rate_key_window (api_key_id, window_started_at),
+    INDEX idx_api_rate_window (window_started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Site-wide rate limit counters (rate_limit_helper.php)
+--
+-- Backs every anonymous, IP-keyed limit on the site: admin and community
+-- login, portal token lookups, license validate/redeem, the paid AI and OCR
+-- endpoints, outbound email, sync pairing. Replaced a flat JSON file, which
+-- forced every rate-limited request across the whole site to queue behind one
+-- exclusive file lock. One row per bucket means requests only contend when
+-- they are the same bucket.
+--
+-- Distinct from the two other counter tables, which key off a real record:
+-- `rate_limits` is per community user, `api_rate_limits` is per API key. This
+-- one keys off whatever the caller has, usually an IP with no account behind
+-- it, so there is no foreign key to hang it on.
+--
+-- bucket_key is '<environment>:<prefix>_<sha256(identifier)>'. The identifier
+-- is normally an IP but can be any opaque string (a license key, a browser
+-- fingerprint, the literal 'GLOBAL' for a site-wide cap). ascii_bin because
+-- the value is hex plus an ASCII prefix, which keeps the primary key narrow
+-- and the comparison exact.
+--
+-- Windows are anchored at first_attempt_at rather than clock-aligned, so a
+-- bucket stays tripped until its own window elapses. Rows are deleted
+-- opportunistically once they are over a day old; stale rows are harmless
+-- before then because reads filter on the window.
+CREATE TABLE IF NOT EXISTS rate_limit_counters (
+    bucket_key VARCHAR(120) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    attempt_count INT UNSIGNED NOT NULL DEFAULT 0,
+    first_attempt_at DATETIME NOT NULL COMMENT 'UTC. Start of the current window for this bucket',
+    PRIMARY KEY (bucket_key),
+    INDEX idx_rlc_first_attempt (first_attempt_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Argo Books public API: webhooks
+--
+-- Events describe what the MERCHANT did, not what the developer did. A
+-- developer already knows they created an expense; what they cannot see is the
+-- moment a human accepted, declined, or undid it. That is the whole value here,
+-- and it is why there is no <object>.created event.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS api_webhook_endpoints (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'whe_<24 hex>',
+    url VARCHAR(500) NOT NULL,
+    signing_secret VARCHAR(80) NOT NULL COMMENT 'whsec_..., shown once at creation and used to sign every delivery',
+    enabled_events JSON DEFAULT NULL COMMENT 'Array of event types, or NULL for all',
+    description VARCHAR(255) NOT NULL DEFAULT '',
+    status ENUM('enabled','disabled') NOT NULL DEFAULT 'enabled',
+    disabled_reason VARCHAR(255) DEFAULT NULL COMMENT 'Set when auto-disabled after sustained failure',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_whe_public_id (public_id),
+    INDEX idx_api_whe_account (account_id, status, deleted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The event log. Readable through GET /v1/events so a developer whose endpoint
+-- was down can catch up without needing us to replay anything.
+CREATE TABLE IF NOT EXISTS api_events (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INT NOT NULL,
+    public_id VARCHAR(40) NOT NULL COMMENT 'evt_<24 hex>',
+    type VARCHAR(60) NOT NULL COMMENT 'e.g. revenue.imported, import_batch.reverted',
+    object_id VARCHAR(40) DEFAULT NULL COMMENT 'The object the event is about',
+    data JSON NOT NULL COMMENT 'The serialized object at the time of the event',
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES api_accounts(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_events_public_id (public_id),
+    INDEX idx_api_events_account (account_id, id),
+    INDEX idx_api_events_type (account_id, type, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- One row per (event, endpoint). Separate from api_events because the same
+-- event fans out to every matching endpoint and each retries independently.
+CREATE TABLE IF NOT EXISTS api_webhook_deliveries (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    endpoint_id INT NOT NULL,
+    event_id INT NOT NULL,
+    status ENUM('pending','succeeded','failed') NOT NULL DEFAULT 'pending',
+    attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    next_attempt_at DATETIME NOT NULL,
+    last_status_code SMALLINT UNSIGNED DEFAULT NULL,
+    last_error VARCHAR(500) DEFAULT NULL,
+    delivered_at DATETIME DEFAULT NULL,
+    environment VARCHAR(10) NOT NULL DEFAULT 'sandbox',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (endpoint_id) REFERENCES api_webhook_endpoints(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES api_events(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_api_delivery_endpoint_event (endpoint_id, event_id),
+    INDEX idx_api_delivery_due (status, next_attempt_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

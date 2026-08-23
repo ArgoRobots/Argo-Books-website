@@ -167,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const postSelect = document.createElement("div");
     postSelect.className = "post-select checkbox";
 
-    // Create checkbox
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "post-checkbox";
@@ -263,7 +262,6 @@ document.addEventListener("DOMContentLoaded", function () {
       checkedVisibleCheckboxes.length < visibleCheckboxes.length;
   }
 
-  // Update the search/filter label
   function updateSearchFilterLabel() {
     if (!searchFilterLabel) return;
 
@@ -587,7 +585,6 @@ document.addEventListener("DOMContentLoaded", function () {
     hasMorePosts = true;
     let filteredPosts = filterAndSortPosts();
 
-    // Update the search/filter label
     updateSearchFilterLabel();
 
     // Hide all posts first

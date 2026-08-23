@@ -1,0 +1,114 @@
+/* Email Customers admin page. Combines the former Marketing (broadcast) and
+   Reviews (review/feedback email) pages into two tabs. Shared admin styles
+   (section-tabs, tab-content, stat-card, table-container, btn) come from
+   admin/common-style.css. */
+
+/* ─── Broadcast tab (compose + recent) ─────────────────────────────────── */
+
+.mkt-section-head { text-align: center; }
+.mkt-compose { display: flex; flex-direction: column; gap: 14px; max-width: 760px; margin: 0 auto; }
+.mkt-field label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+.mkt-field input[type=text],
+.mkt-field input[type=email],
+.mkt-field select,
+.mkt-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color, #d8e2f0);
+    border-radius: 8px;
+    font: 500 14px/1.5 inherit;
+    background: var(--input-bg, #fff);
+    color: inherit;
+    box-sizing: border-box;
+}
+.mkt-field textarea { min-height: 240px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.mkt-hint { font-size: 12.5px; color: var(--black); margin-top: 5px; }
+.mkt-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.mkt-test { display: flex; gap: 8px; flex: 1; min-width: 240px; }
+.mkt-test input { flex: 1; }
+.mkt-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.mkt-badge.queued { background: #fef3c7; color: #92400e; }
+.mkt-badge.sending { background: #dbeafe; color: #1e40af; }
+.mkt-badge.sent { background: #dcfce7; color: #166534; }
+.mkt-badge.canceled { background: #f3f4f6; color: var(--black); }
+
+/* The base input rule hardcodes a light background and .mkt-hint has no dark
+   variant, so match the global dark input + label styling here. */
+[data-theme="dark"] .mkt-field input[type=text],
+[data-theme="dark"] .mkt-field input[type=email],
+[data-theme="dark"] .mkt-field select,
+[data-theme="dark"] .mkt-field textarea {
+    background: var(--gray-700); border-color: var(--black); color: var(--white);
+}
+[data-theme="dark"] .mkt-field input::placeholder,
+[data-theme="dark"] .mkt-field textarea::placeholder { color: var(--white); }
+[data-theme="dark"] .mkt-hint { color: var(--white); }
+
+/* ─── Review requests tab ──────────────────────────────────────────────── */
+
+.reviews-intro {
+    background: var(--blue-50, #eff6ff);
+    border-left: 3px solid var(--primary-blue);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.reviews-intro p { margin: 0 0 8px 0; }
+.reviews-intro p:last-child { margin-bottom: 0; }
+
+.review-section {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--shadow-default);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+.review-section h2 { font-size: 18px; margin: 0 0 4px 0; color: var(--admin-text); }
+.review-section h2 .count { color: var(--admin-text); font-weight: 400; font-size: 14px; }
+.review-section.active h2 { color: var(--emerald-800); }
+.review-section.inactive h2 { color: var(--amber-700); }
+
+.section-description { font-size: 13px; color: var(--admin-text); margin: 0 0 14px 0; }
+
+.reviews-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.reviews-table th,
+.reviews-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--gray-100, var(--gray-bg-light)); }
+.reviews-table th {
+    font-weight: 600;
+    background: var(--gray-50, var(--whiteBackground));
+    color: var(--admin-text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.reviews-table tr:last-child td { border-bottom: none; }
+.reviews-table code { background: var(--gray-100, var(--gray-bg-light)); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+.form-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+.btn-small { padding: 4px 10px; font-size: 12px; }
+
+/* Empty-state note, used by both tabs ("No broadcasts yet" / "No eligible
+   customers in this group"). */
+.empty-state { text-align: center; color: var(--admin-text); font-style: italic; padding: 1.5rem; margin: 0; }
+
+/* ─── Dark theme ───────────────────────────────────────────────────────── */
+
+/* The shared .btn-gray has no dark variant, so the Skip / Send test buttons
+   render light-on-dark without this. */
+[data-theme="dark"] .btn-gray { background-color: var(--gray-700); color: var(--white); border-color: var(--black); }
+[data-theme="dark"] .btn-gray:hover { background-color: var(--gray-600); color: var(--white); }
+
+[data-theme="dark"] .reviews-intro { background: var(--blue-alpha-15); border-left-color: var(--blue-400); color: var(--white); }
+[data-theme="dark"] .review-section { background: var(--gray-800); box-shadow: 0 1px 3px var(--shadow-default); }
+[data-theme="dark"] .review-section h2 { color: var(--blue-300); }
+[data-theme="dark"] .review-section.active h2 { color: var(--emerald-300); }
+[data-theme="dark"] .review-section.inactive h2 { color: var(--amber-300); }
+[data-theme="dark"] .review-section h2 .count,
+[data-theme="dark"] .section-description,
+[data-theme="dark"] .empty-state { color: var(--white); }
+[data-theme="dark"] .reviews-table th,
+[data-theme="dark"] .reviews-table td { border-bottom-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] .reviews-table th { background: var(--gray-700); color: var(--white); }
+[data-theme="dark"] .reviews-table code { background: var(--gray-700); color: var(--white); }

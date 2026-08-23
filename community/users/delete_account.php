@@ -47,7 +47,6 @@ try {
     $stmt = $pdo->prepare('UPDATE community_users SET deletion_scheduled_at = ? WHERE id = ?');
     $stmt->execute([$scheduledDate, $user_id]);
 
-    // Send account deletion scheduled email
     $email_sent = send_account_deletion_scheduled_email($user['email'], $user['username'], $scheduledDate);
 
     clear_remember_token($user_id);

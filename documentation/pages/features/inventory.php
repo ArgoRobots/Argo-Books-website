@@ -20,13 +20,17 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Setting Up Inventory</h2>
             <ol class="steps-list">
-                <li>Navigate to "Products / Services" under the Management section in the sidebar</li>
+                <li>Go to "Expense products" or "Revenue products" in the sidebar</li>
                 <li>Select a product or create a new one</li>
                 <li>Enable inventory tracking in the product settings</li>
                 <li>Enter your current stock quantity</li>
                 <li>Set your minimum stock level (reorder point)</li>
             </ol>
             <p>Once inventory tracking is enabled, you can monitor stock levels from the "Stock Levels" page and make manual adjustments from the "Adjustments" page, both under the Inventory section in the sidebar.</p>
+
+            <div class="info-box">
+                <strong>Note:</strong> The Balance Sheet values your stock on hand at its current unit cost. Buying stock is still recorded as an expense at the time of purchase, so adding inventory does not change your profit. See <a class="link" href="../reference/how-numbers-are-calculated.php#inventory-balance-sheet">How Numbers Are Calculated</a>.
+            </div>
 
             <h2>Reorder Points</h2>
             <p>Set stock thresholds to stay on top of your inventory:</p>

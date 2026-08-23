@@ -111,36 +111,59 @@ showResult(true, 'Google Sheets connected successfully!');
  */
 function showResult(bool $success, string $message): void
 {
-    $color = $success ? '#059669' : '#dc2626';
-    $icon = $success ? '&#10003;' : '&#10007;';
-    $title = $success ? 'Connected' : 'Error';
+    $iconColor = $success ? '#22c55e' : '#ef4444';
+    $title = $success ? 'Connected' : 'Connection Failed';
     $safeMessage = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+    $iconSvg = $success
+        ? '<svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="28" fill="' . $iconColor . '" opacity="0.1"/><circle cx="28" cy="28" r="20" fill="' . $iconColor . '" opacity="0.15"/><path d="M20 28.5L25.5 34L36 22" stroke="' . $iconColor . '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="28" fill="' . $iconColor . '" opacity="0.1"/><circle cx="28" cy="28" r="20" fill="' . $iconColor . '" opacity="0.15"/><path d="M22 22L34 34M34 22L22 34" stroke="' . $iconColor . '" stroke-width="3" stroke-linecap="round"/></svg>';
     $autoCloseScript = $success ? '<script>setTimeout(function(){window.close()},1500);</script>' : '';
-    $closingNote = $success ? '<p style="font-size:13px;color:#9ca3af;margin-top:12px;">This window will close automatically...</p>' : '';
+    $closingNote = $success
+        ? '<p class="callback-hint">This window will close automatically...</p>'
+        : '<p class="callback-hint">You can close this window and try again from Argo Books.</p>';
 
     header('Content-Type: text/html; charset=utf-8');
     echo <<<HTML
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Google Sheets - {$title}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
+    <link rel="stylesheet" href="/resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="/portal/style.css">
     {$autoCloseScript}
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f3f4f6; }
-        .card { background: white; border-radius: 12px; padding: 48px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; }
-        .icon { font-size: 48px; color: {$color}; margin-bottom: 16px; }
-        h1 { font-size: 24px; color: #111827; margin: 0 0 12px; }
-        p { font-size: 16px; color: #6b7280; margin: 0; line-height: 1.5; }
+        .callback-result { text-align: center; padding: 60px 20px; max-width: 480px; margin: 0 auto; }
+        .callback-icon { margin-bottom: 20px; }
+        .callback-title { font-size: 22px; font-weight: 600; color: var(--gray-900, #111); margin: 0; }
+        .callback-message { color: var(--gray-900, #111); font-size: 15px; margin-top: 12px; line-height: 1.5; }
+        .callback-hint { color: var(--gray-900, #111); font-size: 13px; margin-top: 24px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="icon">{$icon}</div>
-        <h1>{$title}</h1>
-        <p>{$safeMessage}</p>
-        {$closingNote}
+    <div class="portal-page">
+        <header class="portal-header">
+            <div class="portal-header-inner">
+                <div class="company-info">
+                    <h1 class="company-name">Argo Books</h1>
+                    <span class="portal-subtitle">Google Sheets integration</span>
+                </div>
+            </div>
+        </header>
+        <main class="portal-main">
+            <div class="callback-result">
+                <div class="callback-icon">{$iconSvg}</div>
+                <h2 class="callback-title">{$title}</h2>
+                <p class="callback-message">{$safeMessage}</p>
+                {$closingNote}
+            </div>
+        </main>
+        <footer class="portal-footer">
+            <p>Powered by <a href="https://argorobots.com" target="_blank" rel="noopener">Argo Books</a></p>
+        </footer>
     </div>
 </body>
 </html>

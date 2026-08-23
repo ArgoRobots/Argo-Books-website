@@ -81,7 +81,6 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
                         }
                     }
 
-                    // Update last login time
                     $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                     $stmt->execute([$username]);
 
@@ -155,7 +154,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
                 clear_rate_limit_attempts($clientIp, 'admin_login');
 
-                // Update last login time
                 $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                 $stmt->execute([$actual_username]);
 

@@ -21,7 +21,8 @@ $sidebarSections = [
             'system-requirements' => ['title' => 'System Requirements'],
             'installation' => ['title' => 'Installation Guide'],
             'quick-start' => ['title' => 'Quick Start Tutorial'],
-            'version-comparison' => ['title' => 'Free vs. Paid Version']
+            'version-comparison' => ['title' => 'Free vs. Paid Version'],
+            'redeem-license-key' => ['title' => 'Redeem a License Key']
         ]
     ],
     'Core Features' => [
@@ -33,6 +34,8 @@ $sidebarSections = [
             'report-generator' => ['title' => 'Report Generator'],
             'sales-tracking' => ['title' => 'Expense/Revenue Tracking'],
             'invoicing' => ['title' => 'Invoicing & Payments'],
+            'payroll' => ['title' => 'Payroll'],
+            'payroll-year-end' => ['title' => 'Payroll Year-End'],
             'bank-statement-import' => ['title' => 'Bank Statement Import'],
             'bank-matching' => ['title' => 'Bank Matching'],
             'rental' => ['title' => 'Rental Management'],
@@ -50,6 +53,23 @@ $sidebarSections = [
             'history-modal' => ['title' => 'Version History']
         ]
     ],
+    'Integrations' => [
+        'folder' => 'pages/integrations',
+        'pages' => [
+            'stripe-integration' => ['title' => 'Stripe Integration']
+        ]
+    ],
+    'Developer API' => [
+        'folder' => 'pages/api',
+        'pages' => [
+            'overview' => ['title' => 'Overview'],
+            'authentication' => ['title' => 'Authentication'],
+            'resources' => ['title' => 'Resources'],
+            'imports' => ['title' => 'Imports'],
+            'webhooks' => ['title' => 'Webhooks'],
+            'errors' => ['title' => 'Errors']
+        ]
+    ],
     'Reference' => [
         'folder' => 'pages/reference',
         'pages' => [
@@ -64,8 +84,7 @@ $sidebarSections = [
         'pages' => [
             'encryption' => ['title' => 'Encryption'],
             'password' => ['title' => 'Password Protection'],
-            'backups' => ['title' => 'Regular Backups'],
-            'anonymous-data' => ['title' => 'Anonymous Usage Data']
+            'backups' => ['title' => 'Regular Backups']
         ]
     ]
 ];

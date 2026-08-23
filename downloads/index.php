@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../resources/format.php';
 require_once __DIR__ . '/../track_referral.php';
 
 track_referral_event('downloads_page');
@@ -12,17 +13,6 @@ function getSystemRequirements()
         return json_decode($json, true);
     }
     return [];
-}
-
-// Get platform icon SVG path
-function getPlatformIconPath($platform)
-{
-    $icons = [
-        'windows' => 'M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801',
-        'macos' => 'M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z',
-        'linux' => 'M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z'
-    ];
-    return $icons[$platform] ?? '';
 }
 
 // Platform file patterns for Avalonia builds
@@ -79,79 +69,13 @@ function getLatestVersion()
     ];
 }
 
-function formatFileSize($bytes)
-{
-    $units = ['B', 'KB', 'MB', 'GB'];
-    $bytes = max($bytes, 0);
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-
-    $bytes /= (1 << (10 * $pow));
-
-    return round($bytes, 1) . ' ' . $units[$pow];
-}
 
 $latestVersion = getLatestVersion();
 $systemRequirements = getSystemRequirements();
 
-// Detect browser for SmartScreen guide (Windows downloads only)
-function detectBrowserForGuide(): string
-{
-    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    $chUa = $_SERVER['HTTP_SEC_CH_UA'] ?? '';
-
-    if (stripos($chUa, 'Brave') !== false) return 'brave';
-    if (stripos($ua, 'Edg/') !== false) return 'edge';
-    if (stripos($ua, 'OPR/') !== false || stripos($ua, 'Opera/') !== false) return 'opera';
-    if (stripos($ua, 'Vivaldi/') !== false) return 'vivaldi';
-    if (stripos($ua, 'Firefox/') !== false) return 'firefox';
-    if (stripos($ua, 'Chrome/') !== false) return 'chrome';
-    return 'unknown';
-}
-
-// Browser-specific walkthroughs for the SmartScreen / download warning.
-// Add more browsers by dropping a key here + saving screenshots to
-// resources/images/smartscreen-guide/<browser>-step-N.svg.
-$smartScreenGuides = [
-    'edge' => [
-        'browser_name' => 'Microsoft Edge',
-        'intro' => 'Edge sometimes flags new apps before they are widely downloaded. Here\'s how to keep the installer:',
-        'steps' => [
-            [
-                'title' => 'Open the Downloads panel, hover the file, and click the ⋯ menu',
-                'image' => '../resources/images/smartscreen-guide/edge-step-1.svg',
-                'alt'   => 'Edge Downloads panel showing the Argo Books installer with the more-options menu',
-            ],
-            [
-                'title' => 'Choose Keep from the menu',
-                'image' => '../resources/images/smartscreen-guide/edge-step-2.svg',
-                'alt'   => 'Edge download menu with the Keep option highlighted',
-            ],
-            [
-                'title' => 'Click the arrow next to Delete, then choose Keep anyway',
-                'image' => '../resources/images/smartscreen-guide/edge-step-3.svg',
-                'alt'   => 'Edge confirmation dialog with the Keep anyway button',
-            ],
-        ],
-    ],
-];
-
-// Only Edge gets an illustrated, browser-specific keep-guide: Edge reliably nags
-// on downloads and we have accurate screenshots for it. Other browsers (Chrome,
-// Firefox, etc.) rarely warn on a signed installer, and we can't verify their
-// exact dialogs, so they fall through to the Windows launch step alone.
-
-// Windows launch step. Appended as the final step of the walkthrough (after the
-// browser's "keep" steps), because the "Windows protected your PC" prompt appears
-// when the installer is opened. One combined step on purpose.
-$windowsLaunchStep = [
-    'title' => 'Open the installer. If Windows shows "Windows protected your PC", click More info, then Run anyway.',
-    'image' => '../resources/images/smartscreen-guide/windows-step.svg',
-    'alt'   => 'Windows protected your PC dialog showing Argo Books Installer, publisher Evan Di Placido, with the Run anyway button highlighted',
-];
-
-$browserKey = detectBrowserForGuide();
-$smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
+// The SmartScreen guide config, detection, and markup live in the shared
+// partial resources/smartscreen-guide/guide.php (also used by the paid
+// landing pages); it's included below where the block renders.
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -163,13 +87,17 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
+    <!-- Platform wording here has to match the page: there is no macOS build yet,
+         only a waitlist. The title and description are what Google prints in the
+         SERP and what link previews and crawlers read, so promising a Mac download
+         here sends Mac users to a signup form they didn't ask for. -->
     <meta name="description"
-        content="Download Argo Books for Windows, macOS, and Linux. Free bookkeeping software for small businesses. Get started with easy invoicing, expense tracking, and financial reports.">
+        content="Download Argo Books free for Windows and Linux. Simple bookkeeping software for small businesses, with easy invoicing, expense tracking, and financial reports. Mac users can join the waitlist.">
     <meta name="keywords"
-        content="argo books download, bookkeeping software, Windows, macOS, Linux, free accounting software, small business software, invoice software">
+        content="argo books download, bookkeeping software, Windows, Linux, free accounting software, small business software, invoice software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Download Argo Books | Windows, macOS & Linux">
+    <meta property="og:title" content="Download Argo Books | Windows & Linux">
     <meta property="og:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:url" content="https://argorobots.com/downloads/">
@@ -179,7 +107,7 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Download Argo Books | Windows, macOS & Linux">
+    <meta name="twitter:title" content="Download Argo Books | Windows & Linux">
     <meta name="twitter:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
@@ -197,16 +125,22 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
     <link rel="canonical" href="https://argorobots.com/downloads/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
-    <title>Download Argo Books | Windows, macOS & Linux</title>
+    <title>Download Argo Books | Windows & Linux</title>
 
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../resources/styles/smartscreen-guide.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>
@@ -251,7 +185,8 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 </div>
             </div>
 
-            <!-- macOS -->
+            <!-- macOS: no build yet, so the action is a launch-notification
+                 waitlist signup (api/waitlist/subscribe.php). -->
             <div class="platform-card platform-macos">
                 <div class="platform-icon">
                     <?= svg_icon('apple') ?>
@@ -259,11 +194,25 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 <div class="platform-info">
                     <h2>macOS</h2>
                     <p class="platform-desc">For macOS 14 Sonoma and later</p>
+                    <div class="version-details">
+                        <span class="version-tag">Coming soon</span>
+                    </div>
                 </div>
                 <div class="platform-actions">
-                    <button class="btn btn-gray download-btn disabled" disabled>
-                        Coming Soon
-                    </button>
+                    <form class="waitlist-form" id="macWaitlistForm" autocomplete="off" novalidate>
+                        <div class="waitlist-fields">
+                            <input type="email" name="email" class="waitlist-email" placeholder="you@example.com"
+                                   required aria-label="Email address for the Mac release notification">
+                            <button type="submit" class="btn btn-blue waitlist-submit">Notify me</button>
+                        </div>
+                        <!-- Honeypot: hidden from real users, bots autofill it -->
+                        <input type="text" name="website" class="waitlist-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <p class="waitlist-note" id="macWaitlistNote">One email when the Mac version ships. Nothing else.</p>
+                    </form>
+                    <div class="waitlist-success" id="macWaitlistSuccess" hidden>
+                        <?= svg_icon('check', 16) ?>
+                        <span>You're on the list</span>
+                    </div>
                 </div>
             </div>
 
@@ -297,51 +246,24 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
         <!-- Post-download walkthrough: the browser's "keep" steps (when the browser
              warns) followed by a final Windows launch step, as one continuous
              numbered list. Revealed after a Windows download click. -->
-        <?php
-        if ($smartScreenGuide) {
-            $guideHeading = $smartScreenGuide['browser_name'] . ' has an extra confirmation step';
-            $guideIntro   = $smartScreenGuide['intro'];
-            $guideSteps   = $smartScreenGuide['steps'];
-        } else {
-            // Browser without a keep-guide: still show the Windows launch step alone.
-            $guideHeading = 'Opening Argo Books on Windows';
-            $guideIntro   = 'Windows may warn you because Argo Books is a newer app, not because it is unsafe. After the download finishes, here is the last step to open it:';
-            $guideSteps   = [];
-        }
-        // Append the Windows launch step as the final numbered step.
-        if (!empty($windowsLaunchStep)) {
-            $guideSteps[] = $windowsLaunchStep;
-        }
-        ?>
-        <?php if ($guideSteps): ?>
-        <div class="download-guides" id="downloadGuides" data-browser="<?php echo htmlspecialchars($browserKey); ?>" style="--step-count: <?php echo count($guideSteps); ?>;" hidden>
-            <div class="smartscreen-guide">
-                <div class="smartscreen-guide-header">
-                    <div class="smartscreen-status">
-                        <?= svg_icon('check', 16) ?>
-                        <span>Your download is starting</span>
-                    </div>
-                    <h2><?php echo htmlspecialchars($guideHeading); ?></h2>
-                    <p><?php echo htmlspecialchars($guideIntro); ?></p>
-                </div>
-                <ol class="smartscreen-steps" style="--step-count: <?php echo count($guideSteps); ?>;">
-                    <?php foreach ($guideSteps as $i => $step): ?>
-                    <li class="smartscreen-step">
-                        <?php if (count($guideSteps) > 1): ?>
-                        <div class="smartscreen-step-number"><?php echo $i + 1; ?></div>
-                        <?php endif; ?>
-                        <p class="smartscreen-step-title"><?php echo htmlspecialchars($step['title']); ?></p>
-                        <?php if (!empty($step['image'])): ?>
-                        <div class="smartscreen-step-image">
-                            <img src="<?php echo htmlspecialchars($step['image']); ?>" alt="<?php echo htmlspecialchars($step['alt'] ?? ''); ?>" loading="lazy">
-                        </div>
-                        <?php endif; ?>
-                    </li>
-                    <?php endforeach; ?>
-                </ol>
+        <?php include __DIR__ . '/../resources/smartscreen-guide/guide.php'; ?>
+
+        <!-- What you get after installing. Sits between the download buttons and the
+             requirements because this is where the "should I run an unknown installer"
+             hesitation lands, and the page had nothing but text to answer it. -->
+        <div class="preview-section">
+            <img class="preview-image"
+                 src="../resources/images/laptop-coffee-800.webp"
+                 srcset="../resources/images/laptop-coffee-800.webp 800w, ../resources/images/laptop-coffee-1200.webp 1200w, ../resources/images/laptop-coffee-1600.webp 1600w"
+                 sizes="(max-width: 900px) 100vw, 560px"
+                 width="1200" height="900"
+                 alt="Argo Books running on a laptop, showing the dashboard with total revenue, expenses, outstanding invoices and recent transactions"
+                 loading="lazy" decoding="async">
+            <div class="preview-copy">
+                <h2>What you get</h2>
+                <p>Argo Books opens straight onto your dashboard: revenue, expenses, profit and everything still outstanding, in one place. There is no account to create and no trial clock. Install it, open it, and your books stay on your computer.</p>
             </div>
         </div>
-        <?php endif; ?>
 
         <!-- System Requirements -->
         <div class="requirements-section">
@@ -451,6 +373,64 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 }
             });
         });
+
+        // macOS waitlist signup ("notify me when the Mac version ships")
+        (function () {
+            const form = document.getElementById('macWaitlistForm');
+            const success = document.getElementById('macWaitlistSuccess');
+            const note = document.getElementById('macWaitlistNote');
+            if (!form || !success || !note) return;
+            const defaultNote = note.textContent;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const emailInput = form.querySelector('.waitlist-email');
+                const submitBtn = form.querySelector('.waitlist-submit');
+                const email = (emailInput.value || '').trim();
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    note.textContent = 'Please enter a valid email address.';
+                    note.classList.add('waitlist-note-error');
+                    emailInput.focus();
+                    return;
+                }
+                note.textContent = defaultNote;
+                note.classList.remove('waitlist-note-error');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Adding…';
+
+                fetch('../api/waitlist/subscribe.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        email: email,
+                        platform: 'macos',
+                        website: form.querySelector('.waitlist-hp').value || ''
+                    })
+                }).then(function (res) {
+                    return res.json().catch(function () { return {}; }).then(function (data) {
+                        return { ok: res.ok, data: data };
+                    });
+                }).then(function (r) {
+                    if (r.ok && r.data.success) {
+                        form.hidden = true;
+                        success.hidden = false;
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'mac_waitlist_signup', { 'event_category': 'software' });
+                        }
+                    } else {
+                        note.textContent = (r.data && r.data.error) || 'Something went wrong. Please try again.';
+                        note.classList.add('waitlist-note-error');
+                    }
+                }).catch(function () {
+                    note.textContent = 'Something went wrong. Please try again.';
+                    note.classList.add('waitlist-note-error');
+                }).finally(function () {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Notify me';
+                });
+            });
+        })();
 
         // Linux installation instructions modal
         const installModal = document.getElementById('linuxInstallModal');

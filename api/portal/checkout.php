@@ -38,7 +38,6 @@ if (!empty($missing)) {
     send_error_response(400, 'Missing required fields: ' . implode(', ', $missing), 'MISSING_FIELDS');
 }
 
-// Get invoice data
 $invoice = get_invoice_by_token($data['invoice_token']);
 if (!$invoice) {
     send_error_response(404, 'Invoice not found.', 'NOT_FOUND');
@@ -279,7 +278,6 @@ function process_square_payment(array $invoice, array $company, array $data, int
         if (isset($paymentResult['payment']) && $paymentResult['payment']['status'] === 'COMPLETED') {
             $payment = $paymentResult['payment'];
 
-            // Record the payment
             $result = record_portal_payment([
                 'company_id' => $invoice['company_id'],
                 'invoice_id' => $invoice['invoice_id'],

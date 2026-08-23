@@ -3,7 +3,7 @@
 //
 // "Email me my results" — sends the summary + the cleaned .xlsx attached
 // (Option A: nothing stored; the spreadsheet is generated at send time). All
-// transactional mail goes through Resend via the SMTP relay (create_smtp_mailer),
+// transactional mail goes through Resend via the SMTP relay (argo_send_html_email),
 // falling back to mail() only when SMTP isn't configured.
 
 header('Content-Type: application/json; charset=utf-8');
@@ -74,24 +74,11 @@ $xlsx = pa_write_xlsx(pa_build_workbook($normalized));
 $xlsxName = 'cleaned-' . date('Y-m-d') . '.xlsx';
 $xlsxMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-try {
-    $mailer = create_smtp_mailer();
-    if ($mailer) {
-        $mailer->addAddress($email);
-        $mailer->Subject = $subject;
-        $mailer->Body = $html;
-        $mailer->addStringAttachment($xlsx, $xlsxName, 'base64', $xlsxMime);
-        $mailer->send();
-    } else {
-        // Fallback: HTML email via mail() (no attachment in this path).
-        $headers = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n"
-            . "From: Argo Books <noreply@argorobots.com>\r\n";
-        if (!@mail($email, $subject, $html, $headers)) {
-            throw new RuntimeException('mail() failed');
-        }
-    }
-} catch (Throwable $e) {
-    error_log('profit-analyzer email failed: ' . $e->getMessage());
+$sent = argo_send_html_email($email, $subject, $html, [
+    'attachments' => [['data' => $xlsx, 'name' => $xlsxName, 'mime' => $xlsxMime]],
+]);
+if (!$sent['success']) {
+    error_log('profit-analyzer email failed: ' . ($sent['error'] ?? 'unknown'));
     pae_fail(500, "We couldn't send the email just now. Please try again.");
 }
 

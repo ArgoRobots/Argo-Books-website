@@ -1,11 +1,32 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
+require_once __DIR__ . '/../../partials/feature-demo.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
-require_once __DIR__ . '/../../resources/components/feature-video.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
-$argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limit'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'Can customers pay invoices online through Argo Books?',
+        'a' => 'Yes. Every invoice includes a secure online payment link so your customers can pay by credit card with a single click. Argo Books supports Stripe, Square, and PayPal. You choose which payment gateway works best for your business. Payments are tracked automatically, so you always know which invoices are outstanding and which have been paid.',
+    ],
+    [
+        'q' => 'Can I customize how my invoices look?',
+        'a' => 'Yes. Invoices are sent via professional email templates that include your company logo, billing details, and itemized line items. You can choose from multiple templates and customize the content to match your brand. Every invoice looks polished and professional, with no design skills required.',
+    ],
+    [
+        'q' => 'How does invoice tracking work?',
+        'a' => 'Argo Books tracks every invoice from draft to paid with color-coded status badges so you can see where things stand at a glance. Summary cards on the invoicing dashboard show your outstanding, paid, and overdue totals in real time. You\'ll never have to wonder whether a client has paid. It\'s all right there.',
+    ],
+    [
+        'q' => 'How many invoices can I send per month?',
+        'a' => 'The Free plan includes <?= $argo_free_invoice_limit ?> invoices per month, which is plenty for most small businesses and freelancers getting started. If you need unlimited invoicing, the Premium plan removes all limits so you can send as many invoices as your business requires.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,15 +38,12 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking that help you get paid faster.">
-    <meta name="keywords"
-        content="invoice software, invoice generator, professional invoicing, small business invoicing, invoice templates, online invoice payments, invoice tracking, send invoices, payment reminders, invoice management">
+    <meta name="description" content="Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking that help you get paid faster.">
+    <meta name="keywords" content="invoice software, invoice generator, professional invoicing, small business invoicing, invoice templates, online invoice payments, invoice tracking, send invoices, payment reminders, invoice management">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Invoicing | Argo Books">
-    <meta property="og:description"
-        content="Create professional invoices with Argo Books. Customizable templates, payment tracking, and online payment links that help you get paid faster.">
+    <meta property="og:description" content="Create professional invoices with Argo Books. Customizable templates, payment tracking, and online payment links that help you get paid faster.">
     <meta property="og:url" content="https://argorobots.com/features/invoicing/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -37,8 +55,7 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Invoicing | Argo Books">
-    <meta name="twitter:description"
-        content="Create professional invoices with Argo Books. Customizable templates, payment tracking, and online payment links that help you get paid faster.">
+    <meta name="twitter:description" content="Create professional invoices with Argo Books. Customizable templates, payment tracking, and online payment links that help you get paid faster.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -49,59 +66,10 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <link rel="canonical" href="https://argorobots.com/features/invoicing/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "Invoicing", "item": "https://argorobots.com/features/invoicing/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Invoicing" => "/features/invoicing/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "Can customers pay invoices online through Argo Books?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Every invoice includes a secure online payment link so your customers can pay by credit card with a single click. Argo Books supports Stripe, Square, and PayPal. You choose which payment gateway works best for your business. Payments are tracked automatically, so you always know which invoices are outstanding and which have been paid."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I customize how my invoices look?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Invoices are sent via professional email templates that include your company logo, billing details, and itemized line items. You can choose from multiple templates and customize the content to match your brand. Every invoice looks polished and professional, with no design skills required."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How does invoice tracking work?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books tracks every invoice from draft to paid with color-coded status badges so you can see where things stand at a glance. Summary cards on the invoicing dashboard show your outstanding, paid, and overdue totals in real time. You'll never have to wonder whether a client has paid. It's all right there."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How many invoices can I send per month?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "The Free plan includes <?= $argo_free_invoice_limit ?> invoices per month, which is plenty for most small businesses and freelancers getting started. If you need unlimited invoicing, the Premium plan removes all limits so you can send as many invoices as your business requires."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -110,15 +78,15 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
             "@type": "SoftwareApplication",
             "name": "Argo Books",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows, macOS",
+            "operatingSystem": "Windows, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking.",
-            "featureList": "Professional invoice templates with branding, Online payment links via Stripe and Square, Automatic tax and total calculations, Real-time payment status tracking"
+            "description": "Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking that help you get paid faster.",
+            "featureList": "Invoice creation and templates, Online payment collection, Payment reminders, Invoice status tracking"
         }
     </script>
 
@@ -126,12 +94,20 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <title>Invoicing | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
+    <!-- Mockup animations, shared with the landing and comparison pages. -->
+    <script src="../../resources/scripts/feature-tour.js" defer></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+    <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -141,449 +117,234 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">Create professional invoices and get paid faster</h1>
-            <p class="hero-subtitle animate-fade-in">Build polished invoices in seconds with customizable templates, automatic calculations, and built-in online payments. Track every invoice from draft to paid, with no chasing required.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>Send it today.<br>Get paid this week.</h1>
+                    <p class="fp-hero-sub">Build an invoice in a couple of minutes, send it with a payment link attached, and watch it move from sent to paid without chasing anyone by email.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and your invoices stay on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="invoices">
+                    <?= argo_feature_demo('invoices') ?>
+                </div>
             </div>
         </div>
     </section>
 
-    <?php feature_video_section('cTQaejF6Gh0', 'Argo Books Invoicing demo'); ?>
+    <!-- =============================================
+         HOW IT WORKS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, about two minutes</h2>
+                <p class="fp-lede">The gap between finishing the work and getting paid is mostly admin. This removes the admin.</p>
+            </div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
+                    <h3>Fill in the work</h3>
+                    <p>Pick the customer, add line items, and let the totals and tax work themselves out. Saved details fill most of it in for you.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>Choose how it looks</h3>
+                    <p>Swap the template and the accent colour to something that matches your business, then preview exactly what your customer will open.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Send it with a payment link</h3>
+                    <p>The invoice goes out with a link to pay by card. You see the status change the moment they do.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
+         PRODUCT BLOCK
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Unprofessional invoices cost you money and credibility</h2>
-                    <p>Sending invoices as Word documents or plain emails doesn't just look bad, it slows down payments. Clients lose track of loose attachments, there's no easy way for them to pay online, and you end up chasing payments manually. Argo Books gives you a complete invoicing system with professional templates and built-in payment collection, so you look polished and get paid on time.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Professional invoice templates with your company branding</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Built-in online payments, customers pay in seconds</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Real-time status tracking from draft to sent to paid</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">After you send</div>
+                    <h2 class="fp-h2">Know what is paid, and what is not</h2>
+                    <p class="fp-lede">Every invoice carries a status: draft, sent, viewed, paid, overdue. The dashboard totals what is outstanding so you can see at a glance who owes you and for how long, and send a reminder without writing the email yourself.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Outstanding and overdue totals on one screen</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Automatic payment reminders on the schedule you set</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Card payments through Stripe, PayPal or Square</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/invoice-dashboard.svg" alt="Argo Books invoice dashboard showing invoice list with status tracking, customer details, and financial summary cards" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Start sending professional invoices today</h3>
-                <p>Download Argo Books and create your first invoice in under two minutes. No credit card required.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/invoice-dashboard.svg"
+                         alt="The Argo Books invoice dashboard showing outstanding, paid and overdue totals with a list of recent invoices"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>1 minute</h3>
-                    <p>To create and send a complete invoice</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Send your first invoice in about two minutes</h2>
+                <p>No account, no credit card, and no setup before you can bill someone.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when invoicing is not a chore</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('clock', 20) ?></div>
+                    <h3>Billing stops slipping to the weekend</h3>
+                    <p>When an invoice takes two minutes instead of half an hour, it goes out the day the work finishes rather than whenever you get around to it.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Online payments</h3>
-                    <p>Customers pay online with any card</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('credit-card', 20) ?></div>
+                    <h3>Paying you takes one click</h3>
+                    <p>A payment link in the invoice removes the step where your customer means to pay you and then forgets for three weeks.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>Real-time</h3>
-                    <p>Invoice status tracking and payment alerts</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('bell', 20) ?></div>
+                    <h3>Reminders you do not have to write</h3>
+                    <p>Overdue invoices chase themselves on the schedule you set, so you are not the one sending the awkward email.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>The numbers match your books</h3>
+                    <p>A paid invoice becomes revenue in your records automatically, so what you billed and what you banked stay in step.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: Creating Invoices
-         Image left, text right (reversed)
+         PRIVACY
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Create Invoices</span>
-                    <h2>Build invoices in seconds, not hours</h2>
-                    <p>Select a customer, add your products or services, set quantities and prices, and Argo Books handles the rest. Subtotals, tax calculations, and totals update in real time as you type.</p>
-                    <p>Click send, and it's done. Argo Books handles the rest.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Real-time subtotal, tax, and total calculations as you add items</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Multiple customizable professional templates</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Customers can pay online with their preferred payment method</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/invoice-create-form.svg" alt="Argo Books create invoice form showing customer selection, line items, automatic calculations, and template options" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS, 3 Steps
+         WHO IT'S FOR
          ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to getting paid</h2>
-                <p class="section-desc">From blank invoice to money in your account. No accounting knowledge needed. Argo Books handles the details.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <h3>Build your invoice</h3>
-                    <p>Select a customer and your products or services, set quantities and prices.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>Bill by project or by hour, and see which clients pay on time and which ones need a reminder.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>Preview and send</h3>
-                    <p>Preview your invoice as the customer will see it. The invoice includes your branding 
-                        and an online payment link. Send it by email with one click.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Trades and services</h3>
+                    <p>Quote, invoice and collect from the same record, without a separate app for each step.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Get paid online</h3>
-                    <p>Your customer receives the invoice with a secure payment link. They pay, and you see the status update to "Paid" in real time.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and wholesale</h3>
+                    <p>Invoice trade customers on terms while retail sales settle immediately.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop chasing payments</h3>
-                <p>Built-in online payment links mean your customers can pay the moment they open the invoice. Get started with Argo Books in minutes.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('document', 19) ?> Anyone with a slow payer</h3>
+                    <p>Overdue totals and automatic reminders make the follow-up routine instead of personal.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Professional Preview
-         Text left, image right
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Professional Templates</span>
-                    <h2>Invoices your clients will take seriously</h2>
-                    <p>Every invoice is rendered as a clean, professional document with your company name, customer billing details, line items, and a clear total. The layout is designed to look
-                    great with your branding front and center.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Branded invoice header with your company name and logo</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Full billing details: address, email, invoice number, and dates</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Itemized line-item table with quantities, prices, and amounts</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Clear due date so customers know exactly when to pay</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/invoice-preview.svg" alt="Argo Books invoice preview showing a professional invoice document with branded header, billing details, line items, and totals" loading="lazy">
-                </div>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 4: Online Payments
-         Image left, text right (reversed)
+         RELATED
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Online Payments</span>
-                    <h2>Let customers pay with a single click</h2>
-                    <p>Every invoice includes a secure online payment link powered by Stripe or Square. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a bank card form. No account creation, no extra steps, just enter card details and pay.</p>
-                    <p>Payments are processed securely, and the invoice status updates to "Paid" in Argo Books automatically. You get notified when the payment is received, and the transaction is recorded. No more back-and-forth about e-transfers or check deposits.</p>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/invoice-payment.svg" alt="Argo Books online invoice payment page showing a secure Stripe-powered credit card form with invoice details and pay button" loading="lazy">
-                </div>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">What invoicing connects to</h2>
             </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 5: Invoice Management
-         Text left, image right
-         ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Invoice Management</span>
-                    <h2>Track every invoice from draft to paid</h2>
-                    <p>The invoices dashboard gives you a complete view of every invoice you've ever sent. See all invoices in a sortable, searchable table.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Search and filter by customer, date, amount, or status</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Resend invoices or record manual payments</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/invoice-dashboard.svg" alt="Argo Books invoice management dashboard showing sortable invoice table with status badges and summary statistics" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
-         ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just sending invoices</h2>
-                <p class="section-desc">Professional invoicing in Argo Books isn't just about sending a bill. It's about getting paid faster and keeping your financial records accurate.</p>
-            </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Get paid faster</h3>
-                    <p>Built-in online payment links let customers pay the moment they open your invoice. No waiting for checks, no chasing e-transfers. Payments go straight into your account.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>Look professional</h3>
-                    <p>Clean, branded invoice templates show your clients you're a serious business. Professional invoices build trust and credibility.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('clock', 22) ?>
-                    </div>
-                    <h3>Save hours every month</h3>
-                    <p>Stop building invoices in spreadsheets or Word. Auto-populated customers, products, and calculations mean you spend seconds per invoice instead of minutes.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Track payment status</h3>
-                    <p>Know which invoices are paid, pending, or overdue at a glance. Summary cards and color-coded badges give you a real-time overview.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Secure payment processing</h3>
-                    <p>Online payments are processed through Stripe, PayPal, and Square: the same payment platforms used by millions of businesses worldwide.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Automatic revenue recording</h3>
-                    <p>When an invoice is paid, the transaction is automatically recorded. No double entry, no missed payments. Your books stay accurate.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Get paid on time, every time</h3>
-                <p>Join small business owners who stopped chasing payments and started getting paid automatically with Argo Books.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         USE CASES SECTION
-         ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for every business that sends invoices</h2>
-                <p class="section-desc">Whether you bill hourly, per project, or per product, Argo Books invoicing adapts to your workflow.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Freelancers &amp; consultants
-                    </h3>
-                    <p>Bill clients per project or per hour. Create invoices from your service catalog, add custom line items, and include payment links so clients pay instantly when the work is done.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Retail &amp; e-commerce
-                    </h3>
-                    <p>Invoice customers for the products they ordered. Pull items directly from your inventory and let Argo Books calculate quantities, prices, and tax.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Service businesses
-                    </h3>
-                    <p>Invoice for completed jobs, maintenance contracts, and recurring services. Track which invoices are paid and which are overdue to keep your cash flow healthy.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('document', 22) ?>
-                        Property &amp; rental management
-                    </h3>
-                    <p>Send rent invoices and lease-related charges to tenants. Online payment links make it easy for tenants to pay on time, and you can track payment history per property.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Invoicing is even more powerful when combined with these features.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense &amp; Revenue Tracking</h3>
-                    <p>Paid invoices automatically become revenue records. Your books stay accurate without manual double-entry. Every payment flows into your financial picture.</p>
+            <div class="fp-related fp-reveal">
+                <a href="../customer-management/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('users', 20) ?></div>
+                    <h3>Customer management</h3>
+                    <p>Contacts, purchase history and balances, so a new invoice starts half filled in.</p>
                 </a>
-                <a href="../customer-management/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('users', 22) ?>
-                    </div>
-                    <h3>Customer Management</h3>
-                    <p>Invoice creation pulls customer details directly from your customer profiles. Everything stays up to date.</p>
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>Paid invoices land in your revenue records without a second entry.</p>
                 </a>
-                <a href="../predictive-analytics/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>Your invoice data feeds ML-powered forecasting. See predicted revenue, profits, and cash flow trends based on your invoicing history.</p>
+                <a href="../report-builder/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('report', 20) ?></div>
+                    <h3>Report builder</h3>
+                    <p>Turn what you have billed into statements you can hand to an accountant.</p>
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Guides</span>
-                <h2 class="section-title">Related guides</h2>
-                <p class="section-desc">Go deeper with these step-by-step guides.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../../how-to-invoice-clients/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>How to invoice clients</h3>
-                    <p>A step-by-step guide to billing clients and getting paid faster.</p>
-                </a>
-                <a href="../../what-to-include-on-an-invoice/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>What to include on an invoice</h3>
-                    <p>The fields every invoice needs so you get paid without back-and-forth.</p>
-                </a>
-                <a href="../../invoice-numbering-best-practices/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Invoice numbering best practices</h3>
-                    <p>How to number invoices cleanly for your records and your accountant.</p>
+                <a href="../../invoice-generator/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document', 20) ?></div>
+                    <h3>Free invoice generator</h3>
+                    <p>Make a one-off invoice in your browser without installing anything.</p>
                 </a>
             </div>
         </div>
@@ -591,23 +352,21 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to send your first invoice?</h2>
-                    <p>Download Argo Books and start invoicing in minutes. Free to get started, with no credit card and no trial period.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Stop waiting to get paid</h2>
+                <p>Download Argo Books and send your first invoice today. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -618,23 +377,22 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

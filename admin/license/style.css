@@ -20,6 +20,18 @@ table th {
     font-weight: 500;
     color: var(--admin-text);
 }
+/* Label paired with the shared .info-tip button (common-style.css). The tip sits
+   outside the <label> on purpose: nested inside, clicking it would forward the
+   click to the field and pop the select open. */
+.label-with-tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+.label-with-tip label {
+    margin-bottom: 0;
+}
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 10px 12px;
@@ -46,8 +58,8 @@ table th {
     color: var(--green-800);
 }
 .badge-free {
-    background: var(--violet-100);
-    color: var(--purple-600);
+    background: var(--sky-100);
+    color: var(--sky-700);
 }
 .badge-redeemed {
     background: var(--blue-100);
@@ -73,16 +85,16 @@ table th {
     background: var(--gray-bg-light);
     color: var(--admin-text);
 }
-.btn-purple {
-    background: var(--purple-500);
+.btn-premium {
+    background: var(--premium-500);
     color: var(--white);
     border: none;
 }
-.btn-purple:hover {
-    background: var(--purple-600);
+.btn-premium:hover {
+    background: var(--premium-600);
 }
-.btn-purple:disabled {
-    background: var(--purple-300);
+.btn-premium:disabled {
+    background: var(--premium-300);
     cursor: not-allowed;
 }
 .btn-secondary {

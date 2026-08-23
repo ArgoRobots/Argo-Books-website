@@ -69,23 +69,25 @@
     background: var(--red-50);
 }
 
-.btn-purple {
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+/* Premium subscription actions (subscribe, resubscribe, manage billing).
+   Renamed from .btn-purple when Premium moved to the blue brand ramp. */
+.btn-premium {
+    background: var(--premium-500);
     color: var(--white);
 }
 
-.btn-purple:hover {
-    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
+.btn-premium:hover {
+    background: var(--premium-600);
 }
 
-.btn-outline-purple {
+.btn-outline-premium {
     background: var(--white);
-    color: var(--purple-600);
-    border: 2px solid var(--purple-600);
+    color: var(--premium-600);
+    border: 2px solid var(--premium-600);
 }
 
-.btn-outline-purple:hover {
-    background: var(--purple-50);
+.btn-outline-premium:hover {
+    background: var(--premium-50);
 }
 
 .btn-black {

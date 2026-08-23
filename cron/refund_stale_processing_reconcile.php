@@ -108,7 +108,6 @@ foreach ($rows as $r) {
     }
 }
 
-echo "Reconciled $reconciled of " . count($rows) . " stuck-processing rows\n";
 cron_metric_incr('refunds_reconciled', $reconciled);
 cron_run_finish($pdo, $runId, 'ok');
 

@@ -19,7 +19,6 @@ if (($_ENV['APP_ENV'] ?? '') === 'production') {
 
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../cron/lib/outreach_helpers.php';
-require_once __DIR__ . '/../../cron/lib/ab_helpers.php';
 
 global $pdo;
 

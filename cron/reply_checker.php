@@ -38,7 +38,6 @@ if (!is_dir(__DIR__ . '/logs')) {
 }
 $lockFp = fopen($lockFile, 'c');
 if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
-    echo "Reply checker already running. Exiting.\n";
     exit(0);
 }
 
@@ -54,10 +53,6 @@ function logReply($message, $type = 'INFO')
         mkdir(__DIR__ . '/logs', 0755, true);
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-
-    if (!isset($_SERVER['HTTP_HOST'])) {
-        echo $logEntry;
-    }
 }
 
 // ─── Main ───

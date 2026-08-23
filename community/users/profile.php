@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../community_functions.php';
 require_once __DIR__ . '/user_functions.php';
+require_once __DIR__ . '/../affiliate/affiliate_functions.php';
 
 require_once __DIR__ . '/../../resources/icons.php';
 
@@ -19,6 +20,9 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 $is_logged_in = isset($_SESSION['user_id']);
+// Only surface the affiliate link once the user has actually applied. Newcomers
+// discover the program through /affiliates/, not this button.
+$has_applied_affiliate = get_affiliate_for_user((int) $_SESSION['user_id'], current_environment()) !== null;
 $requested_username = isset($_GET['username']) ? trim($_GET['username']) : '';
 $is_own_profile = false;
 $user = null;
@@ -596,10 +600,12 @@ if ($user) {
                                     <?= svg_icon('mail', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Email Preferences
                                 </a>
-                                <a href="../affiliate/" class="btn btn-blue">
-                                    <?= svg_icon('dollar', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
-                                    Affiliate Program
-                                </a>
+                                <?php if ($has_applied_affiliate): ?>
+                                    <a href="../affiliate/" class="btn btn-blue">
+                                        <?= svg_icon('dollar', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                                        Affiliate Program
+                                    </a>
+                                <?php endif; ?>
                                 <a href="logout.php" class="btn btn-gray">Log Out</a>
                             <?php endif; ?>
                         </div>

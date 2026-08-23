@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Predictive Analytics';
-$pageDescription = 'See the future of your business with machine learning forecasting, seasonal pattern detection, and inventory predictions.';
+$pageDescription = 'Forecast revenue, expenses and profit, spot anomalies in your books, and get seasonal patterns and recommendations, all calculated on your own device.';
 $currentPage = 'predictive-analytics';
 $pageCategory = 'features';
 
@@ -11,19 +11,26 @@ include __DIR__ . '/../../docs-header.php';
         <div class="docs-content">
             <div class="info-box">
                 <p><strong>Premium Feature:</strong> Predictive Analytics is available with the Premium plan.
-                <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
+                    <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>See the future of your business with machine learning (ML) forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions. All analysis happens locally on your device. Your data is never uploaded to the cloud - the ML models run entirely on your computer.</p>
+            <p>The Insights page, under Main in the sidebar, analyzes your historical data to forecast where your business is heading, flag anything unusual, and suggest what to act on. All analysis happens locally on your device. Your data is never uploaded to the cloud, the models run entirely on your computer.</p>
 
             <img src="../../../resources/images/insights.webp" alt="Predictive Analytics Insights" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
-            <h2>Revenue Forecasting</h2>
-            <p>Our predictive engine analyzes your historical data to forecast:</p>
+            <h2>Forecasting</h2>
+            <p>The forecast covers the period you select and projects:</p>
             <ul>
-                <li><strong>Growth</strong> Expected revenue, expenses, and profits for the selected time frame</li>
-                <li><strong>Product Demand:</strong> Which products will sell best</li>
-                <li><strong>Peak Periods:</strong> Your best and worst performing times</li>
+                <li><strong>Revenue</strong> and its growth rate against the current period</li>
+                <li><strong>Expenses</strong> and their growth rate</li>
+                <li><strong>Profit</strong>, and the margin that implies</li>
+                <li><strong>New customers</strong> expected over the period</li>
+            </ul>
+            <p>Every figure comes with a range rather than a single number, and you can switch the whole forecast between three scenarios:</p>
+            <ul>
+                <li><strong>Conservative:</strong> the low end of the range</li>
+                <li><strong>Baseline:</strong> the most likely outcome</li>
+                <li><strong>Optimistic:</strong> the high end of the range</li>
             </ul>
 
             <h2>How Forecasting Works</h2>
@@ -35,19 +42,30 @@ include __DIR__ . '/../../docs-header.php';
             </ol>
 
             <div class="info-box">
-                <p><strong>Note:</strong> Forecasts become more accurate with more historical data. We recommend at least 3 months of transaction history for reliable predictions.</p>
+                <p><strong>Note:</strong> Insights need at least five recorded transactions before they will run at all, and they get considerably more useful with more history. Several months of data is a reasonable target for a forecast you would actually plan around.</p>
             </div>
 
-            <h2>Seasonal Pattern Detection</h2>
-            <p>The system automatically identifies seasonal trends in your business:</p>
+            <h2>Prediction Accuracy</h2>
+            <p>Each forecast carries a confidence level based on how consistent your history is:</p>
             <ul>
-                <li><strong>Holiday Patterns:</strong> Revenue spikes around holidays</li>
-                <li><strong>Weekly Cycles:</strong> Which days perform best</li>
-                <li><strong>Monthly Trends:</strong> Beginning vs end of month patterns</li>
-                <li><strong>Year-over-Year:</strong> Compare performance across years</li>
+                <li><strong>High Confidence:</strong> Strong historical patterns support this forecast</li>
+                <li><strong>Medium Confidence:</strong> Some uncertainty in the prediction</li>
+                <li><strong>Low Confidence:</strong> Limited data or unusual patterns detected</li>
+            </ul>
+            <p>You can also open past predictions to see how previous forecasts compared against what actually happened, which is the honest way to judge whether to trust the current one.</p>
+
+            <h2>Anomaly Detection</h2>
+            <p>Argo Books watches for things that look out of line with your own history and surfaces them so nothing quietly slips past:</p>
+            <ul>
+                <li><strong>Unusual expense spike:</strong> spending well above your normal pattern</li>
+                <li><strong>Unusual revenue drop:</strong> income noticeably below what the period would suggest</li>
+                <li><strong>Unusually large transaction:</strong> a single entry far outside your typical size</li>
+                <li><strong>Return rate above normal:</strong> more coming back than usual</li>
+                <li><strong>Inventory depletion alert:</strong> stock heading for zero at your current rate of sale</li>
             </ul>
 
-            <h2>Using Seasonal Insights</h2>
+            <h2>Seasonal Patterns</h2>
+            <p>The system looks for repeating cycles in your revenue and reports what it finds, including how strong the pattern is and over what cycle length, whether that is yearly, semi-annual or quarterly. When there is no strong cycle, it falls back to identifying the month that consistently outperforms your average.</p>
             <p>Seasonal patterns help you:</p>
             <ul>
                 <li>Plan inventory levels for peak seasons</li>
@@ -56,21 +74,14 @@ include __DIR__ . '/../../docs-header.php';
                 <li>Set realistic revenue targets</li>
             </ul>
 
-            <h2>Inventory Predictions</h2>
-            <p>Get ahead of stockouts with intelligent inventory forecasting:</p>
+            <h2>Recommendations</h2>
+            <p>Alongside the forecast, Argo Books highlights things worth acting on:</p>
             <ul>
-                <li><strong>Depletion Dates:</strong> When each product will run out</li>
-                <li><strong>Reorder Timing:</strong> When to place orders with suppliers</li>
-                <li><strong>Quantity Suggestions:</strong> How much to order</li>
-                <li><strong>Seasonal Adjustments:</strong> Stock up before busy periods</li>
-            </ul>
-
-            <h2>Prediction Accuracy</h2>
-            <p>The system shows confidence levels for each prediction:</p>
-            <ul>
-                <li><strong>High Confidence:</strong> Strong historical patterns support this forecast</li>
-                <li><strong>Medium Confidence:</strong> Some uncertainty in the prediction</li>
-                <li><strong>Low Confidence:</strong> Limited data or unusual patterns detected</li>
+                <li><strong>Top performing product:</strong> what is actually carrying your revenue</li>
+                <li><strong>Customer retention opportunity:</strong> customers who have gone quiet</li>
+                <li><strong>Payment collection needed:</strong> money you are owed and have not chased</li>
+                <li><strong>Supplier concentration risk:</strong> too much of your buying with one vendor</li>
+                <li><strong>Revenue concentration risk:</strong> too much of your income from one customer</li>
             </ul>
 
             <div class="warning-box">

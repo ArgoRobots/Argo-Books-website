@@ -30,8 +30,8 @@ h1 {
 }
 
 .checkout-form h2 {
-  margin-bottom: 20px;
-  text-align: center;
+  margin-bottom: 24px;
+  font-size: 20px;
 }
 
 .form-group {
@@ -71,31 +71,40 @@ h1 {
   box-shadow: 0 6px 12px var(--shadow-lg);
 }
 
+/* Plain priced list rather than a tinted, bordered card. A receipt reads as a
+   receipt: quiet rows, one hairline rule above the total. */
 .order-summary {
-  background: var(--gray-50);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .order-summary h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--black);
 }
 
 .order-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--gray-200);
+  gap: 16px;
+  padding: 7px 0;
+  font-size: 15px;
+  color: var(--black);
 }
 
 .order-total {
   display: flex;
   justify-content: space-between;
-  padding-top: 15px;
-  font-weight: 600;
-  font-size: 18px;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--gray-200);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--black);
 }
 
 #stripe-submit-btn,
@@ -178,24 +187,112 @@ h1 {
   margin: 0 auto 15px;
 }
 
-/* Premium-specific overrides */
-.ai-order-summary {
-  border: 2px solid var(--purple-500);
+/* Billing cycle switcher. Lets someone change their mind at checkout without
+   a round-trip back to /pricing/. Each option is a plain link that reloads
+   with a new ?billing=, so the server stays the single source of truth for
+   the price, fee, and totals shown below it. */
+.cycle-switcher {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--gray-100);
+  border-radius: 10px;
+  margin-bottom: 24px;
 }
 
-.subscription-notice {
-  background: var(--sky-50);
-  border: 1px solid var(--sky-500);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
+.cycle-switcher-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 7px;
   text-align: center;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cycle-switcher-btn.active {
+  background: var(--white);
+  color: var(--premium-600);
+  box-shadow: 0 2px 8px var(--shadow-default);
+}
+
+/* Payment method picker. Options are links rather than in-place form swaps
+   so that only one provider SDK is ever initialised per document. */
+.method-picker {
+  margin-bottom: 24px;
+}
+
+/* Matches the order summary's label so the two sections read as one column. */
+.method-picker h3 {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--black);
+}
+
+.payment-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 520px) {
+  .payment-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Logo only: each SVG is the provider's wordmark, so a "Pay with Stripe"
+   caption underneath would just repeat it. The accessible name comes from
+   aria-label on the link. */
+.payment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 14px 12px;
+  background: var(--white);
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.payment-btn:hover {
+  border-color: var(--gray-500);
+}
+
+.payment-btn.is-selected {
+  border-color: var(--premium-500);
+  box-shadow: inset 0 0 0 1px var(--premium-500);
+}
+
+.payment-btn img {
+  max-width: 100%;
+  max-height: 24px;
+  object-fit: contain;
+}
+
+.payment-btn .Square {
+  max-height: 18px;
+}
+
+/* Billing terms. Fine print, not an alert: it confirms what the buyer already
+   agreed to, so it sits quietly under the total instead of in a tinted box. */
+.subscription-notice {
+  margin-bottom: 28px;
 }
 
 .subscription-notice p {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--sky-700);
+  margin: 0 0 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--black);
 }
 
 .subscription-notice p:last-child {
@@ -203,9 +300,9 @@ h1 {
 }
 
 .ai-checkout-btn {
-  background: linear-gradient(135deg, var(--purple-500), var(--purple-600)) !important;
+  background: var(--premium-500) !important;
 }
 
 .ai-checkout-btn:hover {
-  background: linear-gradient(135deg, var(--purple-600), var(--purple-700)) !important;
+  background: var(--premium-600) !important;
 }

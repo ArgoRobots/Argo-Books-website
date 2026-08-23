@@ -39,7 +39,6 @@ include __DIR__ . '/../../docs-header.php';
                 <ul>
                     <li>Employees</li>
                     <li>Locations</li>
-                    <li>Departments</li>
                     <li>Rental Inventory</li>
                     <li>Rental Records</li>
                     <li>Recurring Invoices</li>
@@ -48,6 +47,12 @@ include __DIR__ . '/../../docs-header.php';
                     <li>Returns</li>
                     <li>Lost / Damaged Items</li>
                 </ul>
+            </div>
+
+            <p>Invoices and purchase orders can also carry their line items on a separate sheet, which is detected and linked to the parent records automatically.</p>
+
+            <div class="info-box">
+                <strong>Note:</strong> Pay run history is export only. An approved pay run's figures are frozen so a stub reprinted next year still matches the one the employee was handed, so a Pay Runs sheet is recognised and skipped rather than imported.
             </div>
 
             <h2>Column Mapping</h2>

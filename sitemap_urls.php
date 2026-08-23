@@ -57,6 +57,7 @@ function sitemap_build_urls(): array
         ['/features/',       'features/index.php',       '0.9', 'monthly'],
         ['/pricing/',        'pricing/index.php',        '0.9', 'monthly'],
         ['/documentation/',  'documentation/index.php',  '0.9', 'weekly'],
+        ['/integrations/',   'integrations/index.php',   '0.9', 'monthly'],
         ['/about-us/',       'about-us/index.php',       '0.9', 'monthly'],
         ['/who-its-for/',    'who-its-for/index.php',    '0.8', 'monthly'],
         ['/contact-us/',     'contact-us/index.php',     '0.8', 'monthly'],
@@ -75,6 +76,7 @@ function sitemap_build_urls(): array
     $clusters = [
         ['glob' => 'features/*/index.php', 'prefix' => '/features/',  'priority' => '0.8'],
         ['glob' => 'compare/*/index.php',  'prefix' => '/compare/',   'priority' => '0.8'],
+        ['glob' => 'integrations/*/index.php', 'prefix' => '/integrations/', 'priority' => '0.8'],
     ];
     foreach ($clusters as $cluster) {
         foreach (glob($root . '/' . $cluster['glob']) as $file) {
@@ -87,6 +89,17 @@ function sitemap_build_urls(): array
     foreach (glob($root . '/for-*/index.php') as $file) {
         $slug = basename(dirname($file));
         sitemap_add_url($urls, site_url('/' . $slug . '/'), $file, '0.8', 'monthly');
+    }
+
+    // --- Documentation sub-pages ---
+    // Served directly as .php under their category folder. Only /documentation/
+    // itself was listed before, so none of the individual guides were in the
+    // sitemap or reaching IndexNow. Adding a page to documentation/pages/ now
+    // needs no sitemap edit.
+    foreach (glob($root . '/documentation/pages/*/*.php') as $file) {
+        $category = basename(dirname($file));
+        $slug     = basename($file, '.php');
+        sitemap_add_url($urls, site_url('/documentation/pages/' . $category . '/' . $slug . '.php'), $file, '0.6', 'monthly');
     }
 
     // --- Legal pages (served as .php, change rarely) ---
@@ -106,6 +119,32 @@ function sitemap_build_urls(): array
             ? site_url('/free-invoice-generator/')
             : site_url('/free-invoice-generator/' . $urlSlug . '/');
         sitemap_add_url($urls, $loc, $file, $urlSlug === 'generic' ? '0.9' : '0.8', 'monthly');
+    }
+
+    // --- Free tools hub + the standalone calculators / generators it links to ---
+    // Curated rather than globbed: these live at the site root alongside
+    // non-tool directories, so there is no glob that catches them all.
+    $toolPages = [
+        ['/tools/',                          'tools/index.php',                          '0.9', 'monthly'],
+        ['/etsy-fee-calculator/',            'etsy-fee-calculator/index.php',            '0.9', 'monthly'],
+        ['/self-employed-tax-calculator/',   'self-employed-tax-calculator/index.php',   '0.9', 'monthly'],
+        ['/craft-pricing-calculator/',       'craft-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/estimate-generator/',             'estimate-generator/index.php',             '0.9', 'monthly'],
+        ['/purchase-order-generator/',       'purchase-order-generator/index.php',       '0.9', 'monthly'],
+        ['/free-receipt-scanner/',           'free-receipt-scanner/index.php',           '0.9', 'monthly'],
+        ['/candle-pricing-calculator/',     'candle-pricing-calculator/index.php',     '0.9', 'monthly'],
+        ['/soap-pricing-calculator/',       'soap-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/tumbler-pricing-calculator/',    'tumbler-pricing-calculator/index.php',    '0.9', 'monthly'],
+        ['/cake-pricing-calculator/',       'cake-pricing-calculator/index.php',       '0.9', 'monthly'],
+        ['/craft-fair-calculator/',         'craft-fair-calculator/index.php',         '0.9', 'monthly'],
+        ['/hourly-rate-calculator/',        'hourly-rate-calculator/index.php',        '0.9', 'monthly'],
+        ['/mileage-deduction-calculator/',  'mileage-deduction-calculator/index.php',  '0.9', 'monthly'],
+        ['/late-fee-calculator/',           'late-fee-calculator/index.php',           '0.9', 'monthly'],
+        ['/markup-margin-calculator/',      'markup-margin-calculator/index.php',      '0.9', 'monthly'],
+        ['/break-even-calculator/',         'break-even-calculator/index.php',         '0.9', 'monthly'],
+    ];
+    foreach ($toolPages as [$path, $file, $priority, $changefreq]) {
+        sitemap_add_url($urls, site_url($path), $root . '/' . $file, $priority, $changefreq);
     }
 
     // --- Free profit analyzer tool ---

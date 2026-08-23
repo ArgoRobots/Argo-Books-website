@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmDelete = document.getElementById("confirm-delete");
   const cancelDelete = document.getElementById("cancel-delete");
 
-  // Show message in modal
   function showModalMessage(message, isSuccess = false) {
     // Remove any existing message
     const existingMessage = deleteModal.querySelector(".modal-message");
@@ -12,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
       existingMessage.remove();
     }
 
-    // Create new message element
     const messageDiv = document.createElement("div");
     messageDiv.className = `modal-message ${
       isSuccess ? "success-message" : "error-message"
@@ -64,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 1000);
   }
 
-  // Show delete modal function
   window.showDeleteModal = function () {
     if (deleteModal) {
       deleteModal.style.display = "flex";

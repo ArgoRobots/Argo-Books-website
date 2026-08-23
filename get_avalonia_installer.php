@@ -92,24 +92,6 @@ function findInstaller(string $version, string $platform): ?array
 }
 
 /**
- * Compute an 8-char HMAC token for the given visitor_id. The token is
- * embedded in the served installer filename so the desktop app can pass
- * it back on first-run, letting us join "ad click -> install" without
- * sending PII through the filename.
- *
- * Token verification on the API side re-hashes recent visitor_ids and
- * compares, so this is one-way.
- */
-function computeInstallerToken(string $visitor_id): string
-{
-    $secret = $_ENV['REFERRAL_TOKEN_SECRET'] ?? '';
-    if ($secret === '') {
-        return '';
-    }
-    return substr(hash_hmac('sha256', $visitor_id, $secret), 0, 8);
-}
-
-/**
  * Serves a file for download and exits.
  */
 function serveFile(array $installer): void
@@ -126,12 +108,14 @@ function serveFile(array $installer): void
     ]);
 
     // Embed the visitor token into the served filename so the installer can
-    // extract it during install. Falls back to the plain filename if the
-    // visitor has no cookie or no secret is configured.
+    // extract it during install, letting us join "ad click -> install" without
+    // sending PII through the filename (verification on the API side re-hashes
+    // recent visitor_ids and compares, so this is one-way). Falls back to the
+    // plain filename if the visitor has no cookie or no secret is configured.
     $served_filename = $installer['filename'];
     $visitor_id = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
     if ($visitor_id && preg_match('/^[0-9a-f-]{36}$/i', $visitor_id)) {
-        $token = computeInstallerToken($visitor_id);
+        $token = referral_install_token($visitor_id);
         if ($token !== '') {
             $ext_pos = strrpos($served_filename, '.');
             if ($ext_pos !== false) {
@@ -169,6 +153,17 @@ function serveFile(array $installer): void
 
 $requestedVersion  = $_GET['version']  ?? null;
 $requestedPlatform = $_GET['platform'] ?? null;
+
+// Optional ?source= from direct-download links on the paid landing pages
+// (e.g. /download/avalonia/win?source=paid-lp-contractors). First-touch only,
+// same rule as track_referral_visit() in statistics.php: an existing session
+// source (set on the original landing) always wins, this is just the fallback
+// for visitors whose session was lost between landing and download.
+if (!isset($_SESSION['referral_source'])
+    && !empty($_GET['source'])
+    && preg_match('/^[a-zA-Z0-9_-]{1,50}$/', $_GET['source'])) {
+    $_SESSION['referral_source'] = $_GET['source'];
+}
 
 // Platform is required
 if (!$requestedPlatform || !isset($platformPatterns[$requestedPlatform])) {

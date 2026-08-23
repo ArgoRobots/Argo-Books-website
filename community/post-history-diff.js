@@ -229,7 +229,6 @@ function calculateSimilarity(str1, str2) {
  * @param {Element} nextEntry - The older version
  */
 function compareMetadataFields(currentEntry, nextEntry) {
-  // Get all metadata fields in the current entry
   const currentMetadataFields = currentEntry.querySelectorAll(
     ".metadata-field-value"
   );

@@ -13,7 +13,7 @@ $canonical_url = 'https://argorobots.com/invoice-generator/';
 // tests (no $_SERVER['REMOTE_ADDR'], no real visitor).
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php';
-    track_page_view('invgen_tool');
+    defer_client_page_view('invgen_tool');
 }
 
 // Referral source baked into every conversion-pitch CTA inside _fragment.php.

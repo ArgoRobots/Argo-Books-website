@@ -1,9 +1,32 @@
 <?php
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
+require_once __DIR__ . '/../../partials/schema.php';
+require_once __DIR__ . '/../../partials/faq.php';
+require_once __DIR__ . '/../../partials/feature-demo.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+
+// One array drives both the visible accordion and the FAQPage schema.
+$faqs = [
+    [
+        'q' => 'How accurate are the revenue forecasts?',
+        'a' => 'Argo Books achieves an average of 88% forecast accuracy in backtesting. Every prediction includes a confidence score so you know exactly how reliable it is. The more data Argo Books has to work with, the more accurate forecasts become over time.',
+    ],
+    [
+        'q' => 'Do I need technical skills to use predictive analytics?',
+        'a' => 'Not at all. The analytics engine runs automatically in the background with zero configuration. No formulas, no spreadsheets, no data science degree required. Just use Argo Books normally and forecasts are generated from your real business data. Results are presented in clear, visual charts that anyone can understand.',
+    ],
+    [
+        'q' => 'Can Argo Books detect seasonal patterns in my business?',
+        'a' => 'Yes. Argo Books automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast. This means your projections account for predictable fluctuations like holiday rushes or slow summer months, giving you a more realistic picture of what\'s ahead.',
+    ],
+    [
+        'q' => 'Is predictive analytics included in the Free plan?',
+        'a' => 'Basic real-time analytics are included in the Free plan. Predictive analytics, including revenue forecasting, trend detection, and confidence scoring, is a Premium feature. It\'s one of the most powerful reasons to upgrade, especially for businesses that want to plan ahead with data-driven insights.',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,15 +38,12 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <meta name="description"
-        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
-    <meta name="keywords"
-        content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, ML business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
+    <meta name="description" content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
+    <meta name="keywords" content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, ML business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Predictive Analytics | Argo Books">
-    <meta property="og:description"
-        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
+    <meta property="og:description" content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta property="og:url" content="https://argorobots.com/features/predictive-analytics/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -35,8 +55,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Predictive Analytics | Argo Books">
-    <meta name="twitter:description"
-        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
+    <meta name="twitter:description" content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -47,59 +66,10 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <link rel="canonical" href="https://argorobots.com/features/predictive-analytics/">
 
     <!-- Breadcrumb Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "Predictive Analytics", "item": "https://argorobots.com/features/predictive-analytics/"}
-            ]
-        }
-    </script>
+    <script type="application/ld+json"><?= argo_breadcrumb_schema(["Home" => "/", "Features" => "/features/", "Predictive Analytics" => "/features/predictive-analytics/"]) ?></script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "How accurate are the revenue forecasts?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books achieves an average of 88% forecast accuracy in backtesting. Every prediction includes a confidence score so you know exactly how reliable it is. The more data Argo Books has to work with, the more accurate forecasts become over time."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Do I need technical skills to use predictive analytics?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Not at all. The analytics engine runs automatically in the background with zero configuration. No formulas, no spreadsheets, no data science degree required. Just use Argo Books normally and forecasts are generated from your real business data. Results are presented in clear, visual charts that anyone can understand."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can Argo Books detect seasonal patterns in my business?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Argo Books automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast. This means your projections account for predictable fluctuations like holiday rushes or slow summer months, giving you a more realistic picture of what's ahead."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is predictive analytics included in the Free plan?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Basic real-time analytics are included in the Free plan. Predictive analytics, including revenue forecasting, trend detection, and confidence scoring, is a Premium feature. It's one of the most powerful reasons to upgrade, especially for businesses that want to plan ahead with data-driven insights."
-                    }
-                }
-            ]
-        }
-    </script>
+    <!-- FAQ Schema, built from the same array as the accordion further down -->
+    <script type="application/ld+json"><?= argo_faq_schema($faqs) ?></script>
 
     <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
@@ -108,7 +78,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
             "@type": "SoftwareApplication",
             "name": "Argo Books",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows, macOS",
+            "operatingSystem": "Windows, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "0",
@@ -116,7 +86,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.",
-            "featureList": "AI-powered revenue and expense forecasting, Seasonal pattern detection, Accuracy tracking with confidence scores, Plain-language business insights"
+            "featureList": "Cash flow forecasting, Revenue and expense projections, Confidence ranges, Trend analysis"
         }
     </script>
 
@@ -124,12 +94,20 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <title>Predictive Analytics | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
+    <!-- Mockup animations, shared with the landing and comparison pages. -->
+    <script src="../../resources/scripts/feature-tour.js" defer></script>
 
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+    <link rel="stylesheet" href="../../resources/styles/typography.css">
+    <link rel="stylesheet" href="../../resources/styles/feature-tour.css">
+    <link rel="stylesheet" href="../feature-page.css">
 </head>
 
 <body>
@@ -139,531 +117,234 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <main>
 
     <!-- =============================================
-         HERO SECTION
+         HERO
          ============================================= -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="hero-gradient-orb hero-orb-1"></div>
-            <div class="hero-gradient-orb hero-orb-2"></div>
-        </div>
-        <div class="container">
-            <h1 class="animate-fade-in">See what's coming before it happens</h1>
-            <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions, automatically.</p>
-            <div class="hero-ctas animate-fade-in">
-                <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                    <span>Get Started Free</span>
-                    <?= svg_icon('arrow-right', 18) ?>
-                </a>
-                <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                    <span>View Pricing</span>
-                </a>
+    <section class="fp-hero hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="fp-wrap">
+            <div class="fp-hero-grid">
+                <div>
+                    <h1>See next month<br>before it arrives.</h1>
+                    <p class="fp-hero-sub">Argo Books reads the history already in your books and projects where revenue, expenses and cash are heading, with an honest range around the estimate.</p>
+                    <div class="fp-hero-act">
+                        <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                            <span>Download free</span>
+                            <?= svg_icon('arrow-right', 17) ?>
+                        </a>
+                        <a href="../../pricing/" class="fp-textlink">See pricing</a>
+                    </div>
+                    <p class="fp-hero-facts">Free plan, no credit card, and the analysis runs on your own computer.</p>
+                </div>
+
+                <div class="fp-hero-demo" data-feature-demo="predictive">
+                    <?= argo_feature_demo('predictive') ?>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
+         HOW IT WORKS
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">The Problem</span>
-                    <h2>Most small businesses are flying blind on finances</h2>
-                    <p>You know what happened last month. But do you know what's coming next month? Most small business owners make financial decisions based on gut feeling, not data. Argo Books changes that by using machine learning to forecast your future revenue, expenses, and profit, based on your actual business data.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Forecast next month's revenue, expenses, and profit automatically</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Detect seasonal patterns in your business cycle</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Get actionable insights, not just charts and numbers</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No data science skills needed. Argo Books handles everything</span>
-                        </li>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">How it works</div>
+                <h2 class="fp-h2">Three steps, and it keeps itself current</h2>
+                <p class="fp-lede">A forecast is only useful if it is built from what actually happened. This one is, and it updates as the month goes on.</p>
+            </div>
+            <div class="fp-steps fp-reveal">
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 1</div>
+                    <h3>Keep recording as normal</h3>
+                    <p>Invoices, expenses and payments are all the input the forecast needs. There is nothing extra to fill in.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 2</div>
+                    <h3>It finds the pattern</h3>
+                    <p>Seasonality, growth and recurring costs are picked out of your own history rather than an industry average.</p>
+                </div>
+                <div class="fp-step">
+                    <div class="fp-step-n">Step 3</div>
+                    <h3>Read the range, not just the line</h3>
+                    <p>Every projection comes with a confidence band, so you can see how sure it is before you spend against it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         PRODUCT BLOCK
+         ============================================= -->
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Honest numbers</div>
+                    <h2 class="fp-h2">A forecast that admits what it does not know</h2>
+                    <p class="fp-lede">A single confident line is easy to draw and easy to be wrong about. Argo Books shows the projection inside a band that widens the further out it looks, so a quiet month reads as a risk rather than a surprise.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Projections built from your own transaction history</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Confidence range that widens with distance</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Revenue, expenses and net cash flow each projected</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-dashboard.svg" alt="Argo Books predictive analytics dashboard showing forecasted revenue, expenses, and profit with trend chart" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 1 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>See what's coming, with Premium</h3>
-                <p>Predictive analytics is included in Argo Books Premium for $<?= $argo_monthly ?>/month. Download for free, add your data, and upgrade whenever you're ready to forecast.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
-                        <span>See Pricing</span>
-                    </a>
+                <div class="fp-split-media">
+                    <img src="../../resources/images/features/analytics-dashboard.svg"
+                         alt="The Argo Books analytics dashboard showing a cash flow forecast with a confidence band around the projection"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         STATS BANNER
+         The page's one mid-page CTA.
          ============================================= -->
-    <section class="highlight-banner">
-        <div class="container">
-            <div class="highlight-grid animate-on-scroll">
-                <div class="highlight-item">
-                    <h3>88%</h3>
-                    <p>Average forecast accuracy in backtesting</p>
+    <section class="fp-midcta">
+        <div class="fp-wrap fp-midcta-in">
+            <div>
+                <h2>Find out where the next quarter is heading</h2>
+                <p>No account, no credit card, and no data science required.</p>
+            </div>
+            <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                <span>Download free</span>
+                <?= svg_icon('arrow-right', 17) ?>
+            </a>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS
+         ============================================= -->
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Why it matters</div>
+                <h2 class="fp-h2">What changes when you can see ahead</h2>
+            </div>
+            <div class="fp-benefits fp-reveal">
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('trending-up', 20) ?></div>
+                    <h3>Slow months stop being surprises</h3>
+                    <p>A dip you can see coming six weeks out is a planning problem. The same dip discovered on the day is a cash problem.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>9</h3>
-                    <p>Insights per analysis cycle</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>You can time the big spends</h3>
+                    <p>Knowing what cash looks like in eight weeks is the difference between buying the equipment now and buying it after the quiet season.</p>
                 </div>
-                <div class="highlight-item">
-                    <h3>0</h3>
-                    <p>Configuration required. Works out of the box</p>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('bolt', 20) ?></div>
+                    <h3>The picture updates as you work</h3>
+                    <p>Every transaction you record sharpens the projection, so it is never based on last quarter alone.</p>
+                </div>
+                <div class="fp-benefit">
+                    <div class="fp-benefit-ic"><?= svg_icon('check', 20, '', 2.4) ?></div>
+                    <h3>No guessing at the inputs</h3>
+                    <p>It reads your real invoices and expenses, so the forecast reflects your business rather than a generic template.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: How the ML works
-         Image left, text right (reversed)
+         PRIVACY
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Under the Hood</span>
-                    <h2>Machine learning that adapts to your business</h2>
-                    <p>Our forecasting system uses multiple ML algorithms to predict future revenue, expenses, and customer growth. It continuously tests predictions against actual outcomes and adapts its methods based on what works best for your specific business.</p>
-                    <p>The system doesn't just look at averages. It detects whether your business is growing, stable, or declining. It identifies seasonal cycles, like higher sales in December or slower months in summer, and factors these patterns into every forecast.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Multiple ML algorithms for seasonal forecasting</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Automatic trend detection: growing, stable, or declining</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Bi-monthly and seasonal cycle detection built in</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Confidence scores on every prediction so you know how reliable it is</span>
-                        </li>
+    <section class="fp-section" style="background: var(--gray-50)">
+        <div class="fp-wrap">
+            <div class="fp-split fp-split-flip fp-reveal">
+                <div class="fp-split-text">
+                    <div class="fp-eyebrow">Privacy</div>
+                    <h2 class="fp-h2">Your books stay on your computer</h2>
+                    <p class="fp-lede">Argo Books is a desktop application, not a cloud service holding your finances on someone else's server. Your records are written to your own machine, and you can back them up or move them like any other file.</p>
+                    <ul class="fp-list">
+                        <li><?= svg_icon('check', 17) ?><span>Records and documents stored locally</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>No third-party cloud storage of your financial data</span></li>
+                        <li><?= svg_icon('check', 17) ?><span>Your data moves and backs up like any other file</span></li>
                     </ul>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-ml-engine.svg" alt="How predictions work: seasonal pattern detection, trend analysis, adaptive model selection, and confidence scoring" loading="lazy">
+                <div class="fp-split-media">
+                    <img src="../../resources/images/privacy-local-storage.svg"
+                         alt="The Argo Books folder open on a local disk, showing receipts, invoices and the database file stored on this computer"
+                         loading="lazy" width="600" height="500">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS, 3 Steps
+         WHO IT'S FOR
          ============================================= -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">From raw data to actionable forecasts</h2>
-                <p class="section-desc">No setup, no configuration, no data science degree required. Just use Argo Books normally and the analytics engine works in the background.</p>
+    <section class="fp-section-tight">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Who it's for</div>
+                <h2 class="fp-h2">Built for the way you actually work</h2>
             </div>
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <h3>Use Argo Books normally</h3>
-                    <p>Record your data as you normally would. The more data you have, the better the forecasts become.</p>
+            <div class="fp-who fp-reveal">
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('calendar', 19) ?> Seasonal businesses</h3>
+                    <p>See the quiet stretch coming while there is still time to do something about it.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <h3>ML analyzes your patterns</h3>
-                    <p>The analytics engine processes your historical data, detects trends and seasonal patterns, and builds forecasting models tuned to your business.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('users', 19) ?> Freelancers</h3>
+                    <p>Spot the gap between projects before it becomes an empty month.</p>
                 </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <h3>Get forecasts and insights</h3>
-                    <p>View next-month predictions for revenue, expenses, and profit. Get business insights, anomaly alerts, and growth opportunities.</p>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('package', 19) ?> Retail and e-commerce</h3>
+                    <p>Plan stock and cash around what demand has actually done, not what you hope it does.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 2 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop guessing about next month</h3>
-                <p>Let Argo Books forecast your revenue, flag anomalies, and surface opportunities you'd otherwise miss.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Get Started Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
+                <div class="fp-who-item">
+                    <h3><?= svg_icon('wrench', 19) ?> Growing businesses</h3>
+                    <p>Decide whether the next hire or the next van is affordable before committing.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Business Insights
-         Text left, image right
+         FAQ. Accordion and schema both come from $faqs.
          ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Smart Insights</span>
-                    <h2>Insights that actually help</h2>
-                    <p>Predictive analytics in Argo Books doesn't just show you charts. It generates plain-language business insights by analyzing your data across multiple dimensions: revenue trends, expense patterns, anomalies, and growth opportunities.</p>
-                    <p>Every insight comes with a specific recommendation. If revenue is growing, it tells you to investigate which products drove it. If return rates spike, it flags the affected products. If a seasonal peak is approaching, it suggests preparing inventory and marketing in advance.</p>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-insights.svg" alt="Argo Books business insights panel showing revenue trends, anomaly detection, and opportunities" loading="lazy">
-                </div>
+    <section class="fp-faq">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Questions</div>
+                <h2 class="fp-h2">Before you download</h2>
             </div>
+            <?= argo_faq_grid($faqs) ?>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 4: Accuracy Tracking
-         Image left, text right (reversed)
+         RELATED
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Accuracy You Can Verify</span>
-                    <h2>Every prediction is tested against reality</h2>
-                    <p>Most forecasting tools give you a number and ask you to trust it. Argo Books shows you exactly how accurate its predictions have been, so you can decide how much weight to give each forecast.</p>
-                    <p>The system tracks every past prediction and compares it to what actually happened. You can see the forecast vs. actual revenue and expenses for each month, along with the accuracy. Over time, the model improves as it learns from its own performance.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Backtesting validates predictions against historical data</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Confidence scores tell you how reliable each prediction is</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Model adapts over time. Accuracy improves as more data comes in</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-accuracy.svg" alt="Past predictions accuracy table showing forecast vs actual results with 88% overall accuracy" loading="lazy">
-                </div>
+    <section class="fp-section">
+        <div class="fp-wrap">
+            <div class="fp-head-c fp-reveal">
+                <div class="fp-eyebrow fp-eyebrow-c">Works with</div>
+                <h2 class="fp-h2">What the forecast is built from</h2>
             </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
-         ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just forecasting</h2>
-                <p class="section-desc">Predictive analytics transforms how you plan, budget, and grow your business.</p>
-            </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Plan ahead with confidence</h3>
-                    <p>Know what next month's revenue and expenses are likely to be before the month starts. Make hiring, inventory, and marketing decisions based on data, not gut feeling.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>Catch problems early</h3>
-                    <p>Anomaly detection flags unusual patterns, like a spike in product returns or an unexpected expense increase, before they become bigger issues.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Understand your seasonality</h3>
-                    <p>Automatically detect bi-monthly and seasonal patterns in your business. Know when your peak months are and prepare accordingly: stock up, hire temp staff, or boost marketing.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Zero setup required</h3>
-                    <p>No configuration, no parameters to tune, no data science knowledge needed. The analytics engine works automatically in the background as you use Argo Books normally.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Transparent accuracy</h3>
-                    <p>Every forecast includes a confidence score and historical accuracy data. You can see exactly how reliable the predictions are for your specific business, with no black boxes.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('star', 22) ?>
-                    </div>
-                    <h3>Surface hidden opportunities</h3>
-                    <p>Argo Books identifies high-margin products, customer retention opportunities, and approaching seasonal peaks: insights you'd miss from looking at raw numbers alone.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inline CTA 3 -->
-    <section class="inline-cta">
-        <div class="container">
-            <div class="inline-cta-inner animate-on-scroll">
-                <h3>Make data-driven decisions</h3>
-                <p>Join small business owners who replaced gut-feeling budgeting with Argo Books.</p>
-                <div class="inline-cta-buttons">
-                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                        <span>Download Free</span>
-                        <?= svg_icon('arrow-right', 18) ?>
-                    </a>
-                    <a href="../" class="btn-cta btn-cta-outline">
-                        <span>View All Features</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         USE CASES SECTION
-         ============================================= -->
-    <section class="use-cases-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for business owners who want to plan smarter</h2>
-                <p class="section-desc">Whether you're a solo freelancer or running a growing retail operation, predictive analytics helps you stay ahead.</p>
-            </div>
-            <div class="use-cases-grid">
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Retail &amp; e-commerce
-                    </h3>
-                    <p>Forecast demand to plan inventory purchases. Know when seasonal peaks are coming so you can stock up in advance instead of scrambling. Identify which products have the highest margins and focus your marketing there.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Freelancers &amp; consultants
-                    </h3>
-                    <p>Predict income fluctuations so you can plan for lean months. See revenue trends over time to identify whether your business is growing or plateauing. Make informed decisions about raising rates or taking on new clients.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('calendar', 22) ?>
-                        Service businesses
-                    </h3>
-                    <p>Understand your busy and slow seasons with data, not memory. Forecast expenses to budget for equipment, materials, and subcontractors. Catch expense anomalies before they eat into your profit.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('dollar', 22) ?>
-                        Anyone planning a budget
-                    </h3>
-                    <p>Stop building budgets from scratch every month. Let ML project your expected revenue and expenses, then adjust based on what you know. The forecast gives you a starting point grounded in real data.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         WHAT MAKES IT SMART, 6 capability cards
-         ============================================= -->
-    <section class="benefits-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">What Makes It Smart</span>
-                <h2 class="section-title">Six capabilities working together</h2>
-                <p class="section-desc">Not a single algorithm, but a system of interconnected capabilities that produce accurate, useful forecasts.</p>
-            </div>
-            <div class="benefits-grid">
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon">
-                        <?= svg_icon('calendar', 22) ?>
-                    </div>
-                    <h3>Seasonal pattern detection</h3>
-                    <p>Detects recurring cycles like holiday spikes or summer slowdowns and adjusts forecasts automatically.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon green">
-                        <?= svg_icon('trending-up', 22) ?>
-                    </div>
-                    <h3>Trend analysis</h3>
-                    <p>Factors in whether your business is growing, stable, or declining, so predictions aren't just based on averages.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
-                        <?= svg_icon('circle-check', 22) ?>
-                    </div>
-                    <h3>Accuracy tracking</h3>
-                    <p>Compares past predictions to actual results so you can see how reliable the forecasts are over time.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon amber">
-                        <?= svg_icon('shield', 22) ?>
-                    </div>
-                    <h3>Confidence scoring</h3>
-                    <p>Every prediction includes a confidence percentage so you know when to trust the forecast and when to be cautious.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon cyan">
-                        <?= svg_icon('bolt', 22) ?>
-                    </div>
-                    <h3>Adaptive learning</h3>
-                    <p>Automatically selects the best forecasting model for your data and refines itself as more months come in.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon red">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Forecast range</h3>
-                    <p>Gives you a predicted range (e.g., $12,554 – $18,831) so you can plan for both optimistic and conservative scenarios.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 6: Privacy & Security
-         Image left, text right (reversed)
-         ============================================= -->
-    <section class="feature-detail-section">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your financial data never leaves your computer</h2>
-                    <p>Unlike cloud-based analytics platforms that upload your financial data to third-party servers, Argo Books runs everything on your machine, not on someone else's cloud.</p>
-                    <p>The ML processes your data directly on your computer. No data is sent to external servers for analysis. You get enterprise-grade predictive analytics with the privacy of a desktop application.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>All analytics processing happens locally on your device</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No financial data uploaded to cloud servers for analysis</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Forecasts and insights stored alongside your existing data</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Works offline, generate forecasts without internet</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         RELATED FEATURES
-         ============================================= -->
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Related Features</span>
-                <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">Predictive analytics is even more powerful when combined with these features.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('dollar', 22) ?>
-                    </div>
-                    <h3>Expense & Revenue Tracking</h3>
-                    <p>The more expense and revenue data you track, the more accurate your forecasts become. Every transaction feeds the analytics engine.</p>
+            <div class="fp-related fp-reveal">
+                <a href="../expense-revenue-tracking/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('dollar', 20) ?></div>
+                    <h3>Expense & revenue tracking</h3>
+                    <p>The transaction history every projection is calculated from.</p>
                 </a>
-                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('receipt-scan-detail', 22) ?>
-                    </div>
-                    <h3>Receipt Scanning</h3>
-                    <p>Scan receipts to capture detailed expense data. More granular data means better predictions and more useful anomaly detection.</p>
+                <a href="../invoicing/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('document', 20) ?></div>
+                    <h3>Invoicing</h3>
+                    <p>Outstanding invoices feed expected income into the forecast.</p>
                 </a>
-                <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document-upload', 22) ?>
-                    </div>
-                    <h3>Spreadsheet Import</h3>
-                    <p>Import your full transaction history to give the analytics engine a head start. More historical data means more accurate forecasts from day one.</p>
+                <a href="../report-builder/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('report', 20) ?></div>
+                    <h3>Report builder</h3>
+                    <p>Turn the projection into something you can show a lender or an accountant.</p>
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <section class="related-features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-label">Guides</span>
-                <h2 class="section-title">Related guides</h2>
-                <p class="section-desc">Learn the thinking behind the forecasts.</p>
-            </div>
-            <div class="related-grid">
-                <a href="../../how-to-forecast-cash-flow-small-business/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>How to forecast cash flow</h3>
-                    <p>Build a forecast from your real numbers, without a spreadsheet.</p>
-                </a>
-                <a href="../../how-to-forecast-revenue-small-business/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>How to forecast revenue</h3>
-                    <p>Three simple ways to predict next month's sales.</p>
-                </a>
-                <a href="../../how-to-spot-seasonal-trends-in-your-business/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Spot your seasonal trends</h3>
-                    <p>Find your busy and slow cycles and plan for them.</p>
-                </a>
-                <a href="../../free-cash-flow-forecast-template/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Free cash flow forecast template</h3>
-                    <p>Build a simple template, and know when to outgrow it.</p>
-                </a>
-                <a href="../../cash-flow-forecasting-software/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Cash flow forecasting software</h3>
-                    <p>Native, add-on, or all-in-one: what to look for.</p>
-                </a>
-                <a href="../../predictive-analytics-for-small-business/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Predictive analytics, explained</h3>
-                    <p>Is the "AI" real? How to judge a forecast.</p>
+                <a href="../bank-statement-import/" class="fp-rel-card">
+                    <div class="fp-rel-ic"><?= svg_icon('bank', 20) ?></div>
+                    <h3>Bank statement import</h3>
+                    <p>More history in means a sharper forecast out.</p>
                 </a>
             </div>
         </div>
@@ -671,23 +352,21 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
 
     </main>
 
-    <!-- CTA + Footer Wrapper -->
-    <div class="dark-section-wrapper">
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="cta-card animate-on-scroll">
-                    <h2>Ready to predict your business future?</h2>
-                    <p>Download now and let Argo Books forecast your revenue, flag anomalies, and surface growth opportunities.</p>
-                    <div class="cta-buttons">
-                        <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download for Free</span>
-                            <?= svg_icon('arrow-right', 18) ?>
-                        </a>
-                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
-                            <span>View Pricing</span>
-                        </a>
-                    </div>
+    <!-- Final CTA and footer share one dark block. dark-section-wrapper is what
+         lets the footer's orbs bleed up past the footer's own box. -->
+    <div class="dark-section-wrapper fp-outro">
+        <section class="fp-outro-cta cta-section">
+            <div class="fp-wrap">
+                <h2>Stop running your business on last month</h2>
+                <p>Download Argo Books and see where your numbers are heading. Free plan, no credit card, and your data stays on your own machine.</p>
+                <div class="fp-btns">
+                    <a href="../../downloads/" class="fp-btn fp-btn-primary">
+                        <span>Download free</span>
+                        <?= svg_icon('arrow-right', 17) ?>
+                    </a>
+                    <a href="../../pricing/" class="fp-btn fp-btn-onnavy">
+                        <span>See pricing</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -698,23 +377,22 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+        document.addEventListener('DOMContentLoaded', function () {
+            var targets = document.querySelectorAll('.fp-reveal');
+            if (!('IntersectionObserver' in window) ||
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                targets.forEach(function (el) { el.classList.add('is-in'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            targets.forEach(function (el) { observer.observe(el); });
         });
     </script>
 </body>

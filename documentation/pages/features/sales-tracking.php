@@ -31,7 +31,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Adding a Transaction</h2>
             <ol class="steps-list">
-                <li>Go to "Expenses" or "Revenue" in the navigation menu (under Transactions)</li>
+                <li>Go to "Expenses" (under the Expenses section) or "Revenue" (under the Revenue section) in the navigation menu</li>
                 <li>Click the "Add Expense" or "Add Revenue" button</li>
                 <li>Select a product, enter the quantity and unit price</li>
                 <li>Choose the date, category, and optionally assign a customer or supplier</li>

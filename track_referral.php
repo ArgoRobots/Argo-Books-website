@@ -17,65 +17,9 @@ require_once __DIR__ . '/dev-gate.php';
 
 require_once __DIR__ . '/statistics.php';
 require_once __DIR__ . '/track_referral_event.php';
-
-/**
- * Map of referrer hosts and utm_source values to source codes.
- * Add new entries here to start auto-tracking traffic from additional channels.
- */
-function get_auto_referral_sources()
-{
-    return [
-        // AI chats
-        'chatgpt.com'           => ['code' => 'ai-chatgpt',     'name' => 'ChatGPT'],
-        'chat.openai.com'       => ['code' => 'ai-chatgpt',     'name' => 'ChatGPT'],
-        'chatgpt'               => ['code' => 'ai-chatgpt',     'name' => 'ChatGPT'],
-        'claude.ai'             => ['code' => 'ai-claude',      'name' => 'Claude'],
-        'claude'                => ['code' => 'ai-claude',      'name' => 'Claude'],
-        'perplexity.ai'         => ['code' => 'ai-perplexity',  'name' => 'Perplexity'],
-        'www.perplexity.ai'     => ['code' => 'ai-perplexity',  'name' => 'Perplexity'],
-        'perplexity'            => ['code' => 'ai-perplexity',  'name' => 'Perplexity'],
-        'gemini.google.com'     => ['code' => 'ai-gemini',      'name' => 'Gemini'],
-        'gemini'                => ['code' => 'ai-gemini',      'name' => 'Gemini'],
-        'copilot.microsoft.com' => ['code' => 'ai-copilot',     'name' => 'Microsoft Copilot'],
-        'copilot'               => ['code' => 'ai-copilot',     'name' => 'Microsoft Copilot'],
-        'you.com'               => ['code' => 'ai-you',         'name' => 'You.com'],
-        'phind.com'             => ['code' => 'ai-phind',       'name' => 'Phind'],
-        'poe.com'               => ['code' => 'ai-poe',         'name' => 'Poe'],
-        'meta.ai'               => ['code' => 'ai-meta',        'name' => 'Meta AI'],
-        'duckduckgo.com'        => ['code' => 'ai-duckduckgo',  'name' => 'DuckDuckGo'],
-
-        // Social
-        'reddit.com'            => ['code' => 'social-reddit',      'name' => 'Reddit'],
-        'www.reddit.com'        => ['code' => 'social-reddit',      'name' => 'Reddit'],
-        'old.reddit.com'        => ['code' => 'social-reddit',      'name' => 'Reddit'],
-        'reddit'                => ['code' => 'social-reddit',      'name' => 'Reddit'],
-        'news.ycombinator.com'  => ['code' => 'social-hn',          'name' => 'Hacker News'],
-        'hackernews'            => ['code' => 'social-hn',          'name' => 'Hacker News'],
-        'producthunt.com'       => ['code' => 'social-producthunt', 'name' => 'Product Hunt'],
-        'www.producthunt.com'   => ['code' => 'social-producthunt', 'name' => 'Product Hunt'],
-        'producthunt'           => ['code' => 'social-producthunt', 'name' => 'Product Hunt'],
-        'twitter.com'           => ['code' => 'social-x',           'name' => 'X (Twitter)'],
-        'x.com'                 => ['code' => 'social-x',           'name' => 'X (Twitter)'],
-        't.co'                  => ['code' => 'social-x',           'name' => 'X (Twitter)'],
-        'twitter'               => ['code' => 'social-x',           'name' => 'X (Twitter)'],
-        'linkedin.com'          => ['code' => 'social-linkedin',    'name' => 'LinkedIn'],
-        'www.linkedin.com'      => ['code' => 'social-linkedin',    'name' => 'LinkedIn'],
-        'lnkd.in'               => ['code' => 'social-linkedin',    'name' => 'LinkedIn'],
-        'linkedin'              => ['code' => 'social-linkedin',    'name' => 'LinkedIn'],
-        'facebook.com'          => ['code' => 'social-facebook',    'name' => 'Facebook'],
-        'www.facebook.com'      => ['code' => 'social-facebook',    'name' => 'Facebook'],
-        'm.facebook.com'        => ['code' => 'social-facebook',    'name' => 'Facebook'],
-        'facebook'              => ['code' => 'social-facebook',    'name' => 'Facebook'],
-        'youtube.com'           => ['code' => 'social-youtube',     'name' => 'YouTube'],
-        'www.youtube.com'       => ['code' => 'social-youtube',     'name' => 'YouTube'],
-        'youtu.be'              => ['code' => 'social-youtube',     'name' => 'YouTube'],
-        'youtube'               => ['code' => 'social-youtube',     'name' => 'YouTube'],
-        'instagram.com'         => ['code' => 'social-instagram',   'name' => 'Instagram'],
-        'www.instagram.com'     => ['code' => 'social-instagram',   'name' => 'Instagram'],
-        'tiktok.com'            => ['code' => 'social-tiktok',      'name' => 'TikTok'],
-        'www.tiktok.com'        => ['code' => 'social-tiktok',      'name' => 'TikTok'],
-    ];
-}
+// get_auto_referral_sources() lives in referral_sources.php (shared with the
+// marketing-funnel channel classifier).
+require_once __DIR__ . '/referral_sources.php';
 
 /**
  * Ensure a referral_links row exists for an auto-detected source.
@@ -101,7 +45,7 @@ function ensure_auto_referral_link($source_code, $name)
         $insert->execute([
             $source_code,
             $name,
-            'Auto-detected from referrer',
+            'Auto-detected',
             'https://argorobots.com/'
         ]);
     } catch (PDOException $e) {
@@ -206,14 +150,23 @@ if ($resolved_source === null && !empty($_SERVER['HTTP_REFERER'])) {
 }
 
 if ($resolved_source !== null) {
-    // Auto-register guides-hub and per-article (guide-*) sources so they show
-    // up in the referral admin without manual setup, the same way UTM and
-    // referrer sources self-register. Ad and sponsor sources are still added
-    // by hand so their names and targets stay curated.
+    // Auto-register guides-hub, per-article (guide-*) and invoice-generator
+    // (invgen-*) sources so they show up in the referral admin without manual
+    // setup, the same way UTM and referrer sources self-register. Ad and sponsor
+    // sources are still added by hand so their names and targets stay curated.
+    // Outreach (outreach-*) is intentionally NOT auto-registered: its codes
+    // encode lead id + A/B variant for the outreach dashboard, and there can be
+    // thousands, so it stays in its own admin rather than the referral list.
     if ($resolved_source === 'guides-hub' || strncmp($resolved_source, 'guide-', 6) === 0) {
         $auto_name = $resolved_source === 'guides-hub'
             ? 'Guides hub'
             : 'Guide: ' . ucwords(str_replace('-', ' ', substr($resolved_source, 6)));
+        ensure_auto_referral_link($resolved_source, $auto_name);
+    } elseif (strncmp($resolved_source, 'invgen-', 7) === 0) {
+        $slug = substr($resolved_source, 7);
+        $auto_name = $slug === 'tool'
+            ? 'Invoice generator (tool)'
+            : 'Invoice generator: ' . ucwords(str_replace('-', ' ', $slug));
         ensure_auto_referral_link($resolved_source, $auto_name);
     }
 

@@ -60,15 +60,3 @@ header .header-inner .menu-container .menu .community:after {
 .guidelines-list li {
   margin-bottom: 8px;
 }
-
-.important-note {
-  background-color: var(--amber-100);
-  border: 1px solid var(--amber-500);
-  border-radius: 6px;
-  padding: 15px;
-  margin: 20px 0;
-}
-
-.important-note strong {
-  color: var(--amber-800);
-}

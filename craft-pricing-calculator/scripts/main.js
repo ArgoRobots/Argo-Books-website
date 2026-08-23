@@ -1,14 +1,16 @@
 // craft-pricing-calculator/scripts/main.js
 // Wires the pricing form to the pure calc and renders live. Vanilla ES module.
 //
-// Note: unlike the invoice/tax tools, this calculator is currency-agnostic, so
-// it shows a plain "$" with no ISO code (reusing formatMoney would append
-// "USD", implying a US-only tool, which this isn't).
+// Tier 1 tool (see read-me/Tool page standards.md): the math is the same in any
+// currency, so the picker carries the full supported list. Locales come from
+// window.ARGO_CURRENCY_LOCALES, emitted by index.php from shared/currencies.php.
 
 import { computeCraftPrice } from './calc.js';
+import { currencyFormatter, applyCurrencyAffixes } from '../../shared/scripts/currency-format.js';
 
 const $ = (sel) => document.querySelector(sel);
 const el = {
+  currency: $('[data-cc="currency"]'),
   material: $('[data-cc="material"]'),
   labor: $('[data-cc="labor"]'),
   markup: $('[data-cc="markup"]'),
@@ -18,9 +20,17 @@ const el = {
   margin: $('[data-cc="margin"]'),
 };
 
-const moneyFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-const money = (n) => moneyFmt.format(Number.isFinite(n) ? n : 0);
+let money = (n) => `$${(Number.isFinite(n) ? n : 0).toFixed(2)}`;
 const pct = (rate) => `${Math.round(rate * 100)}%`;
+
+// Rebuild the formatter for the chosen currency and push its symbol into the
+// money input affixes. The :not() skips the percent suffix on the markup field,
+// which is not a currency affix.
+function setCurrency(code) {
+  const fmt = currencyFormatter(code);
+  money = fmt.money;
+  applyCurrencyAffixes(fmt.symbol, '.calc-money', '.calc-money-affix:not(.calc-money-affix-right)');
+}
 
 function render() {
   const r = computeCraftPrice({
@@ -53,31 +63,17 @@ function wirePresets() {
   }
 }
 
-// Collapsible FAQ accordion, matching the invoice-template pages. Reuses the
-// shared .faq-item / .faq-question / .faq-answer styling from tool.css.
-function wireFaq() {
-  const items = document.querySelectorAll('.craft-faqs .faq-item');
-  items.forEach((item) => {
-    const question = item.querySelector('.faq-question');
-    if (!question) return;
-    question.addEventListener('click', () => {
-      const wasActive = item.classList.contains('active');
-      items.forEach((other) => {
-        other.classList.remove('active');
-        const btn = other.querySelector('.faq-question');
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-      });
-      if (!wasActive) {
-        item.classList.add('active');
-        question.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
-}
-
 function init() {
-  wireFaq();
   if (!el.material) return;
+
+  if (el.currency) {
+    setCurrency(el.currency.value);
+    el.currency.addEventListener('change', () => {
+      setCurrency(el.currency.value);
+      render();
+    });
+  }
+
   const form = el.material.closest('form') || document;
   form.addEventListener('input', render);
   wirePresets();

@@ -170,46 +170,15 @@ function record_failed_lookup(string $ip): void
 
 /**
  * Check and enforce rate limiting for payment endpoints.
- * Atomically checks the limit and records the attempt under a single file lock
- * to prevent concurrent requests from bypassing the limit.
+ * Atomically checks the limit and records the attempt in one statement so
+ * concurrent requests can't bypass the limit.
  * Allows 20 payment attempts per IP per 15 minutes.
  * Sends a 429 response and exits if rate limited.
  */
 function enforce_payment_rate_limit(): void
 {
-    $ip = get_client_ip();
-    $maxAttempts = 20;
-    $windowSeconds = 900;
-    $prefix = 'payment';
-
-    // Atomic check + increment under a single lock
-    $result = read_rate_limits_locked($windowSeconds);
-    $rateLimits = $result['rateLimits'];
-    $handle = $result['handle'];
-
-    $key = $prefix . '_' . hash('sha256', $ip);
-    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
-
-    if ($isLimited) {
-        if ($handle) {
-            write_rate_limits_unlock($handle, $rateLimits);
-        }
+    if (check_and_record_rate_limit(get_client_ip(), 20, 900, 'payment')) {
         send_error_response(429, 'Too many payment attempts. Please try again later.', 'RATE_LIMITED');
-    }
-
-    // Record this attempt while still holding the lock
-    $now = time();
-    if (!isset($rateLimits[$key])) {
-        $rateLimits[$key] = [
-            'count' => 1,
-            'first_attempt' => $now
-        ];
-    } else {
-        $rateLimits[$key]['count']++;
-    }
-
-    if ($handle) {
-        write_rate_limits_unlock($handle, $rateLimits);
     }
 }
 
@@ -416,6 +385,38 @@ function record_portal_payment(array $params): array
              WHERE company_id = ? AND invoice_id = ?'
         );
         $stmt->execute([$invoiceAmount, $invoiceAmount, $invoiceAmount, $companyId, $invoiceId]);
+
+        // Tell the merchant. This point is only reachable on a genuine first
+        // insert: the duplicate branch above returns early, and the UNIQUE
+        // index on provider_payment_id means that when the synchronous path
+        // and the provider webhook race the same payment, exactly one of them
+        // gets rowCount() == 1 and arrives here. No extra dedupe needed.
+        //
+        // Hooked inside this helper rather than at the call sites because five
+        // of them funnel through here (process-payment.php, checkout.php, and
+        // the stripe/square/paypal webhooks); editing each one would guarantee
+        // the sixth gets forgotten.
+        //
+        // Refunds carry status 'refunded' so they never enter this block, and
+        // a failure here must never change what this function returns: a dead
+        // SMTP relay cannot be allowed to fail a Stripe webhook, which would
+        // only be retried into the duplicate path anyway.
+        if ($amount > 0) {
+            try {
+                send_owner_payment_notification([
+                    'companyId' => $companyId,
+                    'invoiceId' => $invoiceId,
+                    'amount' => $amount,
+                    'processingFee' => $processingFee,
+                    'currency' => $currency,
+                    'customerName' => $customerName,
+                    'referenceNumber' => $referenceNumber,
+                    'paymentMethod' => $paymentMethod,
+                ]);
+            } catch (\Throwable $e) {
+                error_log('Owner payment notification failed: ' . $e->getMessage());
+            }
+        }
     }
 
     return [
@@ -614,36 +615,147 @@ function send_invoice_notification(array $params): array
         $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
         $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
-        $mailer = create_smtp_mailer();
-        if ($mailer) {
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addAddress($customerEmail, $customerName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->Subject = $subject;
-            $mailer->Body = $html;
-            $mailer->send();
-            return ['success' => true, 'message' => 'Email sent'];
-        }
-
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $fromName . ' <' . $fromEmail . '>',
-            'Reply-To: ' . $fromEmail,
-            'X-Mailer: ArgoBooks/1.0'
-        ];
-
-        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
-        $result = mail($to, $subject, $html, implode("\r\n", $headers));
-
-        if ($result) {
-            return ['success' => true, 'message' => 'Email sent'];
-        } else {
-            error_log('Portal invoice notification: mail() returned false for ' . $customerEmail);
-            return ['success' => false, 'message' => 'mail() returned false'];
-        }
+        $sent = argo_send_html_email($customerEmail, $subject, $html, [
+            'toName' => $customerName,
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'replyTo' => $fromEmail,
+            'replyToName' => $fromName,
+        ]);
+        return $sent['success']
+            ? ['success' => true, 'message' => 'Email sent']
+            : ['success' => false, 'message' => $sent['error'] ?? 'Failed to send email'];
     } catch (\Throwable $e) {
         error_log('Portal invoice notification email failed: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Send an overdue-invoice reminder to a customer. Driven by
+ * cron/portal_invoice_reminders.php on a fixed 3/7/14-day cadence.
+ *
+ * White-label, exactly like send_invoice_notification: the header carries the
+ * merchant's name, never Argo Books. The customer has a relationship with the
+ * merchant, not with us. Amber rather than blue so it is visually distinct
+ * from the original invoice mail in a crowded inbox.
+ *
+ * @param array $params Email parameters:
+ *   - customerEmail, customerName, companyName, invoiceId
+ *   - balanceDue, currency, dueDate, invoiceUrl
+ *   - passProcessingFee: bool, whether the fee is added at checkout
+ *   - stage: 1|2|3, controls the subject line and closing urgency
+ *   - daysOverdue: int, shown as a detail row
+ *   - replyToEmail: optional verified owner address, so "I already paid"
+ *     replies reach the merchant instead of the noreply mailbox
+ * @return array Result with 'success' and 'message'
+ */
+function send_invoice_reminder(array $params): array
+{
+    $customerEmail = $params['customerEmail'] ?? '';
+    $customerName = $params['customerName'] ?? '';
+    $companyName = $params['companyName'] ?? '';
+    $invoiceId = $params['invoiceId'] ?? '';
+    $balanceDue = $params['balanceDue'] ?? 0;
+    $currency = $params['currency'] ?? 'USD';
+    $dueDate = $params['dueDate'] ?? '';
+    $invoiceUrl = $params['invoiceUrl'] ?? '';
+    $stage = (int)($params['stage'] ?? 1);
+    $daysOverdue = (int)($params['daysOverdue'] ?? 0);
+    $replyToEmail = trim((string)($params['replyToEmail'] ?? ''));
+    $passProcessingFee = !array_key_exists('passProcessingFee', $params)
+        ? true
+        : !empty($params['passProcessingFee']);
+
+    if (empty($customerEmail) || empty($invoiceUrl)) {
+        return ['success' => false, 'message' => 'Missing customer email or invoice URL'];
+    }
+
+    // Sanitize inputs against email header injection (strip CRLF and control chars)
+    $customerName = preg_replace('/[\r\n\x00-\x1F]/', '', $customerName);
+    $customerEmail = preg_replace('/[\r\n\x00-\x1F]/', '', $customerEmail);
+    $companyName = preg_replace('/[\r\n\x00-\x1F]/', '', $companyName);
+
+    $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+
+    // Identical fee maths to send_invoice_notification, and it has to stay
+    // identical: if this reminder quotes a different number than the checkout
+    // page actually charges, the customer stops trusting the amount and does
+    // not pay. See the comment on that function for the reasoning.
+    $balanceFloat = floatval($balanceDue);
+    $processingFee = ($passProcessingFee && $balanceFloat > 0)
+        ? floatval(calculate_invoice_processing_fee($balanceFloat, $currency))
+        : 0.0;
+    $headlineAmount = $balanceFloat + $processingFee;
+    $headlineLabel = $processingFee > 0 ? 'Amount to Pay' : 'Amount Due';
+    $formattedAmount = $currencySymbol . number_format($headlineAmount, 2) . ' ' . $currency;
+    $formattedDueDate = $dueDate ? date('F j, Y', strtotime($dueDate)) : '';
+
+    $subjects = [
+        1 => "Reminder: invoice {$invoiceId} from {$companyName} is past due",
+        2 => "Second reminder: invoice {$invoiceId} from {$companyName}",
+        3 => "Final reminder: invoice {$invoiceId} from {$companyName}",
+    ];
+    $subject = $subjects[$stage] ?? $subjects[1];
+
+    $safeCompany = htmlspecialchars($companyName);
+    $detailRows = [
+        ['Invoice', htmlspecialchars($invoiceId), 'padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;'],
+        [$headlineLabel, htmlspecialchars($formattedAmount), 'padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;'],
+    ];
+    if (!empty($formattedDueDate)) {
+        $detailRows[] = ['Due Date', htmlspecialchars($formattedDueDate)];
+    }
+    if ($daysOverdue > 0) {
+        $dayWord = $daysOverdue === 1 ? 'day' : 'days';
+        $detailRows[] = ['Overdue By', htmlspecialchars($daysOverdue . ' ' . $dayWord)];
+    }
+
+    $intro = $stage >= 3
+        ? 'This is a final reminder that the invoice below from <strong>' . $safeCompany . '</strong> is still unpaid.'
+        : 'This is a reminder that the invoice below from <strong>' . $safeCompany . '</strong> is now past due.';
+
+    // The disregard line is the single most important sentence in a dunning
+    // email. The merchant may have recorded a cash payment that has not
+    // reached us yet, and accusing a paying customer of not paying costs far
+    // more than a missed reminder.
+    $closing = 'If you have already paid, please disregard this reminder. '
+        . 'If you have any questions about this invoice, please contact ' . $safeCompany . ' directly.';
+
+    $html = build_portal_email_html([
+        'headerGradient' => 'linear-gradient(135deg, #d97706, #b45309)',
+        'headerTitle' => $companyName,         // escaped by helper
+        'greetingName' => $customerName,       // escaped by helper
+        'introHtml' => $intro,
+        'detailRows' => $detailRows,
+        'ctaButton' => ['url' => $invoiceUrl, 'text' => 'View & Pay Invoice', 'color' => '#d97706'],
+        'closingHtml' => $closing,
+    ]);
+
+    try {
+        $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
+        $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
+
+        // Point replies at the merchant when we have a verified address for
+        // them. A chase email that bounces replies into a noreply mailbox is
+        // worse than not sending it.
+        $replyTo = ($replyToEmail !== '' && filter_var($replyToEmail, FILTER_VALIDATE_EMAIL))
+            ? $replyToEmail
+            : $fromEmail;
+        $replyToName = $replyTo === $fromEmail ? $fromName : $companyName;
+
+        $sent = argo_send_html_email($customerEmail, $subject, $html, [
+            'toName' => $customerName,
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'replyTo' => $replyTo,
+            'replyToName' => $replyToName,
+        ]);
+        return $sent['success']
+            ? ['success' => true, 'message' => 'Email sent']
+            : ['success' => false, 'message' => $sent['error'] ?? 'Failed to send email'];
+    } catch (\Throwable $e) {
+        error_log('Portal invoice reminder email failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
     }
 }
@@ -716,36 +828,123 @@ function send_payment_confirmation(array $params): array
         $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
         $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
-        $mailer = create_smtp_mailer();
-        if ($mailer) {
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addAddress($customerEmail, $customerName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->Subject = $subject;
-            $mailer->Body = $html;
-            $mailer->send();
-            return ['success' => true, 'message' => 'Confirmation email sent'];
-        }
-
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $fromName . ' <' . $fromEmail . '>',
-            'Reply-To: ' . $fromEmail,
-            'X-Mailer: ArgoBooks/1.0'
-        ];
-
-        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
-        $result = mail($to, $subject, $html, implode("\r\n", $headers));
-
-        if ($result) {
-            return ['success' => true, 'message' => 'Confirmation email sent'];
-        } else {
-            error_log('Portal payment confirmation: mail() returned false for ' . $customerEmail);
-            return ['success' => false, 'message' => 'mail() returned false'];
-        }
+        $sent = argo_send_html_email($customerEmail, $subject, $html, [
+            'toName' => $customerName,
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'replyTo' => $fromEmail,
+            'replyToName' => $fromName,
+        ]);
+        return $sent['success']
+            ? ['success' => true, 'message' => 'Email sent']
+            : ['success' => false, 'message' => $sent['error'] ?? 'Failed to send email'];
     } catch (\Throwable $e) {
         error_log('Portal payment confirmation email failed: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Tell the merchant (the Argo Books user) that one of their customers paid.
+ *
+ * Argo-branded rather than white-label: the recipient is an Argo customer, not
+ * their customer, so this uses send_styled_email() with the purple portal
+ * accent instead of build_portal_email_html().
+ *
+ * Three gates, all required:
+ *   - notify_owner_on_payment, the per-company toggle set from Argo Books
+ *   - a syntactically valid owner_email. It is NULL for any company that
+ *     registered without one, which register.php treats as optional, so a
+ *     missing address is a normal state rather than an error
+ *   - email_verified_at, the same bar the refund endpoints enforce. A typo'd
+ *     registration address must never receive someone's revenue data
+ *
+ * @param array $params Keys: companyId, invoiceId, amount, processingFee,
+ *                      currency, customerName, referenceNumber, paymentMethod
+ * @return array Result with 'success' and 'message'
+ */
+function send_owner_payment_notification(array $params): array
+{
+    global $pdo;
+
+    $companyId = (int)($params['companyId'] ?? 0);
+    if ($companyId <= 0) {
+        return ['success' => false, 'message' => 'Missing company id'];
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT company_name, owner_email, email_verified_at, notify_owner_on_payment
+         FROM portal_companies WHERE id = ? LIMIT 1'
+    );
+    $stmt->execute([$companyId]);
+    $company = $stmt->fetch();
+
+    if (!$company) {
+        return ['success' => false, 'message' => 'Company not found'];
+    }
+    if (empty($company['notify_owner_on_payment'])) {
+        return ['success' => false, 'message' => 'Owner notifications disabled'];
+    }
+    if (empty($company['email_verified_at'])) {
+        return ['success' => false, 'message' => 'Owner email not verified'];
+    }
+
+    $ownerEmail = trim((string)($company['owner_email'] ?? ''));
+    if ($ownerEmail === '' || !filter_var($ownerEmail, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'No valid owner email'];
+    }
+
+    // Required here rather than at file scope: every portal page pulls in this
+    // helper, and email_sender.php loads email.css plus the whole styled-email
+    // machinery that only this one function needs.
+    require_once __DIR__ . '/../../email_sender.php';
+
+    $invoiceId = (string)($params['invoiceId'] ?? '');
+    $amount = floatval($params['amount'] ?? 0);
+    $processingFee = floatval($params['processingFee'] ?? 0);
+    $currency = strtoupper((string)($params['currency'] ?? 'USD'));
+    $customerName = (string)($params['customerName'] ?? '');
+    $referenceNumber = (string)($params['referenceNumber'] ?? '');
+    $paymentMethod = (string)($params['paymentMethod'] ?? '');
+
+    $methodLabels = [
+        'stripe' => 'Credit Card (Stripe)',
+        'paypal' => 'PayPal',
+        'square' => 'Credit Card (Square)',
+    ];
+    $methodLabel = $methodLabels[$paymentMethod] ?? ucfirst($paymentMethod);
+
+    $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+    // The invoice is credited with the payment minus the processing fee, the
+    // same split record_portal_payment applies to balance_due. Reporting the
+    // gross here would not match what the owner sees against the invoice.
+    $invoiceAmount = max(0, $amount - $processingFee);
+
+    $amountSafe = htmlspecialchars($currencySymbol . number_format($invoiceAmount, 2) . ' ' . $currency);
+    $invoiceSafe = htmlspecialchars($invoiceId);
+    $customerSafe = $customerName !== '' ? htmlspecialchars($customerName) : 'A customer';
+    $referenceSafe = htmlspecialchars($referenceNumber);
+    $methodSafe = htmlspecialchars($methodLabel);
+
+    $feeLine = '';
+    if ($processingFee > 0) {
+        $feeSafe = htmlspecialchars($currencySymbol . number_format($processingFee, 2));
+        $feeLine = "<p>A processing fee of <strong>$feeSafe</strong> was collected on top of this and is not applied to the invoice balance.</p>";
+    }
+
+    $subject = "Payment received: $amountSafe for invoice $invoiceSafe";
+    $body = <<<HTML
+        <p><strong>$customerSafe</strong> paid <strong>$amountSafe</strong> on invoice <strong>$invoiceSafe</strong>.</p>
+        <p>Paid by $methodSafe. Reference: $referenceSafe.</p>
+        $feeLine
+        <p>This payment will appear in Argo Books the next time it syncs with the payment portal.</p>
+HTML;
+
+    try {
+        send_styled_email($ownerEmail, $subject, $body, 'purple');
+        return ['success' => true, 'message' => 'Email sent'];
+    } catch (\Throwable $e) {
+        error_log('Portal owner payment notification failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
     }
 }

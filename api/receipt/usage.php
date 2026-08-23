@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
 // Accept either license_key (premium) or device_id (free)
@@ -46,72 +45,23 @@ $action = $input['action'];
 // Load database connection and pricing config
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../config/pricing.php';
+require_once __DIR__ . '/scan_quota.php';
 
 /**
  * Determine tier and validate identity.
  * Premium users (license key) get 500 scans/month.
  * Free users (device ID) get the configured free monthly limit.
+ *
+ * Delegates to receipt_scan_quota_identity() so this endpoint and completions.php,
+ * which now spends the quota, always key the same row. This one receives the raw
+ * device id and hashes it; the shared helper takes the hash.
  */
 function validateAndGetTier($pdo, $license_key, $device_id) {
-    $config = get_pricing_config();
-
-    if (!empty($license_key)) {
-        // Check if it's a Premium key (starts with PREM-)
-        if (strpos($license_key, 'PREM-') === 0) {
-            // Look up the key and verify it has been redeemed before granting
-            // the premium scan limit. Without the redeemed_at check, anyone
-            // who obtained an unredeemed promo code (screenshot, support
-            // ticket, etc.) could claim premium quota.
-            $stmt = $pdo->prepare("
-                SELECT subscription_key, subscription_id, redeemed_at
-                FROM premium_subscription_keys
-                WHERE subscription_key = ?
-            ");
-            $stmt->execute([$license_key]);
-            $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($premiumKey && $premiumKey['redeemed_at'] !== null) {
-                // Verify the linked subscription is active and not expired
-                $stmt = $pdo->prepare("
-                    SELECT id FROM premium_subscriptions
-                    WHERE subscription_id = ?
-                    AND status IN ('active', 'cancelled')
-                    AND end_date > NOW()
-                ");
-                $stmt->execute([$premiumKey['subscription_id']]);
-                if ($stmt->fetch()) {
-                    return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
-                }
-            }
-
-            // Fallback: subscription_id may have been used directly as the license key
-            $stmt = $pdo->prepare("
-                SELECT id FROM premium_subscriptions
-                WHERE subscription_id = ?
-                AND status IN ('active', 'cancelled')
-                AND end_date > NOW()
-            ");
-            $stmt->execute([$license_key]);
-            if ($stmt->fetch()) {
-                return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
-            }
-        }
-
-        // Check free license keys table
-        $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
-        $stmt->execute([$license_key]);
-        if ($stmt->fetch()) {
-            return ['tier' => 'free', 'limit' => $config['free_receipt_scan_monthly_limit'], 'identifier' => $license_key];
-        }
-    }
-
-    if (!empty($device_id)) {
-        // Free tier via device ID
-        $identifier = 'device_' . hash('sha256', $device_id);
-        return ['tier' => 'free', 'limit' => $config['free_receipt_scan_monthly_limit'], 'identifier' => $identifier];
-    }
-
-    return null;
+    return receipt_scan_quota_identity(
+        $pdo,
+        (string)$license_key,
+        $device_id !== '' && $device_id !== null ? hash('sha256', $device_id) : null
+    );
 }
 
 /**
@@ -194,7 +144,6 @@ try {
     $monthly_limit = $tierInfo['limit'];
     $identifier = $tierInfo['identifier'];
 
-    // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $scan_count = $usage['scan_count'];
     // Use the limit from the tier info (in case it changed)
@@ -207,38 +156,15 @@ try {
     }
 
     if ($action === 'increment') {
-        // Check if limit reached before incrementing
-        if ($scan_count >= $monthly_limit) {
-            $response = buildResponse($scan_count, $monthly_limit, $tier, false);
-            $response['success'] = false;
-            $response['error'] = 'Monthly scan limit reached';
-            http_response_code(429);
-            echo json_encode($response);
-            exit();
-        }
-
-        // Atomic conditional update so two concurrent requests can't both pass
-        // the read-then-check above and increment past the cap.
-        $usage_month = date('Y-m-01');
-        $stmt = $pdo->prepare("
-            UPDATE receipt_scan_usage
-            SET scan_count = scan_count + 1
-            WHERE license_key = ? AND usage_month = ? AND scan_count < ?
-        ");
-        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
-
-        if ($stmt->rowCount() === 0) {
-            $response = buildResponse($scan_count, $monthly_limit, $tier, false);
-            $response['success'] = false;
-            $response['error'] = 'Monthly scan limit reached';
-            http_response_code(429);
-            echo json_encode($response);
-            exit();
-        }
-
-        // Return updated status
-        $new_scan_count = $scan_count + 1;
-        echo json_encode(buildResponse($new_scan_count, $monthly_limit, $tier));
+        // Deliberately does NOT increment any more. api/ai/completions.php now takes the
+        // scan as part of the request that actually calls Gemini, which is what makes the
+        // limit hold against a client that under-reports or skips this call entirely.
+        //
+        // Kept as an accepted no-op rather than removed, because every installed build
+        // still calls it after each successful scan. Removing it would 400 those clients,
+        // and incrementing here as well would bill every scan twice. Returning the current
+        // status keeps their usage display correct.
+        echo json_encode(buildResponse($scan_count, $monthly_limit, $tier));
         exit();
     }
 

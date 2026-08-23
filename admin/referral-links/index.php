@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../country_names.php';
+// Needed for svg_icon() when an AJAX save renders table rows without the header.
+require_once __DIR__ . '/../../resources/icons.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -18,54 +20,94 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+/**
+ * Send a JSON reply and stop. Used by the create / update / delete handlers
+ * when the form was submitted with fetch() instead of a full page post.
+ */
+function referral_json_response(array $payload)
+{
+    header('Content-Type: application/json');
+    echo json_encode($payload);
+    exit;
+}
+
+// The management-table forms post through fetch() and set ajax=1. Those requests
+// get JSON back (message + freshly rendered table rows) instead of a redirect,
+// so adding or editing a link never reloads the page.
+$is_ajax = ($_SERVER['REQUEST_METHOD'] === 'POST') && (($_POST['ajax'] ?? '') === '1');
+$saved_message = '';
+$saved_category = '';
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF check: every state-mutating POST must include the session token.
     $posted_token = $_POST['csrf_token'] ?? '';
     if (!is_string($posted_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $posted_token)) {
         http_response_code(403);
+        if ($is_ajax) {
+            referral_json_response([
+                'success' => false,
+                'message' => 'Your session has expired. Reload the page and try again.',
+            ]);
+        }
         die('Invalid CSRF token. Reload the page and try again.');
     }
 
-    if (isset($_POST['action'])) {
-        if ($_POST['action'] === 'create') {
-            $source_code = trim($_POST['source_code']);
-            $name = trim($_POST['name']);
-            $description = trim($_POST['description']);
-            $target_url = trim($_POST['target_url']);
+    $action = $_POST['action'] ?? '';
+    if (in_array($action, ['create', 'update', 'delete'], true)) {
+        try {
+            if ($action === 'create') {
+                $source_code = trim($_POST['source_code']);
+                $name = trim($_POST['name']);
+                $description = trim($_POST['description']);
+                $target_url = trim($_POST['target_url']);
 
-            $stmt = $pdo->prepare('INSERT INTO referral_links (source_code, name, description, target_url) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$source_code, $name, $description, $target_url]);
+                $stmt = $pdo->prepare('INSERT INTO referral_links (source_code, name, description, target_url) VALUES (?, ?, ?, ?)');
+                $stmt->execute([$source_code, $name, $description, $target_url]);
 
-            $_SESSION['success_message'] = 'Referral link created successfully!';
-            header('Location: index.php');
-            exit;
-        } elseif ($_POST['action'] === 'update') {
-            $id = (int)$_POST['id'];
-            $name = trim($_POST['name']);
-            $description = trim($_POST['description']);
-            $target_url = trim($_POST['target_url']);
+                $saved_message = 'Referral link created successfully!';
+                $saved_category = referral_category_key($source_code);
+            } elseif ($action === 'update') {
+                $id = (int)$_POST['id'];
+                $name = trim($_POST['name']);
+                $description = trim($_POST['description']);
+                $target_url = trim($_POST['target_url']);
 
-            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ? WHERE id = ?');
-            $stmt->execute([$name, $description, $target_url, $id]);
+                $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ? WHERE id = ?');
+                $stmt->execute([$name, $description, $target_url, $id]);
 
-            $_SESSION['success_message'] = 'Referral link updated successfully!';
-            header('Location: index.php');
-            exit;
-        } elseif ($_POST['action'] === 'delete') {
-            $id = (int)$_POST['id'];
+                $saved_message = 'Referral link updated successfully!';
+                $saved_category = referral_category_key(trim($_POST['source_code'] ?? ''));
+            } else {
+                $id = (int)$_POST['id'];
 
-            $stmt = $pdo->prepare('DELETE FROM referral_links WHERE id = ?');
-            $stmt->execute([$id]);
+                $stmt = $pdo->prepare('DELETE FROM referral_links WHERE id = ?');
+                $stmt->execute([$id]);
 
-            $_SESSION['success_message'] = 'Referral link deleted successfully!';
+                $saved_message = 'Referral link deleted successfully!';
+            }
+        } catch (PDOException $e) {
+            if (!$is_ajax) {
+                throw $e;
+            }
+            // 23000 is the duplicate-key state; the only realistic collision here
+            // is a source code that already exists.
+            $message = $e->getCode() === '23000'
+                ? 'That source code is already in use. Pick a different one.'
+                : 'The referral link could not be saved. Please try again.';
+            referral_json_response(['success' => false, 'message' => $message]);
+        }
+
+        if (!$is_ajax) {
+            $_SESSION['success_message'] = $saved_message;
             header('Location: index.php');
             exit;
         }
+    } elseif ($is_ajax) {
+        referral_json_response(['success' => false, 'message' => 'Unknown action.']);
     }
 }
 
-// Function to get all referral links
 function get_referral_links()
 {
     global $pdo;
@@ -116,7 +158,6 @@ function get_visits_by_source($limit = 10)
     return $data;
 }
 
-// Function to get visits over time by source
 function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
 {
     global $pdo;
@@ -221,6 +262,12 @@ function referral_category_key($source_code)
     if (strncmp($code, 'guide-', 6) === 0 || $code === 'guides-hub') {
         return 'website';
     }
+    if (strncmp($code, 'invgen-', 7) === 0) {
+        return 'invgen';
+    }
+    if (strncmp($code, 'outreach-', 9) === 0) {
+        return 'outreach';
+    }
     if (strncmp($code, 'social-', 7) === 0) {
         return 'social';
     }
@@ -236,17 +283,61 @@ function referral_category_key($source_code)
     return 'other';
 }
 
-// Get statistics
-$referral_links = get_referral_links();
-$visits_by_source = get_visits_by_source(15);
-$period = isset($_GET['period']) ? $_GET['period'] : 'day';
-$allowed_periods = ['day', 'week', 'month'];
-if (!in_array($period, $allowed_periods)) {
-    $period = 'day';
+/**
+ * Render the grouped <tbody> blocks of the management table (the <thead> stays
+ * put). Shared by the initial page render and the JSON reply an AJAX save gets
+ * back, so both go through exactly the same markup.
+ */
+function render_referral_table_bodies()
+{
+    global $category_order, $category_labels, $grouped_links, $category_visits, $category_conversions;
+
+    ob_start();
+    foreach ($category_order as $ckey) {
+        $clinks = $grouped_links[$ckey] ?? [];
+        if (empty($clinks)) {
+            continue;
+        }
+        $cvisits = $category_visits[$ckey];
+        $cconv   = $category_conversions[$ckey];
+        $crate   = $cvisits > 0 ? round(($cconv / $cvisits) * 100, 1) : 0;
+        ?>
+        <tbody class="category-group collapsed" data-cat="<?php echo htmlspecialchars($ckey); ?>">
+            <tr class="category-header" role="button" tabindex="0" aria-expanded="false">
+                <td colspan="8">
+                    <span class="cat-caret" aria-hidden="true">&#9656;</span>
+                    <span class="cat-name"><?php echo htmlspecialchars($category_labels[$ckey]); ?></span>
+                    <span class="cat-meta"><?php echo count($clinks); ?> source<?php echo count($clinks) === 1 ? '' : 's'; ?>
+                        &middot; <?php echo number_format($cvisits); ?> visits
+                        &middot; <?php echo number_format($cconv); ?> conversions
+                        &middot; <?php echo $crate; ?>%</span>
+                </td>
+            </tr>
+            <?php foreach ($clinks as $link): ?>
+                <?php $conv_rate = $link['total_visits'] > 0 ? round(($link['conversions'] / $link['total_visits']) * 100, 1) : 0; ?>
+                <tr class="source-row">
+                    <td><code><?php echo htmlspecialchars($link['source_code']); ?></code></td>
+                    <td><?php echo htmlspecialchars($link['name']); ?></td>
+                    <td><?php echo htmlspecialchars(substr($link['description'], 0, 50)) . (strlen($link['description']) > 50 ? '...' : ''); ?></td>
+                    <td><a href="<?php echo htmlspecialchars($link['target_url']); ?>" target="_blank" class="link-preview"><?php echo htmlspecialchars(substr($link['target_url'], 0, 30)) . (strlen($link['target_url']) > 30 ? '...' : ''); ?></a></td>
+                    <td><?php echo number_format($link['total_visits']); ?></td>
+                    <td><?php echo number_format($link['conversions']); ?></td>
+                    <td><?php echo $conv_rate; ?>%</td>
+                    <td class="actions-cell">
+                        <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-icon" title="Edit" aria-label="Edit"><?php echo svg_icon('pencil', 16); ?></button>
+                        <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-icon" title="Delete" aria-label="Delete"><?php echo svg_icon('trash', 16); ?></button>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+        <?php
+    }
+
+    return ob_get_clean();
 }
 
-$visits_over_time = get_visits_over_time($period, 30);
-$referral_countries = get_referral_countries();
+// Get statistics
+$referral_links = get_referral_links();
 
 // Group-by toggle: 'source' (per-link, default) or 'category' (rolled up).
 $group_mode = (($_GET['group'] ?? 'source') === 'category') ? 'category' : 'source';
@@ -254,13 +345,15 @@ $group_mode = (($_GET['group'] ?? 'source') === 'category') ? 'category' : 'sour
 $category_labels = [
     'paid'    => 'Paid ads',
     'website' => 'My website (guides & articles)',
+    'invgen'  => 'Invoice generator',
+    'outreach' => 'Outreach',
     'social'  => 'Social media',
     'youtube' => 'YouTube',
     'ai'        => 'AI assistants',
     'directory' => 'Directories (launch & SaaS sites)',
     'other'     => 'Other',
 ];
-$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'directory', 'other'];
+$category_order = ['paid', 'website', 'invgen', 'outreach', 'social', 'youtube', 'ai', 'directory', 'other'];
 
 // Bucket every referral link by category and tally per-category subtotals.
 $grouped_links = [];
@@ -276,6 +369,27 @@ foreach ($referral_links as $link) {
     $category_visits[$k] += (int)$link['total_visits'];
     $category_conversions[$k] += (int)$link['conversions'];
 }
+
+// An AJAX save is done here: hand back the rebuilt table and skip the chart
+// queries entirely, since the page keeps the charts it already drew.
+if ($is_ajax) {
+    referral_json_response([
+        'success' => true,
+        'message' => $saved_message,
+        'table_html' => render_referral_table_bodies(),
+        'expand' => $saved_category,
+    ]);
+}
+
+$visits_by_source = get_visits_by_source(15);
+$period = isset($_GET['period']) ? $_GET['period'] : 'day';
+$allowed_periods = ['day', 'week', 'month'];
+if (!in_array($period, $allowed_periods)) {
+    $period = 'day';
+}
+
+$visits_over_time = get_visits_over_time($period, 30);
+$referral_countries = get_referral_countries();
 
 // Prepare data for charts
 $source_labels = [];
@@ -341,14 +455,13 @@ include __DIR__ . '/../admin_header.php';
 <link rel="stylesheet" href="style.css">
 
 <div class="container">
-    <?php if (isset($_SESSION['success_message'])): ?>
-        <div class="success-message">
-            <?php
-            echo htmlspecialchars($_SESSION['success_message']);
-            unset($_SESSION['success_message']);
-            ?>
-        </div>
-    <?php endif; ?>
+    <?php
+    // One message box for both the redirect flash (a non-JS post) and the
+    // messages JavaScript writes after an AJAX save.
+    $flash_message = $_SESSION['success_message'] ?? '';
+    unset($_SESSION['success_message']);
+    ?>
+    <div id="pageMessage" class="success-message"<?php echo $flash_message === '' ? ' style="display: none;"' : ''; ?>><?php echo htmlspecialchars($flash_message); ?></div>
 
     <!-- Controls: group-by toggle + time period selector, combined into one bar -->
     <div class="control-bar">
@@ -459,47 +572,7 @@ include __DIR__ . '/../admin_header.php';
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <?php foreach ($category_order as $ckey): ?>
-                    <?php
-                        $clinks = $grouped_links[$ckey] ?? [];
-                        if (empty($clinks)) {
-                            continue;
-                        }
-                        $cvisits = $category_visits[$ckey];
-                        $cconv   = $category_conversions[$ckey];
-                        $crate   = $cvisits > 0 ? round(($cconv / $cvisits) * 100, 1) : 0;
-                        // Category mode starts collapsed (just the subtotals); source mode expanded.
-                        $collapsed = ($group_mode === 'category');
-                    ?>
-                    <tbody class="category-group<?php echo $collapsed ? ' collapsed' : ''; ?>" data-cat="<?php echo htmlspecialchars($ckey); ?>">
-                        <tr class="category-header" role="button" tabindex="0" aria-expanded="<?php echo $collapsed ? 'false' : 'true'; ?>">
-                            <td colspan="8">
-                                <span class="cat-caret" aria-hidden="true">&#9656;</span>
-                                <span class="cat-name"><?php echo htmlspecialchars($category_labels[$ckey]); ?></span>
-                                <span class="cat-meta"><?php echo count($clinks); ?> source<?php echo count($clinks) === 1 ? '' : 's'; ?>
-                                    &middot; <?php echo number_format($cvisits); ?> visits
-                                    &middot; <?php echo number_format($cconv); ?> conversions
-                                    &middot; <?php echo $crate; ?>%</span>
-                            </td>
-                        </tr>
-                        <?php foreach ($clinks as $link): ?>
-                            <?php $conv_rate = $link['total_visits'] > 0 ? round(($link['conversions'] / $link['total_visits']) * 100, 1) : 0; ?>
-                            <tr class="source-row">
-                                <td><code><?php echo htmlspecialchars($link['source_code']); ?></code></td>
-                                <td><?php echo htmlspecialchars($link['name']); ?></td>
-                                <td><?php echo htmlspecialchars(substr($link['description'], 0, 50)) . (strlen($link['description']) > 50 ? '...' : ''); ?></td>
-                                <td><a href="<?php echo htmlspecialchars($link['target_url']); ?>" target="_blank" class="link-preview"><?php echo htmlspecialchars(substr($link['target_url'], 0, 30)) . (strlen($link['target_url']) > 30 ? '...' : ''); ?></a></td>
-                                <td><?php echo number_format($link['total_visits']); ?></td>
-                                <td><?php echo number_format($link['conversions']); ?></td>
-                                <td><?php echo $conv_rate; ?>%</td>
-                                <td class="actions-cell">
-                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-icon" title="Edit" aria-label="Edit"><?php echo svg_icon('pencil', 16); ?></button>
-                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-icon" title="Delete" aria-label="Delete"><?php echo svg_icon('trash', 16); ?></button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                <?php endforeach; ?>
+                <?php echo render_referral_table_bodies(); ?>
             </table>
         </div>
     </div>
@@ -510,6 +583,7 @@ include __DIR__ . '/../admin_header.php';
     <div class="modal-content">
         <span class="modal-close" onclick="closeModal()">&times;</span>
         <h2 id="modalTitle">Create Referral Link</h2>
+        <div id="modalError" class="error-message" style="display: none;"></div>
 
         <form id="linkForm" method="POST">
             <input type="hidden" name="action" id="formAction" value="create">
@@ -725,8 +799,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Visits',
                     data: countryVisitCounts,
-                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
@@ -766,8 +840,8 @@ include __DIR__ . '/../admin_header.php';
                 datasets: [{
                     label: 'Conversion Rate (%)',
                     data: conversionRates,
-                    backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                    borderColor: 'rgba(139, 92, 246, 1)',
+                    backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                    borderColor: 'rgba(14, 165, 233, 1)',
                     borderWidth: 1,
                     borderRadius: 5
                 }]
@@ -803,6 +877,7 @@ include __DIR__ . '/../admin_header.php';
 
     // Modal Functions
     function openModal() {
+        document.getElementById('modalError').style.display = 'none';
         document.getElementById('linkModal').style.display = 'block';
     }
 
@@ -812,6 +887,7 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('formAction').value = 'create';
         document.getElementById('modalTitle').textContent = 'Create Referral Link';
         document.getElementById('source_code').removeAttribute('readonly');
+        document.getElementById('modalError').style.display = 'none';
     }
 
     function editLink(link) {
@@ -827,33 +903,120 @@ include __DIR__ . '/../admin_header.php';
     }
 
     function deleteLink(id) {
-        if (confirm('Are you sure you want to delete this referral link? This will not delete visit history.')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            const tokenInput = document.createElement('input');
-            tokenInput.type = 'hidden';
-            tokenInput.name = 'csrf_token';
-            tokenInput.value = csrfToken;
-            const actionInput = document.createElement('input');
-            actionInput.type = 'hidden';
-            actionInput.name = 'action';
-            actionInput.value = 'delete';
-            const idInput = document.createElement('input');
-            idInput.type = 'hidden';
-            idInput.name = 'id';
-            idInput.value = id;
-            form.appendChild(tokenInput);
-            form.appendChild(actionInput);
-            form.appendChild(idInput);
-            document.body.appendChild(form);
-            form.submit();
+        if (!confirm('Are you sure you want to delete this referral link? This will not delete visit history.')) {
+            return;
         }
+        const data = new FormData();
+        data.append('csrf_token', csrfToken);
+        data.append('action', 'delete');
+        data.append('id', id);
+        postLinkChange(data);
+    }
+
+    // Send a create / update / delete to the server and refresh just the table.
+    // Nothing here reloads the page, so the charts and scroll position survive.
+    async function postLinkChange(formData, onError) {
+        formData.append('ajax', '1');
+
+        let result;
+        try {
+            const response = await fetch('index.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            result = await response.json();
+        } catch (err) {
+            result = { success: false, message: 'Could not reach the server. Please try again.' };
+        }
+
+        if (!result.success) {
+            if (onError) {
+                onError(result.message);
+            } else {
+                showPageMessage(result.message, true);
+            }
+            return false;
+        }
+
+        refreshTableBodies(result.table_html, result.expand);
+        showPageMessage(result.message, false);
+        return true;
+    }
+
+    let pageMessageTimer = null;
+
+    function showPageMessage(text, isError) {
+        const box = document.getElementById('pageMessage');
+        box.textContent = text;
+        box.className = isError ? 'error-message' : 'success-message';
+        box.style.display = 'block';
+
+        clearTimeout(pageMessageTimer);
+        if (!isError) {
+            pageMessageTimer = setTimeout(function() {
+                box.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Swap in the server-rendered category groups, keeping whichever sections
+    // the user had open and expanding the one the saved link belongs to.
+    function refreshTableBodies(html, expandCategory) {
+        const table = document.querySelector('.referral-table');
+        if (!table || typeof html !== 'string') {
+            return;
+        }
+
+        const stayOpen = new Set();
+        table.querySelectorAll('.category-group:not(.collapsed)').forEach(function(group) {
+            stayOpen.add(group.dataset.cat);
+        });
+        if (expandCategory) {
+            stayOpen.add(expandCategory);
+        }
+
+        table.querySelectorAll('tbody').forEach(function(body) {
+            body.remove();
+        });
+        table.insertAdjacentHTML('beforeend', html);
+
+        table.querySelectorAll('.category-group').forEach(function(group) {
+            if (stayOpen.has(group.dataset.cat)) {
+                group.classList.remove('collapsed');
+                group.querySelector('.category-header').setAttribute('aria-expanded', 'true');
+            }
+        });
+        bindCategoryHeaders();
     }
 
     const createLinkBtnEl = document.getElementById('createLinkBtn');
     if (createLinkBtnEl) {
         createLinkBtnEl.addEventListener('click', openModal);
     }
+
+    // Save without leaving the page; errors stay in the modal so the typed
+    // values are still there to correct.
+    document.getElementById('linkForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const modalError = document.getElementById('modalError');
+
+        modalError.style.display = 'none';
+        submitBtn.disabled = true;
+
+        const saved = await postLinkChange(new FormData(form), function(message) {
+            modalError.textContent = message;
+            modalError.style.display = 'block';
+        });
+
+        submitBtn.disabled = false;
+        if (saved) {
+            closeModal();
+        }
+    });
 
     // Close modal when clicking outside (only if mousedown also started on backdrop)
     let modalMouseDownTarget = null;
@@ -867,11 +1030,7 @@ include __DIR__ . '/../admin_header.php';
         }
     });
 
-    // Restore scroll position
-    if (sessionStorage.getItem('scrollPosition')) {
-        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
-        sessionStorage.removeItem('scrollPosition');
-    }
+
 
     // Save scroll position when clicking period or group-by links so the page
     // reload doesn't jump back to the top.
@@ -882,15 +1041,22 @@ include __DIR__ . '/../admin_header.php';
     });
 
     // Collapse / expand referral category sections in the management table.
-    document.querySelectorAll('.category-header').forEach(header => {
-        const toggle = () => {
-            const group = header.closest('.category-group');
-            const collapsed = group.classList.toggle('collapsed');
-            header.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-        };
-        header.addEventListener('click', toggle);
-        header.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    // Re-run after an AJAX save replaces the rows.
+    function bindCategoryHeaders() {
+        document.querySelectorAll('.category-header').forEach(header => {
+            const toggle = () => {
+                const group = header.closest('.category-group');
+                const collapsed = group.classList.toggle('collapsed');
+                header.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            };
+            header.addEventListener('click', toggle);
+            header.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
         });
-    });
+    }
+
+    bindCategoryHeaders();
 </script>
+<script>window.ADMIN_PRESERVE_SCROLL = ['a[href^="?period="]', 'a[href^="?group="]'];</script>
+<script src="../preserve-scroll.js" defer></script>

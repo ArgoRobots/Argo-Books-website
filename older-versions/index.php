@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../resources/format.php';
+
 // Platform configuration
 $platforms = [
     'windows' => [
@@ -68,18 +70,6 @@ function getOlderVersions($filePattern)
     return $versions;
 }
 
-function formatFileSize($bytes)
-{
-    $units = ['B', 'KB', 'MB', 'GB'];
-    $bytes = max($bytes, 0);
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-
-    $bytes /= (1 << (10 * $pow));
-
-    return round($bytes, 1) . ' ' . $units[$pow];
-}
-
 // Get versions for each platform
 $platformVersions = [];
 foreach ($platforms as $key => $platform) {
@@ -140,6 +130,11 @@ foreach ($platforms as $key => $platform) {
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
+    <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
 <body>

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Installation Guide';
-$pageDescription = 'Learn how to download and install Argo Books on your Windows, macOS, or Linux computer.';
+$pageDescription = 'Learn how to download and install Argo Books on Windows or Linux. The macOS build is coming soon.';
 $currentPage = 'installation';
 $pageCategory = 'getting-started';
 
@@ -24,26 +24,17 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <h2>macOS</h2>
-            <ol class="steps-list">
-                <li>Download the <strong>.dmg</strong> file from the <a class="link" href="../../../downloads/">downloads page</a></li>
-                <li>Open the downloaded .dmg file</li>
-                <li>Drag Argo Books to your Applications folder</li>
-                <li>Launch Argo Books from your Applications folder or Launchpad</li>
-            </ol>
-
-            <div class="info-box">
-                <strong>Tip:</strong> If macOS blocks the application, go to System Settings > Privacy & Security and click "Open Anyway" next to the Argo Books message.
-            </div>
+            <p><strong>Coming soon.</strong> There is no macOS build of Argo Books yet, so there is nothing to install on a Mac at the moment. You can leave your email on the <a class="link" href="../../../downloads/">downloads page</a> to be notified once the Mac version ships. Installation steps will be added here at the same time.</p>
 
             <h2>Linux</h2>
             <ol class="steps-list">
                 <li>Download the <strong>AppImage</strong> file from the <a class="link" href="../../../downloads/">downloads page</a></li>
-                <li>Make the file executable: right-click the file, go to Properties > Permissions, and check "Allow executing file as program" (or run <code>chmod +x</code> on the file)</li>
+                <li>Make the file executable: right-click the file, go to Properties > Permissions, and check "Allow executing file as program". The exact wording varies between distributions. From a terminal, <code>chmod +x ArgoBooks-*-linux-x64.AppImage</code> does the same thing.</li>
                 <li>Double-click the AppImage to launch Argo Books</li>
             </ol>
 
             <div class="info-box">
-                <strong>Note:</strong> AppImage files are self-contained and don't require installation. You can move the file to any location on your system and run it from there.
+                <strong>Tip:</strong> AppImage files are self-contained and don't require installation. You can move the file to any location on your system and run it from there.
             </div>
 
             <h2>After Installation</h2>

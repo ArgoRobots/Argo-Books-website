@@ -31,7 +31,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
         } elseif ($post_id <= 0) {
             $response['message'] = 'Invalid post ID';
         } else {
-            // Update the post status
             if (update_post_status($post_id, $status)) {
                 $response = [
                     'success' => true,

@@ -27,6 +27,14 @@ PHP/MySQL website for [Argo Books](https://argorobots.com/) accounting software.
 
 ## Database access
 
+**There is ONE database on the server, shared by production (`argorobots.com`) and dev (`dev.argorobots.com`).** They are not separate instances. Rows are separated by an `environment` column (`sandbox` / `production`), compared against `current_environment()`.
+
+Consequences:
+
+- Schema changes are run **once**. Applying them "on dev" applies them to production, because it is the same database.
+- Any query over a table with an `environment` column must filter on it. Forget it and a sandbox test row is treated as live production data, e.g. emailing a real customer from a test invoice.
+- Locally, Laragon has `argo_books` (development) and `argo_books_test` (PHPUnit only). These are the only truly separate databases.
+
 All queries go through the global `$pdo`. PDO is configured with `ATTR_ERRMODE => ERRMODE_EXCEPTION`, default fetch mode `FETCH_ASSOC`, `ATTR_EMULATE_PREPARES => false`. Inside functions, declare `global $pdo;` before use.
 
 - Use prepared statements for anything touching user input. Pass params as an array to `execute([...])`; never concatenate into SQL.
@@ -49,7 +57,7 @@ For local dev, set up MailHog so the fallback path doesn't try to hit a real MTA
 
 **PayPal portal Connect is disabled.** The "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, and proper merchant onboarding requires the Partner Referrals API (gated behind Platforms & Marketplaces partner enrollment). All portal-side PayPal handlers (`api/portal/connect.php`, `connect-callback.php`, `checkout.php` `handle_paypal_checkout()`, `process-payment.php` `process_paypal_payment()`) return 503 `PROVIDER_UNSUPPORTED`, and `get_available_payment_methods()` in `api/portal/portal-helper.php` deliberately omits PayPal even when `paypal_merchant_id` is set. The desktop app hides the PayPal Connect button.
 
-**PayPal IS still used for the SaaS subscription flow** (Argo Premium billing on argorobots.com): separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout. Do not touch SaaS-subscription PayPal code when working on portal features.
+**PayPal IS still used for the SaaS subscription flow** (Argo Books Premium billing on argorobots.com): separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout. Do not touch SaaS-subscription PayPal code when working on portal features.
 
 ## Header / footer loading
 
@@ -72,6 +80,34 @@ All colors come from CSS variables in `resources/styles/custom-colors.css`. Don'
 
 Admin pages with filter pills that reload the page (period selectors, source pills, range buttons) use a shared `sessionStorage.scrollPosition` pattern so the reload doesn't jump back to the top. When adding a new filter, extend the existing handler's selector on that page rather than writing a parallel script. URL anchors (`#section-id`) do NOT solve this; they only change where the jump lands. Reference implementations: `admin/referral-links/index.php`, `admin/website-stats/index.php`, `admin/users/index.php`, `admin/crons/index.php`.
 
+## Server access
+
+**There is no shell on the server.** No SSH, no cPanel Terminal. Never hand over a command to "run on the server" and never write a tool whose only entry point is a shell prompt.
+
+What is available:
+
+- **cPanel > Cron Jobs** is the only way to execute a script server-side. Set a schedule a minute or two out, let it fire, then restore or delete the entry. It runs through the shell, so `php_sapi_name() === 'cli'` and CLI guards still pass.
+- **HeidiSQL** for all SQL. Schema changes and any one-off queries go to the user as a copy-pasteable block.
+- **Local Laragon** for anything genuinely interactive. Reproduce there first; the server is not a debugging environment.
+
+**Cron mail is not configured, so stdout goes nowhere.** Never treat `echo` as a way to report anything, and don't add one. No cron script echoes.
+
+## Cron scripts
+
+`admin/crons/` is where cron results are read. **It is the only channel.** There is no cron mail and nobody tails the log files, so a cron that does not write to `cron_runs` is invisible, whatever else it logs.
+
+Required for every cron:
+
+- Wrap the run in `cron_run_start($pdo, '<name>')` / `cron_run_finish($pdo, $runId, 'ok'|'error', $msg)` from `cron/lib/run_tracker.php`, and count work with `cron_metric_incr()`. All eleven scripts do this; it is the only universal convention.
+- **Put the numbers in `cron_metric_incr()`, not in prose.** The admin page renders metrics as tiles, so counts recorded there are readable at a glance and comparable across runs. The optional 4th argument to `cron_run_finish()` is for a short summary line shown under "Last run detail"; it lands in the `error_message` column either way, so on an `ok` run keep it to a summary and not an error.
+- **Report failures through `cron_runs` too**, including ones that happen before the main work starts. An early `exit` that skips `cron_run_start` leaves no trace on the admin page and looks identical to the cron never firing.
+- Add a `$cronConfig` entry in `admin/crons/index.php` with the metric labels, or the page has nothing to render.
+- Add a section to `read-me/Cron jobs.md` with the crontab line.
+- CLI guard at the top (`php_sapi_name()`), so the script cannot be triggered over HTTP.
+- `error_log()` for anything worth diagnosing later.
+
+Situational, not required: a `flock` lock file (5 of 11, for scripts where overlapping runs would double-process), a `--dry-run` flag (3 of 11, worth it for anything that sends email or money), and a daily log in `cron/logs/` (6 of 11).
+
 ## Tests
 
 PHPUnit suite lives in `/tests/`. Run with `./vendor/bin/phpunit` from the project root. Requires a separate `argo_books_test` database (creds in `.env.testing`). The deploy workflow does not run tests; they're a local / pre-commit guardrail only.
@@ -93,6 +129,16 @@ For end users, plain language, no jargon. Include only user-visible changes; ski
 
 When writing markdown docs (in `read-me/` or anywhere else in the repo), don't use em dashes (the `—` character). Use a comma, a colon, or a period instead, to match the project's house style. Don't substitute a regular hyphen either: that reads as a compound-word marker, not a clause break.
 
+## Explaining technical work
+
+Every technical explanation ends with an `## In simple terms` section as the very last thing in the response. This applies to all technical explanations: code changes, debugging, architecture, data analysis, "why is X happening" answers. Not just the complicated ones.
+
+The reader is a programmer, so don't dumb it down too much. Standard technical vocabulary (SQL, HTTP headers, indexes, caching, regex) needs no translation or analogy. What the section strips is project-specific detail: file paths, function names, table and column names, and anything that assumes familiarity with this codebase.
+
+Think "explaining it to a developer who has never seen this repo", not "explaining it to a non-technical person". Keep it short, a few sentences to a short paragraph, and cover what happened and why it matters rather than restating the mechanics.
+
+If a response has no technical content (a quick yes/no, or a basic question), skip it.
+
 ## Security
 
 - Admin requires TOTP 2FA. Secret stored in `admin_users.two_factor_secret`
@@ -103,14 +149,14 @@ When writing markdown docs (in `read-me/` or anywhere else in the repo), don't u
 
 The `read-me/` directory has authoritative reference docs that are kept current. Don't duplicate their content here:
 
+- `read-me/Tool page standards.md`: conventions for the free tools under `/tools/`, including which currencies each tool offers and why
 - `read-me/Cron jobs.md`: every scheduled cron and its frequency
 - `read-me/Deployment.md`: how `.github/workflows/deploy.yml` ships code to the server
 - `read-me/Email outreach.md`: outreach pipeline behavior
-- `read-me/Admin guide.md`: admin dashboard tour
+- `read-me/Admin guide.md`: payment processor fees, sandbox vs production modes, key rotation, admin-account scripts
 - `read-me/setup/Payment provider setup.md`: Stripe / PayPal / Square provider config
 - `read-me/testing/Payment provider testing.md`: sandbox testing procedures
 - `read-me/testing/First-run install tracking.md`: how the install funnel attributes back to the originating ad click, why your own machine deduplicates itself, and the end-to-end test procedure
 - `read-me/setup/Local email setup.md`: MailHog setup
 - `read-me/setup/Google Ads campaign setup.md`: Google Ads campaign + UET/gtag wiring
-- `read-me/setup/Advanced Installer project setup.md` - recovery guide for the Windows installer project (tooling install, project recreation, signing, the WriteInstallToken custom action for funnel attribution)
 - `read-me/procedures/Refund block response procedure.md`: what to do when the refund safety check fires

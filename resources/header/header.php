@@ -53,6 +53,7 @@
                   <div class="dropdown-col">
                     <span class="dropdown-col-header">Integrations</span>
                     <a class="dropdown-item" href="<?= $base ?>integrations/stripe/">Stripe</a>
+                    <a class="dropdown-item" href="<?= $base ?>integrations/argo-books-api/">Argo Books API</a>
                   </div>
                 </div>
                 <a class="dropdown-all-features" href="<?= $base ?>integrations/">

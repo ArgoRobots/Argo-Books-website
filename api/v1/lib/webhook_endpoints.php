@@ -98,9 +98,13 @@ function api_validate_event_types($value): ?string
 /**
  * Endpoints must be public HTTPS.
  *
- * The loopback and private-range check is not politeness: without it this
- * endpoint is a server-side request forgery primitive, letting anyone with a key
- * point a signed POST at our own internal network.
+ * This is not politeness. Without it, anyone holding a write-scoped key can
+ * point a signed POST from our server at our own network, which is a
+ * server-side request forgery primitive.
+ *
+ * The host rules live in net.php because the delivery cron applies the same
+ * ones again before every send. Checking only here would leave DNS rebinding
+ * open: a name can resolve publicly now and privately at delivery time.
  */
 function api_validate_webhook_url(string $url): string
 {
@@ -114,15 +118,22 @@ function api_validate_webhook_url(string $url): string
         api_error(400, 'invalid_request_error', 'parameter_too_long', "Parameter 'url' must be 500 characters or fewer.", 'url');
     }
 
-    $host = strtolower($parts['host']);
-    if ($host === 'localhost' || str_ends_with($host, '.localhost') || str_ends_with($host, '.internal')) {
+    $host = api_normalise_host((string) $parts['host']);
+
+    if (api_host_is_reserved_name($host)) {
         api_error(400, 'invalid_request_error', 'parameter_invalid_value', "Parameter 'url' must be publicly reachable.", 'url');
     }
 
-    $ip = filter_var($host, FILTER_VALIDATE_IP) ?: gethostbyname($host);
-    if (filter_var($ip, FILTER_VALIDATE_IP)
-        && !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-        api_error(400, 'invalid_request_error', 'parameter_invalid_value', "Parameter 'url' must not resolve to a private address.", 'url');
+    if (!api_host_is_public($host)) {
+        // One message for "private" and for "did not resolve" on purpose. The
+        // distinction is only useful to someone probing what our network can see.
+        api_error(
+            400,
+            'invalid_request_error',
+            'parameter_invalid_value',
+            "Parameter 'url' must resolve to a public address.",
+            'url'
+        );
     }
 
     return $url;

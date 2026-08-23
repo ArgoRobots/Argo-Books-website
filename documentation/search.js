@@ -52,7 +52,7 @@
             { id: 'how-numbers-are-calculated', title: 'How Numbers Are Calculated', category: 'Reference', folder: 'reference', keywords: 'revenue profit net tax sales tax shipping refund refunds cash basis accrual currency calculations formula gross subtotal total discount fee invoice status pending conversion sales by product' },
             { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', folder: 'reference', keywords: 'currency currencies usd eur gbp cad aud exchange rate convert historical pending' },
             { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', folder: 'reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
-            { id: 'keyboard_shortcuts', title: 'Keyboard Shortcuts', category: 'Reference', folder: 'reference', keywords: 'keyboard shortcuts hotkeys ctrl k quick actions report designer undo redo duplicate delete move align' },
+            { id: 'keyboard_shortcuts', title: 'Keyboard Shortcuts', category: 'Reference', folder: 'reference', keywords: 'keyboard shortcuts hotkeys ctrl k quick actions full screen fullscreen f11 escape esc title bar report designer undo redo duplicate delete move align' },
 
             // Security
             { id: 'encryption', title: 'Encryption', category: 'Security', folder: 'security', keywords: 'encryption aes-256 gcm pbkdf2 security protect data recovery key' },

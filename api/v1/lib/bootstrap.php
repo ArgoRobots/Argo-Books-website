@@ -18,17 +18,25 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../../../db_connect.php';
+require_once __DIR__ . '/../../../rate_limit_helper.php';
 
 /** The only API version this build speaks. Sent back on every response. */
 const API_VERSION = '2026-08-18';
 
-/** Where the docs live, used to build `doc_url` on errors. */
-const API_DOC_BASE = 'https://argorobots.com/documentation/api';
+/**
+ * Where the docs live, used to build `doc_url` on errors.
+ *
+ * The real served path, not a prettier alias. Documentation pages link their
+ * assets and each other relatively, so serving one at a shallower URL breaks
+ * every stylesheet and every next/previous link on it.
+ */
+const API_DOC_BASE = 'https://argorobots.com/documentation/pages/api';
 
 /** Requests per minute, per key. */
 const API_RATE_LIMIT_PER_MINUTE = 120;
 
 require_once __DIR__ . '/ids.php';
+require_once __DIR__ . '/net.php';
 require_once __DIR__ . '/response.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/ratelimit.php';
@@ -96,6 +104,13 @@ function api_request_path(): string
 function api_request_body(): array
 {
     static $cached = null;
+
+    // php://input cannot be written from a test, so under API_TESTING a handler
+    // can be driven with a supplied body. Production never defines the flag.
+    if (defined('API_TESTING') && API_TESTING && isset($GLOBALS['__api_test_body'])) {
+        return $GLOBALS['__api_test_body'];
+    }
+
     if ($cached !== null) {
         return $cached;
     }

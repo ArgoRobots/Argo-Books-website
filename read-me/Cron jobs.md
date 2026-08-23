@@ -2,6 +2,26 @@
 
 All cron scripts live in `/cron/` and must be run via CLI only. Each script writes daily logs to `/cron/logs/`.
 
+## Run history retention
+
+`cron_runs` is pruned by `cron_runs_prune()` in `cron/lib/run_tracker.php`, called
+from `cron_run_finish()` on roughly one run in five hundred. Retention is 90 days,
+well beyond the 30 day maximum the admin page displays.
+
+It lives in the tracker rather than in any single cron because that file is what
+writes the rows, so every cron contributes to the cleanup regardless of which one
+happens to fire.
+
+Two rows are never deleted, whatever their age:
+
+- The newest run of each cron. Without that, a cron that has not fired in months
+  would disappear from `/admin/crons/` and read as "never run", which is the one
+  question that page exists to answer.
+- Anything still marked `running`, since that is a stuck run worth seeing.
+
+The table had no cleanup at all before this. A cron on a one minute schedule adds
+around 525,000 rows a year on its own, and two of them are on that schedule.
+
 ---
 
 ## 1. Subscription Renewal
@@ -408,7 +428,7 @@ no `<object>.created` event, since the developer who created it already knows.
 1. Claims up to 200 due deliveries, oldest first
 2. POSTs each one with an `Argo-Signature: t=<unix>,v1=<hmac-sha256>` header
 3. Treats 2xx as success, everything else as retryable
-4. Backs off across six attempts spread over roughly a day
+4. Backs off across six attempts spanning about 15 hours
 5. Auto-disables an endpoint whose last 20 deliveries all failed
 6. Prunes `api_events` rows older than 90 days
 
@@ -429,6 +449,16 @@ would drop events during a bad deploy on the developer's side; the attempt limit
 genuinely dead URL soon enough.
 
 Redirects are never followed. The signature is for the URL the merchant approved.
+
+The destination is re-checked against the private-address rules immediately before
+every POST, not just when the endpoint was registered. Checking only at registration
+would leave DNS rebinding open: a name that resolved publicly then can resolve to an
+internal address by delivery time. A destination that fails the re-check is counted
+under "Refused, destination not public".
+
+**This is the one cron that does not filter on `environment`,** and it is on purpose.
+Only production runs crons, so filtering would queue sandbox webhooks and never deliver
+them. The trade is that its metrics count both environments together.
 
 Supports `--dry-run`, which resolves everything and logs what would be sent without sending it.
 

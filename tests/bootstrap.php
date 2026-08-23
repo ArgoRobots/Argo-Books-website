@@ -36,6 +36,8 @@ define('API_TESTING', true);
 require_once PROJECT_ROOT . '/api/v1/lib/bootstrap.php';
 require_once PROJECT_ROOT . '/api/v1/lib/definitions.php';
 require_once PROJECT_ROOT . '/api/v1/lib/events.php';
+require_once PROJECT_ROOT . '/api/v1/lib/batches.php';
+require_once PROJECT_ROOT . '/api/v1/lib/account.php';
 require_once PROJECT_ROOT . '/api/v1/lib/webhook_endpoints.php';
 
 // db_connect.php assigns $pdo at "top-level" of the included file, but when

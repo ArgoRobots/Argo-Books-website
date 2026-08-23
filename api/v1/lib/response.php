@@ -73,7 +73,7 @@ function api_error(
         'type'       => $type,
         'code'       => $code,
         'message'    => $message,
-        'doc_url'    => API_DOC_BASE . '/errors#' . $code,
+        'doc_url'    => API_DOC_BASE . '/errors.php#' . $code,
         'request_id' => api_request_id(),
     ];
     if ($param !== null) {
@@ -86,6 +86,26 @@ function api_error(
  * Collection envelope. `has_more` is what a client loops on; `url` mirrors
  * Stripe so pagination helpers in a generated SDK have somewhere to point.
  */
+/**
+ * Send an already-serialized body, used by the idempotent replay path.
+ *
+ * Separate from api_json because the cached body is a string we must return
+ * byte for byte, and because it needs the same API_TESTING escape hatch: without
+ * it the replay would exit() straight out of the test runner.
+ */
+function api_send_cached_response(int $status, string $rawBody): void
+{
+    if (defined('API_TESTING') && API_TESTING) {
+        throw new ApiResponseSent($status, json_decode($rawBody, true) ?? []);
+    }
+
+    api_send_common_headers();
+    header('Idempotent-Replayed: true');
+    http_response_code($status);
+    echo $rawBody;
+    exit;
+}
+
 function api_list_response(array $data, bool $hasMore, string $url): array
 {
     return [

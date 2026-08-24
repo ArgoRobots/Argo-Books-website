@@ -46,6 +46,24 @@ if ($label === '') {
 global $pdo;
 $env = current_environment();
 
+// Same uniqueness rule as creating one, minus the key being renamed: renaming a key
+// to what it already says has to stay a no-op rather than a collision.
+$dupe = $pdo->prepare(
+    'SELECT 1 FROM api_keys k
+       JOIN api_accounts a ON a.id = k.account_id
+      WHERE a.owner_identity_hash = ?
+        AND a.company_uid = ?
+        AND a.environment = ?
+        AND k.revoked_at IS NULL
+        AND k.public_id <> ?
+        AND LOWER(k.label) = LOWER(?)
+      LIMIT 1'
+);
+$dupe->execute([$owner, $companyUid, $env, $keyId, $label]);
+if ($dupe->fetchColumn() !== false) {
+    send_error_response(409, "There is already a key called '$label'.", 'KEY_LABEL_TAKEN');
+}
+
 // The join through api_accounts is what stops one owner renaming another
 // owner's key by guessing an id.
 $stmt = $pdo->prepare(

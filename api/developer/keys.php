@@ -90,6 +90,20 @@ if ((int) $activeStmt->fetchColumn() >= 10) {
 
 $label = substr(trim((string) ($body['label'] ?? '')), 0, 100);
 
+// The name is the only thing telling two keys apart in the app: the secret is never
+// shown again and the hint is a dozen characters of hex. Checked here rather than
+// only in the app because the app hides its own key from that list, so it cannot see
+// the collision, and because two devices can create at once.
+if ($label !== '') {
+    $dupe = $pdo->prepare(
+        'SELECT 1 FROM api_keys WHERE account_id = ? AND revoked_at IS NULL AND LOWER(label) = LOWER(?) LIMIT 1'
+    );
+    $dupe->execute([$accountId, $label]);
+    if ($dupe->fetchColumn() !== false) {
+        send_error_response(409, "There is already a key called '$label'.", 'KEY_LABEL_TAKEN');
+    }
+}
+
 // Scopes are an allow-list, not free text: a typo that silently granted write
 // access would be a security bug rather than a validation error.
 $requested = $body['scopes'] ?? ['read', 'write'];

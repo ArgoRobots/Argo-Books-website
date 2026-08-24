@@ -171,7 +171,13 @@ foreach (array_chunk(array_values($datesToFetch), $concurrency) as $chunk) {
         $status = curl_multi_exec($multi, $running);
         if ($running) {
             // Blocks until something moves, rather than spinning on the CPU.
-            curl_multi_select($multi, 1.0);
+            // select() returns -1 when there is no descriptor to wait on, which
+            // libcurl can do while resolving a name. It did not happen in testing
+            // here (one already-resolved host), so this is a guard rather than a
+            // fix: without it that case would busy-loop for the whole fetch.
+            if (curl_multi_select($multi, 1.0) === -1) {
+                usleep(1000);
+            }
         }
     } while ($running && $status === CURLM_OK);
 

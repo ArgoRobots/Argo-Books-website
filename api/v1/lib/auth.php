@@ -91,7 +91,10 @@ function api_authenticate(): array
         api_error(401, 'authentication_error', 'invalid_api_key', 'The API key provided is not valid.');
     }
     if ($row['revoked_at'] !== null) {
-        record_rate_limit_attempt($ip, 'apiauth', API_AUTH_FAILURE_WINDOW);
+        // Deliberately NOT counted against the address. A revoked key is a key we
+        // issued, not a guess, and the bucket is per-address with no key in it: an
+        // integration still retrying a key its merchant revoked would fill the
+        // bucket and lock that address out of every OTHER merchant's key as well.
         api_error(401, 'authentication_error', 'api_key_revoked', 'This API key has been revoked by the account owner.');
     }
     if ((int) $row['is_active'] !== 1) {

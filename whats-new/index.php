@@ -94,6 +94,49 @@ $pricing = get_pricing_config();
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.13 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.13</span>
+                        <span class="date-tag">August 25 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Connect other apps to your books:</strong> Other software can now send customers, suppliers, invoices and expenses straight into Argo Books. Nothing reaches your books until you have seen it: everything arrives as a list of suggestions you look over and accept, and a single undo reverses a whole import if you change your mind. Argo Books matches customers and suppliers you already have, so the same person does not turn up twice. Switch it on under Settings, Integrations, where you can give each app its own key and take it back whenever you like.</li>
+                                <li><strong>Full screen with F11:</strong> Press F11 to fill the whole screen with Argo Books and put everything else out of sight. F11 or Escape brings the window back.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Activation asks less of you:</strong> After you enter a license key, the email box is yours to fill in or skip. Leave your address if you would like us to be able to reach you, or carry straight on to the app.</li>
+                                <li><strong>Amounts keep their own date's rate:</strong> Money arriving from a connected app is converted using the exchange rate for the day it belongs to, so a figure from last month keeps last month's value.</li>
+                                <li><strong>See what a sync is doing:</strong> A sync now tells you what it is working on while it runs, instead of leaving you watching a spinner.</li>
+                                <li><strong>Settings is easier to move around:</strong> Each kind of settings panel now has a shape that suits what it holds, with roomier spacing throughout.</li>
+                                <li><strong>Charts open the way most people want them:</strong> Charts now start in the area style rather than needing a change every time.</li>
+                                <li><strong>A sample company that adds up:</strong> The practice company's payroll and purchases are now in proportion to its sales, so the numbers behave like a real business while you are finding your way around.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Steadier Premium activation</strong> Argo Books is more patient when it checks your license as it starts up, so Premium stays on.</li>
+                                <li><strong>The activation window knows when it is finished</strong> The license window now closes on its own once you are done with it.</li>
+                                <li><strong>Imports tidy up after themselves</strong> Undoing an import now clears away everything it brought in, and Argo Books says so plainly when an import cannot be brought back.</li>
+                                <li>The usual round of polish and performance work across the app.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.12 -->
             <div class="version-card">
                 <div class="version-header">

@@ -53,6 +53,12 @@ try {
 /**
  * Claim due deliveries. Limited per run so one badly-behaved endpoint with a
  * huge backlog cannot starve everyone else's notifications.
+ *
+ * Deliberately NOT filtered by environment, which is the one place in this
+ * codebase that rule is broken on purpose. Production and dev share a database
+ * but only production runs crons, so filtering would mean sandbox webhooks were
+ * queued and never delivered, making them impossible to test. The cost is that
+ * the metrics below count both environments together.
  */
 $stmt = $pdo->prepare("
     SELECT d.id, d.attempts, d.event_id,
@@ -76,6 +82,7 @@ cron_metric_set('due', count($due));
 $delivered = 0;
 $retried = 0;
 $exhausted = 0;
+$blocked = 0;
 
 foreach ($due as $row) {
     $body = json_encode([
@@ -92,6 +99,23 @@ foreach ($due as $row) {
 
     if ($dryRun) {
         error_log("api_webhook_delivery [dry-run] would POST {$row['type']} to {$row['url']} (attempt $attempt)");
+        continue;
+    }
+
+    // Re-check the destination immediately before sending. The URL was screened
+    // when it was registered, but DNS can be repointed afterwards, so screening
+    // once would leave rebinding open: a name that was public then can resolve
+    // to a private address now and turn this cron into the attacker's client.
+    $host = (string) parse_url((string) $row['url'], PHP_URL_HOST);
+    if (api_host_is_reserved_name($host) || !api_host_is_public($host)) {
+        $pdo->prepare("
+            UPDATE api_webhook_deliveries
+               SET status = 'failed', attempts = ?, last_error = ?
+             WHERE id = ?
+        ")->execute([$attempt, 'Destination no longer resolves to a public address.', (int) $row['id']]);
+        $blocked++;
+        error_log("api_webhook_delivery: refused delivery {$row['id']} to {$row['url']}: host is not publicly routable");
+        api_maybe_disable_endpoint($pdo, (int) $row['endpoint_id'], (string) $row['endpoint_public_id']);
         continue;
     }
 
@@ -134,6 +158,7 @@ foreach ($due as $row) {
 cron_metric_set('delivered', $delivered);
 cron_metric_set('retried', $retried);
 cron_metric_set('exhausted', $exhausted);
+cron_metric_set('blocked', $blocked);
 
 // Events are the developer's catch-up log, but they do not need to be kept
 // forever. Ninety days is well past any reasonable outage.
@@ -144,7 +169,7 @@ cron_run_finish(
     $pdo,
     $runId,
     'ok',
-    sprintf('%d delivered, %d retrying, %d exhausted', $delivered, $retried, $exhausted)
+    sprintf('%d delivered, %d retrying, %d exhausted, %d blocked', $delivered, $retried, $exhausted, $blocked)
 );
 
 } catch (Throwable $e) {

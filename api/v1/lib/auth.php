@@ -10,6 +10,12 @@ declare(strict_types=1);
  * database leak does not hand anyone a working key.
  */
 
+/** Failed authentications allowed from one address before it is shut out. */
+const API_AUTH_FAILURE_LIMIT = 20;
+
+/** Window for that count, in seconds. */
+const API_AUTH_FAILURE_WINDOW = 900;
+
 /** Pull the presented secret from either accepted header, or '' if absent. */
 function api_presented_secret(): string
 {
@@ -36,6 +42,21 @@ function api_authenticate(): array
 {
     global $pdo;
 
+    // Per-key rate limiting cannot help here, because a request that fails to
+    // authenticate has no key to count against. Without an IP bucket, an
+    // attacker can spend our database on unlimited key lookups for free.
+    // Only failures count, so a busy legitimate integration never trips it.
+    $ip = get_client_ip();
+    if (is_rate_limited($ip, API_AUTH_FAILURE_LIMIT, API_AUTH_FAILURE_WINDOW, 'apiauth')) {
+        header('Retry-After: ' . API_AUTH_FAILURE_WINDOW);
+        api_error(
+            429,
+            'rate_limit_error',
+            'rate_limit_exceeded',
+            'Too many failed authentication attempts from this address. Try again later.'
+        );
+    }
+
     $secret = api_presented_secret();
     if ($secret === '') {
         api_error(
@@ -49,6 +70,7 @@ function api_authenticate(): array
     // Reject anything not shaped like one of our keys before touching the
     // database, so a scanner spraying random bearer tokens costs us nothing.
     if (!preg_match('/^ab_[0-9a-f]{48}$/', $secret)) {
+        record_rate_limit_attempt($ip, 'apiauth', API_AUTH_FAILURE_WINDOW);
         api_error(401, 'authentication_error', 'invalid_api_key', 'The API key provided is not valid.');
     }
 
@@ -65,9 +87,14 @@ function api_authenticate(): array
     $row = $stmt->fetch();
 
     if (!$row) {
+        record_rate_limit_attempt($ip, 'apiauth', API_AUTH_FAILURE_WINDOW);
         api_error(401, 'authentication_error', 'invalid_api_key', 'The API key provided is not valid.');
     }
     if ($row['revoked_at'] !== null) {
+        // Deliberately NOT counted against the address. A revoked key is a key we
+        // issued, not a guess, and the bucket is per-address with no key in it: an
+        // integration still retrying a key its merchant revoked would fill the
+        // bucket and lock that address out of every OTHER merchant's key as well.
         api_error(401, 'authentication_error', 'api_key_revoked', 'This API key has been revoked by the account owner.');
     }
     if ((int) $row['is_active'] !== 1) {

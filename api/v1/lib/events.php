@@ -35,7 +35,7 @@ const API_EVENT_TYPES = [
     'import_batch.reverted',
 ];
 
-/** Attempt schedule in seconds. Six tries spread over roughly a day. */
+/** Attempt schedule in seconds. Six tries spanning about 15 hours. */
 const API_WEBHOOK_BACKOFF = [0, 60, 300, 1800, 7200, 43200];
 
 const API_WEBHOOK_MAX_ATTEMPTS = 6;

@@ -68,6 +68,10 @@ function api_with_idempotency(int $accountId, string $rawBody, callable $handler
     $bodyHash = hash('sha256', $rawBody);
 
     $claim = $pdo->prepare(
+        // No environment column here on purpose: the row is keyed on
+        // (account_id, idempotency_key), and account_id is already scoped to one
+        // environment, so a second copy of the column would only be able to
+        // disagree with it. api_rate_limits omits it for the same reason.
         "INSERT INTO api_idempotency_cache
              (account_id, idempotency_key, body_hash, response_status, response_body)
          VALUES (?, ?, ?, 0, '')
@@ -117,11 +121,7 @@ function api_with_idempotency(int $accountId, string $rawBody, callable $handler
         );
     }
 
-    api_send_common_headers();
-    header('Idempotent-Replayed: true');
-    http_response_code((int) $row['response_status']);
-    echo $row['response_body'];
-    exit;
+    api_send_cached_response((int) $row['response_status'], (string) $row['response_body']);
 }
 
 /**
@@ -149,6 +149,24 @@ function api_run_claimed_handler(int $accountId, string $key, callable $handler)
 
     try {
         $handler();
+    } catch (ApiResponseSent $sent) {
+        // Only reachable under API_TESTING, where api_json throws instead of
+        // exiting. That is the handler FINISHING, not failing, so the response
+        // has to be persisted exactly as the shutdown hook would have done in
+        // production. Treating it as a crash would release the claim and let a
+        // replay run the handler a second time, which is the one thing this
+        // whole mechanism exists to prevent.
+        $state->persist = false;
+        while (ob_get_level() > $level) {
+            ob_end_clean();
+        }
+        api_persist_idempotent_response(
+            $accountId,
+            $key,
+            $sent->status,
+            (string) json_encode($sent->payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
+        throw $sent;
     } catch (\Throwable $e) {
         $state->persist = false;
         while (ob_get_level() > $level) {

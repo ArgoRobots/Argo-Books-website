@@ -84,6 +84,56 @@ function cron_run_finish(PDO $pdo, int $runId, string $status, ?string $error = 
     } catch (Throwable $e) {
         error_log("cron_run_finish failed for run #$runId: " . $e->getMessage());
     }
+
+    cron_runs_prune($pdo);
+}
+
+/**
+ * How long a finished run is kept. The admin Crons page looks back 30 days at
+ * most, so this leaves a wide margin while stopping the table growing forever.
+ */
+const CRON_RUN_RETENTION_DAYS = 90;
+
+/**
+ * Delete finished runs past the retention window, occasionally.
+ *
+ * Nothing pruned this table before, and it only grows: the crons that run every
+ * minute add well over half a million rows a year each. Retention lives here
+ * rather than in any one cron because this file is what creates the rows, so
+ * every cron contributes to the cleanup no matter which one happens to fire.
+ *
+ * The newest run of each cron is always kept, whatever its age. Without that, a
+ * cron that has not run in months would vanish from the admin page entirely and
+ * read as "never run", which is exactly the question that page exists to answer.
+ *
+ * Sampled rather than run every time: at these frequencies one in five hundred
+ * still means several sweeps a day, and a DELETE on every single run would cost
+ * more than the rows it removes.
+ */
+function cron_runs_prune(PDO $pdo): void
+{
+    try {
+        if (random_int(1, 500) !== 1) {
+            return;
+        }
+
+        // The derived table is not optional. MySQL refuses a subquery that
+        // selects from the same table an UPDATE or DELETE is modifying, and
+        // wrapping it in a second SELECT is what gets around that.
+        $pdo->prepare(
+            'DELETE FROM cron_runs
+              WHERE started_at < DATE_SUB(NOW(), INTERVAL ' . CRON_RUN_RETENTION_DAYS . ' DAY)
+                AND status <> ?
+                AND id NOT IN (
+                    SELECT keep_id FROM (
+                        SELECT MAX(id) AS keep_id FROM cron_runs GROUP BY cron_name
+                    ) AS latest_per_cron
+                )'
+        )->execute(['running']);
+    } catch (Throwable $e) {
+        // Housekeeping must never take a cron down with it.
+        error_log('cron_runs_prune failed: ' . $e->getMessage());
+    }
 }
 
 /** Increment a named counter by $by (default 1). */

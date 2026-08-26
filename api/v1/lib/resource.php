@@ -209,7 +209,7 @@ function api_handle_list(array $spec, array $auth, string $segment): void
     // what is still waiting, and how a developer checks whether their push landed.
     if (isset($_GET['import_status']) && $_GET['import_status'] !== '') {
         $status = (string) $_GET['import_status'];
-        $allowed = ['pending', 'imported', 'rejected', 'superseded'];
+        $allowed = ['pending', 'imported', 'rejected'];
         if (!in_array($status, $allowed, true)) {
             api_error(
                 400,
@@ -356,9 +356,11 @@ function api_handle_delete(array $spec, array $auth, string $publicId): void
     $existing = api_fetch_object($spec, $publicId, $accountId);
     api_require_pending($spec, $existing, 'deleted');
 
-    // Soft delete. The row stays so that a later reference to its id, from a
-    // developer's retry or from an already-issued receipt, still resolves to a
-    // clear "this was deleted" rather than a bare 404 with no explanation.
+    // Soft delete, and note that a later GET of this id returns a plain 404:
+    // the row is kept for referential integrity, not to report the deletion.
+    // Keeping it means an id is never reused, a reference from another object
+    // cannot dangle onto a recycled row, and a deleted refund stops counting
+    // against its revenue's refundable balance.
     $pdo->prepare(
         'UPDATE ' . $spec['table'] . ' SET deleted_at = NOW() WHERE public_id = ? AND account_id = ? AND environment = ?'
     )->execute([$publicId, $accountId, api_env()]);

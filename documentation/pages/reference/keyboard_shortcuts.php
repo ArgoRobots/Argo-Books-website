@@ -22,13 +22,18 @@ include __DIR__ . '/../../docs-header.php';
                     <tbody>
                         <tr><td><strong>Ctrl + K</strong></td><td>Open search / quick actions</td></tr>
                         <tr><td><strong>Ctrl + Scroll</strong></td><td>Zoom a chart or an invoice preview</td></tr>
-                        <tr><td><strong>Esc</strong></td><td>Close the open dialog or panel</td></tr>
+                        <tr><td><strong>F11</strong></td><td>Enter or leave full screen</td></tr>
+                        <tr><td><strong>Esc</strong></td><td>Close the open dialog or panel, or leave full screen</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="info-box">
                 <strong>In the quick actions panel:</strong> type to search, use <strong>&uarr;</strong> and <strong>&darr;</strong> to move through the results, <strong>Enter</strong> to run the highlighted one, and <strong>Esc</strong> to close.
+            </div>
+
+            <div class="info-box">
+                <strong>Full screen:</strong> <strong>F11</strong> hides the title bar and fills the screen, and pressing it again returns you. <strong>Esc</strong> also leaves full screen, but only when nothing else is using it: if a dialog is open, Esc closes the dialog and you stay full screen. If you would rather use the mouse, the restore button in the top right corner also brings the window back.
             </div>
 
             <h2>Report Generator Layout Designer</h2>

@@ -14,14 +14,14 @@ require_once __DIR__ . '/../track_referral.php';
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, with more integrations on the way.">
+        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, or send data from your own systems through the Argo Books API.">
     <meta name="keywords"
         content="Argo Books integrations, Stripe integration, Square integration, PayPal integration, Shopify integration, Etsy integration, WooCommerce integration, Gumroad integration, Argo Books API, accounting software integrations, connect Stripe to accounting software">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Integrations | Argo Books">
     <meta property="og:description"
-        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, with more integrations on the way.">
+        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, or send data from your own systems through the Argo Books API.">
     <meta property="og:url" content="https://argorobots.com/integrations/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Integrations | Argo Books">
     <meta name="twitter:description"
-        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, with more integrations on the way.">
+        content="Connect Argo Books to the tools you already use. Import your Stripe sales, fees, and customers automatically, or send data from your own systems through the Argo Books API.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -123,7 +123,7 @@ require_once __DIR__ . '/../track_referral.php';
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Integrations</h1>
-            <p class="hero-subtitle animate-fade-in">Bring the tools you already use into your books. Connect your existing tools so your sales, fees, and customers flow into Argo Books automatically.</p>
+            <p class="hero-subtitle animate-fade-in">Bring the tools you already use into your books. Connect an existing tool, or your own systems through the API, so your sales, fees, and customers arrive on their own.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -141,8 +141,8 @@ require_once __DIR__ . '/../track_referral.php';
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Connect Your Tools</span>
-                <h2 class="section-title">Where you take payments</h2>
-                <p class="section-desc">Start with Stripe today. We're building out support for the other platforms below next.</p>
+                <h2 class="section-title">What you can connect</h2>
+                <p class="section-desc">Stripe and the Argo Books API are live today. We're building out support for the other platforms below next.</p>
             </div>
             <div class="features-grid">
                 <!-- Stripe (live) -->
@@ -153,6 +153,18 @@ require_once __DIR__ . '/../track_referral.php';
                     </div>
                     <h3>Stripe</h3>
                     <p>Import your Stripe sales, fees, tax, and customers into your books automatically.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
+
+                <!-- Argo Books API (live). Kept beside Stripe so the two that
+                     actually work sit together at the front of the grid. -->
+                <a href="<?= $base ?>integrations/argo-books-api/" class="feature-card animate-on-scroll">
+                    <span class="integration-card-badge live">Live</span>
+                    <div class="feature-card-icon green">
+                        <?= svg_icon('bolt', 24) ?>
+                    </div>
+                    <h3>Argo Books API</h3>
+                    <p>Connect your own store, booking system or in-house tool and send sales straight into your books.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
 
@@ -215,16 +227,6 @@ require_once __DIR__ . '/../track_referral.php';
                     <h3>Gumroad</h3>
                     <p>Coming soon.</p>
                 </div>
-
-                <!-- Argo API (coming soon) -->
-                <div class="feature-card integration-card-disabled animate-on-scroll">
-                    <span class="integration-card-badge soon">Coming Soon</span>
-                    <div class="feature-card-icon green">
-                        <?= svg_icon('bolt', 24) ?>
-                    </div>
-                    <h3>Argo API</h3>
-                    <p>Connect your own website or app and send sales into your books directly. Coming soon.</p>
-                </div>
             </div>
         </div>
     </section>
@@ -249,8 +251,8 @@ require_once __DIR__ . '/../track_referral.php';
                     <div class="why-card-icon">
                         <?= svg_icon('shield', 28) ?>
                     </div>
-                    <h3>Read-only, always</h3>
-                    <p>Every integration connects with a restricted, read-only key. Argo Books can read your data, but it can never move money.</p>
+                    <h3>Limited by design</h3>
+                    <p>Stripe connects with a restricted, read-only key. The API can only add to a review list you approve. Neither can move money or change records you already have.</p>
                 </div>
                 <div class="why-card animate-on-scroll">
                     <div class="why-card-icon">
@@ -272,7 +274,7 @@ require_once __DIR__ . '/../track_referral.php';
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to connect your tools?</h2>
-                    <p>Download Argo Books for free and connect Stripe in a few minutes.</p>
+                    <p>Download Argo Books for free and connect Stripe, or your own systems, in a few minutes.</p>
                     <div class="cta-buttons">
                         <a href="../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

@@ -135,39 +135,79 @@ $insertStmt = $pdo->prepare(
      ON DUPLICATE KEY UPDATE rates = VALUES(rates), fetched_at = NOW()"
 );
 
-foreach ($datesToFetch as $date) {
-    $isLatest = ($date === $today);
-    if ($isLatest) {
-        $url = "https://openexchangerates.org/api/latest.json?app_id={$apiKey}&base=USD";
-    } else {
-        $url = "https://openexchangerates.org/api/historical/{$date}.json?app_id={$apiKey}&base=USD";
+// Fetched concurrently, not one after another.
+//
+// This request is a batch only between the app and here; upstream still needs one
+// call per date, and running them in series meant an import waited the sum of every
+// round trip. Five cold dates was routinely fifteen seconds, with the desktop app
+// showing nothing, which reads as a hang. Concurrently it costs about as long as the
+// slowest single date.
+//
+// Windowed rather than all at once: $maxOerCalls is 30, and thirty simultaneous
+// connections is the kind of thing an upstream rate limiter exists to stop.
+$concurrency = 8;
+
+foreach (array_chunk(array_values($datesToFetch), $concurrency) as $chunk) {
+    $multi = curl_multi_init();
+    $handles = [];
+
+    foreach ($chunk as $date) {
+        $url = $date === $today
+            ? "https://openexchangerates.org/api/latest.json?app_id={$apiKey}&base=USD"
+            : "https://openexchangerates.org/api/historical/{$date}.json?app_id={$apiKey}&base=USD";
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
+
+        curl_multi_add_handle($multi, $ch);
+        $handles[$date] = $ch;
     }
 
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_CONNECTTIMEOUT => 5,
-    ]);
+    do {
+        $status = curl_multi_exec($multi, $running);
+        if ($running) {
+            // Blocks until something moves, rather than spinning on the CPU.
+            // select() returns -1 when there is no descriptor to wait on, which
+            // libcurl can do while resolving a name. It did not happen in testing
+            // here (one already-resolved host), so this is a guard rather than a
+            // fix: without it that case would busy-loop for the whole fetch.
+            if (curl_multi_select($multi, 1.0) === -1) {
+                usleep(1000);
+            }
+        }
+    } while ($running && $status === CURLM_OK);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    foreach ($handles as $date => $ch) {
+        $response = curl_multi_getcontent($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-    if ($response === false || $httpCode !== 200) {
-        $failed[] = $date;
-        continue;
+        curl_multi_remove_handle($multi, $ch);
+        // The old serial loop never closed its handle. Harmless when the script was
+        // about to end anyway, not harmless once there are several per request.
+        curl_close($ch);
+
+        if ($response === false || $response === null || $httpCode !== 200) {
+            $failed[] = $date;
+            continue;
+        }
+
+        $data = json_decode($response, true);
+        if ($data === null || !isset($data['rates'])) {
+            $failed[] = $date;
+            continue;
+        }
+
+        // Store in MySQL
+        $insertStmt->execute([$date, json_encode($data['rates'])]);
+
+        $results[$date] = $data['rates'];
     }
 
-    $data = json_decode($response, true);
-    if ($data === null || !isset($data['rates'])) {
-        $failed[] = $date;
-        continue;
-    }
-
-    // Store in MySQL
-    $insertStmt->execute([$date, json_encode($data['rates'])]);
-
-    $results[$date] = $data['rates'];
+    curl_multi_close($multi);
 }
 
 send_json_response(200, [

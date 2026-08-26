@@ -16,7 +16,7 @@ Argo Books, reviews it, and imports it.
 Three consequences that shape everything else:
 
 1. Every resource row carries an import lifecycle: `pending`, `imported`,
-   `rejected`, `superseded`.
+   `rejected`.
 2. API ids (`cus_`, `exp_`, ...) are not the ids the desktop assigns. The local id
    comes back in `import.local_ref` after an import.
 3. An object can only be changed while it is `pending`. Once imported, the
@@ -69,7 +69,7 @@ delete (soft), and list. Expenses and revenue also support
     "code": "parameter_missing",
     "message": "Missing required parameter 'name'.",
     "param": "name",
-    "doc_url": "https://argorobots.com/documentation/api/errors#parameter_missing",
+    "doc_url": "https://argorobots.com/documentation/pages/api/errors.php#parameter_missing",
     "request_id": "req_9f3ed3dc2e61733488a1db04"
   }
 }
@@ -139,21 +139,34 @@ Types are `<object>.imported`, `<object>.rejected`, `import_batch.completed` and
 - Delivery is a cron (`cron/api_webhook_delivery.php`), not inline with the
   request that creates the event. A developer's hanging server must never become
   a merchant's hanging import.
-- Six attempts over roughly a day. An endpoint whose last 20 deliveries all
+- Six attempts spanning about 15 hours. An endpoint whose last 20 deliveries all
   failed is auto-disabled and the merchant re-enables it.
 - `/v1/events` is a 90 day log, so an endpoint that was down catches up itself
   rather than needing us to replay anything.
 
-**Endpoint URLs must be public HTTPS.** The private-range and loopback checks in
-`api_validate_webhook_url()` are not politeness: without them this endpoint is a
-server-side request forgery primitive that anyone holding a key can aim at our
-own network.
+**Endpoint URLs must be public HTTPS.** The host rules in `api/v1/lib/net.php`
+are not politeness: without them this endpoint is a server-side request forgery
+primitive that anyone holding a key can aim at our own network. They:
+
+- resolve A and AAAA records and require EVERY address to be public, so a name
+  answering with one public and one private address is refused
+- strip the brackets off an IPv6 literal first, since `https://[::1]/` otherwise
+  passes every check by being neither a parseable IP nor a resolvable name
+- unwrap IPv4-mapped IPv6 (`::ffff:127.0.0.1`) before judging it
+- fail closed on a name that does not resolve
+- run again in the delivery cron immediately before every POST, because a name
+  that resolved publicly at registration can be repointed afterwards
 
 ## Documentation
 
-Public developer docs are at `/documentation/api` (rewritten to
-`documentation/pages/api/`). Six pages: overview, authentication, resources,
-imports, webhooks, errors.
+Public developer docs are at `/documentation/pages/api/`, listed on the
+documentation index and in the sidebar. Six pages: overview, authentication,
+resources, imports, webhooks, errors.
+
+There is no prettier `/documentation/api` alias, and adding one back would
+break the pages. Documentation pages link their stylesheets and each other
+relatively, so serving one at a shallower URL leaves every asset and every
+next/previous link resolving from the wrong base.
 
 Two of them generate themselves from the code, which is the only reason to trust
 them a year from now:
@@ -163,17 +176,56 @@ them a year from now:
 - `errors.php` holds a row per error code, and `ContractTest` fails the build if
   the API can emit a code the page does not document. Every live error links to
   its anchor there, so a missing row is a broken link in a developer's face.
+  That check skips itself while the page is absent, so it enforces nothing until
+  the documentation ships alongside the API.
 
 ## Tests
 
 `tests/Unit/PublicApi/` covers validation, the webhook and signing rules, and the
 wire contract (id format, error envelope, pagination bounds, definition
-integrity). 69 tests.
+integrity).
+
+`tests/Integration/PublicApi/` covers the parts that fail expensively and cannot
+be reached by a pure-function test: authentication and scopes, the environment
+boundary (a key from one environment must not authenticate in the other, and no
+list may leak across), the idempotency claim (replay, body mismatch, in-flight,
+and release after a crashed handler), and import-batch atomicity.
+
+`SampleCodeTest` **executes every code sample printed in the documentation**.
+It starts a PHP server, mints a real key, and runs each sample as written in
+cURL, PHP, C#, JavaScript and Python, asserting on what it prints. Signature
+verification samples are driven with four vectors: a genuine signature, a forged
+one, one correctly signed but too old, and a header that is not a signature.
+
+Two things make it worth having rather than decorative:
+
+- Samples are run verbatim. Only the host and the placeholder key are rewritten,
+  so what executes is the code on the page.
+- The assertions check the printed value, not just the exit code. Several
+  samples exited zero while printing `undefined` or a PHP warning, and looked
+  green until the expected shape was asserted.
+
+Run just those with `./vendor/bin/phpunit --group doc-samples`. They add about
+15 seconds to the suite, nearly all of it compiling the C# samples, which are
+built once into a single project and then invoked per sample.
+
+A language that is not installed is skipped rather than failed, so the suite
+still runs on a machine without dotnet. `.env.testing` must exist: the sample
+server refuses to start against anything but `argo_books_test`, because the
+samples create records.
 
 The bootstrap defines `API_TESTING` before loading the lib, which makes
 `api_json()` throw `ApiResponseSent` instead of ending the process. Without that,
 every validator would be untestable in process and the alternative would be
-duplicating validation logic somewhere test-shaped.
+duplicating validation logic somewhere test-shaped. Two consequences worth
+knowing before touching that code:
+
+- `api_run_claimed_handler()` treats `ApiResponseSent` as the handler finishing,
+  not failing, and persists the response itself. Read as a crash instead, it
+  would release the claim and let a replay run the handler twice, which is the
+  one outcome the whole mechanism exists to prevent.
+- `api_request_body()` accepts `$GLOBALS['__api_test_body']` under the same flag,
+  because `php://input` cannot be written from a test.
 
 ## Files
 

@@ -30,12 +30,13 @@ $cronConfig = [
     'api_webhook_delivery' => [
         'label'     => 'API Webhook Delivery',
         'frequency' => 'every minute',
-        'description' => "Delivers Argo Books API events to developer webhook endpoints. Events fire when a merchant imports, rejects, or undoes data a developer pushed, which is the only way an integration learns what happened to it. Delivery is signed and retried six times over roughly a day; an endpoint whose last twenty deliveries all failed is switched off automatically and the merchant re-enables it once their receiver is fixed. A high 'Exhausted' count means somebody's integration has been broken long enough to lose events.",
+        'description' => "Delivers Argo Books API events to developer webhook endpoints. Events fire when a merchant imports, rejects, or undoes data a developer pushed, which is the only way an integration learns what happened to it. Delivery is signed and retried up to six times over about 15 hours; an endpoint whose last twenty deliveries all failed is switched off automatically and the merchant re-enables it once their receiver is fixed. A high 'Exhausted' count means somebody's integration has been broken long enough to lose events.",
         'metrics'   => [
             'due'                 => 'Deliveries due this run',
             'delivered'           => 'Delivered successfully',
             'retried'             => 'Failed, will retry',
             'exhausted'           => 'Gave up after 6 attempts',
+            'blocked'             => 'Refused, destination not public',
             'endpoints_disabled'  => 'Endpoints auto-disabled',
             'events_pruned'       => 'Old events pruned',
         ],

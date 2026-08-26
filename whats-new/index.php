@@ -117,19 +117,13 @@ $pricing = get_pricing_config();
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
                                 <li><strong>Activation asks less of you:</strong> After you enter a license key, the email box is yours to fill in or skip. Leave your address if you would like us to be able to reach you, or carry straight on to the app.</li>
-                                <li><strong>Amounts keep their own date's rate:</strong> Money arriving from a connected app is converted using the exchange rate for the day it belongs to, so a figure from last month keeps last month's value.</li>
                                 <li><strong>See what a sync is doing:</strong> A sync now tells you what it is working on while it runs, instead of leaving you watching a spinner.</li>
-                                <li><strong>Settings is easier to move around:</strong> Each kind of settings panel now has a shape that suits what it holds, with roomier spacing throughout.</li>
                                 <li><strong>Charts open the way most people want them:</strong> Charts now start in the area style rather than needing a change every time.</li>
-                                <li><strong>A sample company that adds up:</strong> The practice company's payroll and purchases are now in proportion to its sales, so the numbers behave like a real business while you are finding your way around.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Steadier Premium activation</strong> Argo Books is more patient when it checks your license as it starts up, so Premium stays on.</li>
-                                <li><strong>The activation window knows when it is finished</strong> The license window now closes on its own once you are done with it.</li>
-                                <li><strong>Imports tidy up after themselves</strong> Undoing an import now clears away everything it brought in, and Argo Books says so plainly when an import cannot be brought back.</li>
                                 <li>The usual round of polish and performance work across the app.</li>
                             </ul>
                         </div>

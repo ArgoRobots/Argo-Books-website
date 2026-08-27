@@ -408,6 +408,11 @@ if (!function_exists('ua_kv')) {
     <div class="ua-controls" id="ua-controls">
         <input type="text" id="ua-search" class="ua-input" placeholder="Search id, country, region, version&hellip;">
         <span class="ua-count" id="ua-count"></span>
+        <!-- Same scope as the per-user button, for everybody at once: every event
+             ever sent, ignoring this page's range and tier. Grouped by user with an
+             auth_id column, which the single-user file does not carry. -->
+        <a class="ua-dl" href="download-user.php?all=1"
+           title="Every event from every user, in one file. Ignores the filters above.">Download all users (CSV)</a>
         <?php if ($ua_otherEnvUsers): ?>
             <span class="ua-dupes" title="Premium installs whose subscription is not in this environment: a sandbox test redemption, or a subscription since deleted. Hidden here and everywhere else on this page.">
                 <?= count($ua_otherEnvUsers) ?> <?= htmlspecialchars($ua_otherEnvLabel) ?> install<?= count($ua_otherEnvUsers) === 1 ? '' : 's' ?> hidden

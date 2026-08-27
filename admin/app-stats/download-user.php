@@ -1,11 +1,17 @@
 <?php
 /**
- * CSV export of one user's entire telemetry history.
+ * CSV export of telemetry history, for one user or for everybody.
  *
- * Reached from the "Download CSV" button on each card of the app-stats User
- * Activity tab. Deliberately ignores that page's date range and tier filter:
- * the button means "everything this user ever sent", the same scope the Delete
- * button beside it operates on, so the file you get never depends on page state.
+ * ?authId=...  one user, reached from the "Download CSV" button on their card.
+ * ?all=1       every user in one file, reached from the button above the list.
+ *
+ * Both deliberately ignore the page's date range and tier filter: the buttons mean
+ * "everything ever sent", the same scope the Delete button operates on, so the file
+ * you get never depends on page state.
+ *
+ * The all-users export adds an auth_id column and is grouped by user, newest user
+ * first, each user's own events newest first. The single-user export keeps exactly
+ * the columns it always had, so anything already reading those files still works.
  *
  * Interpretation of each event is shared with the tab via user-activity-events.php
  * rather than duplicated, so the CSV always says what the screen says.
@@ -27,8 +33,9 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 // CSV instead of a dashboard. Point it back at the tab the button lives on.
 $_SESSION['admin_return_to'] = '/admin/app-stats/?tab=user-activity';
 
-$authId = (string)($_GET['authId'] ?? '');
-if ($authId === '') {
+$allMode = (string)($_GET['all'] ?? '') === '1';
+$authId  = (string)($_GET['authId'] ?? '');
+if (!$allMode && $authId === '') {
     http_response_code(400);
     exit('Missing authId');
 }
@@ -85,95 +92,155 @@ function ua_csv_safe($value): string
     return $s;
 }
 
-// ---- Gather this user's events ----------------------------------------------
-// Rows are built in memory rather than streamed, because they are sorted newest
-// first at the end and one user's history is small (thousands of rows at most).
-$rows        = [];
+// ---- Row building -------------------------------------------------------------
+
+/**
+ * Every row one user ever sent, unsorted.
+ *
+ * Held in memory per user rather than for the whole site. One person's history is
+ * small, so the all-users export stays flat in memory no matter how many people
+ * are on it: their rows are built, written and released before the next user
+ * starts. Building the whole site's history at once would not survive a few
+ * hundred installs on shared hosting.
+ *
+ * $seen is threaded through every call so a re-uploaded event is collapsed once
+ * across the entire export, exactly as it is on the tab.
+ */
+function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$matchedFile): array
+{
+    $rows = [];
+
+    foreach ($files as $name => $path) {
+        $raw = @file_get_contents($path);
+        if ($raw === false || trim($raw) === '') continue;
+        $d = json_decode($raw, true);
+        if (!is_array($d) || !isset($d['events']) || !is_array($d['events'])) continue;
+
+        // The parameter is only ever compared against file contents. It never touches a
+        // path, so no value of authId can reach a file outside data-logs/.
+        if ((string)($d['authId'] ?? '') !== $authId) continue;
+        $matchedFile = true;
+
+        $geo = $d['geoLocation'] ?? [];
+        $fileMeta = [
+            'tier'        => $d['tier'] ?? 'premium',
+            'app_version' => $d['appVersion'] ?? '',
+            'platform'    => $d['platform'] ?? '',
+            'country'     => $geo['country'] ?? '',
+            'region'      => $geo['region'] ?? '',
+            'timezone'    => $geo['timezone'] ?? '',
+        ];
+
+        foreach ($d['events'] as $ev) {
+            // A re-uploaded event is the same action, not a second one. Matches the tab,
+            // so the CSV row count agrees with the "Show all N events" figure.
+            if (telemetry_is_duplicate_event($ev, $authId, $seen)) {
+                continue;
+            }
+            $ev = ua_unwrap_event($ev);
+
+            [$type, $text] = ua_describe_event($ev);
+            $ts = isset($ev['timestamp']) ? strtotime($ev['timestamp']) : false;
+
+            $rows[] = [
+                'sort'             => $ts === false ? 0 : $ts,
+                'auth_id'          => $authId,
+                'timestamp_utc'    => $ts === false ? '' : gmdate('Y-m-d H:i:s', $ts),
+                'event_type'       => $type,
+                'description'      => $text,
+                'severity'         => $ev['severity'] ?? '',
+                'tier'             => $fileMeta['tier'],
+                'app_version'      => $fileMeta['app_version'],
+                'platform'         => $fileMeta['platform'],
+                'country'          => $fileMeta['country'],
+                'region'           => $fileMeta['region'],
+                'timezone'         => $fileMeta['timezone'],
+                'feature_name'     => $ev['featureName'] ?? '',
+                'export_type'      => $ev['exportType'] ?? '',
+                'api_name'         => $ev['apiName'] ?? '',
+                'error_category'   => $ev['errorCategory'] ?? '',
+                'error_code'       => $ev['errorCode'] ?? '',
+                'message'          => $ev['message'] ?? '',
+                'source_file'      => $ev['sourceFile'] ?? '',
+                'line_number'      => $ev['lineNumber'] ?? '',
+                'method_name'      => $ev['methodName'] ?? '',
+                'duration_ms'      => $ev['durationMs'] ?? '',
+                'duration_seconds' => $ev['durationSeconds'] ?? '',
+                'clean'            => ua_csv_bool($ev, 'clean'),
+                'file_size'        => $ev['fileSize'] ?? '',
+                'success'          => ua_csv_bool($ev, 'success'),
+                'telemetry_file'   => $name,
+            ];
+        }
+    }
+
+    return $rows;
+}
+
+// ---- Work out who is being exported ------------------------------------------
+// One cheap pass over the files to learn which authId each belongs to, so the
+// all-users export can group by person without ever holding the whole site's
+// events at once. Each user's files are then re-read on their turn.
+
 $seenIds     = [];
 $matchedFile = false;
 
-foreach ($files as $name => $path) {
-    $raw = @file_get_contents($path);
-    if ($raw === false || trim($raw) === '') continue;
-    $d = json_decode($raw, true);
-    if (!is_array($d) || !isset($d['events']) || !is_array($d['events'])) continue;
+if ($allMode) {
+    $filesByAuth = [];   // authId => [basename => path]
+    $newestByAuth = [];  // authId => newest mtime, used only for ordering
 
-    // The parameter is only ever compared against file contents. It never touches a
-    // path, so no value of authId can reach a file outside data-logs/.
-    if ((string)($d['authId'] ?? '') !== $authId) continue;
-    $matchedFile = true;
+    foreach ($files as $name => $path) {
+        $raw = @file_get_contents($path);
+        if ($raw === false || trim($raw) === '') continue;
+        $d = json_decode($raw, true);
+        if (!is_array($d)) continue;
 
-    $geo = $d['geoLocation'] ?? [];
-    $fileMeta = [
-        'tier'        => $d['tier'] ?? 'premium',
-        'app_version' => $d['appVersion'] ?? '',
-        'platform'    => $d['platform'] ?? '',
-        'country'     => $geo['country'] ?? '',
-        'region'      => $geo['region'] ?? '',
-        'timezone'    => $geo['timezone'] ?? '',
-    ];
+        $owner = (string)($d['authId'] ?? '');
+        if ($owner === '') continue;
 
-    foreach ($d['events'] as $ev) {
-        // A re-uploaded event is the same action, not a second one. Matches the tab,
-        // so the CSV row count agrees with the "Show all N events" figure.
-        if (telemetry_is_duplicate_event($ev, $authId, $seenIds)) {
-            continue;
+        $filesByAuth[$owner][$name] = $path;
+        $mtime = @filemtime($path) ?: 0;
+        if (!isset($newestByAuth[$owner]) || $mtime > $newestByAuth[$owner]) {
+            $newestByAuth[$owner] = $mtime;
         }
-        $ev = ua_unwrap_event($ev);
-
-        [$type, $text] = ua_describe_event($ev);
-        $ts = isset($ev['timestamp']) ? strtotime($ev['timestamp']) : false;
-
-        $rows[] = [
-            'sort'             => $ts === false ? 0 : $ts,
-            'timestamp_utc'    => $ts === false ? '' : gmdate('Y-m-d H:i:s', $ts),
-            'event_type'       => $type,
-            'description'      => $text,
-            'severity'         => $ev['severity'] ?? '',
-            'tier'             => $fileMeta['tier'],
-            'app_version'      => $fileMeta['app_version'],
-            'platform'         => $fileMeta['platform'],
-            'country'          => $fileMeta['country'],
-            'region'           => $fileMeta['region'],
-            'timezone'         => $fileMeta['timezone'],
-            'feature_name'     => $ev['featureName'] ?? '',
-            'export_type'      => $ev['exportType'] ?? '',
-            'api_name'         => $ev['apiName'] ?? '',
-            'error_category'   => $ev['errorCategory'] ?? '',
-            'error_code'       => $ev['errorCode'] ?? '',
-            'message'          => $ev['message'] ?? '',
-            'source_file'      => $ev['sourceFile'] ?? '',
-            'line_number'      => $ev['lineNumber'] ?? '',
-            'method_name'      => $ev['methodName'] ?? '',
-            'duration_ms'      => $ev['durationMs'] ?? '',
-            'duration_seconds' => $ev['durationSeconds'] ?? '',
-            'clean'            => ua_csv_bool($ev, 'clean'),
-            'file_size'        => $ev['fileSize'] ?? '',
-            'success'          => ua_csv_bool($ev, 'success'),
-            'telemetry_file'   => $name,
-        ];
     }
+
+    // Most recently active first, which is the order the tab presents people in.
+    // Sorted on file mtime rather than event timestamps so this stays a metadata
+    // read: working out true recency would mean decoding everything twice.
+    arsort($newestByAuth);
+    $exportOrder = array_keys($newestByAuth);
+    $matchedFile = $exportOrder !== [];
+} else {
+    $exportOrder = [$authId];
+    $filesByAuth = [$authId => $files];
 }
 
-// An authId nobody uploaded under is a bad request, not an empty spreadsheet. A
-// zero-byte CSV looks like the user genuinely did nothing, which is worse than an error.
+// Nobody to export is a bad request, not an empty spreadsheet. A zero-byte CSV looks
+// like the user genuinely did nothing, which is worse than an error.
+if (!$allMode) {
+    // Built up front so an authId nobody uploaded under still 404s before any
+    // headers go out. The rows are kept and written below rather than rebuilt.
+    $probe = ua_rows_for_user($files, $authId, $seenIds, $matchedFile);
+}
 if (!$matchedFile) {
     http_response_code(404);
-    exit('No telemetry found for that user');
+    exit($allMode ? 'No telemetry found' : 'No telemetry found for that user');
 }
-
-// Newest first, matching the on-screen timeline. Undated events sort to the bottom.
-usort($rows, fn($a, $b) => $b['sort'] <=> $a['sort']);
 
 // ---- Emit ---------------------------------------------------------------------
-// authId contains a colon ('device:...' / 'subscription:...'), which is illegal in a
-// Windows filename, and is long enough to be unwieldy. Keep it recognisable instead.
-$slug = preg_replace('/[^A-Za-z0-9]+/', '-', $authId);
-$slug = trim((string)$slug, '-');
-if (strlen($slug) > 40) {
-    $slug = substr($slug, 0, 40);
+if ($allMode) {
+    $filename = 'argo-activity-all-users-' . gmdate('Y-m-d') . '.csv';
+} else {
+    // authId contains a colon ('device:...' / 'subscription:...'), which is illegal in a
+    // Windows filename, and is long enough to be unwieldy. Keep it recognisable instead.
+    $slug = preg_replace('/[^A-Za-z0-9]+/', '-', $authId);
+    $slug = trim((string)$slug, '-');
+    if (strlen($slug) > 40) {
+        $slug = substr($slug, 0, 40);
+    }
+    $filename = 'argo-activity-' . ($slug !== '' ? $slug : 'user') . '-' . gmdate('Y-m-d') . '.csv';
 }
-$filename = 'argo-activity-' . ($slug !== '' ? $slug : 'user') . '-' . gmdate('Y-m-d') . '.csv';
 
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -185,20 +252,38 @@ $out = fopen('php://output', 'w');
 // instead of showing mojibake.
 fwrite($out, "\xEF\xBB\xBF");
 
-$columns = [
-    'timestamp_utc', 'event_type', 'description', 'severity', 'tier', 'app_version',
-    'platform', 'country', 'region', 'timezone', 'feature_name', 'export_type',
-    'api_name', 'error_category', 'error_code', 'message', 'source_file',
-    'line_number', 'method_name', 'duration_ms', 'duration_seconds', 'clean',
-    'file_size', 'success', 'telemetry_file',
-];
+// auth_id only in the all-users file. Adding it to the single-user export would
+// repeat one constant on every row and change a format that already has readers.
+$columns = array_merge(
+    $allMode ? ['auth_id'] : [],
+    [
+        'timestamp_utc', 'event_type', 'description', 'severity', 'tier', 'app_version',
+        'platform', 'country', 'region', 'timezone', 'feature_name', 'export_type',
+        'api_name', 'error_category', 'error_code', 'message', 'source_file',
+        'line_number', 'method_name', 'duration_ms', 'duration_seconds', 'clean',
+        'file_size', 'success', 'telemetry_file',
+    ]
+);
 fputcsv($out, $columns);
 
-foreach ($rows as $row) {
-    $line = [];
-    foreach ($columns as $col) {
-        $line[] = ua_csv_safe($row[$col]);
+// One user at a time: build, sort, write, release. The single-user path reuses the
+// rows already gathered by the 404 probe rather than reading everything twice.
+foreach ($exportOrder as $owner) {
+    $rows = ($allMode || !isset($probe))
+        ? ua_rows_for_user($filesByAuth[$owner] ?? [], $owner, $seenIds, $matchedFile)
+        : $probe;
+
+    // Newest first, matching the on-screen timeline. Undated events sort to the bottom.
+    usort($rows, fn($a, $b) => $b['sort'] <=> $a['sort']);
+
+    foreach ($rows as $row) {
+        $line = [];
+        foreach ($columns as $col) {
+            $line[] = ua_csv_safe($row[$col] ?? '');
+        }
+        fputcsv($out, $line);
     }
-    fputcsv($out, $line);
+
+    unset($rows);
 }
 fclose($out);

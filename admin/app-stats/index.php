@@ -55,6 +55,7 @@ $aggregatedData = [
         'Export' => [],
         'Gemini' => [],
         'OpenExchangeRates' => [],
+        'OpenExchangeRatesBatch' => [],
         'ReceiptScanning' => [],
         'Session' => [],
         'Error' => [],
@@ -148,6 +149,12 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
 
                 case 'OpenExchangeRates':
                     return ['category' => 'OpenExchangeRates', 'data' => $normalized];
+
+                // Kept in its own bucket so the bulk call and the per-date repair that follows it
+                // can be told apart. Under one name a failing bulk request looks like ordinary
+                // traffic, which is exactly how it went unnoticed.
+                case 'OpenExchangeRatesBatch':
+                    return ['category' => 'OpenExchangeRatesBatch', 'data' => $normalized];
 
                 case 'ReceiptScanProxy':
                     return ['category' => 'ReceiptScanning', 'data' => $normalized];
@@ -585,6 +592,7 @@ include __DIR__ . '/../admin_header.php';
         count($aggregatedData['dataPoints']['Export']) > 0 ||
         count($aggregatedData['dataPoints']['Gemini']) > 0 ||
         count($aggregatedData['dataPoints']['OpenExchangeRates']) > 0 ||
+        count($aggregatedData['dataPoints']['OpenExchangeRatesBatch']) > 0 ||
         count($aggregatedData['dataPoints']['ReceiptScanning']) > 0 ||
         count($aggregatedData['dataPoints']['Session']) > 0 ||
         count($aggregatedData['dataPoints']['Error']) > 0 ||

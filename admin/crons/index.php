@@ -27,6 +27,27 @@ $rangeInterval = $rangeMap[$range]['interval'];
 // metric across all runs in the time range. Crons not yet writing to
 // cron_runs will show "No runs in range" with zeros across the board.
 $cronConfig = [
+    'argo_books_sync' => [
+        'label'     => 'Argo Books Books Sync',
+        'frequency' => 'daily',
+        'description' => "Pushes this business's own trading history into a company inside Argo Books, through the public API: subscription income, the customers who paid it, affiliate commissions, the affiliates they went to, and refunds against income already sent. Nothing lands in the books unattended, because the API is an ingest queue and someone accepts the proposals inside the app. Most days almost everything is skipped: a row is only sent when it has never been sent or when what it would send has changed, so a large 'Skipped, unchanged' count next to small created counts is the healthy shape. 'Failed' above zero means objects were rejected and the detail is in cron/logs/; 'Refunds deferred' means a refund arrived before the revenue it reverses and will go out on the next run.",
+        'metrics'   => [
+            'category_created'  => 'Categories created',
+            'customer_created'  => 'Customers created',
+            'customer_updated'  => 'Customers updated',
+            'supplier_created'  => 'Suppliers created',
+            'supplier_updated'  => 'Suppliers updated',
+            'revenue_created'   => 'Revenue entries created',
+            'revenue_updated'   => 'Revenue entries updated',
+            'expense_created'   => 'Expenses created',
+            'expense_updated'   => 'Expenses updated',
+            'refund_created'    => 'Refunds created',
+            'refunds_deferred'  => 'Refunds waiting on their revenue',
+            'skipped_unchanged' => 'Skipped, unchanged',
+            'failed'            => 'Rejected by the API',
+        ],
+        'expected_interval_hours' => 48,
+    ],
     'api_webhook_delivery' => [
         'label'     => 'API Webhook Delivery',
         'frequency' => 'every minute',

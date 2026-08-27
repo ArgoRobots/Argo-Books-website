@@ -97,7 +97,7 @@ $runId = cron_run_start($pdo, 'argo_books_sync');
 // ---------------------------------------------------------------------------
 
 $apiKey  = trim((string) env('ARGO_BOOKS_API_KEY', ''));
-$apiBase = rtrim((string) env('ARGO_BOOKS_API_BASE', site_url('/v1')), '/');
+$apiBase = rtrim(site_url('/v1'), '/');
 $env     = current_environment();
 
 if ($apiKey === '') {

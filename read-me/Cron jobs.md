@@ -501,7 +501,6 @@ Every write carries an `Idempotency-Key` derived from the source row, so the API
 | Variable | Purpose |
 |---|---|
 | `ARGO_BOOKS_API_KEY` | The API key minted in the app under Settings, Integrations. Environment-scoped, so a production key only works against production. |
-| `ARGO_BOOKS_API_BASE` | Optional. Defaults to `site_url('/v1')`, which is correct on both environments. |
 
 ### CLI Flags
 

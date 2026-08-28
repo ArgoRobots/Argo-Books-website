@@ -19,6 +19,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../country_names.php';         // country_name()
 require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 // ua_describe_event() / ua_is_warning() / ua_unwrap_event(). Shared with
 // download-user.php so the CSV export says the same thing this timeline does.
@@ -123,7 +124,7 @@ foreach ($ua_files as $name => $path) {
             'isFounder' => $isFounder,
             'platforms' => [],
             'versions'  => [],
-            'country'   => $geo['country'] ?? '',
+            'country'   => country_name($geo['country'] ?? ''),
             'region'    => $geo['region'] ?? '',
             'timezone'  => $geo['timezone'] ?? '',
             'first'     => null,
@@ -143,7 +144,7 @@ foreach ($ua_files as $name => $path) {
     $u['files'][] = $name;
     if (!empty($d['platform']))   $u['platforms'][$d['platform']] = true;
     if (!empty($d['appVersion'])) $u['versions'][$d['appVersion']] = true;
-    if (empty($u['country'])  && !empty($geo['country']))  $u['country']  = $geo['country'];
+    if (empty($u['country'])  && !empty($geo['country']))  $u['country']  = country_name($geo['country']);
     if (empty($u['region'])   && !empty($geo['region']))   $u['region']   = $geo['region'];
     if (empty($u['timezone']) && !empty($geo['timezone'])) $u['timezone'] = $geo['timezone'];
 

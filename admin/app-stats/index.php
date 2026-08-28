@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../country_names.php';         // country_name()
 require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 require_once __DIR__ . '/../date-range.php';
 require_once __DIR__ . '/telemetry-dedupe.php'; // telemetry_is_duplicate_event()
@@ -91,7 +92,12 @@ function normalizeEvent($event, $sessionMeta = []) {
     // Geo-location: prefer event-level, fall back to session-level
     $geo = $event['geoLocation'] ?? $sessionMeta['geoLocation'] ?? null;
     if (isset($geo) && is_array($geo)) {
-        $normalized['country'] = $geo['country'] ?? 'Unknown';
+        // The geolocation service returns a full name for some countries and a bare ISO
+        // code for others, so the same place could appear twice: once as "United States"
+        // and once as "US", splitting a chart bucket and missing its colour. country_name()
+        // maps a code to its name and returns anything else untouched, so it is safe to run
+        // over values that are already spelled out.
+        $normalized['country'] = country_name($geo['country'] ?? '') ?: 'Unknown';
         $normalized['region'] = $geo['region'] ?? '';
         $normalized['city'] = $geo['city'] ?? '';
         $normalized['timezone'] = $geo['timezone'] ?? '';

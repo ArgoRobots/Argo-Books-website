@@ -15,6 +15,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 require_once __DIR__ . '/../../founder_identity.php';      // is_founder_auth_id()
+require_once __DIR__ . '/../../country_names.php';         // country_name()
 require_once __DIR__ . '/../../telemetry_environment.php'; // is_other_environment_auth_id()
 
 // Date-range bounds come from the host page. Defaulted here so this partial
@@ -55,7 +56,8 @@ foreach ($crashFiles as $crashFile) {
     $meta = [
         'appVersion' => (string) ($data['appVersion'] ?? 'unknown'),
         'platform'   => (string) ($data['platform'] ?? 'Unknown'),
-        'country'    => $data['countryCode'] ?? null,
+        // Named countryCode, and it is one, so this column was never spelled out.
+        'country'    => country_name($data['countryCode'] ?? '') ?: null,
         'authId'     => $data['authId'] ?? null,
         'receivedAt' => $data['receivedAt'] ?? null,
     ];

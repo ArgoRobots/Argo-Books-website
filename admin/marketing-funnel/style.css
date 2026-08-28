@@ -1179,3 +1179,11 @@
     gap: 12px;
     margin-bottom: 8px;
 }
+
+/* .landing-breakdown above this carries a top margin but no bottom one, and
+   .table-container has no top margin, so the two cards met flush. Matching the
+   28px the survey block opens with keeps the vertical rhythm on the tab even.
+   Scoped rather than added to .table-container, which is shared site-wide. */
+.funnel-users-card {
+    margin-top: 28px;
+}

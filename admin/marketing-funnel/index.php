@@ -1387,7 +1387,7 @@ include __DIR__ . '/../admin_header.php';
                 ];
             }
         ?>
-        <div class="table-container">
+        <div class="table-container funnel-users-card">
             <div class="installs-head">
                 <h3 style="margin:0;">Users by source</h3>
                 <?php echo funnel_render_download_btn('users-by-source', [[

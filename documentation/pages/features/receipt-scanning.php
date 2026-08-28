@@ -23,19 +23,32 @@ include __DIR__ . '/../../docs-header.php';
             <ul>
                 <li><strong>Photos</strong> of printed or handwritten receipts</li>
                 <li><strong>Screenshots</strong> of digital receipts and email invoices</li>
-                <li><strong>Image files</strong> in common formats (JPG, PNG)</li>
+                <li><strong>Image files</strong> in JPG, PNG, WEBP, HEIC or HEIF</li>
                 <li><strong>PDFs</strong> of receipts or invoices</li>
             </ul>
+            <p>HEIC is what iPhones save photos as by default, so a photo taken on an iPhone
+               can be scanned as it is, with nothing to convert first.</p>
             <p>It also handles faded thermal paper, wrinkled receipts, and poor lighting, and supports multi-currency for international purchases.</p>
             <p>As a rule of thumb, if you can read the receipt in the image, Argo Books can too.</p>
 
             <h2>How It Works</h2>
             <ol class="steps-list">
-                <li>Take a photo of your receipt with your phone or upload an image or PDF</li>
+                <li>Get the receipt onto your computer: photograph it with your phone and
+                    copy the picture across, or use an image or PDF you already have</li>
                 <li>Our AI analyzes the receipt and extracts all relevant information</li>
                 <li>Review the extracted data and make any corrections</li>
                 <li>Save to automatically create a categorized expense record</li>
             </ol>
+
+            <h3>Getting a photo from your phone to your computer</h3>
+            <p>Argo Books runs on your computer, so the photo needs to reach it first. Any of
+               these work, whichever you already use:</p>
+            <ul>
+                <li>Email the photo to yourself and save the attachment</li>
+                <li>Let your phone's photos sync automatically, through OneDrive, Google Photos,
+                    iCloud or Dropbox, and pick the file from that folder</li>
+                <li>Connect the phone with a USB cable and copy it across</li>
+            </ul>
 
             <h2>What Gets Extracted</h2>
             <p>The AI automatically identifies and extracts:</p>

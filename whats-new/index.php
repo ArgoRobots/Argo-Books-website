@@ -116,15 +116,8 @@ $pricing = get_pricing_config();
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Activation asks less of you:</strong> After you enter a license key, the email box is yours to fill in or skip. Leave your address if you would like us to be able to reach you, or carry straight on to the app.</li>
-                                <li><strong>See what a sync is doing:</strong> A sync now tells you what it is working on while it runs, instead of leaving you watching a spinner.</li>
-                                <li><strong>Charts open the way most people want them:</strong> Charts now start in the area style rather than needing a change every time.</li>
-                            </ul>
-                        </div>
-                        <div class="changelog-section">
-                            <h4 class="section-label fix">Fixes</h4>
-                            <ul class="changelog-list">
-                                <li>The usual round of polish and performance work across the app.</li>
+                                <li><strong>See what a sync is doing:</strong> A sync now tells you what it's working on while it runs, instead of leaving you watching a spinner.</li>
+                                <li><strong>Charts open the way most people want them:</strong> Charts now start in the area style rather than the bar style.</li>
                             </ul>
                         </div>
                     </div>

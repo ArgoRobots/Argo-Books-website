@@ -1819,3 +1819,24 @@ CREATE TABLE IF NOT EXISTS api_webhook_deliveries (
     UNIQUE KEY uk_api_delivery_endpoint_event (endpoint_id, event_id),
     INDEX idx_api_delivery_due (status, next_attempt_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Remembers which API object each local row was sent as, so cron/argo_books_sync.php
+-- can tell a row it has never sent from one that has merely changed. Without it the
+-- sync could only ever create, and a corrected amount would arrive as a second entry
+-- beside the wrong one rather than replacing it.
+--
+-- content_hash is the payload as it was last accepted. An unchanged row is skipped
+-- without a request at all, which is what keeps a daily run over years of history down
+-- to the few rows that actually moved.
+CREATE TABLE IF NOT EXISTS argo_books_sync_map (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    source_type VARCHAR(40) NOT NULL COMMENT 'category, customer, supplier, revenue, expense, refund',
+    source_key VARCHAR(191) NOT NULL COMMENT 'Stable local identity, e.g. payment:1234 or email:someone@example.com',
+    api_object_id VARCHAR(64) NOT NULL COMMENT 'The cus_/rev_/exp_ id the API returned',
+    content_hash CHAR(64) DEFAULT NULL COMMENT 'sha256 of the payload last accepted, so unchanged rows cost no request',
+    environment ENUM('production', 'sandbox') NOT NULL DEFAULT 'production' COMMENT 'API keys are environment-scoped, so the mapping has to be too',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_abs_source (source_type, source_key, environment),
+    INDEX idx_abs_api_object (api_object_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

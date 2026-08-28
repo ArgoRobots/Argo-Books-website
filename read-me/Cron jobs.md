@@ -465,3 +465,66 @@ Supports `--dry-run`, which resolves everything and logs what would be sent with
 ### Logs
 
 No daily log file. Metrics are on `/admin/crons/`, and failures go to `error_log`.
+
+---
+
+## 14. Argo Books Books Sync
+
+**Script:** `cron/argo_books_sync.php`
+**Schedule:** Daily at 4:25 AM
+
+```bash
+25 4 * * * /usr/bin/php /home/argorobots/public_html/cron/argo_books_sync.php
+```
+
+### What It Does
+
+Pushes this business's own trading history into a company inside Argo Books, through the public API at `/v1`. It is the company's real bookkeeping, not a demo.
+
+1. Creates the two categories everything else hangs off: subscription income, affiliate commissions
+2. Creates one customer per paying email address, not one per subscription, so a renewing customer stays a single person with several payments
+3. Creates a supplier for each affiliate that has actually been paid
+4. Sends completed and refunded subscription payments as revenue, referencing the customer and category
+5. Sends affiliate payouts as expenses, referencing the supplier and category
+6. Sends a refund against the revenue for each payment whose status is `refunded`
+
+Nothing reaches the books unattended. The API is an ingest queue: objects arrive as proposals and someone accepts them inside the app.
+
+### How Repeat Runs Stay Honest
+
+Every write carries an `Idempotency-Key` derived from the source row, so the API refuses a duplicate even if the script runs twice in the same minute.
+
+`argo_books_sync_map` records the object id the API returned for each source row alongside a hash of what was sent. A row whose payload has not changed is skipped without a request, and one that has changed is updated in place rather than posted again as a second object. Most days almost everything is skipped, so a large "Skipped, unchanged" count beside small created counts is the healthy shape.
+
+### Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `ARGO_BOOKS_API_KEY` | The API key minted in the app under Settings, Integrations. Environment-scoped, so a production key only works against production. |
+
+### CLI Flags
+
+| Flag | Effect |
+|---|---|
+| `--dry-run` | Resolves and hashes everything, logs what would be sent, sends nothing |
+| `--since=YYYY-MM-DD` | Only considers source rows dated on or after this |
+| `--limit=N` | Stops after N writes, for a cautious first run |
+
+### Manual Execution
+
+```bash
+php /home/argorobots/public_html/cron/argo_books_sync.php --dry-run
+php /home/argorobots/public_html/cron/argo_books_sync.php --limit=25
+```
+
+### Known Gaps
+
+Payment processor fees are not stored per payment, so `fee_amount` is left at zero and the margin picture is incomplete.
+
+StackSocial income never appears. Free key redemptions create a subscription with no payment row, and the money arrives as Tipalti payouts that do not touch this database. Those are manual entries.
+
+There is no `refunded_at` column; a payment row simply flips to `refunded`. Refunds are therefore dated to the original sale rather than to when the money went back.
+
+### Logs
+
+Daily file at `cron/logs/argo_books_sync-YYYY-MM-DD.log`, plus metrics on `/admin/crons/` and failures in `error_log`.

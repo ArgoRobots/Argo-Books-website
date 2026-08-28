@@ -52,15 +52,14 @@ function api_record_event(int $accountId, string $type, ?string $objectId, array
     try {
         $publicId = api_generate_id('evt');
         $pdo->prepare(
-            'INSERT INTO api_events (account_id, public_id, type, object_id, data, environment)
-             VALUES (?, ?, ?, ?, ?, ?)'
+            'INSERT INTO api_events (account_id, public_id, type, object_id, data)
+             VALUES (?, ?, ?, ?, ?)'
         )->execute([
             $accountId,
             $publicId,
             $type,
             $objectId,
             json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-            api_env(),
         ]);
 
         api_queue_deliveries($accountId, (int) $pdo->lastInsertId(), $type);
@@ -76,9 +75,9 @@ function api_queue_deliveries(int $accountId, int $eventId, string $type): void
 
     $stmt = $pdo->prepare(
         'SELECT id, enabled_events FROM api_webhook_endpoints
-          WHERE account_id = ? AND environment = ? AND status = ? AND deleted_at IS NULL'
+          WHERE account_id = ? AND status = ? AND deleted_at IS NULL'
     );
-    $stmt->execute([$accountId, api_env(), 'enabled']);
+    $stmt->execute([$accountId, 'enabled']);
 
     foreach ($stmt->fetchAll() as $endpoint) {
         if (!api_endpoint_wants($endpoint['enabled_events'], $type)) {
@@ -87,10 +86,10 @@ function api_queue_deliveries(int $accountId, int $eventId, string $type): void
         // First attempt is due immediately; the delivery cron picks it up on its
         // next pass rather than blocking this request on someone else's server.
         $pdo->prepare(
-            'INSERT INTO api_webhook_deliveries (endpoint_id, event_id, next_attempt_at, environment)
-             VALUES (?, ?, NOW(), ?)
+            'INSERT INTO api_webhook_deliveries (endpoint_id, event_id, next_attempt_at)
+             VALUES (?, ?, NOW())
              ON DUPLICATE KEY UPDATE id = id'
-        )->execute([(int) $endpoint['id'], $eventId, api_env()]);
+        )->execute([(int) $endpoint['id'], $eventId]);
     }
 }
 

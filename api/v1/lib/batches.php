@@ -50,9 +50,9 @@ function api_fetch_batch(string $publicId, int $accountId): array
     global $pdo;
 
     $stmt = $pdo->prepare(
-        'SELECT * FROM api_import_batches WHERE public_id = ? AND account_id = ? AND environment = ? LIMIT 1'
+        'SELECT * FROM api_import_batches WHERE public_id = ? AND account_id = ? LIMIT 1'
     );
-    $stmt->execute([$publicId, $accountId, api_env()]);
+    $stmt->execute([$publicId, $accountId]);
     $row = $stmt->fetch();
 
     if (!$row) {
@@ -108,8 +108,8 @@ function api_handle_create_batch(array $auth): void
         $pdo->beginTransaction();
         try {
             $pdo->prepare(
-                'INSERT INTO api_import_batches (account_id, public_id, status, environment) VALUES (?, ?, ?, ?)'
-            )->execute([$accountId, $batchPublicId, 'open', api_env()]);
+                'INSERT INTO api_import_batches (account_id, public_id, status) VALUES (?, ?, ?)'
+            )->execute([$accountId, $batchPublicId, 'open']);
             $batchId = (int) $pdo->lastInsertId();
 
             foreach ($objects as $publicId) {
@@ -135,10 +135,10 @@ function api_handle_create_batch(array $auth): void
                 $stmt = $pdo->prepare(
                     'UPDATE ' . $target['table'] . '
                         SET import_status = ?, import_batch_id = ?, imported_at = NOW(), local_ref = ?
-                      WHERE public_id = ? AND account_id = ? AND environment = ?
+                      WHERE public_id = ? AND account_id = ?
                         AND deleted_at IS NULL AND import_status = ?'
                 );
-                $stmt->execute(['imported', $batchId, $localRef, $publicId, $accountId, api_env(), 'pending']);
+                $stmt->execute(['imported', $batchId, $localRef, $publicId, $accountId, 'pending']);
 
                 if ($stmt->rowCount() !== 1) {
                     $pdo->rollBack();
@@ -204,8 +204,8 @@ function api_handle_revert_batch(array $auth, string $publicId): void
                 $pdo->prepare(
                     'UPDATE ' . $spec['table'] . '
                         SET import_status = ?, import_batch_id = NULL, imported_at = NULL, local_ref = NULL
-                      WHERE import_batch_id = ? AND account_id = ? AND environment = ?'
-                )->execute(['pending', (int) $batch['id'], $accountId, api_env()]);
+                      WHERE import_batch_id = ? AND account_id = ?'
+                )->execute(['pending', (int) $batch['id'], $accountId]);
             }
 
             $pdo->prepare('UPDATE api_import_batches SET status = ? WHERE id = ?')
@@ -234,8 +234,8 @@ function api_handle_list_batches(array $auth): void
     $page = api_pagination_params();
     $accountId = $auth['account_id'];
 
-    $where = ' WHERE account_id = ? AND environment = ?';
-    $params = [$accountId, api_env()];
+    $where = ' WHERE account_id = ?';
+    $params = [$accountId];
 
     if (isset($_GET['status']) && $_GET['status'] !== '') {
         $status = (string) $_GET['status'];
@@ -293,8 +293,8 @@ function api_handle_reject(array $spec, array $auth, string $publicId): void
         api_require_pending($spec, $row, 'rejected');
 
         $pdo->prepare(
-            'UPDATE ' . $spec['table'] . ' SET import_status = ? WHERE public_id = ? AND account_id = ? AND environment = ?'
-        )->execute(['rejected', $publicId, $accountId, api_env()]);
+            'UPDATE ' . $spec['table'] . ' SET import_status = ? WHERE public_id = ? AND account_id = ?'
+        )->execute(['rejected', $publicId, $accountId]);
 
         $rejected = api_serialize($spec, api_fetch_object($spec, $publicId, $accountId));
         api_record_event($accountId, $spec['object'] . '.rejected', $publicId, $rejected);
@@ -343,10 +343,10 @@ function api_fetch_object_quietly(array $spec, string $publicId, int $accountId)
 
     $stmt = $pdo->prepare(
         'SELECT * FROM ' . $spec['table'] . '
-          WHERE public_id = ? AND account_id = ? AND environment = ? AND deleted_at IS NULL
+          WHERE public_id = ? AND account_id = ? AND deleted_at IS NULL
           LIMIT 1'
     );
-    $stmt->execute([$publicId, $accountId, api_env()]);
+    $stmt->execute([$publicId, $accountId]);
     $row = $stmt->fetch();
 
     return $row === false ? null : $row;

@@ -196,10 +196,10 @@ function api_validate_ref(string $name, array $field, string $value, int $accoun
 
     $stmt = $pdo->prepare(
         'SELECT 1 FROM ' . $field['table'] . '
-          WHERE public_id = ? AND account_id = ? AND environment = ? AND deleted_at IS NULL
+          WHERE public_id = ? AND account_id = ? AND deleted_at IS NULL
           LIMIT 1'
     );
-    $stmt->execute([$value, $accountId, api_env()]);
+    $stmt->execute([$value, $accountId]);
     if ($stmt->fetch() === false) {
         api_error(
             400,

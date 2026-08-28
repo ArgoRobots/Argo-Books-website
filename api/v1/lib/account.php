@@ -28,18 +28,18 @@ function api_handle_account(array $auth): void
     foreach (api_resource_definitions() as $spec) {
         $countStmt = $pdo->prepare(
             'SELECT COUNT(*) FROM ' . $spec['table'] . '
-              WHERE account_id = ? AND environment = ? AND deleted_at IS NULL AND import_status = ?'
+              WHERE account_id = ? AND deleted_at IS NULL AND import_status = ?'
         );
-        $countStmt->execute([$auth['account_id'], api_env(), 'pending']);
+        $countStmt->execute([$auth['account_id'], 'pending']);
         $pending[$spec['object']] = (int) $countStmt->fetchColumn();
     }
 
     $lastImport = $pdo->prepare(
         'SELECT completed_at FROM api_import_batches
-          WHERE account_id = ? AND environment = ? AND status = ?
+          WHERE account_id = ? AND status = ?
           ORDER BY id DESC LIMIT 1'
     );
-    $lastImport->execute([$auth['account_id'], api_env(), 'completed']);
+    $lastImport->execute([$auth['account_id'], 'completed']);
     $lastCompleted = $lastImport->fetchColumn();
 
     api_json(200, [

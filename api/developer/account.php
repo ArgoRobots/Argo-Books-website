@@ -43,12 +43,11 @@ if ($companyUid === '' || strlen($companyUid) > 64) {
 }
 
 global $pdo;
-$env = current_environment();
 
 $stmt = $pdo->prepare(
-    'SELECT * FROM api_accounts WHERE owner_identity_hash = ? AND company_uid = ? AND environment = ? LIMIT 1'
+    'SELECT * FROM api_accounts WHERE owner_identity_hash = ? AND company_uid = ? LIMIT 1'
 );
-$stmt->execute([$owner, $companyUid, $env]);
+$stmt->execute([$owner, $companyUid]);
 $account = $stmt->fetch();
 
 if (!$account && !$isPost) {
@@ -60,11 +59,11 @@ if (!$account) {
     $publicId = api_generate_id('acct');
 
     $pdo->prepare(
-        'INSERT INTO api_accounts (public_id, owner_identity_hash, company_uid, display_name, environment)
-         VALUES (?, ?, ?, ?, ?)'
-    )->execute([$publicId, $owner, $companyUid, substr($displayName, 0, 255), $env]);
+        'INSERT INTO api_accounts (public_id, owner_identity_hash, company_uid, display_name)
+         VALUES (?, ?, ?, ?)'
+    )->execute([$publicId, $owner, $companyUid, substr($displayName, 0, 255)]);
 
-    $stmt->execute([$owner, $companyUid, $env]);
+    $stmt->execute([$owner, $companyUid]);
     $account = $stmt->fetch();
 }
 

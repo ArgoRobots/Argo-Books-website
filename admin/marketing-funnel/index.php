@@ -1354,7 +1354,19 @@ include __DIR__ . '/../admin_header.php';
             // Sorted by installs, not by landings as the query is, because a source with
             // 800 visitors and no installs tells you less than one with four visitors and
             // three installs.
-            $install_rows = $per_source;
+            // A source nobody has ever arrived through is a dead link, not a result. 41 of
+            // 168 are in that state, and they pad the table and the export without ever
+            // saying anything. Dropped outright rather than left to the toggle, which is
+            // about sources that brought visitors but no users: a different question.
+            //
+            // The install and paying guards are belt and braces. Attribution should not be
+            // able to record either without a landing, but if it ever did, that row would
+            // be worth seeing rather than silently discarded.
+            $install_rows = array_values(array_filter($per_source, static function ($r) {
+                return (int)$r['landings'] > 0
+                    || (int)$r['first_runs'] > 0
+                    || (int)$r['paying'] > 0;
+            }));
             // Columns read left to right as the funnel runs, landings through to paying.
             // The sort deliberately does not follow that: rows are ordered by the far end,
             // paying then installs, so the sources that produced someone sit at the top
@@ -1410,7 +1422,7 @@ include __DIR__ . '/../admin_header.php';
                     Hide sources with no users
                     <span class="subtext">
                         (<?php echo number_format($sources_with_installs); ?> of
-                        <?php echo number_format(count($install_rows)); ?> sources,
+                        <?php echo number_format(count($install_rows)); ?> sources with traffic,
                         <?php echo number_format($attributed_installs); ?> attributed
                         install<?php echo $attributed_installs === 1 ? '' : 's'; ?>)
                     </span>

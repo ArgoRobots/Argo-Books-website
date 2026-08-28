@@ -127,6 +127,15 @@ function filter_telemetry_event(array $event): ?array
             return $base + [
                 'action' => telemetry_validate_enum($event['action'] ?? null, TELEMETRY_SESSION_ACTIONS),
                 'durationSeconds' => telemetry_clean_int($event['durationSeconds'] ?? null),
+                // Wall clock from launch to quit, so it counts a window left open
+                // overnight as use. Kept because every past session is measured that
+                // way, but activeSeconds below is the one to chart.
+                //
+                // Seconds the app was actually being driven: input gaps longer than the
+                // client's idle threshold are excluded. Absent on SessionStart and on
+                // ends from builds predating the field, where null means "not measured"
+                // rather than zero.
+                'activeSeconds' => telemetry_clean_int($event['activeSeconds'] ?? null),
                 // Whether the app shut down normally. False marks a SessionEnd the app
                 // reconstructed on its next launch after a force-quit, OS restart, or
                 // power loss. Absent on SessionStart, and on ends from builds predating
@@ -217,6 +226,11 @@ function filter_telemetry_event(array $event): ?array
             // a machine resumed from sleep mid-launch can otherwise report hours.
             return $base + [
                 'toFirstPaintMs' => telemetry_clean_int($event['toFirstPaintMs'] ?? null, 600000),
+                // Two marks between the splash and the window, so the gap between them can
+                // be attributed instead of guessed at: services first, then view models.
+                // All four are measured from process start, so they nest rather than sum.
+                'toServicesReadyMs' => telemetry_clean_int($event['toServicesReadyMs'] ?? null, 600000),
+                'toViewModelsReadyMs' => telemetry_clean_int($event['toViewModelsReadyMs'] ?? null, 600000),
                 'toReadyMs' => telemetry_clean_int($event['toReadyMs'] ?? null, 600000),
                 'coldStart' => isset($event['coldStart']) ? (bool)$event['coldStart'] : null,
             ];

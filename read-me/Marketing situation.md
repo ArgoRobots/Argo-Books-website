@@ -14,7 +14,7 @@ Related: [Google Ads economics.md](Google%20Ads%20economics.md), [Email outreach
 - Pricing: \$15/month or \$150/year. Customer 1 is grandfathered at \$10/month with no payment processing fee added, which is why all-time revenue is \$51.48 rather than \$60.
 - Revenue: **\$61 CAD all time**, \$25.74 in the last 30 days. 2 active licenses, 0% churn so far.
 - **LTV is not known.** Both customers are only a few months in and neither has churned, so there is no retention data to calculate it from. At the \$15/month list price a customer retained a full year is roughly \$180 CAD gross before processing fees, and the grandfathered customer is on \$10. Treat \$180 as an optimistic ceiling rather than a measurement, and do not use the \$150 annual list price as a stand-in for LTV.
-- App telemetry: 19 total unique users all time, 7 monthly active, 2 Premium.
+- App telemetry (as of 28 Aug 2026, excluding my own device): **37 unique users**, 21 active in the last 30 days, 8 on a Premium identity. Only 9 of the 37 ever came back on a second day.
 - **Both paying customers have not opened the app in over a month**, despite still being billed. A feedback email went to both about 2 weeks ago and neither replied. 0% churn is not a retention signal yet, it just means nobody has reached a renewal decision while noticing they don't use it.
 
 ## Traffic numbers are not trustworthy yet
@@ -28,7 +28,9 @@ Those two pictures do not reconcile, and the internal one is the suspect one:
 - 4,014 direct visitors means "no referrer sent". For a site with essentially no brand awareness, almost nobody is typing the URL in. Bots, scrapers, uptime checks, and referrer-stripped traffic all land in this bucket. The site's bot filter (`is_likely_bot()` in `statistics.php`) is basic and clearly not catching everything.
 - Average position 67.5 in Search Console is page 7 of results. Organic search is technically indexed but barely being served to anyone.
 
-What **is** trustworthy is app telemetry, because it requires someone to actually install and run a desktop app: 19 unique users all time, 21 first runs. Work backwards from that number, not from 4.8k.
+What **is** trustworthy is app telemetry, because it requires someone to actually install and run a desktop app: 37 unique users. Work backwards from that number, not from 4.8k.
+
+That 37 covers 5 June to 28 August, which is the span of telemetry currently on the server rather than all time. The earlier figure of 19 was a smaller window, so the base has grown, but the two are not directly comparable.
 
 ## Funnel (all traffic, all time)
 
@@ -120,7 +122,7 @@ Note the site currently advertises macOS availability in about 90 places across 
 
 The two things that produced customers are YouTube and organic search. Both are slow, compounding, and free. Everything push-based (cold email, editorial outreach, YouTuber outreach, paid ads) has produced zero customers across roughly 1,200 emails and CA\$300 of spend.
 
-The real constraint is not conversion, it is reach. Roughly 21 people have ever installed the app, and 2 of them paid. Nothing in the funnel needs fixing at that sample size. What is missing is qualified humans arriving at all, and the only two channels that have ever delivered one are the two that take months to compound.
+The real constraint is not conversion, it is reach. Roughly 37 people have installed and run the app across the last three months, and 3 of them have paid, counting the first StackSocial sale. Nothing in the funnel needs fixing at that sample size. What is missing is qualified humans arriving at all, and the only two channels that have ever delivered one are the two that take months to compound.
 
 The quiet second problem is retention. Both paying customers have gone a month without opening the app. Filling the top of the funnel does not help much if usage decays to zero within a month of install.
 

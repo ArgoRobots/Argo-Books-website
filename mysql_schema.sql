@@ -1819,6 +1819,7 @@ CREATE TABLE IF NOT EXISTS argo_books_sync_map (
     source_key VARCHAR(191) NOT NULL COMMENT 'Stable local identity, e.g. payment:1234 or email:someone@example.com',
     api_object_id VARCHAR(64) NOT NULL COMMENT 'The cus_/rev_/exp_ id the API returned',
     content_hash CHAR(64) DEFAULT NULL COMMENT 'sha256 of the payload last accepted, so unchanged rows cost no request',
+    status ENUM('sent', 'rejected') NOT NULL DEFAULT 'sent' COMMENT 'rejected means the owner declined it in the app. Without this third state a refusal is indistinguishable from never having sent it, so the row would either be posted again or vanish silently',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uk_abs_source (source_type, source_key),

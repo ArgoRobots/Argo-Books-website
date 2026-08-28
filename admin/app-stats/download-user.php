@@ -9,9 +9,15 @@
  * "everything ever sent", the same scope the Delete button operates on, so the file
  * you get never depends on page state.
  *
- * The all-users export adds an auth_id column and is grouped by user, newest user
- * first, each user's own events newest first. The single-user export keeps exactly
- * the columns it always had, so anything already reading those files still works.
+ * The all-users export adds auth_id and is_founder columns and is grouped by user,
+ * newest user first, each user's own events newest first. The single-user export
+ * keeps exactly the columns it always had, so anything already reading those files
+ * still works.
+ *
+ * is_founder is a flag rather than an exclusion, because this tab is the one place
+ * the founder's own installs are deliberately visible. Dropping those rows here
+ * would make the file disagree with the screen it came from; a column lets a total
+ * be filtered without the export having decided for you.
  *
  * Interpretation of each event is shared with the tab via user-activity-events.php
  * rather than duplicated, so the CSV always says what the screen says.
@@ -20,6 +26,7 @@
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/telemetry-dedupe.php';        // telemetry_is_duplicate_event()
 require_once __DIR__ . '/user-activity-events.php';    // ua_describe_event() etc.
+require_once __DIR__ . '/../../founder_identity.php';  // is_founder_auth_id()
 
 // Same guard as the parent page. This endpoint is a normal admin page as far as
 // .htaccess is concerned (that only denies *-tab.php), so it must check for itself.
@@ -109,6 +116,7 @@ function ua_csv_safe($value): string
 function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$matchedFile): array
 {
     $rows = [];
+    $isFounder = is_founder_auth_id($authId) ? 'true' : 'false';
 
     foreach ($files as $name => $path) {
         $raw = @file_get_contents($path);
@@ -145,6 +153,7 @@ function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$mat
             $rows[] = [
                 'sort'             => $ts === false ? 0 : $ts,
                 'auth_id'          => $authId,
+                'is_founder'       => $isFounder,
                 'timestamp_utc'    => $ts === false ? '' : gmdate('Y-m-d H:i:s', $ts),
                 'event_type'       => $type,
                 'description'      => $text,
@@ -252,10 +261,11 @@ $out = fopen('php://output', 'w');
 // instead of showing mojibake.
 fwrite($out, "\xEF\xBB\xBF");
 
-// auth_id only in the all-users file. Adding it to the single-user export would
-// repeat one constant on every row and change a format that already has readers.
+// auth_id and is_founder only in the all-users file. Adding them to the single-user
+// export would repeat two constants on every row and change a format that already
+// has readers.
 $columns = array_merge(
-    $allMode ? ['auth_id'] : [],
+    $allMode ? ['auth_id', 'is_founder'] : [],
     [
         'timestamp_utc', 'event_type', 'description', 'severity', 'tier', 'app_version',
         'platform', 'country', 'region', 'timezone', 'feature_name', 'export_type',

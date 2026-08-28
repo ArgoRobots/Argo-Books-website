@@ -99,7 +99,7 @@ function process_contact_form()
         <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 15px; margin-top: 5px;">
             {$formatted_message}
         </div>
-        <p style="font-size: 12px; color: #64748b; margin-top: 20px;">Hit Reply and your response goes straight to {$safe_first} at {$safe_email}. This was sent from noreply@argorobots.com so it passes our domain checks; the Reply-To header points at them, not at us.</p>
+        <p style="font-size: 12px; color: #64748b; margin-top: 20px;">Hit Reply and your response goes straight to {$safe_first} at {$safe_email}.</p>
         HTML;
 
     $to_email = 'contact@argorobots.com';

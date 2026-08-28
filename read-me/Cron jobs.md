@@ -496,6 +496,14 @@ Every write carries an `Idempotency-Key` derived from the source row, so the API
 
 `argo_books_sync_map` records the object id the API returned for each source row alongside a hash of what was sent. A row whose payload has not changed is skipped without a request, and one that has changed is updated in place rather than posted again as a second object. Most days almost everything is skipped, so a large "Skipped, unchanged" count beside small created counts is the healthy shape.
 
+### Discarding Something in the App
+
+The review step inside Argo Books offers three answers, not two: import, discard, or cancel. Cancel leaves everything queued for next time. Discard marks the objects rejected on the server and tells the apps that sent them.
+
+Each run starts by asking the API which objects have been rejected and marking those rows in the map, before any other work. That step is what makes discard safe. The map otherwise records only "sent", so a discarded row would still match its hash on the next run, be skipped as unchanged, and silently stay missing from the books for good.
+
+A rejected row is never sent again and never re-offered. Reversing that decision means deleting its map row by hand, which is deliberate: the whole point is that a refusal sticks.
+
 ### Environment Variables
 
 | Variable | Purpose |

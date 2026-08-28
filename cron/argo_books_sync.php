@@ -249,13 +249,13 @@ function abs_throttle(): void
 // The map between local rows and API objects
 // ---------------------------------------------------------------------------
 
-/** @return array{api_object_id:string, content_hash:?string}|null */
+/** @return array{api_object_id:string, content_hash:?string, status:string}|null */
 function abs_map_get(string $sourceType, string $sourceKey): ?array
 {
     global $pdo, $env;
 
     $stmt = $pdo->prepare(
-        'SELECT api_object_id, content_hash
+        'SELECT api_object_id, content_hash, status
            FROM argo_books_sync_map
           WHERE source_type = ? AND source_key = ? AND environment = ?
           LIMIT 1'
@@ -297,6 +297,15 @@ function abs_sync(string $sourceType, string $sourceKey, string $collection, arr
 
     $hash     = hash('sha256', json_encode($payload, JSON_UNESCAPED_SLASHES) ?: '');
     $existing = abs_map_get($sourceType, $sourceKey);
+
+    // A row the owner declined in the app is finished with. Sending it again would
+    // re-offer something already refused, and treating it as unsent would drop it from
+    // the books for good the moment the map was consulted. Neither is a decision this
+    // script gets to make, so it stops here.
+    if ($existing !== null && ($existing['status'] ?? 'sent') === 'rejected') {
+        cron_metric_incr('skipped_rejected');
+        return $existing['api_object_id'];
+    }
 
     if ($existing !== null && $existing['content_hash'] === $hash) {
         cron_metric_incr('skipped_unchanged');
@@ -358,6 +367,69 @@ function abs_sync(string $sourceType, string $sourceKey, string $collection, arr
     return $apiObjectId;
 }
 
+/**
+ * Ask the API which objects the owner declined in the app, and record it.
+ *
+ * The server knows: declining sets import_status to 'rejected' and the list endpoint can
+ * filter on it. Nothing tells this script, though, so it asks once per run before doing any
+ * work. Without this step a discard in the app is invisible here, and the very next run
+ * would decide the row still matched its hash and quietly leave the books short.
+ *
+ * @return int How many map rows were newly marked rejected.
+ */
+function abs_mark_rejected(): int
+{
+    global $pdo, $env;
+
+    $marked = 0;
+
+    foreach (['categories', 'customers', 'suppliers', 'expenses', 'revenue', 'refunds'] as $resource) {
+        $after = null;
+
+        // Paged, because a bad push followed by a bulk discard can be far more than one
+        // page and stopping early would leave the rest looking un-actioned forever.
+        do {
+            $path = "/$resource?import_status=rejected&limit=100"
+                . ($after !== null ? '&starting_after=' . rawurlencode($after) : '');
+
+            $result = abs_api_request('GET', $path, null, null);
+            if ($result['error'] !== null) {
+                abs_log("Could not read rejected $resource: " . $result['error']);
+                break;
+            }
+
+            $rows = $result['body']['data'] ?? [];
+            if (!is_array($rows) || $rows === []) {
+                break;
+            }
+
+            $ids = [];
+            foreach ($rows as $row) {
+                if (!empty($row['id'])) {
+                    $ids[] = (string) $row['id'];
+                }
+            }
+
+            if ($ids !== []) {
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $stmt = $pdo->prepare(
+                    "UPDATE argo_books_sync_map
+                        SET status = 'rejected'
+                      WHERE environment = ?
+                        AND status <> 'rejected'
+                        AND api_object_id IN ($placeholders)"
+                );
+                $stmt->execute(array_merge([$env], $ids));
+                $marked += $stmt->rowCount();
+            }
+
+            $after = end($ids) ?: null;
+        } while (!empty($result['body']['has_more']) && $after !== null);
+    }
+
+    return $marked;
+}
+
 /** Decimal string from the database to the integer minor units the API wants. */
 function abs_minor($amount): int
 {
@@ -403,6 +475,14 @@ try {
 
     $sinceClause = $since !== null ? ' AND p.created_at >= :since' : '';
     $sinceParam  = $since !== null ? [':since' => $since] : [];
+
+    // --- Phase 0: catch up on anything declined in the app -------------------
+
+    $newlyRejected = abs_mark_rejected();
+    if ($newlyRejected > 0) {
+        cron_metric_incr('newly_rejected', $newlyRejected);
+        abs_log("Marked $newlyRejected previously sent rows as rejected.");
+    }
 
     // --- Phase 1: categories -----------------------------------------------
     //

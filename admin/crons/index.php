@@ -30,7 +30,7 @@ $cronConfig = [
     'argo_books_sync' => [
         'label'     => 'Argo Books Books Sync',
         'frequency' => 'daily',
-        'description' => "Pushes this business's own trading history into a company inside Argo Books, through the public API: subscription income, the customers who paid it, affiliate commissions, the affiliates they went to, and refunds against income already sent. Nothing lands in the books unattended, because the API is an ingest queue and someone accepts the proposals inside the app. Most days almost everything is skipped: a row is only sent when it has never been sent or when what it would send has changed, so a large 'Skipped, unchanged' count next to small created counts is the healthy shape. 'Failed' above zero means objects were rejected and the detail is in cron/logs/; 'Refunds deferred' means a refund arrived before the revenue it reverses and will go out on the next run.",
+        'description' => "Pushes this business's own trading history into a company inside Argo Books, through the public API: subscription income, the customers who paid it, affiliate commissions, the affiliates they went to, and refunds against income already sent. Nothing lands in the books unattended, because the API is an ingest queue and someone accepts the proposals inside the app. Most days almost everything is skipped: a row is only sent when it has never been sent or when what it would send has changed, so a large 'Skipped, unchanged' count next to small created counts is the healthy shape. 'Failed' above zero means objects were rejected and the detail is in cron/logs/; 'Refunds deferred' means a refund arrived before the revenue it reverses and will go out on the next run. Anything you discard in the app is picked up on the next run and never offered again, which is what the two 'declined' counts track.",
         'metrics'   => [
             'category_created'  => 'Categories created',
             'customer_created'  => 'Customers created',
@@ -44,6 +44,8 @@ $cronConfig = [
             'refund_created'    => 'Refunds created',
             'refunds_deferred'  => 'Refunds waiting on their revenue',
             'skipped_unchanged' => 'Skipped, unchanged',
+            'newly_rejected'    => 'Newly declined in the app',
+            'skipped_rejected'  => 'Skipped, declined earlier',
             'failed'            => 'Rejected by the API',
         ],
         'expected_interval_hours' => 48,

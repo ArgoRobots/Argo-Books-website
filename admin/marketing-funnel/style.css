@@ -1134,3 +1134,48 @@
     color: var(--white);
 }
 [data-theme="dark"] .bd-tab { color: var(--gray-300); }
+
+/* Installs-by-source toggle. Sits above the table rather than in the card header,
+   so the count beside it reads as a caption for what the table is showing. */
+.funnel-installs-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.funnel-installs-toggle input {
+    cursor: pointer;
+}
+
+#funnelUsersTable td .subtext {
+    display: block;
+    font-size: 0.78rem;
+    opacity: 0.7;
+}
+
+/* Even the metric columns up. Left to itself the table hands all the slack to the
+   last column, which put a gulf between "Download clicks" and "Landings" while the
+   others sat shoulder to shoulder. Fixing the metrics at one width lets the source
+   name absorb the remainder instead. */
+#funnelUsersTable th:not(:first-child),
+#funnelUsersTable td:not(:first-child) {
+    width: 140px;
+    text-align: right;
+}
+
+#funnelUsersTable th:first-child,
+#funnelUsersTable td:first-child {
+    width: auto;
+}
+
+.installs-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}

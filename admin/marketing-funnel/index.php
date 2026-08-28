@@ -1343,6 +1343,115 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             </div>
         <?php endif; ?>
+
+        <?php
+            // Users by source. get_funnel_per_source() has always returned first_runs
+            // alongside everything else, but nothing rendered it: the rows were used only
+            // to total spend and revenue. Answering "where did the people who actually ran
+            // the app come from" meant clicking each source pill in turn and writing the
+            // numbers down.
+            //
+            // Sorted by installs, not by landings as the query is, because a source with
+            // 800 visitors and no installs tells you less than one with four visitors and
+            // three installs.
+            $install_rows = $per_source;
+            // Columns read left to right as the funnel runs, landings through to paying.
+            // The sort deliberately does not follow that: rows are ordered by the far end,
+            // paying then installs, so the sources that produced someone sit at the top
+            // rather than the ones that merely produced traffic. Paying is all zeroes today,
+            // in which case this falls through to installs and nothing looks different.
+            usort($install_rows, static function ($a, $b) {
+                return ((int)$b['paying'] <=> (int)$a['paying'])
+                    ?: ((int)$b['first_runs'] <=> (int)$a['first_runs'])
+                    ?: ((int)$b['dl_clicks'] <=> (int)$a['dl_clicks']);
+            });
+
+            $sources_with_installs = 0;
+            $attributed_installs = 0;
+            $install_export = [];
+            foreach ($install_rows as $r) {
+                if ((int)$r['first_runs'] > 0 || (int)$r['paying'] > 0) {
+                    $sources_with_installs++;
+                    $attributed_installs += (int)$r['first_runs'];
+                }
+                // Every source, including the ones the on-screen toggle hides. A CSV is
+                // for slicing elsewhere, and an export that silently mirrors a checkbox
+                // is the kind of thing you only notice after trusting a total.
+                $install_export[] = [
+                    (string)($r['name'] ?: $r['source_code']),
+                    (string)$r['source_code'],
+                    (int)$r['landings'],
+                    (int)$r['dl_clicks'],
+                    (int)$r['first_runs'],
+                    (int)$r['paying'],
+                ];
+            }
+        ?>
+        <div class="table-container">
+            <div class="installs-head">
+                <h3 style="margin:0;">Users by source</h3>
+                <?php echo funnel_render_download_btn('users-by-source', [[
+                    'title'   => 'Users by source',
+                    'columns' => ['Source', 'Source code', 'Landings', 'Download clicks', 'Installs', 'Paying'],
+                    'rows'    => $install_export,
+                ]]); ?>
+            </div>
+            <?php echo funnel_render_panel_desc(
+                'Sources that produced a real user: someone who ran the app, and whoever went'
+                . ' on to pay. Only counts people whose referral token survived the 14 day'
+                . ' attribution window, so the survey above covers the rest.'
+            ); ?>
+
+            <?php if (empty($install_rows)): ?>
+                <div class="empty-state"><p>No active referral sources yet.</p></div>
+            <?php else: ?>
+                <label class="funnel-installs-toggle">
+                    <input type="checkbox" id="funnelHideZeroUsers" checked>
+                    Hide sources with no users
+                    <span class="subtext">
+                        (<?php echo number_format($sources_with_installs); ?> of
+                        <?php echo number_format(count($install_rows)); ?> sources,
+                        <?php echo number_format($attributed_installs); ?> attributed
+                        install<?php echo $attributed_installs === 1 ? '' : 's'; ?>)
+                    </span>
+                </label>
+
+                <div class="table-responsive">
+                    <table id="funnelUsersTable">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Landings</th>
+                                <th>Download clicks</th>
+                                <th>Installs</th>
+                                <th>Paying</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($install_rows as $row): ?>
+                                <?php
+                                    $runs = (int)$row['first_runs'];
+                                    // Hidden only when a source produced neither. A payment
+                                    // without an attributed install is unlikely but possible,
+                                    // and hiding that row would bury the best thing on the page.
+                                    $no_users = $runs === 0 && (int)$row['paying'] === 0;
+                                ?>
+                                <tr<?php echo $no_users ? ' data-no-installs="1"' : ''; ?>>
+                                    <td>
+                                        <?php echo htmlspecialchars($row['name'] ?: $row['source_code']); ?>
+                                        <span class="subtext"><?php echo htmlspecialchars($row['source_code']); ?></span>
+                                    </td>
+                                    <td><?php echo number_format((int)$row['landings']); ?></td>
+                                    <td><?php echo number_format((int)$row['dl_clicks']); ?></td>
+                                    <td><strong><?php echo number_format($runs); ?></strong></td>
+                                    <td><strong><?php echo number_format((int)$row['paying']); ?></strong></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
     </div><!-- /#funnel -->
 
     <div id="spend" class="tab-content <?php echo $current_tab === 'spend' ? 'active' : ''; ?>">
@@ -2360,6 +2469,24 @@ include __DIR__ . '/../admin_header.php';
                 });
             });
         })();
+    })();
+</script>
+<script>
+    // Hide sources that produced no installs. On by default: the point of the table is
+    // which sources produced users, and a wall of zeroes buries the two or three that did.
+    (function () {
+        const toggle = document.getElementById('funnelHideZeroUsers');
+        const table = document.getElementById('funnelUsersTable');
+        if (!toggle || !table) return;
+
+        function apply() {
+            table.querySelectorAll('tr[data-no-installs]').forEach(function (row) {
+                row.style.display = toggle.checked ? 'none' : '';
+            });
+        }
+
+        toggle.addEventListener('change', apply);
+        apply();
     })();
 </script>
 <script>window.ADMIN_PRESERVE_SCROLL = ['.control-pill'];</script>

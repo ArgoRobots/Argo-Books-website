@@ -194,8 +194,7 @@ CREATE TABLE IF NOT EXISTS remember_tokens (
 
 -- Admin notification preferences (single global row, id is always 1).
 -- One destination email plus a set of on/off toggles that every admin alert
--- consults. Managed from admin/settings/ (Notifications tab). Replaces the old
--- per-community-user admin_notification_settings table.
+-- consults. Managed from admin/settings/ (Notifications tab).
 CREATE TABLE IF NOT EXISTS admin_notification_prefs (
     id TINYINT UNSIGNED PRIMARY KEY DEFAULT 1,
     notification_email VARCHAR(255) NOT NULL,

@@ -279,3 +279,43 @@ $base_path = $in_subdir ? '../' : '';
                     }
                 });
             </script>
+
+<script>
+    // Timestamps are printed as UTC so the markup never depends on the server's timezone.
+    // This rewrites them to the browser's zone. With JS off the UTC text stays, which is
+    // not misleading because it still says UTC.
+    (function () {
+        const pad = n => String(n).padStart(2, '0');
+
+        function zoneName(d) {
+            try {
+                const part = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' })
+                    .formatToParts(d).find(p => p.type === 'timeZoneName');
+                return part ? part.value : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function localizeTimes(root) {
+            (root || document).querySelectorAll('time[data-epoch]:not([data-tz-done])').forEach(el => {
+                const secs = Number(el.getAttribute('data-epoch'));
+                if (!secs) return;
+                const d = new Date(secs * 1000);
+                if (isNaN(d.getTime())) return;
+
+                let out = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+                    + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+                if (el.dataset.epochSeconds === '1') out += ':' + pad(d.getSeconds());
+
+                const zone = zoneName(d);
+                el.textContent = zone ? out + ' ' + zone : out;
+                el.setAttribute('data-tz-done', '1');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => localizeTimes());
+        // Exposed so anything rendering rows after load can relabel them.
+        window.adminLocalizeTimes = localizeTimes;
+    })();
+</script>

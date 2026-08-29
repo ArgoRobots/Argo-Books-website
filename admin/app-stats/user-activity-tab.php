@@ -280,9 +280,14 @@ if (isset($selectedRange)) {
 }
 
 if (!function_exists('ua_fmt')) {
-    // gmdate() renders in UTC regardless of the server's timezone, so the "UTC"
-    // label is always accurate. Telemetry timestamps arrive as UTC (Z-suffixed).
-    function ua_fmt($ts) { return $ts ? gmdate('Y-m-d H:i', $ts) . ' UTC' : '—'; }
+    // Printed as UTC and relabelled to the reader's timezone by the script in
+    // admin_header.php. Telemetry timestamps arrive as UTC (Z-suffixed).
+    function ua_fmt($ts, $withSeconds = false) {
+        if (!$ts) return '—';
+        return '<time data-epoch="' . (int)$ts . '"'
+            . ($withSeconds ? ' data-epoch-seconds="1"' : '') . '>'
+            . gmdate($withSeconds ? 'Y-m-d H:i:s' : 'Y-m-d H:i', $ts) . ' UTC</time>';
+    }
 }
 if (!function_exists('ua_kv')) {
     function ua_kv($arr) {
@@ -520,7 +525,7 @@ if (!function_exists('ua_kv')) {
             <div class="ua-timeline">
                 <?php foreach ($timeline as $t): ?>
                     <div class="ua-evt <?= $t['type'] ?>">
-                        <span class="ua-evt-ts"><?= $t['ts'] ? gmdate('Y-m-d H:i:s', $t['ts']) . ' UTC' : '—' ?></span>
+                        <span class="ua-evt-ts"><?= ua_fmt($t['ts'], true) ?></span>
                         <span class="ua-evt-text"><?= htmlspecialchars($t['text']) ?></span>
                     </div>
                 <?php endforeach; ?>

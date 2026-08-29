@@ -99,7 +99,6 @@ function normalizeEvent($event, $sessionMeta = []) {
         // over values that are already spelled out.
         $normalized['country'] = country_name($geo['country'] ?? '') ?: 'Unknown';
         $normalized['region'] = $geo['region'] ?? '';
-        $normalized['city'] = $geo['city'] ?? '';
         $normalized['timezone'] = $geo['timezone'] ?? '';
         $normalized['hashedIP'] = $geo['hashedIp'] ?? '';
     }
@@ -840,10 +839,6 @@ include __DIR__ . '/../admin_header.php';
                     <div class="chart-container">
                         <h2>User Distribution by Country</h2>
                         <canvas id="countryDistributionChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h2>Top Cities</h2>
-                        <canvas id="cityDistributionChart"></canvas>
                     </div>
                 </div>
 

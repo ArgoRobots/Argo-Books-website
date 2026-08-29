@@ -50,13 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
       sessionData,
       errorData
     );
-    generateCityDistributionChart(
-      exportData,
-      geminiData,
-      exchangeRatesData,
-      sessionData,
-      errorData
-    );
     generatePerformanceByCountryChart(
       exportData,
       geminiData,
@@ -207,87 +200,6 @@ document.addEventListener("DOMContentLoaded", function () {
             title: {
               display: true,
               text: "Number of Operations",
-            },
-          },
-        }
-      },
-    });
-  }
-
-  function generateCityDistributionChart(
-    exportData,
-    geminiData,
-    exchangeRatesData,
-    sessionData,
-    errorData
-  ) {
-    const allData = [
-      ...exportData,
-      ...geminiData,
-      ...exchangeRatesData,
-      ...sessionData,
-      ...errorData,
-    ];
-    const cityCounts = {};
-
-    allData.forEach((item) => {
-      const city = item.city || "Unknown";
-      if (city !== "Unknown" && city !== "Hidden") {
-        const region = item.region || "";
-        const country = item.country || "";
-        const fullLocation = region
-          ? `${city}, ${region}, ${country}`
-          : `${city}, ${country}`;
-        cityCounts[fullLocation] = (cityCounts[fullLocation] || 0) + 1;
-      }
-    });
-
-    if (Object.keys(cityCounts).length === 0) {
-      document.getElementById("cityDistributionChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No city data available</div>';
-      return;
-    }
-
-    const sortedCities = Object.entries(cityCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
-
-    new Chart(document.getElementById("cityDistributionChart"), {
-      type: "pie",
-      data: {
-        labels: sortedCities.map(([city]) => city),
-        datasets: [
-          {
-            data: sortedCities.map(([, count]) => count),
-            backgroundColor: [
-              "#3b82f6",
-              "#10b981",
-              "#f59e0b",
-              "#ef4444",
-              "#1e40af",
-              "#06b6d4",
-              "#84cc16",
-              "#f97316",
-              "#ec4899",
-              "#60a5fa",
-            ],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label}: ${context.raw} (${percentage}%)`;
-              },
             },
           },
         }

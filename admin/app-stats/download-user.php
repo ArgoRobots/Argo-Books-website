@@ -176,6 +176,8 @@ function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$mat
                 'method_name'      => $ev['methodName'] ?? '',
                 'duration_ms'      => $ev['durationMs'] ?? '',
                 'duration_seconds' => $ev['durationSeconds'] ?? '',
+                'active_seconds'   => $ev['activeSeconds'] ?? '',
+                'last_page'        => $ev['lastPage'] ?? '',
                 'clean'            => ua_csv_bool($ev, 'clean'),
                 'file_size'        => $ev['fileSize'] ?? '',
                 'success'          => ua_csv_bool($ev, 'success'),
@@ -271,7 +273,8 @@ $columns = array_merge(
         'timestamp_utc', 'event_type', 'description', 'severity', 'tier', 'app_version',
         'platform', 'country', 'region', 'timezone', 'feature_name', 'export_type',
         'api_name', 'error_category', 'error_code', 'message', 'source_file',
-        'line_number', 'method_name', 'duration_ms', 'duration_seconds', 'clean',
+        'line_number', 'method_name', 'duration_ms', 'duration_seconds', 'active_seconds',
+        'last_page', 'clean',
         'file_size', 'success', 'telemetry_file',
     ]
 );

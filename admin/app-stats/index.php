@@ -135,6 +135,8 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             // Null on SessionStart and on ends uploaded by builds before the flag
             // existed, so only an explicit false counts as an unclean exit.
             $normalized['clean'] = $event['clean'] ?? null;
+            $normalized['activeSeconds'] = $event['activeSeconds'] ?? null;
+            $normalized['lastPage'] = $event['lastPage'] ?? null;
             return ['category' => 'Session', 'data' => $normalized];
 
         case 'Export':

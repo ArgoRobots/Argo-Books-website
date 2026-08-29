@@ -39,7 +39,9 @@ const TELEMETRY_FEATURE_NAMES = [
     'ChartExportedToGoogleSheets', 'ChartExportedToExcel',
     'ThemeChanged', 'LanguageChanged',
     'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped',
-    'SampleCompanyOpened'
+    'SampleCompanyOpened',
+    'CompanyCreateOpened', 'ReceiptScanOpened', 'InvoiceCreateOpened',
+    'PageViewed'
 ];
 
 // Business descriptors on a CompanyProfile event. Free text, not enum-checked: these
@@ -136,6 +138,8 @@ function filter_telemetry_event(array $event): ?array
                 // ends from builds predating the field, where null means "not measured"
                 // rather than zero.
                 'activeSeconds' => telemetry_clean_int($event['activeSeconds'] ?? null),
+                // The screen they were on when they quit.
+                'lastPage' => telemetry_clean_string($event['lastPage'] ?? null, 64),
                 // Whether the app shut down normally. False marks a SessionEnd the app
                 // reconstructed on its next launch after a force-quit, OS restart, or
                 // power loss. Absent on SessionStart, and on ends from builds predating

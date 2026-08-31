@@ -27,7 +27,6 @@ if (!$owner) {
 }
 
 global $pdo;
-$env = current_environment();
 
 $isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
 $body = [];
@@ -44,9 +43,9 @@ if ($companyUid === '') {
 }
 
 $accountStmt = $pdo->prepare(
-    'SELECT id FROM api_accounts WHERE owner_identity_hash = ? AND company_uid = ? AND environment = ? LIMIT 1'
+    'SELECT id FROM api_accounts WHERE owner_identity_hash = ? AND company_uid = ? LIMIT 1'
 );
-$accountStmt->execute([$owner, $companyUid, $env]);
+$accountStmt->execute([$owner, $companyUid]);
 $accountId = $accountStmt->fetchColumn();
 
 if ($accountId === false) {
@@ -123,8 +122,8 @@ $scopes = implode(',', array_values(array_unique($requested)));
 $secret = api_generate_secret_key();
 
 $pdo->prepare(
-    'INSERT INTO api_keys (account_id, public_id, key_hash, key_hint, label, scopes, environment)
-     VALUES (?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO api_keys (account_id, public_id, key_hash, key_hint, label, scopes)
+     VALUES (?, ?, ?, ?, ?, ?)'
 )->execute([
     $accountId,
     api_generate_id('key'),
@@ -132,7 +131,6 @@ $pdo->prepare(
     api_key_hint($secret),
     $label,
     $scopes,
-    $env,
 ]);
 
 send_json_response(201, [

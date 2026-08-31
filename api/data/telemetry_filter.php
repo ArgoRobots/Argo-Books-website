@@ -15,7 +15,7 @@ const TELEMETRY_SESSION_ACTIONS = ['SessionStart', 'SessionEnd'];
 
 const TELEMETRY_EXPORT_TYPES = ['Excel', 'GoogleSheets', 'Pdf', 'Csv', 'Backup'];
 
-const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'ReceiptScanProxy'];
+const TELEMETRY_API_NAMES = ['Gemini', 'OpenExchangeRates', 'OpenExchangeRatesBatch', 'ReceiptScanProxy'];
 
 const TELEMETRY_ERROR_CATEGORIES = [
     'Unknown', 'Network', 'FileSystem', 'Parsing', 'Validation', 'UI', 'Api',

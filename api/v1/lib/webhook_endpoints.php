@@ -46,10 +46,10 @@ function api_fetch_endpoint(string $publicId, int $accountId): array
 
     $stmt = $pdo->prepare(
         'SELECT * FROM api_webhook_endpoints
-          WHERE public_id = ? AND account_id = ? AND environment = ? AND deleted_at IS NULL
+          WHERE public_id = ? AND account_id = ? AND deleted_at IS NULL
           LIMIT 1'
     );
-    $stmt->execute([$publicId, $accountId, api_env()]);
+    $stmt->execute([$publicId, $accountId]);
     $row = $stmt->fetch();
 
     if (!$row) {
@@ -158,8 +158,8 @@ function api_handle_create_endpoint(array $auth): void
 
         $pdo->prepare(
             'INSERT INTO api_webhook_endpoints
-                 (account_id, public_id, url, signing_secret, enabled_events, description, environment)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+                 (account_id, public_id, url, signing_secret, enabled_events, description)
+             VALUES (?, ?, ?, ?, ?, ?)'
         )->execute([
             $accountId,
             $publicId,
@@ -167,7 +167,6 @@ function api_handle_create_endpoint(array $auth): void
             $secret,
             $events,
             substr(trim((string) ($input['description'] ?? '')), 0, 255),
-            api_env(),
         ]);
 
         api_json(201, api_serialize_endpoint(api_fetch_endpoint($publicId, $accountId), $secret));
@@ -230,8 +229,8 @@ function api_handle_list_endpoints(array $auth): void
     $page = api_pagination_params();
     $accountId = $auth['account_id'];
 
-    $where = ' WHERE account_id = ? AND environment = ? AND deleted_at IS NULL';
-    $params = [$accountId, api_env()];
+    $where = ' WHERE account_id = ? AND deleted_at IS NULL';
+    $params = [$accountId];
 
     [$cursorSql, $cursorParams, $reverse] = api_cursor_clause($page, 'api_webhook_endpoints', $accountId);
     $where .= $cursorSql;
@@ -289,8 +288,8 @@ function api_handle_list_events(array $auth): void
     $page = api_pagination_params();
     $accountId = $auth['account_id'];
 
-    $where = ' WHERE account_id = ? AND environment = ?';
-    $params = [$accountId, api_env()];
+    $where = ' WHERE account_id = ?';
+    $params = [$accountId];
 
     if (isset($_GET['type']) && $_GET['type'] !== '') {
         $where .= ' AND type = ?';
@@ -324,9 +323,9 @@ function api_handle_retrieve_event(array $auth, string $publicId): void
     global $pdo;
 
     $stmt = $pdo->prepare(
-        'SELECT * FROM api_events WHERE public_id = ? AND account_id = ? AND environment = ? LIMIT 1'
+        'SELECT * FROM api_events WHERE public_id = ? AND account_id = ? LIMIT 1'
     );
-    $stmt->execute([$publicId, $auth['account_id'], api_env()]);
+    $stmt->execute([$publicId, $auth['account_id']]);
     $row = $stmt->fetch();
 
     if (!$row) {

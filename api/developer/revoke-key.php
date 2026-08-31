@@ -35,7 +35,6 @@ if ($companyUid === '' || $keyId === '') {
 }
 
 global $pdo;
-$env = current_environment();
 
 // The join through api_accounts is what stops one owner revoking another
 // owner's key by guessing an id.
@@ -47,9 +46,9 @@ $stmt = $pdo->prepare(
         AND k.revoked_at IS NULL
         AND a.owner_identity_hash = ?
         AND a.company_uid = ?
-        AND a.environment = ?'
+       '
 );
-$stmt->execute([$keyId, $owner, $companyUid, $env]);
+$stmt->execute([$keyId, $owner, $companyUid]);
 
 if ($stmt->rowCount() === 0) {
     // Already revoked and never existed are reported the same way on purpose:

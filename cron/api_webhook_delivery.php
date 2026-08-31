@@ -54,11 +54,8 @@ try {
  * Claim due deliveries. Limited per run so one badly-behaved endpoint with a
  * huge backlog cannot starve everyone else's notifications.
  *
- * Deliberately NOT filtered by environment, which is the one place in this
- * codebase that rule is broken on purpose. Production and dev share a database
- * but only production runs crons, so filtering would mean sandbox webhooks were
- * queued and never delivered, making them impossible to test. The cost is that
- * the metrics below count both environments together.
+ * There is no environment filter here, and no longer one anywhere under /v1:
+ * an account is one Argo Books company, and that is the whole of the scoping.
  */
 $stmt = $pdo->prepare("
     SELECT d.id, d.attempts, d.event_id,

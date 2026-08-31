@@ -44,7 +44,6 @@ if ($label === '') {
 }
 
 global $pdo;
-$env = current_environment();
 
 // Same uniqueness rule as creating one, minus the key being renamed: renaming a key
 // to what it already says has to stay a no-op rather than a collision.
@@ -53,13 +52,12 @@ $dupe = $pdo->prepare(
        JOIN api_accounts a ON a.id = k.account_id
       WHERE a.owner_identity_hash = ?
         AND a.company_uid = ?
-        AND a.environment = ?
         AND k.revoked_at IS NULL
         AND k.public_id <> ?
         AND LOWER(k.label) = LOWER(?)
       LIMIT 1'
 );
-$dupe->execute([$owner, $companyUid, $env, $keyId, $label]);
+$dupe->execute([$owner, $companyUid, $keyId, $label]);
 if ($dupe->fetchColumn() !== false) {
     send_error_response(409, "There is already a key called '$label'.", 'KEY_LABEL_TAKEN');
 }
@@ -73,10 +71,9 @@ $stmt = $pdo->prepare(
       WHERE k.public_id = ?
         AND k.revoked_at IS NULL
         AND a.owner_identity_hash = ?
-        AND a.company_uid = ?
-        AND a.environment = ?'
+        AND a.company_uid = ?'
 );
-$stmt->execute([$label, $keyId, $owner, $companyUid, $env]);
+$stmt->execute([$label, $keyId, $owner, $companyUid]);
 
 // rowCount() is 0 both for "no such key" and for "renamed to what it already
 // said", so confirm the key is really there before reporting a failure.
@@ -88,10 +85,9 @@ if ($stmt->rowCount() === 0) {
             AND k.revoked_at IS NULL
             AND a.owner_identity_hash = ?
             AND a.company_uid = ?
-            AND a.environment = ?
           LIMIT 1'
     );
-    $check->execute([$keyId, $owner, $companyUid, $env]);
+    $check->execute([$keyId, $owner, $companyUid]);
 
     if ($check->fetchColumn() === false) {
         // Already revoked and never existed are reported the same way on

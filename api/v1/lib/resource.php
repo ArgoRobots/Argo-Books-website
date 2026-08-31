@@ -20,7 +20,7 @@ require_once __DIR__ . '/definitions.php';
 /** Columns present on every resource table, handled by the engine not the spec. */
 const API_SYSTEM_COLUMNS = [
     'id', 'account_id', 'public_id', 'import_status', 'import_batch_id',
-    'imported_at', 'local_ref', 'environment', 'created_at', 'updated_at', 'deleted_at',
+    'imported_at', 'local_ref', 'created_at', 'updated_at', 'deleted_at',
 ];
 
 // ---------------------------------------------------------------------------
@@ -122,9 +122,9 @@ function api_apply_expansions(array $spec, array $out, int $accountId, array $ex
         $target = api_definition_for_object($field['object']);
 
         $stmt = $pdo->prepare(
-            'SELECT * FROM ' . $field['table'] . ' WHERE public_id = ? AND account_id = ? AND environment = ? LIMIT 1'
+            'SELECT * FROM ' . $field['table'] . ' WHERE public_id = ? AND account_id = ? LIMIT 1'
         );
-        $stmt->execute([$out[$path], $accountId, api_env()]);
+        $stmt->execute([$out[$path], $accountId]);
         $row = $stmt->fetch();
 
         if ($row) {
@@ -180,10 +180,10 @@ function api_fetch_object(array $spec, string $publicId, int $accountId): array
 
     $stmt = $pdo->prepare(
         'SELECT * FROM ' . $spec['table'] . '
-          WHERE public_id = ? AND account_id = ? AND environment = ? AND deleted_at IS NULL
+          WHERE public_id = ? AND account_id = ? AND deleted_at IS NULL
           LIMIT 1'
     );
-    $stmt->execute([$publicId, $accountId, api_env()]);
+    $stmt->execute([$publicId, $accountId]);
     $row = $stmt->fetch();
 
     if (!$row) {
@@ -202,8 +202,8 @@ function api_handle_list(array $spec, array $auth, string $segment): void
     $page = api_pagination_params();
     $expand = api_expand_params();
 
-    $where = ' WHERE account_id = ? AND environment = ? AND deleted_at IS NULL';
-    $params = [$accountId, api_env()];
+    $where = ' WHERE account_id = ? AND deleted_at IS NULL';
+    $params = [$accountId];
 
     // import_status is available on every resource: it is how the desktop finds
     // what is still waiting, and how a developer checks whether their push landed.
@@ -300,8 +300,8 @@ function api_handle_create(array $spec, array $auth): void
         api_check_resource_invariants($spec, $values, null);
 
         $publicId = api_generate_id($spec['prefix']);
-        $columns = array_merge(['public_id', 'account_id', 'environment'], array_keys($values));
-        $bindings = array_merge([$publicId, $accountId, api_env()], array_values($values));
+        $columns = array_merge(['public_id', 'account_id'], array_keys($values));
+        $bindings = array_merge([$publicId, $accountId], array_values($values));
         $placeholders = implode(', ', array_fill(0, count($columns), '?'));
 
         $pdo->prepare(
@@ -335,11 +335,11 @@ function api_handle_update(array $spec, array $auth, string $publicId): void
         api_check_resource_invariants($spec, array_merge($existing, $values), $existing);
 
         $assignments = implode(', ', array_map(static fn (string $c) => $c . ' = ?', array_keys($values)));
-        $bindings = array_merge(array_values($values), [$publicId, $accountId, api_env()]);
+        $bindings = array_merge(array_values($values), [$publicId, $accountId]);
 
         $pdo->prepare(
             'UPDATE ' . $spec['table'] . ' SET ' . $assignments . '
-              WHERE public_id = ? AND account_id = ? AND environment = ?'
+              WHERE public_id = ? AND account_id = ?'
         )->execute($bindings);
 
         $row = api_fetch_object($spec, $publicId, $accountId);
@@ -362,8 +362,8 @@ function api_handle_delete(array $spec, array $auth, string $publicId): void
     // cannot dangle onto a recycled row, and a deleted refund stops counting
     // against its revenue's refundable balance.
     $pdo->prepare(
-        'UPDATE ' . $spec['table'] . ' SET deleted_at = NOW() WHERE public_id = ? AND account_id = ? AND environment = ?'
-    )->execute([$publicId, $accountId, api_env()]);
+        'UPDATE ' . $spec['table'] . ' SET deleted_at = NOW() WHERE public_id = ? AND account_id = ?'
+    )->execute([$publicId, $accountId]);
 
     api_json(200, [
         'id'      => $publicId,
@@ -415,8 +415,8 @@ function api_check_resource_invariants(array $spec, array $values, ?array $exist
     }
 
     if ($spec['object'] === 'refund') {
-        $stmt = $pdo->prepare('SELECT amount, currency FROM api_revenue WHERE public_id = ? AND environment = ? LIMIT 1');
-        $stmt->execute([$values['revenue'], api_env()]);
+        $stmt = $pdo->prepare('SELECT amount, currency FROM api_revenue WHERE public_id = ? LIMIT 1');
+        $stmt->execute([$values['revenue']]);
         $parent = $stmt->fetch();
 
         if ($parent) {
@@ -434,9 +434,9 @@ function api_check_resource_invariants(array $spec, array $values, ?array $exist
             // live refunds against this revenue, not just the one being written.
             $sumStmt = $pdo->prepare(
                 'SELECT COALESCE(SUM(amount), 0) FROM api_refunds
-                  WHERE revenue = ? AND environment = ? AND deleted_at IS NULL AND public_id <> ?'
+                  WHERE revenue = ? AND deleted_at IS NULL AND public_id <> ?'
             );
-            $sumStmt->execute([$values['revenue'], api_env(), $existing['public_id'] ?? '']);
+            $sumStmt->execute([$values['revenue'], $existing['public_id'] ?? '']);
             $already = (int) $sumStmt->fetchColumn();
 
             if ($already + (int) $values['amount'] > (int) $parent['amount']) {
@@ -469,10 +469,10 @@ function api_list_line_items(int $accountId, string $parentType, string $parentP
     $spec = api_line_item_definition();
     $stmt = $pdo->prepare(
         'SELECT * FROM api_line_items
-          WHERE account_id = ? AND parent_type = ? AND parent_public_id = ? AND environment = ?
+          WHERE account_id = ? AND parent_type = ? AND parent_public_id = ?
           ORDER BY id ASC'
     );
-    $stmt->execute([$accountId, $parentType, $parentPublicId, api_env()]);
+    $stmt->execute([$accountId, $parentType, $parentPublicId]);
 
     return array_map(
         static function (array $row) use ($spec) {
@@ -529,11 +529,11 @@ function api_handle_create_line_item(array $spec, array $auth, string $publicId)
 
         $itemId = api_generate_id('li');
         $columns = array_merge(
-            ['public_id', 'account_id', 'environment', 'parent_type', 'parent_public_id'],
+            ['public_id', 'account_id', 'parent_type', 'parent_public_id'],
             array_keys($values)
         );
         $bindings = array_merge(
-            [$itemId, $accountId, api_env(), $spec['object'], $publicId],
+            [$itemId, $accountId, $spec['object'], $publicId],
             array_values($values)
         );
         $placeholders = implode(', ', array_fill(0, count($columns), '?'));

@@ -98,6 +98,10 @@ $runId = cron_run_start($pdo, 'argo_books_sync');
 
 $apiKey  = trim((string) env('ARGO_BOOKS_API_KEY', ''));
 $apiBase = rtrim(site_url('/v1'), '/');
+// Only the source tables below are still scoped this way. The API dropped its own
+// environment column, so the sync map is not: an account is one company and that is
+// the whole of the scoping there. These three tables are a different matter, and
+// forgetting the filter here would push sandbox test payments into the real books.
 $env     = current_environment();
 
 if ($apiKey === '') {
@@ -252,15 +256,15 @@ function abs_throttle(): void
 /** @return array{api_object_id:string, content_hash:?string, status:string}|null */
 function abs_map_get(string $sourceType, string $sourceKey): ?array
 {
-    global $pdo, $env;
+    global $pdo;
 
     $stmt = $pdo->prepare(
         'SELECT api_object_id, content_hash, status
            FROM argo_books_sync_map
-          WHERE source_type = ? AND source_key = ? AND environment = ?
+          WHERE source_type = ? AND source_key = ?
           LIMIT 1'
     );
-    $stmt->execute([$sourceType, $sourceKey, $env]);
+    $stmt->execute([$sourceType, $sourceKey]);
     $row = $stmt->fetch();
 
     return $row === false ? null : $row;
@@ -268,17 +272,17 @@ function abs_map_get(string $sourceType, string $sourceKey): ?array
 
 function abs_map_put(string $sourceType, string $sourceKey, string $apiObjectId, string $hash): void
 {
-    global $pdo, $env;
+    global $pdo;
 
     $stmt = $pdo->prepare(
         'INSERT INTO argo_books_sync_map
-             (source_type, source_key, api_object_id, content_hash, environment)
-         VALUES (?, ?, ?, ?, ?)
+             (source_type, source_key, api_object_id, content_hash)
+         VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
              api_object_id = VALUES(api_object_id),
              content_hash  = VALUES(content_hash)'
     );
-    $stmt->execute([$sourceType, $sourceKey, $apiObjectId, $hash, $env]);
+    $stmt->execute([$sourceType, $sourceKey, $apiObjectId, $hash]);
 }
 
 /**
@@ -379,7 +383,9 @@ function abs_sync(string $sourceType, string $sourceKey, string $collection, arr
  */
 function abs_mark_rejected(): int
 {
-    global $pdo, $env;
+    // No $env here: the map is not scoped by deploy any more, because the API it points
+    // at is not either. The source tables further down still are, and must stay that way.
+    global $pdo;
 
     $marked = 0;
 
@@ -415,11 +421,10 @@ function abs_mark_rejected(): int
                 $stmt = $pdo->prepare(
                     "UPDATE argo_books_sync_map
                         SET status = 'rejected'
-                      WHERE environment = ?
-                        AND status <> 'rejected'
+                      WHERE status <> 'rejected'
                         AND api_object_id IN ($placeholders)"
                 );
-                $stmt->execute(array_merge([$env], $ids));
+                $stmt->execute($ids);
                 $marked += $stmt->rowCount();
             }
 

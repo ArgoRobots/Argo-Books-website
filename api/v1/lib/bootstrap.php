@@ -11,8 +11,8 @@ declare(strict_types=1);
  * Design notes that apply everywhere under /v1:
  *   - Money crosses the wire as an integer in the currency's minor unit, the
  *     way Stripe does it. No floats, no rounding surprises.
- *   - Every row this API touches carries an `environment` column and EVERY
- *     query filters on api_env(). Production and dev share one database.
+ *   - Rows are scoped by account, and an account is one Argo Books company. That
+ *     is the only isolation there is: a scratch space is a second company.
  *   - Responses are Stripe-shaped: `object` on every resource, `object: "list"`
  *     with `data`/`has_more` on every collection, one error envelope.
  */
@@ -44,16 +44,6 @@ require_once __DIR__ . '/idempotency.php';
 require_once __DIR__ . '/validate.php';
 require_once __DIR__ . '/pagination.php';
 require_once __DIR__ . '/resource.php';
-
-/**
- * Deploy environment for row filtering. NOT a user-facing test mode: `sandbox`
- * means dev.argorobots.com. There is deliberately no test/live key split, since
- * a developer who wants a scratch space just makes a second Argo Books company.
- */
-function api_env(): string
-{
-    return current_environment();
-}
 
 /**
  * Per-request identifier. Echoed in the Request-Id header and embedded in every

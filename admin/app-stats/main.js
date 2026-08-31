@@ -34,7 +34,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const exportData = rawData.dataPoints.Export || [];
   const geminiData = rawData.dataPoints.Gemini || [];
-  const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
+  const exchangeRatesPerDateData = rawData.dataPoints.OpenExchangeRates || [];
+  const exchangeRatesBatchData = rawData.dataPoints.OpenExchangeRatesBatch || [];
+  // Every other chart keeps treating rate traffic as one series, which is what it was before
+  // the bulk call got its own name. Only the exchange-rates chart splits them.
+  const exchangeRatesData = [
+    ...exchangeRatesPerDateData,
+    ...exchangeRatesBatchData,
+  ];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
@@ -127,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   generateGeminiChart(geminiData);
   generateGeminiResponseTimeChart(geminiData);
-  generateExchangeRatesChart(exchangeRatesData);
+  generateExchangeRatesChart(exchangeRatesPerDateData, exchangeRatesBatchData);
 
   generateActiveUsersTab(rawData);
 
@@ -1720,18 +1727,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateExchangeRatesChart(exchangeRatesData) {
-    if (exchangeRatesData.length === 0) {
+  // Two series, deliberately. One bulk request should price every date a currency change needs,
+  // and the per-date line should stay near zero. Per-date climbing alongside bulk means the bulk
+  // response is arriving and not being used, which costs a distant user a round trip per date.
+  function generateExchangeRatesChart(perDateData, batchData) {
+    const combined = [
+      ...perDateData.map((d) => ({ point: d, series: "perDate" })),
+      ...batchData.map((d) => ({ point: d, series: "batch" })),
+    ].sort(
+      (a, b) => new Date(a.point.timestamp) - new Date(b.point.timestamp)
+    );
+
+    if (combined.length === 0) {
       document.getElementById("exchangeRatesChart").parentElement.innerHTML =
         '<div class="chart-no-data">No exchange rates data available</div>';
       return;
     }
 
-    const recentData = exchangeRatesData.slice(-30);
+    const recentData = combined.slice(-40);
     const labels = recentData.map((d) =>
-      new Date(d.timestamp).toLocaleDateString()
+      new Date(d.point.timestamp).toLocaleDateString()
     );
-    const durations = recentData.map((d) => parseInt(d.DurationMS) || 0);
+    const seriesFor = (name) =>
+      recentData.map((d) =>
+        d.series === name ? parseInt(d.point.DurationMS) || 0 : null
+      );
 
     new Chart(document.getElementById("exchangeRatesChart"), {
       type: "line",
@@ -1739,12 +1759,22 @@ document.addEventListener("DOMContentLoaded", function () {
         labels: labels,
         datasets: [
           {
-            label: "Response Time (ms)",
-            data: durations,
+            label: `Bulk request (${batchData.length})`,
+            data: seriesFor("batch"),
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: false,
+            tension: 0.4,
+            spanGaps: true,
+          },
+          {
+            label: `Per-date repair (${perDateData.length})`,
+            data: seriesFor("perDate"),
             borderColor: "#f59e0b",
             backgroundColor: "rgba(245, 158, 11, 0.1)",
-            fill: true,
+            fill: false,
             tension: 0.4,
+            spanGaps: true,
           },
         ],
       },
@@ -1753,7 +1783,7 @@ document.addEventListener("DOMContentLoaded", function () {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false,
+            display: true,
           },
         },
         scales: {

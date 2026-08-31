@@ -80,10 +80,10 @@ function api_authenticate(): array
                 a.company_uid, a.is_active
            FROM api_keys k
            JOIN api_accounts a ON a.id = k.account_id
-          WHERE k.key_hash = ? AND k.environment = ? AND a.environment = ?
+          WHERE k.key_hash = ?
           LIMIT 1'
     );
-    $stmt->execute([hash('sha256', $secret), api_env(), api_env()]);
+    $stmt->execute([hash('sha256', $secret)]);
     $row = $stmt->fetch();
 
     if (!$row) {

@@ -66,9 +66,9 @@ function api_resolve_cursor(string $table, string $publicId, int $accountId, str
     global $pdo;
 
     $stmt = $pdo->prepare(
-        'SELECT id FROM ' . $table . ' WHERE public_id = ? AND account_id = ? AND environment = ? LIMIT 1'
+        'SELECT id FROM ' . $table . ' WHERE public_id = ? AND account_id = ? LIMIT 1'
     );
-    $stmt->execute([$publicId, $accountId, api_env()]);
+    $stmt->execute([$publicId, $accountId]);
     $id = $stmt->fetchColumn();
 
     if ($id === false) {

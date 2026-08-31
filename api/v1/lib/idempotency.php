@@ -68,10 +68,9 @@ function api_with_idempotency(int $accountId, string $rawBody, callable $handler
     $bodyHash = hash('sha256', $rawBody);
 
     $claim = $pdo->prepare(
-        // No environment column here on purpose: the row is keyed on
-        // (account_id, idempotency_key), and account_id is already scoped to one
-        // environment, so a second copy of the column would only be able to
-        // disagree with it. api_rate_limits omits it for the same reason.
+        // Keyed on (account_id, idempotency_key). An account is one Argo Books
+        // company, which is the only scope this API has, so nothing narrower is
+        // needed here. api_rate_limits is keyed the same way.
         "INSERT INTO api_idempotency_cache
              (account_id, idempotency_key, body_hash, response_status, response_body)
          VALUES (?, ?, ?, 0, '')

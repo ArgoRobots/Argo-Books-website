@@ -463,16 +463,6 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.1);
 }
 
-.inline-cta-buttons .btn-cta-outline {
-  color: var(--black);
-  border-color: var(--gray-300);
-}
-
-.inline-cta-buttons .btn-cta-outline:hover {
-  border-color: var(--black);
-  background: var(--gray-50);
-}
-
 /* Reversed layout (image left, text right) */
 
 .feature-detail.reversed {
@@ -798,9 +788,7 @@ body {
   .why-section,
   .feature-detail-section,
   .how-it-works,
-  .related-features,
   .benefits-section,
-  .use-cases-section,
   .cta-section {
     padding: 60px 0;
   }
@@ -827,7 +815,6 @@ body {
   }
 
   .hero-ctas,
-  .inline-cta-buttons,
   .cta-buttons {
     flex-direction: column;
     align-items: stretch;
@@ -835,9 +822,7 @@ body {
     margin-left: auto;
     margin-right: auto;
   }
-
   .hero-ctas .btn-cta,
-  .inline-cta-buttons .btn-cta,
   .cta-buttons .btn-cta {
     justify-content: center;
   }

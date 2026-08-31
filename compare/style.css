@@ -361,13 +361,6 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 18px;
 }
 
-.dm-line {
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .dm-pulse {
   transform-box: fill-box;
   transform-origin: center;
@@ -707,121 +700,6 @@ h1, h2, h3, h4, h5, h6 {
   padding: 100px 0;
 }
 
-.pricing-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-}
-
-.pricing-box {
-  border-radius: 16px;
-  padding: 32px;
-  height: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.pricing-box:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
-}
-
-.argo-box {
-  background: var(--white);
-  border: 2px solid var(--primary-blue);
-  box-shadow: 0 4px 20px var(--blue-alpha-10);
-}
-
-.competitor-box {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  box-shadow: 0 4px 20px var(--shadow-sm);
-}
-
-.pricing-box-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--gray-100);
-}
-
-.pricing-brand {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--gray-900);
-}
-
-.pricing-tiers {
-  display: flex;
-  flex-direction: column;
-}
-
-.pricing-tier {
-  padding: 8px 0;
-}
-
-.tier-name {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--black);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
-}
-
-.tier-price {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.tier-amount {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--gray-900);
-}
-
-.tier-period {
-  font-size: 0.9rem;
-  color: var(--black);
-}
-
-.tier-limit {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--black);
-  font-style: italic;
-}
-
-.tier-features {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.tier-features li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: var(--black);
-  padding: 4px 0;
-}
-
-.tier-features li svg {
-  color: var(--emerald-500);
-  flex-shrink: 0;
-}
-
-.tier-divider {
-  height: 1px;
-  background: var(--gray-100);
-  margin: 16px 0;
-}
-
 /* ========================================
    Honest Take
    ======================================== */
@@ -1082,12 +960,6 @@ section.faq {
    ======================================== */
 @media (max-width: 900px) {
   .diff-grid {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .pricing-grid {
     grid-template-columns: 1fr;
     max-width: 500px;
     margin: 0 auto;

@@ -144,16 +144,6 @@ h3, h4, h5, h6 {
   background: var(--blue-700);
 }
 
-.fp-btn-quiet {
-  background: transparent;
-  color: var(--fp-ink);
-  border-color: var(--fp-line);
-}
-
-.fp-btn-quiet:hover {
-  border-color: var(--fp-ink-3);
-}
-
 .fp-btn-onnavy {
   background: var(--white-alpha-10);
   color: var(--white);
@@ -282,20 +272,6 @@ h3, h4, h5, h6 {
    so their heroes show the product illustration in the same card the demos
    use. Matching the frame keeps the set consistent even though the contents
    differ. */
-.fp-hero-still {
-  padding: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
-  background: linear-gradient(150deg, var(--gray-800) 0%, var(--gray-700) 100%);
-  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.5);
-}
-
-.fp-hero-still img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-}
 
 /* ------------------------------------------------------------
    Hero demo.
@@ -800,31 +776,6 @@ h3, h4, h5, h6 {
   color: var(--fp-ink-3);
 }
 
-.fp-readnext {
-  margin: 34px 0 0;
-  padding-top: 22px;
-  border-top: 1px solid var(--fp-line-soft);
-  font-family: var(--fp-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--fp-ink-3);
-}
-
-.fp-readnext a {
-  color: var(--primary-blue);
-  text-decoration: none;
-  border-bottom: 1px solid var(--blue-200);
-}
-
-.fp-readnext a:hover {
-  border-bottom-color: var(--primary-blue);
-}
-
-.fp-readnext span {
-  padding: 0 10px;
-  color: var(--fp-ink);
-}
-
 /* ============================================================
    FAQ. faq.css owns the accordion; this only sets the wrapper.
    ============================================================ */
@@ -898,8 +849,7 @@ h3, h4, h5, h6 {
    ============================================================ */
 .fp-btn:focus-visible,
 .fp-rel-card:focus-visible,
-.fp-textlink:focus-visible,
-.fp-readnext a:focus-visible {
+.fp-textlink:focus-visible {
   outline: 2px solid var(--primary-blue);
   outline-offset: 3px;
   border-radius: 10px;
@@ -930,8 +880,7 @@ h3, h4, h5, h6 {
    ============================================================ */
 @media (max-width: 1080px) {
   .fp-hero-demo .feature-visual-card,
-  .fp-hero-demo .invoice-studio-card,
-  .fp-hero-still {
+  .fp-hero-demo .invoice-studio-card {
     padding: 20px;
   }
 
@@ -954,8 +903,7 @@ h3, h4, h5, h6 {
     gap: 52px;
   }
 
-  .fp-hero-demo,
-  .fp-hero-still {
+  .fp-hero-demo {
     max-width: 620px;
     margin: 0 auto;
   }

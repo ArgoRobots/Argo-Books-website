@@ -483,7 +483,6 @@ body.docs-landing {
   }
 }
 
-
 /* ==========================================
    SUB-PAGE STYLES
    ========================================== */
@@ -578,11 +577,6 @@ body.docs-page .account-avatar {
 
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--gray-400);
-}
-
-/* Sidebar Search */
-.sidebar-search {
-  display: none;
 }
 
 /* ==========================================
@@ -700,13 +694,6 @@ body.docs-page .account-avatar {
 }
 
 /* Hide old page header elements */
-.docs-page-header {
-  display: none;
-}
-
-.docs-category-badge {
-  display: none;
-}
 
 /* Content Area - No card, clean typography */
 .docs-content {

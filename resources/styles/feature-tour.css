@@ -201,62 +201,6 @@
     border: 1px solid var(--gray-200);
 }
 
-.scan-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--blue-500), transparent);
-    box-shadow: 0 0 12px 3px var(--blue-alpha-30);
-    animation: scanLine 2.5s linear 1 forwards;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-.scan-animation.scan-complete .scan-line {
-    opacity: 0;
-}
-
-.ai-badge {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    width: max-content;
-    transition: all 0.3s ease;
-}
-
-.ai-badge .badge-text-scanning {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ai-badge .badge-text-complete {
-    display: none;
-}
-
-.ai-badge.complete {
-    background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
-}
-
-.ai-badge.complete .badge-text-scanning {
-    display: none;
-}
-
-.ai-badge.complete .badge-text-complete {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 /* ========================================
    Invoice Studio (interactive invoicing demo)
    ======================================== */
@@ -364,8 +308,6 @@
     background: var(--gray-50);
     border-bottom: 1px solid var(--gray-200);
 }
-.win-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--gray-300); }
-.win-title { margin-left: 8px; font-size: 0.8rem; font-weight: 600; color: var(--gray-500); }
 
 .invoice-doc {
     position: relative;
@@ -994,7 +936,6 @@
     .cust-head, .cust-row { grid-template-columns: 1.5fr 64px 58px; gap: 8px; padding: 9px 10px; }
     .cust-head span:nth-child(2), .cust-co { display: none; }
 }
-
 
 /* ---- Responsive rules (extracted from the landing CSS media blocks) ---- */
 @media (max-width: 1200px) {

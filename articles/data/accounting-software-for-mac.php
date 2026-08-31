@@ -98,7 +98,7 @@ HTML,
 <ul>
 <li>It's a real installed app that works offline. Your books are stored locally on your own machine, not on someone else's server, so you keep working whether or not you have a connection.</li>
 <li>It's cross-platform between Windows and Linux, so there's no Windows-only lock-in. Move between those machines, or run a mix, and your books come with you.</li>
-<li>It's free to start, and Premium is a flat $15/month or $150/year in Canadian dollars, not a price that quietly climbs. The free tier covers up to 25 invoices and 10 receipt scans a month; Premium lifts that to unlimited invoices and 500 receipt scans a month and adds predictive cash-flow analytics, biometric login, and priority support.</li>
+<li>It's free to start, and Premium is a flat ${argo_premium_monthly}/month or ${argo_premium_yearly}/year in Canadian dollars, not a price that quietly climbs. The free tier covers up to {argo_free_invoice_limit} invoices and {argo_free_receipt_scan_limit} receipt scans a month; Premium lifts that to unlimited invoices and {argo_receipt_scan_limit} receipt scans a month and adds predictive cash-flow analytics, biometric login, and priority support.</li>
 <li>It covers the core small-business jobs: invoicing and taking payments and refunds, AI receipt scanning, expense and revenue tracking, inventory and cost of goods sold, and a report builder for profit and loss, balance sheet, and tax-ready reports. It also tracks sales tax you collected against tax you paid and gives you a summary.</li>
 </ul>
 <p><strong>Where it's honestly not the right pick:</strong></p>

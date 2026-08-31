@@ -207,7 +207,7 @@ HTML,
     ],
     [
       'q' => 'Is there a cheaper way to get what QuickBooks does?',
-      'a' => 'Often yes, if you use a fraction of it. Wave and Zoho Books both have free tiers for simple businesses. Xero delivers most of the QuickBooks feature set for roughly half the annual price. Argo Books is a desktop app with a free tier that has no time limit and Premium at $150 a year. The one thing you will not replace cheaply is built-in Canadian payroll, so if that is your main reason for using QuickBooks, switching saves less than the sticker prices suggest.',
+      'a' => 'Often yes, if you use a fraction of it. Wave and Zoho Books both have free tiers for simple businesses. Xero delivers most of the QuickBooks feature set for roughly half the annual price. Argo Books is a desktop app with a free tier that has no time limit and Premium at ${argo_premium_yearly} a year. The one thing you will not replace cheaply is built-in Canadian payroll, so if that is your main reason for using QuickBooks, switching saves less than the sticker prices suggest.',
     ],
     [
       'q' => 'Is this article biased because it is on a QuickBooks competitor\'s site?',

@@ -82,6 +82,10 @@ foreach (($data['faqs'] ?? []) as $faq) {
     $reading_text .= ' ' . (string) ($faq['q'] ?? '') . ' ' . (string) ($faq['a'] ?? '');
 }
 $reading_text = preg_replace('/\{\{illustration:[a-z0-9-]+\}\}/', ' ', $reading_text);
+// Resolve pricing placeholders first. Unresolved, {argo_premium_monthly} counts
+// as three words where the "$15" it becomes counts as none, so every placeholder
+// on the page pushed the estimate up.
+$reading_text = pricing_substitute($reading_text);
 $reading_time_min = max(1, (int) ceil(str_word_count(strip_tags($reading_text)) / 220));
 
 // --- 5. JSON-LD ---------------------------------------------------------------

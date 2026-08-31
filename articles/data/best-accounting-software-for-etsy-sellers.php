@@ -83,7 +83,7 @@ HTML,
       'html' => <<<'HTML'
 <p>We built Argo Books for exactly this kind of small, hands-on business, so here's an honest account of where it's a strong fit for an Etsy seller, and the next section covers where it isn't.</p>
 <ul>
-<li><strong>Free to start, cheap if you grow.</strong> You can run your books on the free tier, which covers up to 25 invoices and 10 receipt scans a month, plenty for a lot of handmade shops. Premium is CA$15 a month or CA$150 a year (prices are in Canadian dollars) and lifts those caps to unlimited invoices and 500 receipt scans, plus predictive cash-flow analytics and biometric login. There's no per-seat creep for a solo maker.</li>
+<li><strong>Free to start, cheap if you grow.</strong> You can run your books on the free tier, which covers up to {argo_free_invoice_limit} invoices and {argo_free_receipt_scan_limit} receipt scans a month, plenty for a lot of handmade shops. Premium is CA${argo_premium_monthly} a month or CA${argo_premium_yearly} a year (prices are in Canadian dollars) and lifts those caps to unlimited invoices and {argo_receipt_scan_limit} receipt scans, plus predictive cash-flow analytics and biometric login. There's no per-seat creep for a solo maker.</li>
 <li><strong>Inventory and COGS are built in, not an upsell.</strong> Argo tracks your materials as inventory and your cost of goods sold, which is the exact job a generic service-business tool tends to skip. That's the maker-specific work you can't easily do in a spreadsheet.</li>
 <li><strong>Desktop and offline.</strong> Argo runs on Windows and Linux, and your data lives locally on your own machine. It works without an internet connection, which is genuinely handy at a craft fair or if you just don't love your books sitting on someone else's server.</li>
 <li><strong>Receipt scanning for supply runs.</strong> Snap a photo of a receipt from the craft store and Argo's AI scanning turns it into an expense, so a season of supply buying doesn't become a paper pile.</li>
@@ -153,7 +153,7 @@ HTML,
     ],
     [
       'q' => 'Is Argo Books a good fit for a small Etsy shop?',
-      'a' => 'It fits well if you do your own books and want something cheap, offline, and simple with inventory and cost of goods sold built in. It\'s free to start, covering up to 25 invoices and 10 receipt scans a month, and Premium is CA$15 a month or CA$150 a year for higher limits plus cash-flow analytics. It runs on Windows and Linux, keeps your data on your own machine, and scans supply receipts. The honest limits: you import your Etsy data rather than syncing it live, Stripe is the only live third-party integration, and it tracks sales tax but doesn\'t file it. If those trade-offs suit you, it\'s a strong pick.',
+      'a' => 'It fits well if you do your own books and want something cheap, offline, and simple with inventory and cost of goods sold built in. It\'s free to start, covering up to {argo_free_invoice_limit} invoices and {argo_free_receipt_scan_limit} receipt scans a month, and Premium is CA${argo_premium_monthly} a month or CA${argo_premium_yearly} a year for higher limits plus cash-flow analytics. It runs on Windows and Linux, keeps your data on your own machine, and scans supply receipts. The honest limits: you import your Etsy data rather than syncing it live, Stripe is the only live third-party integration, and it tracks sales tax but doesn\'t file it. If those trade-offs suit you, it\'s a strong pick.',
     ],
     [
       'q' => 'What features matter most when choosing bookkeeping software as a maker?',

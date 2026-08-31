@@ -41,7 +41,13 @@ const TELEMETRY_FEATURE_NAMES = [
     'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped',
     'SampleCompanyOpened',
     'CompanyCreateOpened', 'ReceiptScanOpened', 'InvoiceCreateOpened',
-    'PageViewed'
+    // Payroll reported only its exceptions, so a company could run payroll all year
+    // and file its T4s without producing one event.
+    'PayRunDrafted',
+    'PayRunApproved',
+    'PayStubsExported',
+    'T4SlipsGenerated',
+    'T4XmlGenerated'
 ];
 
 // Business descriptors on a CompanyProfile event. Free text, not enum-checked: these
@@ -125,6 +131,18 @@ function filter_telemetry_event(array $event): ?array
     ];
 
     switch ($dataType) {
+        // One visit to one screen. Its own type rather than a feature: navigating is not a
+        // feature, and mixed into that list it would bury the events that mean something.
+        case 'PageView':
+            return $base + [
+                'pageName' => telemetry_clean_string($event['pageName'] ?? null, 64),
+                // Idle-aware, so a page left open contributes nothing to this.
+                'activeSeconds' => telemetry_clean_int($event['activeSeconds'] ?? null),
+                // Wall clock. A large gap against activeSeconds is someone who walked away
+                // on this screen rather than someone stuck on it.
+                'durationSeconds' => telemetry_clean_int($event['durationSeconds'] ?? null),
+            ];
+
         case 'Session':
             return $base + [
                 'action' => telemetry_validate_enum($event['action'] ?? null, TELEMETRY_SESSION_ACTIONS),

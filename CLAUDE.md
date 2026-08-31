@@ -9,7 +9,9 @@ PHP/MySQL website for [Argo Books](https://argorobots.com/) accounting software.
 ## Environment files
 
 - `.env`: active environment file (gitignored)
-- `.env - production` and `.env - sandbox`: checked-in templates
+- `.env - production` and `.env - sandbox`: reference copies kept on disk, not in
+  the repo. `.gitignore` excludes `.env*`, so a fresh clone has none of them and
+  they have never been committed. They hold real credentials; keep it that way.
 - `APP_ENV` (`sandbox` or `production`) drives all environment-conditional code (see `current_environment()` in `db_connect.php`)
 
 ## Key files
@@ -98,7 +100,7 @@ What is available:
 
 Required for every cron:
 
-- Wrap the run in `cron_run_start($pdo, '<name>')` / `cron_run_finish($pdo, $runId, 'ok'|'error', $msg)` from `cron/lib/run_tracker.php`, and count work with `cron_metric_incr()`. All eleven scripts do this; it is the only universal convention.
+- Wrap the run in `cron_run_start($pdo, '<name>')` / `cron_run_finish($pdo, $runId, 'ok'|'error', $msg)` from `cron/lib/run_tracker.php`, and count work with `cron_metric_incr()`. All fourteen scripts do this; it is the only universal convention.
 - **Put the numbers in `cron_metric_incr()`, not in prose.** The admin page renders metrics as tiles, so counts recorded there are readable at a glance and comparable across runs. The optional 4th argument to `cron_run_finish()` is for a short summary line shown under "Last run detail"; it lands in the `error_message` column either way, so on an `ok` run keep it to a summary and not an error.
 - **Report failures through `cron_runs` too**, including ones that happen before the main work starts. An early `exit` that skips `cron_run_start` leaves no trace on the admin page and looks identical to the cron never firing.
 - Add a `$cronConfig` entry in `admin/crons/index.php` with the metric labels, or the page has nothing to render.

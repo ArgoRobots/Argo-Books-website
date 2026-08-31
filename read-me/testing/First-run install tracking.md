@@ -47,9 +47,11 @@ The reporter also stamps each POST with a stable per-machine UUID stored in:
 %LOCALAPPDATA%\ArgoBooks\machine_uuid.txt
 ```
 
-`/api/track-app-event.php` checks the most recent `referral_events` rows for any existing `app_first_run` with the same `machine_uuid` JSON field. A match returns `{"success": true, "duplicate": true}` and writes nothing. The machine_uuid file also survives uninstall.
+`/api/track-app-event.php` checks the most recent `referral_events` rows for any existing `app_first_run` with the same `machine_uuid` JSON field **in the same environment**. A match returns `{"success": true, "duplicate": true}` and writes nothing. The machine_uuid file also survives uninstall.
 
-The combined effect: once a machine has produced one `app_first_run` row, that machine is permanently locked out of producing another, even after wiping the local marker. To re-test, both the local marker and the corresponding database row need to be cleared.
+The environment part matters because production and sandbox share one database. Without it, a sandbox test install would permanently stop that same machine from ever producing a production row, and the funnel would undercount with nothing to show for it.
+
+The combined effect: once a machine has produced one `app_first_run` row in a given environment, that machine is permanently locked out of producing another in that environment, even after wiping the local marker. To re-test, both the local marker and the corresponding database row need to be cleared.
 
 ---
 

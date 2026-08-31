@@ -117,14 +117,17 @@ if ($event_type === 'signup_survey') {
     }
 
     try {
-        // Find the most recent app_first_run row for this machine.
+        // Find the most recent app_first_run row for this machine, in this
+        // environment. Production and sandbox share one database, so without
+        // the filter a sandbox test row would answer a production survey.
         $find = $pdo->prepare(
             "SELECT id FROM referral_events
               WHERE event_type = 'app_first_run'
+                AND environment = ?
                 AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
               ORDER BY created_at DESC LIMIT 1"
         );
-        $find->execute([$machine_uuid]);
+        $find->execute([current_environment(), $machine_uuid]);
         $row = $find->fetch();
         if ($row === false) {
             // Survey arrived before first-run was logged. Desktop only fires
@@ -207,7 +210,9 @@ if ($visitor_id !== null) {
     }
 }
 
-// Dedup: skip if we've already logged a first_run for this machine.
+// Dedup: skip if we've already logged a first_run for this machine in this
+// environment. Sandbox and production share a database, so an unscoped check
+// let a test install permanently suppress the real one from the same machine.
 // When visitor_id is null (token didn't resolve), dedupe by machine_uuid
 // alone so retries from an untokenized installer don't create multiple rows.
 if ($machine_uuid !== '') {
@@ -216,20 +221,22 @@ if ($machine_uuid !== '') {
             $dedup = $pdo->prepare(
                 "SELECT 1 FROM referral_events
                   WHERE event_type = 'app_first_run'
+                    AND environment = ?
                     AND visitor_id = ?
                     AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
                   LIMIT 1"
             );
-            $dedup->execute([$visitor_id, $machine_uuid]);
+            $dedup->execute([current_environment(), $visitor_id, $machine_uuid]);
         } else {
             $dedup = $pdo->prepare(
                 "SELECT 1 FROM referral_events
                   WHERE event_type = 'app_first_run'
+                    AND environment = ?
                     AND visitor_id IS NULL
                     AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
                   LIMIT 1"
             );
-            $dedup->execute([$machine_uuid]);
+            $dedup->execute([current_environment(), $machine_uuid]);
         }
         if ($dedup->fetch() !== false) {
             echo json_encode(['success' => true, 'duplicate' => true]);

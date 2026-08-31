@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const errorData = rawData.dataPoints.Error || [];
   const featureUsageData = rawData.dataPoints.FeatureUsage || [];
   const startupData = rawData.dataPoints.Startup || [];
+  const pageViewData = rawData.dataPoints.PageView || [];
 
   // Initialize all charts
   if (isGeoEnabled) {
@@ -108,9 +109,10 @@ document.addEventListener("DOMContentLoaded", function () {
   generateErrorDetailsTable(errorData);
 
   // Feature Usage Charts
-  const filteredFeatureUsageData = featureUsageData.filter(f => f.FeatureName !== "PageView");
-  generateFeatureUsageChart(filteredFeatureUsageData);
-  generateFeatureTimelineChart(filteredFeatureUsageData);
+  generateFeatureUsageChart(featureUsageData);
+  generateFeatureTimelineChart(featureUsageData);
+
+  generatePageViewsTable(pageViewData);
 
   // Receipt Scanning Charts
   generateReceiptScanOverviewChart(receiptScanningData);
@@ -2162,6 +2164,72 @@ document.addEventListener("DOMContentLoaded", function () {
         "<td>" + u.platform + "</td>" +
         "<td>" + u.country + "</td>" +
         "<td>" + u.appVersion + "</td>";
+      tbody.appendChild(tr);
+    });
+  }
+
+  // =====================
+  // Pages
+  // =====================
+  function generatePageViewsTable(pageViewData) {
+    const tbody = document.querySelector("#pageViewsTable tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (pageViewData.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--admin-text);">' +
+        "No page data yet. Page timing ships in 2.0.14." +
+        "</td></tr>";
+      return;
+    }
+
+    // Median rather than mean: one person who left a screen open for an hour would otherwise
+    // decide the number for that page.
+    const median = (nums) => {
+      if (nums.length === 0) return 0;
+      const sorted = nums.slice().sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+    };
+
+    const fmt = (secs) => {
+      if (secs < 60) return secs + "s";
+      const m = Math.floor(secs / 60);
+      return m < 60 ? m + "m " + (secs % 60) + "s" : Math.floor(m / 60) + "h " + (m % 60) + "m";
+    };
+
+    const byPage = {};
+    pageViewData.forEach((v) => {
+      const name = v.PageName || "Unknown";
+      if (!byPage[name]) byPage[name] = { active: [], open: [] };
+      byPage[name].active.push(Number(v.ActiveSeconds) || 0);
+      byPage[name].open.push(Number(v.DurationSeconds) || 0);
+    });
+
+    const rows = Object.entries(byPage)
+      .map(([name, d]) => ({
+        name,
+        visits: d.active.length,
+        medianActive: median(d.active),
+        medianOpen: median(d.open),
+        totalActive: d.active.reduce((a, b) => a + b, 0),
+      }))
+      // Total active time first: that is where the app is actually being used, which is a
+      // different question from which page gets opened most.
+      .sort((a, b) => b.totalActive - a.totalActive);
+
+    rows.forEach((r) => {
+      const tr = document.createElement("tr");
+      // Flag the walked-away pattern rather than making every reader do the subtraction.
+      const abandoned = r.medianOpen > r.medianActive * 3 && r.medianOpen - r.medianActive > 30;
+      tr.innerHTML =
+        '<td style="font-weight:600;">' + escapeHtml(r.name) + "</td>" +
+        "<td>" + r.visits.toLocaleString() + "</td>" +
+        "<td>" + fmt(r.medianActive) + "</td>" +
+        "<td" + (abandoned ? ' style="color:var(--admin-warning, #f59e0b); font-weight:600;"' : "") +
+          ">" + fmt(r.medianOpen) + "</td>" +
+        "<td>" + fmt(r.totalActive) + "</td>";
       tbody.appendChild(tr);
     });
   }

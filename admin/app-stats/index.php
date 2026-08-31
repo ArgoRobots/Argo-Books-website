@@ -201,6 +201,12 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             $normalized['ColdStart']      = !empty($event['coldStart']);
             return ['category' => 'Startup', 'data' => $normalized];
 
+        case 'PageView':
+            $normalized['PageName'] = $event['pageName'] ?? 'Unknown';
+            $normalized['ActiveSeconds'] = (int)($event['activeSeconds'] ?? 0);
+            $normalized['DurationSeconds'] = (int)($event['durationSeconds'] ?? 0);
+            return ['category' => 'PageView', 'data' => $normalized];
+
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
             $normalized['Context'] = $event['context'] ?? '';
@@ -707,6 +713,7 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
                 <button class="section-tab" data-tab="versions">Versions</button>
                 <button class="section-tab" data-tab="features">Features</button>
+                <button class="section-tab" data-tab="pages">Pages</button>
                 <button class="section-tab" data-tab="usage">Usage</button>
                 <button class="section-tab" data-tab="api">API Usage</button>
                 <button class="section-tab" data-tab="errors">Errors</button>
@@ -928,6 +935,32 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <!-- Usage Tab -->
+            <div id="pages" class="tab-content">
+                <h2 class="section-title">Pages</h2>
+
+                <p style="color: var(--admin-text); margin-bottom: 1.5rem;">
+                    Where time goes inside a session. <strong>Active</strong> excludes gaps longer
+                    than five minutes, so a window left open counts for nothing; <strong>open</strong>
+                    is wall clock. A page whose open time is far above its active time is where
+                    people walk away. A page with a high active time is where they get stuck.
+                </p>
+
+                <div class="error-details-wrapper">
+                    <table class="error-details-table" id="pageViewsTable" data-paginate="25" data-paginate-noun="pages">
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Visits</th>
+                                <th>Median active</th>
+                                <th>Median open</th>
+                                <th>Total active</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div id="usage" class="tab-content">
                 <h2 class="section-title">Usage Analytics</h2>
 

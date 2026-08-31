@@ -21,7 +21,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .hero .hero-gradient-orb {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   filter: blur(80px);
   opacity: 0.5;
 }
@@ -51,7 +51,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: var(--text-6xl);
   font-weight: 700;
   color: var(--white);
   margin-bottom: 16px;
@@ -59,7 +59,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .hero .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--white);
   margin: 0;
 }
@@ -109,23 +109,23 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .option-card {
   background: var(--white);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 32px;
   text-align: center;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .option-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .option-icon {
   width: 64px;
   height: 64px;
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,14 +155,14 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .option-card h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--gray-900);
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .option-card p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--black);
   margin-bottom: 16px;
   line-height: 1.6;
@@ -174,7 +174,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   gap: 6px;
   color: var(--primary-blue);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   text-decoration: none;
   transition: gap 0.2s ease;
   margin-bottom: 12px;
@@ -189,7 +189,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   color: var(--black);
 }
 
@@ -217,7 +217,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .form-wrapper {
   background: var(--gray-50);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 40px;
 }
 
@@ -226,7 +226,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .form-header h2 {
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
   color: var(--gray-900);
   margin-bottom: 8px;
   font-weight: 600;
@@ -234,7 +234,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .form-header p {
   color: var(--black);
-  font-size: 1rem;
+  font-size: var(--text-sm);
 }
 
 .form-row {
@@ -249,7 +249,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .form-group label {
   display: block;
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   color: var(--black);
   margin-bottom: 8px;
@@ -260,9 +260,9 @@ header .header-inner .menu-container .menu .contact-us:after {
 .form-group textarea {
   width: 100%;
   padding: 14px 18px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   border: 2px solid var(--gray-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--white);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: inherit;
@@ -305,17 +305,17 @@ header .header-inner .menu-container .menu .contact-us:after {
   padding: 16px 32px;
   background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--blue-alpha-30);
+  box-shadow: var(--elevation-brand-strong);
 }
 
 .submit-btn:active {
@@ -333,7 +333,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .sidebar-card {
   background: var(--gray-50);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
@@ -341,7 +341,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   width: 48px;
   height: 48px;
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -355,14 +355,14 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .sidebar-card h4 {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--gray-900);
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .sidebar-card p {
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   color: var(--black);
   line-height: 1.6;
   margin-bottom: 12px;
@@ -374,7 +374,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   gap: 4px;
   color: var(--primary-blue);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   text-decoration: none;
 }
 
@@ -388,8 +388,8 @@ header .header-inner .menu-container .menu .contact-us:after {
   gap: 6px;
   padding: 8px 14px;
   background: var(--white);
-  border-radius: 20px;
-  font-size: 0.85rem;
+  border-radius: var(--radius-xl);
+  font-size: var(--text-xs);
   color: var(--black);
   border: 1px solid var(--gray-border);
 }
@@ -406,9 +406,9 @@ header .header-inner .menu-container .menu .contact-us:after {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 24px;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   background: var(--red-50);
   border: 1px solid var(--red-200);
   color: var(--red-800);
@@ -424,7 +424,7 @@ header .header-inner .menu-container .menu .contact-us:after {
    ======================================== */
 @media (max-width: 900px) {
   .hero h1 {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
   }
 
   .options-grid {
@@ -452,11 +452,11 @@ header .header-inner .menu-container .menu .contact-us:after {
   }
 
   .hero h1 {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
 
   .hero .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--text-md);
   }
 
   .contact-options,

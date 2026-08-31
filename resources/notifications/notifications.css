@@ -1,9 +1,9 @@
 .success-message,
 .error-message {
     padding: 12px 15px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     margin-bottom: 0;
-    box-shadow: 0 4px 6px var(--shadow-default);
+    box-shadow: var(--elevation-sm);
     text-align: center;
     animation: fadeInOut 3s forwards;
     overflow: hidden;

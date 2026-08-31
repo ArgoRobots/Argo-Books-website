@@ -12,7 +12,7 @@
 }
 
 .craft-legend {
-  font-size: 12px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -25,7 +25,7 @@
 .craft-batch {
   margin-top: 22px;
   padding: 16px 18px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--blue-50);
   border: 1px solid var(--blue-100);
 }
@@ -36,7 +36,7 @@
 
 .calc-subtitle {
   margin: 0 0 6px;
-  font-size: 13px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -50,7 +50,7 @@
 }
 
 .craft-channel-table .calc-table {
-  font-size: 14px;
+  font-size: var(--text-xs);
 }
 
 .craft-channel-table .calc-table td,
@@ -71,6 +71,6 @@
 
 @media (max-width: 860px) {
   .craft-channel-table .calc-table {
-    font-size: 13px;
+    font-size: var(--text-2xs);
   }
 }

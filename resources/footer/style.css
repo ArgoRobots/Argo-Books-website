@@ -27,7 +27,7 @@
 
 .footer .footer-gradient-orb {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   filter: blur(80px);
   opacity: 0;
   animation: orbFadeIn 1.5s ease-out forwards, orbPulse 4s ease-in-out infinite 1.5s;
@@ -132,13 +132,13 @@
   color: var(--white);
   line-height: 1.6;
   margin-bottom: 16px;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .footer-section h3 {
   color: var(--white);
   margin-bottom: 16px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -157,7 +157,7 @@
   color: var(--white);
   text-decoration: none;
   transition: color 0.2s ease;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .footer-links a:hover {
@@ -176,7 +176,7 @@
 
 .footer-bottom p {
   color: var(--white);
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
   margin: 0;
 }
 

@@ -10,10 +10,10 @@
 
 :root {
   --hub-bg: #fbf9f4;
-  --hub-surface: #ffffff;
-  --hub-text: #000000;
-  --hub-text-soft: #000000;
-  --hub-muted: #000000;
+  --hub-surface: var(--white);
+  --hub-text: var(--black);
+  --hub-text-soft: var(--black);
+  --hub-muted: var(--black);
   --hub-rule: #cdc7b9;
   --hub-rule-soft: #dad5c7;
   --hub-num: #6b7280;
@@ -46,7 +46,7 @@ body:has(.guides-hub) {
 
 .guides-hub-eyebrow {
   font-family: var(--hub-sans);
-  font-size: 12px;
+  font-size: var(--text-2xs);
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -63,7 +63,7 @@ body:has(.guides-hub) {
 .guides-hub-title {
   font-family: var(--hub-serif);
   font-weight: 400;
-  font-size: clamp(42px, 6.4vw, 80px);
+  font-size: clamp(var(--text-5xl), 6.4vw, var(--text-9xl));
   line-height: 0.96;
   letter-spacing: -0.022em;
   color: var(--hub-text);
@@ -79,7 +79,7 @@ body:has(.guides-hub) {
 .guides-hub-lede {
   font-family: var(--hub-serif);
   font-weight: 300;
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: clamp(var(--text-md), 1.6vw, var(--text-lg));
   line-height: 1.55;
   color: var(--hub-text-soft);
   margin: 0;
@@ -99,14 +99,14 @@ body:has(.guides-hub) {
 
 .guides-hub-pill {
   font-family: var(--hub-sans);
-  font-size: 11px;
+  font-size: var(--text-2xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--hub-text-soft);
   background: var(--hub-surface);
   border: 1px solid var(--hub-rule);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 8px 16px 7px;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -118,7 +118,7 @@ body:has(.guides-hub) {
 }
 
 .guides-hub-pill.is-active {
-  color: #ffffff;
+  color: var(--white);
   background: var(--hub-accent);
   border-color: var(--hub-accent);
 }
@@ -161,7 +161,7 @@ body:has(.guides-hub) {
 .guides-hub-group-label {
   margin: 0;
   font-family: var(--hub-serif);
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(var(--text-xl), 3vw, var(--text-3xl));
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--hub-text);
@@ -208,7 +208,7 @@ body:has(.guides-hub) {
   font-family: var(--hub-serif);
   font-feature-settings: 'tnum', 'lnum';
   font-weight: 400;
-  font-size: 104px;
+  font-size: var(--text-10xl);
   line-height: 0.82;
   color: var(--hub-num);
   letter-spacing: -0.05em;
@@ -227,7 +227,7 @@ body:has(.guides-hub) {
 .guides-hub-headline {
   font-family: var(--hub-serif);
   font-weight: 500;
-  font-size: 27px;
+  font-size: var(--text-2xl);
   line-height: 1.22;
   letter-spacing: -0.012em;
   color: var(--hub-text);
@@ -236,7 +236,7 @@ body:has(.guides-hub) {
 
 .guides-hub-desc {
   font-family: var(--hub-sans);
-  font-size: 15px;
+  font-size: var(--text-xs);
   line-height: 1.6;
   color: var(--hub-text-soft);
   max-width: 540px;
@@ -251,14 +251,14 @@ body:has(.guides-hub) {
 
 .guides-hub-chip {
   font-family: var(--hub-sans);
-  font-size: 10.5px;
+  font-size: var(--text-2xs);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--hub-muted);
   border: 1px solid var(--hub-rule);
   padding: 5px 11px 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
 }
 
@@ -270,7 +270,7 @@ body:has(.guides-hub) {
 
 .guides-hub-arrow {
   font-family: var(--hub-serif);
-  font-size: 26px;
+  font-size: var(--text-xl);
   color: var(--hub-num);
   padding-top: 18px;
   transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), color 0.35s ease;
@@ -341,7 +341,7 @@ body:has(.guides-hub) {
 
 .guides-hub-banner-eyebrow {
   font-family: var(--hub-sans);
-  font-size: 11px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -352,7 +352,7 @@ body:has(.guides-hub) {
 .guides-hub-banner-text {
   font-family: var(--hub-serif);
   font-weight: 400;
-  font-size: 19px;
+  font-size: var(--text-md);
   line-height: 1.5;
   color: var(--hub-text);
   margin: 0;
@@ -361,7 +361,7 @@ body:has(.guides-hub) {
 
 .guides-hub-banner-link {
   font-family: var(--hub-sans);
-  font-size: 14px;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--hub-accent);
@@ -389,11 +389,11 @@ body:has(.guides-hub) {
     margin-bottom: 22px;
   }
   .guides-hub-title {
-    font-size: clamp(34px, 9vw, 50px);
+    font-size: clamp(var(--text-3xl), 9vw, var(--text-6xl));
     margin-bottom: 24px;
   }
   .guides-hub-lede {
-    font-size: 17px;
+    font-size: var(--text-sm);
   }
   .guides-hub-group {
     margin-top: 40px;
@@ -405,7 +405,7 @@ body:has(.guides-hub) {
     padding: 22px 0 24px;
   }
   .guides-hub-num {
-    font-size: 56px;
+    font-size: var(--text-7xl);
     padding-top: 2px;
   }
   .guides-hub-body {
@@ -413,13 +413,13 @@ body:has(.guides-hub) {
     gap: 10px;
   }
   .guides-hub-headline {
-    font-size: 19px;
+    font-size: var(--text-md);
   }
   .guides-hub-desc {
-    font-size: 14px;
+    font-size: var(--text-xs);
   }
   .guides-hub-arrow {
-    font-size: 18px;
+    font-size: var(--text-md);
     padding-top: 10px;
   }
   .guides-hub-banner {
@@ -434,7 +434,7 @@ body:has(.guides-hub) {
     display: none;
   }
   .guides-hub-banner-text {
-    font-size: 17px;
+    font-size: var(--text-sm);
   }
 }
 
@@ -464,7 +464,7 @@ body:has(.guides-hub) {
   gap: 0.625rem;
   background: var(--hub-surface);
   border: 1px solid var(--hub-rule);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 0 0.9rem;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -485,7 +485,7 @@ body:has(.guides-hub) {
   border: none;
   background: transparent;
   padding: 0.85rem 0;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-family: var(--hub-sans);
   color: var(--hub-text);
   outline: none;

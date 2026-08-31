@@ -9,7 +9,7 @@
   cursor: pointer;
   appearance: none;
   border: 2px solid var(--primary-blue);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   outline: none;
   transition: all 0.2s ease-in-out;
   position: relative;
@@ -40,6 +40,6 @@
 }
 
 .checkbox label {
-  font-size: 16px;
+  font-size: var(--text-sm);
   cursor: pointer;
 }

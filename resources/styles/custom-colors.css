@@ -324,6 +324,9 @@
   --text-5xl: 2.5rem;     /* 40 */
   --text-6xl: 3rem;       /* 48 */
   --text-7xl: 3.5rem;     /* 56 - home hero */
+  --text-8xl: 4rem;       /* 64 - tool and calculator display headings */
+  --text-9xl: 5rem;       /* 80 */
+  --text-10xl: 6.5rem;    /* 104 - the numeral on the guides hub */
 
   /* Type inside the product mockups, which sit below the page floor. A
      simulated desktop app shown at reduced size needs its own ramp;
@@ -341,6 +344,7 @@
   --radius-sm: 8px;    /* small controls */
   --radius-md: 12px;   /* buttons, inputs, panels */
   --radius-lg: 16px;   /* cards, device frames, large media */
+  --radius-xl: 20px;   /* the largest panels and hero surfaces */
   --radius-pill: 50px;
   --radius-round: 50%;
 

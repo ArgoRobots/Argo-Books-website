@@ -10,8 +10,8 @@
   right: 0;
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 16px;
-  box-shadow: 0 20px 40px var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-lg);
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
@@ -45,21 +45,21 @@
 }
 
 .search-result-item:first-child {
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .search-result-item:last-child {
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .search-result-item:only-child {
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 /* Result Title */
 .search-result-title {
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: var(--text-xs);
   color: var(--gray-900);
   margin-bottom: 4px;
   display: flex;
@@ -76,7 +76,7 @@
 
 /* Result Section Badge */
 .search-result-section {
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   font-weight: 500;
   color: var(--black);
   text-transform: uppercase;
@@ -88,7 +88,7 @@
 .search-highlight {
   background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-50) 100%);
   color: var(--amber-800);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-weight: 600;
 }
 
@@ -106,14 +106,14 @@
 }
 
 .no-results-title {
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--black);
   margin-bottom: 4px;
 }
 
 .no-results-text {
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
   color: var(--black);
 }
 
@@ -122,7 +122,7 @@
 @media (max-width: 768px) {
   .search-results {
     max-height: 60vh;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .search-result-item {
@@ -130,15 +130,15 @@
   }
 
   .search-result-item:first-child {
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
   .search-result-item:last-child {
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
   }
 
   .search-result-item:only-child {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .no-results {
@@ -157,7 +157,7 @@
 
 .search-results::-webkit-scrollbar-thumb {
   background: var(--gray-300);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .search-results::-webkit-scrollbar-thumb:hover {

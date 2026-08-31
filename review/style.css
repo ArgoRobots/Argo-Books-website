@@ -14,8 +14,8 @@
   padding: 12px 20px;
   background: var(--white-alpha-10);
   border: 1px solid var(--white-alpha-20);
-  border-radius: 50px;
-  font-size: 0.95rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
   color: var(--white);
   line-height: 1.4;
   text-align: left;
@@ -39,9 +39,9 @@
 
 @media (max-width: 600px) {
   .review-prefer-contact {
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     padding: 10px 16px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -54,9 +54,9 @@
   padding: 14px 18px;
   background: var(--blue-50);
   border: 1px solid var(--blue-100);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   color: var(--gray-800);
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
 }
 
@@ -73,9 +73,9 @@
 .review-info-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 22px;
+  border-radius: var(--radius-xl);
   padding: 32px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  box-shadow: var(--elevation-xl);
   position: relative;
 }
 
@@ -103,19 +103,19 @@
 .review-info-card-label {
   display: inline-flex;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   font-weight: 600;
   line-height: 1;
   color: var(--emerald-700);
   background: var(--emerald-100);
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .review-info-card-quote {
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--gray-800);
   margin: 0 0 20px;
@@ -133,7 +133,7 @@
 .review-info-card-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
   color: var(--primary-blue);
   display: grid;
@@ -144,16 +144,16 @@
 .review-info-card-name {
   font-weight: 600;
   color: var(--gray-900);
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .review-info-card-role {
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   color: var(--gray-500);
 }
 
 .review-info-card-disclaimer {
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   color: var(--gray-400);
   margin: 14px 0 0;
   text-align: right;
@@ -169,9 +169,9 @@
   position: relative;
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 22px;
+  border-radius: var(--radius-xl);
   padding: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  box-shadow: var(--elevation-xl);
   overflow: hidden;
 }
 
@@ -179,7 +179,7 @@
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: none;
 }
 
@@ -195,14 +195,14 @@
 }
 
 .review-screenshot-fallback h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--gray-900);
   margin: 0 0 8px;
 }
 
 .review-screenshot-fallback p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--gray-600);
   margin: 0;
   line-height: 1.6;
@@ -231,20 +231,20 @@
 .review-privacy-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 32px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .review-privacy-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .review-privacy-card-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   margin-bottom: 16px;
@@ -263,7 +263,7 @@
 }
 
 .review-privacy-card h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--gray-900);
   margin: 0 0 16px;
@@ -280,7 +280,7 @@
   align-items: flex-start;
   gap: 10px;
   padding: 6px 0;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--gray-700);
   line-height: 1.5;
 }
@@ -320,7 +320,7 @@
   }
 
   .review-info-card-quote {
-    font-size: 1rem;
+    font-size: var(--text-sm);
   }
 
   .review-screenshot-frame {
@@ -332,7 +332,7 @@
   }
 
   .review-callout {
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
     padding: 12px 14px;
   }
 }

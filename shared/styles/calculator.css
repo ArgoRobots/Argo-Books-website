@@ -45,9 +45,9 @@
   gap: 22px;
   background: var(--tool-surface);
   border: 1px solid var(--tool-border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 24px;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
 }
 
 /* ---------- Inputs ---------- */
@@ -58,7 +58,7 @@
 }
 
 .calc-field label {
-  font-size: 14px;
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--tool-text);
 }
@@ -71,7 +71,7 @@
   color: var(--tool-text);
   background: var(--tool-surface);
   border: 1px solid var(--tool-border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 10px 12px;
   min-height: 44px;
 }
@@ -111,7 +111,7 @@
 
 .calc-hint {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-2xs);
   line-height: 1.5;
   color: var(--tool-muted);
 }
@@ -120,9 +120,9 @@
 .calc-results {
   background: var(--tool-surface);
   border: 1px solid var(--tool-border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 28px;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
   /* Long forms scroll the answer off screen otherwise, which defeats the point
      of a live calculator. Unpinned again in the single-column breakpoint. */
   position: sticky;
@@ -140,7 +140,7 @@
 }
 
 .calc-headline-label {
-  font-size: 13px;
+  font-size: var(--text-2xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -148,7 +148,7 @@
 }
 
 .calc-headline-amount {
-  font-size: 44px;
+  font-size: var(--text-5xl);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--tool-text);
@@ -157,7 +157,7 @@
 }
 
 .calc-headline-sub {
-  font-size: 13px;
+  font-size: var(--text-2xs);
   color: var(--tool-muted);
 }
 
@@ -171,7 +171,7 @@
   align-items: baseline;
   gap: 16px;
   padding: 7px 0;
-  font-size: 15px;
+  font-size: var(--text-xs);
 }
 
 .calc-breakdown-row dt {
@@ -196,7 +196,7 @@
 .calc-row-rate dd {
   color: var(--tool-muted);
   font-weight: 500;
-  font-size: 14px;
+  font-size: var(--text-xs);
 }
 
 /* ---------- Article / SEO content ---------- */
@@ -211,14 +211,14 @@
 }
 
 .calc-content h2 {
-  font-size: 24px;
+  font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
   margin: 0 0 12px;
 }
 
 .calc-content h3 {
-  font-size: 17px;
+  font-size: var(--text-sm);
   font-weight: 600;
   margin: 20px 0 8px;
 }
@@ -243,7 +243,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 8px 0 12px;
-  font-size: 15px;
+  font-size: var(--text-xs);
 }
 
 .calc-table th,
@@ -254,7 +254,7 @@
 }
 
 .calc-table thead th {
-  font-size: 13px;
+  font-size: var(--text-2xs);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--tool-muted);
@@ -267,7 +267,7 @@
 .calc-example {
   background: var(--blue-50);
   border: 1px solid var(--blue-100);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 18px 20px;
 }
 
@@ -286,7 +286,7 @@
 }
 
 .calc-faqs h2 {
-  font-size: 24px;
+  font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
   text-align: center;
@@ -304,11 +304,11 @@
   }
 
   .calc-headline-amount {
-    font-size: 36px;
+    font-size: var(--text-4xl);
   }
 
   .calc-content h2 {
-    font-size: 21px;
+    font-size: var(--text-lg);
   }
 }
 
@@ -323,10 +323,10 @@
 .calc-note {
   margin-top: 18px;
   padding: 14px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--amber-50);
   border: 1px solid var(--amber-200);
-  font-size: 13px;
+  font-size: var(--text-2xs);
   line-height: 1.55;
   color: var(--invoice-text);
 }
@@ -338,21 +338,21 @@
 .calc-verified {
   margin: 16px 0 0;
   text-align: center;
-  font-size: 12px;
+  font-size: var(--text-2xs);
   color: var(--tool-muted);
 }
 
 .calc-disclaimer {
   max-width: 760px;
   margin: 40px auto 0;
-  font-size: 12px;
+  font-size: var(--text-2xs);
   line-height: 1.6;
   text-align: center;
   color: var(--tool-muted);
 }
 
 .calc-band-rate {
-  font-size: 12px;
+  font-size: var(--text-2xs);
   color: var(--tool-muted);
   margin-left: 4px;
 }
@@ -360,7 +360,7 @@
 .calc-callout {
   margin-top: 22px;
   padding: 16px 18px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--blue-50);
   border: 1px solid var(--blue-100);
 }
@@ -372,7 +372,7 @@
 
 .calc-callout p {
   margin: 8px 0 0;
-  font-size: 13px;
+  font-size: var(--text-2xs);
   line-height: 1.55;
   color: var(--invoice-text);
 }
@@ -381,10 +381,10 @@
 
 .calc-preset-btn {
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-2xs);
   cursor: pointer;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--tool-border);
   background: var(--tool-surface);
   color: var(--tool-text);
@@ -442,7 +442,7 @@
 
 /* Group heading inside a results breakdown, e.g. "Etsy takes" or "Per sale". */
 .calc-group {
-  font-size: 12px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -455,13 +455,13 @@
    totals below them. */
 .calc-row-cost {
   padding-left: 12px;
-  font-size: 14px;
+  font-size: var(--text-xs);
 }
 
 .calc-formula {
   background: var(--tool-secondary);
   border: 1px solid var(--tool-border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 12px 16px;
   font-weight: 600;
   text-align: center;

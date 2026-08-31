@@ -55,7 +55,7 @@ body {
 
 .hero .hero-gradient-orb {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   filter: blur(80px);
   opacity: 0;
   mix-blend-mode: screen;
@@ -110,14 +110,14 @@ body {
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: var(--text-6xl);
   font-weight: 700;
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
 
 .hero .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--white);
   max-width: 600px;
   margin: 0 auto;
@@ -143,19 +143,19 @@ body {
   align-items: flex-start;
   background: var(--white);
   padding: 28px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-decoration: none;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tool-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .tool-card h2 {
-  font-size: 1.35rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--gray-900);
   margin: 4px 0 10px;
@@ -163,7 +163,7 @@ body {
 }
 
 .tool-card p {
-  font-size: 1rem;
+  font-size: var(--text-sm);
   color: var(--black);
   margin: 0 0 20px;
   line-height: 1.6;
@@ -174,7 +174,7 @@ body {
   align-items: center;
   gap: 8px;
   margin-top: auto;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--primary-blue);
 }
@@ -192,7 +192,7 @@ body {
   width: 56px;
   height: 56px;
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -270,7 +270,7 @@ body {
 }
 
 .contact-card h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--white);
   margin-bottom: 16px;
@@ -278,7 +278,7 @@ body {
 }
 
 .contact-card p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--white);
   margin-bottom: 32px;
   line-height: 1.7;
@@ -294,7 +294,7 @@ body {
   gap: 8px;
   width: auto;
   padding: 14px 28px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   white-space: nowrap;
 }
 
@@ -302,10 +302,10 @@ body {
   padding: 14px 28px;
   background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -313,7 +313,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--blue-alpha-30);
+  box-shadow: var(--elevation-brand-strong);
 }
 
 /* ========================================
@@ -341,11 +341,11 @@ body {
   }
 
   .hero h1 {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
   }
 
   .hero .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--text-md);
   }
 
   .tools-section,
@@ -354,6 +354,6 @@ body {
   }
 
   .contact-card h2 {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl);
   }
 }

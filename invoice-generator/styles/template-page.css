@@ -17,20 +17,20 @@
 }
 
 .template-breadcrumb {
-  font-size: 14px;
+  font-size: var(--text-xs);
   margin-bottom: 12px;
 }
 
 .template-page h1,
 .template-hub h1 {
-  font-size: 32px;
+  font-size: var(--text-3xl);
   line-height: 1.2;
   margin-bottom: 8px;
 }
 
 .template-page h2,
 .template-hub h2 {
-  font-size: 22px;
+  font-size: var(--text-lg);
   line-height: 1.3;
   margin-top: 32px;
   margin-bottom: 12px;
@@ -38,7 +38,7 @@
 
 .template-page h3,
 .template-hub h3 {
-  font-size: 17px;
+  font-size: var(--text-sm);
   margin-top: 18px;
   margin-bottom: 6px;
 }
@@ -49,7 +49,7 @@
   max-width: 100%;
   height: auto;
   border: 1px solid var(--gray-border);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin: 12px 0;
 }
 
@@ -84,7 +84,7 @@
   background: var(--primary-blue);
   color: var(--white);
   padding: 12px 20px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-weight: 600;
   margin: 12px 0;
@@ -119,7 +119,7 @@
 
 .template-hub-style-block {
   border: 1px solid var(--gray-border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 16px;
 }
 
@@ -130,10 +130,10 @@
   }
   .template-page h1,
   .template-hub h1 {
-    font-size: 26px;
+    font-size: var(--text-xl);
   }
   .template-page h2,
   .template-hub h2 {
-    font-size: 19px;
+    font-size: var(--text-md);
   }
 }

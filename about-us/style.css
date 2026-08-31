@@ -42,7 +42,7 @@ body {
    ======================================== */
 .section-label {
   display: inline-block;
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--primary-blue);
   text-transform: uppercase;
@@ -69,7 +69,7 @@ body {
 
 .hero .hero-gradient-orb {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   filter: blur(80px);
   opacity: 0;
   mix-blend-mode: screen;
@@ -150,14 +150,14 @@ body {
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: var(--text-6xl);
   font-weight: 700;
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
 
 .hero .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--white);
   max-width: 600px;
   margin: 0 auto;
@@ -171,16 +171,16 @@ body {
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50px;
-  font-size: 0.95rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--white);
 }
 
 .hero-made-in img {
   display: block;
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-xs);
+  box-shadow: var(--elevation-xs);
 }
 
 /* ========================================
@@ -198,7 +198,7 @@ body {
 }
 
 .mission-content h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -206,7 +206,7 @@ body {
 }
 
 .mission-content > p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   margin-bottom: 32px;
   line-height: 1.7;
@@ -228,7 +228,7 @@ body {
   width: 24px;
   height: 24px;
   background: var(--green-50);
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,13 +244,13 @@ body {
 
 .mission-point p {
   color: var(--black);
-  font-size: 1rem;
+  font-size: var(--text-sm);
   margin: 0;
 }
 
 .mission-image img {
   width: 100%;
-  box-shadow: 0 25px 50px -12px var(--shadow-lg);
+  box-shadow: var(--elevation-xl);
 }
 
 /* ========================================
@@ -268,7 +268,7 @@ body {
 }
 
 .overview-content h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -276,7 +276,7 @@ body {
 }
 
 .overview-content p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   line-height: 1.7;
 }
@@ -290,9 +290,9 @@ body {
 .feature-item {
   background: var(--white);
   padding: 28px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   /* These are anchors now. The card already lifted on hover, which promised a
      click it could not deliver; the heading and body keep their own colours so
@@ -309,14 +309,14 @@ body {
 
 .feature-item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .feature-icon {
   width: 56px;
   height: 56px;
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -354,14 +354,14 @@ body {
 }
 
 .feature-item h3 {
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 8px;
 }
 
 .feature-item p {
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   color: var(--black);
   margin: 0;
   line-height: 1.5;
@@ -376,7 +376,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--gray-900);
   text-decoration: none;
@@ -408,8 +408,8 @@ body {
 
 .story-image img {
   width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-xl);
 }
 
 .image-badge {
@@ -421,11 +421,11 @@ body {
   gap: 8px;
   padding: 10px 16px;
   background: var(--white);
-  border-radius: 50px;
-  font-size: 0.875rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
   font-weight: 500;
   color: var(--black);
-  box-shadow: 0 4px 12px var(--shadow-default);
+  box-shadow: var(--elevation-sm);
 }
 
 .image-badge svg {
@@ -433,7 +433,7 @@ body {
 }
 
 .story-content h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -441,7 +441,7 @@ body {
 }
 
 .story-content p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   margin-bottom: 16px;
   line-height: 1.7;
@@ -461,13 +461,13 @@ body {
 }
 
 .stat-value {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   font-weight: 700;
   color: var(--gray-900);
 }
 
 .stat-label {
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
   color: var(--black);
 }
 
@@ -493,12 +493,12 @@ body {
 .founder-image img {
   width: 100%;
   max-width: 360px;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-xl);
 }
 
 .founder-content h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -506,7 +506,7 @@ body {
 }
 
 .founder-content p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   margin-bottom: 16px;
   line-height: 1.7;
@@ -531,7 +531,7 @@ body {
 .founder-signature span {
   margin-top: 2px;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--gray-600);
 }
 
@@ -563,7 +563,7 @@ body {
 }
 
 .values-header h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   letter-spacing: -0.02em;
@@ -578,22 +578,22 @@ body {
 .value-card {
   background: var(--white);
   padding: 32px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  box-shadow: 0 4px 20px var(--shadow-sm);
+  box-shadow: var(--elevation-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .value-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .value-icon {
   width: 64px;
   height: 64px;
   background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -623,14 +623,14 @@ body {
 }
 
 .value-card h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 12px;
 }
 
 .value-card p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--black);
   line-height: 1.6;
   margin: 0;
@@ -651,7 +651,7 @@ body {
 }
 
 .future-content h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -659,7 +659,7 @@ body {
 }
 
 .future-content p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   line-height: 1.7;
   margin-bottom: 32px;
@@ -699,7 +699,7 @@ body {
 }
 
 .contact-card h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--white);
   margin-bottom: 16px;
@@ -707,7 +707,7 @@ body {
 }
 
 .contact-card p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--white);
   margin-bottom: 32px;
   line-height: 1.7;
@@ -726,10 +726,10 @@ body {
   padding: 14px 28px;
   background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -737,17 +737,17 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--blue-alpha-30);
+  box-shadow: var(--elevation-brand-strong);
 }
 
 .btn-secondary {
   padding: 14px 28px;
   background: var(--white);
   color: var(--gray-900);
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   border: 2px solid var(--gray-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -799,11 +799,11 @@ body {
   }
 
   .hero h1 {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
   }
 
   .hero .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--text-md);
   }
 
   .mission,
@@ -823,6 +823,6 @@ body {
   .values-header h2,
   .future-content h2,
   .contact-card h2 {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl);
   }
 }

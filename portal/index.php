@@ -11,6 +11,7 @@
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/portal-helper.php';
+require_once __DIR__ . '/../shared/currencies.php';
 
 require_once __DIR__ . '/../resources/icons.php';
 
@@ -117,8 +118,7 @@ $customerName = !empty($invoices) ? ($invoices[0]['customer_name'] ?? '') : '';
 
 // Currency info
 $currency = !empty($invoices) ? ($invoices[0]['currency'] ?: 'USD') : 'USD';
-$currencySymbols = ['USD' => '$', 'CAD' => 'CA$', 'EUR' => '€', 'GBP' => '£', 'AUD' => 'A$', 'JPY' => '¥', 'CHF' => 'CHF ', 'CNY' => '¥', 'INR' => '₹', 'MXN' => 'MX$'];
-$currencySymbol = $currencySymbols[$currency] ?? '$';
+$currencySymbol = argo_currency_display_symbol($currency);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -192,7 +192,7 @@ $currencySymbol = $currencySymbols[$currency] ?? '$';
                             $invBalance = floatval($inv['balance_due']);
                             $invTotal = floatval($inv['total_amount']);
                             $invCurrency = $inv['currency'] ?: 'USD';
-                            $invSymbol = $currencySymbols[$invCurrency] ?? '$';
+                            $invSymbol = argo_currency_display_symbol($invCurrency);
                         ?>
                             <div class="invoice-card <?php echo $invStatus === 'overdue' ? 'overdue' : ''; ?>">
                                 <div class="card-header">
@@ -254,7 +254,7 @@ $currencySymbol = $currencySymbols[$currency] ?? '$';
                                     $invBalance = floatval($inv['balance_due']);
                                     $invTotal = floatval($inv['total_amount']);
                                     $invCurrency = $inv['currency'] ?: 'USD';
-                                    $invSymbol = $currencySymbols[$invCurrency] ?? '$';
+                                    $invSymbol = argo_currency_display_symbol($invCurrency);
 
                                     if ($inv['due_date'] && !in_array($invStatus, ['paid', 'cancelled'])) {
                                         if (strtotime($inv['due_date']) < time() && $invStatus !== 'partial') {

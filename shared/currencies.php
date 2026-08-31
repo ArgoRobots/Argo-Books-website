@@ -78,6 +78,28 @@ function argo_currency_label(string $code): string
 }
 
 /**
+ * The symbol to prepend to a formatted amount, e.g. "CA$" for 1,234.00 CAD.
+ *
+ * Two rules separate this from the raw 'symbol' above, both about reading an
+ * amount on its own rather than in a picker:
+ *
+ * - USD, CAD and AUD all carry a bare "$", so CAD and AUD get their region
+ *   letters. Without them "$1,234.00" is three different amounts.
+ * - A symbol that ends in a letter (CHF, kr, Kč, zł, lei) needs a space before
+ *   the digits, or "CHF1234.00" runs together.
+ *
+ * Falls back to "$" for an unknown code, which is what the customer-facing
+ * portal pages did before they shared this.
+ */
+function argo_currency_display_symbol(string $code): string
+{
+    $distinct = ['CAD' => 'CA$', 'AUD' => 'A$'];
+    $symbol = $distinct[$code] ?? (argo_currencies_all()[$code]['symbol'] ?? '$');
+
+    return preg_match('/\p{L}$/u', $symbol) ? $symbol . ' ' : $symbol;
+}
+
+/**
  * Render the standard <option> set: a "Common" optgroup, then all currencies.
  *
  * No option carries `selected`. USD leads the Common group, so the browser's

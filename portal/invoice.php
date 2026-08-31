@@ -10,6 +10,7 @@
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/portal-helper.php';
+require_once __DIR__ . '/../shared/currencies.php';
 
 require_once __DIR__ . '/../resources/icons.php';
 
@@ -77,8 +78,7 @@ $invoiceId = $invoice['invoice_id'] ?? '';
 $totalAmount = floatval($invoice['total_amount']);
 $balanceDue = floatval($invoice['balance_due']);
 $currency = $invoice['currency'] ?: 'USD';
-$currencySymbols = ['USD' => '$', 'CAD' => 'CA$', 'EUR' => '€', 'GBP' => '£', 'AUD' => 'A$', 'JPY' => '¥', 'CHF' => 'CHF ', 'CNY' => '¥', 'INR' => '₹', 'MXN' => 'MX$'];
-$currencySymbol = $currencySymbols[$currency] ?? '$';
+$currencySymbol = argo_currency_display_symbol($currency);
 $dueDate = $invoice['due_date'] ?? '';
 $status = $invoice['status'] ?? 'sent';
 $issueDate = $invoiceData['issueDate'] ?? $invoiceData['IssueDate'] ?? $invoice['created_at'] ?? '';

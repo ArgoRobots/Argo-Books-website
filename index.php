@@ -118,6 +118,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <title>Argo Books: Free Accounting Software for Small Business</title>
 
     <script defer src="resources/scripts/main.js"></script>
+    <script defer src="resources/scripts/reveal.js"></script>
 
     <?= argo_font_links('default', '    ') ?>
     <link rel="stylesheet" href="resources/styles/home.css?v=<?= @filemtime(__DIR__ . '/resources/styles/home.css') ?>">
@@ -864,24 +865,6 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             if (e.key === 'Escape' && videoModal.classList.contains('active')) {
                 closeVideoModal();
             }
-        });
-
-        // Scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            observer.observe(el);
         });
 
         // Pricing cycle toggle

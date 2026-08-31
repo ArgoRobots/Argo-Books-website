@@ -127,6 +127,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <title>Argo Books Pricing: Free Plan and Affordable Premium</title>
 
     <script src="../resources/scripts/main.js"></script>
+    <script defer src="../resources/scripts/reveal.js"></script>
 
     <link rel="stylesheet" href="../resources/styles/marketing-sections.css">
     <link rel="stylesheet" href="style.css">
@@ -403,21 +404,6 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-visible');
-                }
-            });
-        }, observerOptions);
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            observer.observe(el);
-        });
-
         // Pricing cycle toggle
         document.querySelectorAll('.pcards-cycle-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {

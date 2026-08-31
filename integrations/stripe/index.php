@@ -370,25 +370,7 @@ $faqs = [
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var targets = document.querySelectorAll('.fp-reveal');
-            if (!('IntersectionObserver' in window) ||
-                window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                targets.forEach(function (el) { el.classList.add('is-in'); });
-                return;
-            }
-            var observer = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-in');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-            targets.forEach(function (el) { observer.observe(el); });
-        });
-    </script>
+    <script defer src="../../resources/scripts/reveal.js"></script>
 </body>
 
 </html>

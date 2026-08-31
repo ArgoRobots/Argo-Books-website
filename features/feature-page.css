@@ -15,16 +15,9 @@
      4.8:1 on white and near 3:1 on the navy hero. Hierarchy is carried by
      size and weight instead. The three tokens stay distinct so the rules
      below still read as primary / secondary / tertiary. */
-  --fp-ink: #0f172a;
-  --fp-ink-2: #0f172a;
-  --fp-ink-3: #0f172a;
-  --fp-line: #e6eaf0;
-  --fp-line-soft: #eef1f6;
-  --fp-paper: #fdfbf5;
-  --fp-paper-edge: #e8e1d2;
-  --fp-paper-ink: #46403a;
-  --fp-navy: #0b1220;
-  --fp-navy-2: #16233a;
+  --fp-ink: var(--gray-900);
+  --fp-ink-2: var(--gray-900);
+  --fp-ink-3: var(--gray-900);
   --fp-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
@@ -54,7 +47,7 @@ h3, h4, h5, h6 {
   align-items: center;
   gap: 14px;
   font-family: var(--fp-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -66,7 +59,7 @@ h3, h4, h5, h6 {
   content: "";
   flex: 1;
   height: 1px;
-  background: repeating-linear-gradient(90deg, var(--fp-line) 0 4px, transparent 4px 8px);
+  background: repeating-linear-gradient(90deg, var(--gray-200) 0 4px, transparent 4px 8px);
 }
 
 .fp-eyebrow-c {
@@ -78,7 +71,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-h2 {
-  font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+  font-size: clamp(var(--text-2xl), 3.2vw, var(--text-5xl));
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.025em;
@@ -87,7 +80,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-lede {
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--fp-ink-2);
   margin: 0 0 22px;
@@ -120,9 +113,9 @@ h3, h4, h5, h6 {
   justify-content: center;
   gap: 9px;
   padding: 13px 24px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-family: var(--font-body);
-  font-size: 0.97rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: -0.005em;
   text-decoration: none;
@@ -137,7 +130,7 @@ h3, h4, h5, h6 {
 .fp-btn-primary {
   background: var(--primary-blue);
   color: var(--white);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--elevation-xs);
 }
 
 .fp-btn-primary:hover {
@@ -218,7 +211,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-hero h1 {
-  font-size: clamp(2.35rem, 4.1vw, 3.4rem);
+  font-size: clamp(var(--text-4xl), 4.1vw, var(--text-7xl));
   font-weight: 600;
   line-height: 1.04;
   letter-spacing: -0.035em;
@@ -226,7 +219,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-hero-sub {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   line-height: 1.7;
   color: var(--white);
   max-width: 33em;
@@ -242,7 +235,7 @@ h3, h4, h5, h6 {
 
 .fp-textlink {
   color: var(--white);
-  font-size: 0.97rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.28);
@@ -258,7 +251,7 @@ h3, h4, h5, h6 {
    is the stock answer and it says nothing this line does not. */
 .fp-hero-facts {
   margin: 30px 0 0;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   line-height: 1.7;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -299,11 +292,11 @@ h3, h4, h5, h6 {
   min-height: 0;
   padding: 26px;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   /* Same slate family as the hero, one step lighter. The landing page's indigo
      sits in a different hue family and fights this background. */
   background: linear-gradient(150deg, var(--gray-800) 0%, var(--gray-700) 100%);
-  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--elevation-frame-dark);
 }
 
 .fp-hero-demo .invoice-studio {
@@ -311,7 +304,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-hero-demo .invoice-window {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .fp-hero-demo .app-body {
@@ -330,7 +323,7 @@ h3, h4, h5, h6 {
 
 .fp-hero-demo .app-brand {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -348,7 +341,7 @@ h3, h4, h5, h6 {
 .fp-hero-demo .app-nav-btn {
   width: 29px;
   height: 29px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .fp-hero-demo .app-nav-btn svg {
@@ -362,7 +355,7 @@ h3, h4, h5, h6 {
 
 .fp-hero-demo .app-page-title {
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   padding: 14px 2px 10px;
 }
@@ -376,14 +369,14 @@ h3, h4, h5, h6 {
 .fp-hero-demo .rcpt-paper {
   width: 100%;
   max-width: 162px;
-  font-size: 0.55rem;
+  font-size: var(--demo-text-2xs);
   line-height: 1.9;
   padding: 18px 13px 22px;
 }
 
-.fp-hero-demo .rcpt-store { font-size: 0.66rem; }
-.fp-hero-demo .rcpt-meta { font-size: 0.48rem; white-space: nowrap; }
-.fp-hero-demo .rcpt-total { font-size: 0.63rem; }
+.fp-hero-demo .rcpt-store { font-size: var(--demo-text-sm); }
+.fp-hero-demo .rcpt-meta { font-size: var(--demo-text-3xs); white-space: nowrap; }
+.fp-hero-demo .rcpt-total { font-size: var(--demo-text-xs); }
 .fp-hero-demo .rcpt-barcode { height: 20px; }
 
 .fp-hero-demo .scan-form {
@@ -391,14 +384,14 @@ h3, h4, h5, h6 {
   padding: 13px 15px;
 }
 
-.fp-hero-demo .ef-title { font-size: 0.85rem; }
-.fp-hero-demo .ef-status { font-size: 0.6rem; padding: 3px 9px; }
+.fp-hero-demo .ef-title { font-size: var(--text-xs); }
+.fp-hero-demo .ef-status { font-size: var(--demo-text-xs); padding: 3px 9px; }
 .fp-hero-demo .ef-field { grid-template-columns: 72px minmax(0, 1fr) auto; padding: 6px 0; }
-.fp-hero-demo .ef-label { font-size: 0.56rem; }
-.fp-hero-demo .ef-value { font-size: 0.74rem; }
-.fp-hero-demo .ef-line { font-size: 0.68rem; }
-.fp-hero-demo .ef-trow { font-size: 0.72rem; }
-.fp-hero-demo .ef-grand { font-size: 0.86rem; }
+.fp-hero-demo .ef-label { font-size: var(--demo-text-2xs); }
+.fp-hero-demo .ef-value { font-size: var(--demo-text-md); }
+.fp-hero-demo .ef-line { font-size: var(--demo-text-sm); }
+.fp-hero-demo .ef-trow { font-size: var(--demo-text-md); }
+.fp-hero-demo .ef-grand { font-size: var(--text-xs); }
 
 /* Three of the demos float a panel on top of a table, positioned for the
    landing page's full-width card. Beside a headline there is no room to the
@@ -513,8 +506,8 @@ h3, h4, h5, h6 {
    Mid-page CTA. One only, deliberately thin.
    ============================================================ */
 .fp-midcta {
-  border-top: 1px solid var(--fp-line);
-  border-bottom: 1px solid var(--fp-line);
+  border-top: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
   background: var(--gray-50);
   padding: 34px 0;
 }
@@ -528,7 +521,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-midcta h2 {
-  font-size: 1.3rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   letter-spacing: -0.02em;
   margin: 0 0 4px;
@@ -536,7 +529,7 @@ h3, h4, h5, h6 {
 
 .fp-midcta p {
   margin: 0;
-  font-size: 0.94rem;
+  font-size: var(--text-sm);
   color: var(--fp-ink-2);
 }
 
@@ -558,14 +551,14 @@ h3, h4, h5, h6 {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .fp-list {
   list-style: none;
   padding: 0;
   margin: 26px 0 0;
-  border-top: 1px solid var(--fp-line-soft);
+  border-top: 1px solid var(--gray-100);
 }
 
 .fp-list li {
@@ -574,9 +567,9 @@ h3, h4, h5, h6 {
   gap: 12px;
   align-items: start;
   padding: 11px 0;
-  font-size: 0.96rem;
+  font-size: var(--text-sm);
   color: var(--fp-ink-2);
-  border-bottom: 1px solid var(--fp-line-soft);
+  border-bottom: 1px solid var(--gray-100);
 }
 
 .fp-list li svg {
@@ -592,7 +585,7 @@ h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
-  border-top: 1px solid var(--fp-line);
+  border-top: 1px solid var(--gray-200);
 }
 
 .fp-step {
@@ -611,12 +604,12 @@ h3, h4, h5, h6 {
   top: 34px;
   bottom: 8px;
   width: 1px;
-  background: repeating-linear-gradient(180deg, var(--fp-line) 0 5px, transparent 5px 10px);
+  background: repeating-linear-gradient(180deg, var(--gray-200) 0 5px, transparent 5px 10px);
 }
 
 .fp-step-n {
   font-family: var(--fp-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--primary-blue);
@@ -624,7 +617,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-step h3 {
-  font-size: 1.08rem;
+  font-size: var(--text-md);
   font-weight: 600;
   margin: 0 0 8px;
   color: var(--fp-ink);
@@ -632,7 +625,7 @@ h3, h4, h5, h6 {
 
 .fp-step p {
   margin: 0;
-  font-size: 0.94rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--fp-ink-2);
 }
@@ -653,7 +646,7 @@ h3, h4, h5, h6 {
   grid-template-columns: auto minmax(0, 1fr);
   column-gap: 18px;
   padding: 26px 0;
-  border-bottom: 1px solid var(--fp-line-soft);
+  border-bottom: 1px solid var(--gray-100);
 }
 
 .fp-benefit:nth-last-child(-n + 2) {
@@ -665,7 +658,7 @@ h3, h4, h5, h6 {
   align-self: start;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   background: var(--blue-50);
@@ -673,7 +666,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-benefit h3 {
-  font-size: 1.02rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   margin: 2px 0 6px;
   color: var(--fp-ink);
@@ -681,7 +674,7 @@ h3, h4, h5, h6 {
 
 .fp-benefit p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   line-height: 1.65;
   color: var(--fp-ink-3);
 }
@@ -693,7 +686,7 @@ h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
-  border-top: 1px solid var(--fp-line);
+  border-top: 1px solid var(--gray-200);
 }
 
 .fp-who-item {
@@ -702,14 +695,14 @@ h3, h4, h5, h6 {
 
 .fp-who-item + .fp-who-item {
   padding-left: 26px;
-  border-left: 1px solid var(--fp-line-soft);
+  border-left: 1px solid var(--gray-100);
 }
 
 .fp-who-item h3 {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 0.98rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   margin: 0 0 8px;
   color: var(--fp-ink);
@@ -722,7 +715,7 @@ h3, h4, h5, h6 {
 
 .fp-who-item p {
   margin: 0;
-  font-size: 0.89rem;
+  font-size: var(--text-xs);
   line-height: 1.65;
   color: var(--fp-ink-3);
 }
@@ -739,8 +732,8 @@ h3, h4, h5, h6 {
 .fp-rel-card {
   display: block;
   padding: 22px;
-  border: 1px solid var(--fp-line);
-  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
   text-decoration: none;
   background: var(--white);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -748,13 +741,13 @@ h3, h4, h5, h6 {
 
 .fp-rel-card:hover {
   border-color: var(--blue-300);
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--elevation-sm);
 }
 
 .fp-rel-card .fp-rel-ic {
   width: 36px;
   height: 36px;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
   background: var(--blue-50);
@@ -763,7 +756,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-rel-card h3 {
-  font-size: 0.98rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   margin: 0 0 5px;
   color: var(--fp-ink);
@@ -771,7 +764,7 @@ h3, h4, h5, h6 {
 
 .fp-rel-card p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   line-height: 1.6;
   color: var(--fp-ink-3);
 }
@@ -789,8 +782,8 @@ h3, h4, h5, h6 {
 }
 
 .fp-faq .faq-item {
-  border-color: var(--fp-line);
-  border-radius: 12px;
+  border-color: var(--gray-200);
+  border-radius: var(--radius-md);
 }
 
 /* ============================================================
@@ -825,7 +818,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-outro-cta h2 {
-  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  font-size: clamp(var(--text-2xl), 3.4vw, var(--text-5xl));
   font-weight: 600;
   letter-spacing: -0.028em;
   color: var(--white);
@@ -833,7 +826,7 @@ h3, h4, h5, h6 {
 }
 
 .fp-outro-cta p {
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--white);
   max-width: 46em;
@@ -852,7 +845,7 @@ h3, h4, h5, h6 {
 .fp-textlink:focus-visible {
   outline: 2px solid var(--primary-blue);
   outline-offset: 3px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .fp-hero .fp-btn:focus-visible,
@@ -934,7 +927,7 @@ h3, h4, h5, h6 {
   .fp-step,
   .fp-step + .fp-step {
     padding: 26px 0;
-    border-bottom: 1px solid var(--fp-line-soft);
+    border-bottom: 1px solid var(--gray-100);
   }
 
   .fp-step + .fp-step::before {
@@ -951,7 +944,7 @@ h3, h4, h5, h6 {
   }
 
   .fp-benefit:nth-last-child(-n + 2) {
-    border-bottom: 1px solid var(--fp-line-soft);
+    border-bottom: 1px solid var(--gray-100);
   }
 
   .fp-benefit:last-child {
@@ -1013,7 +1006,7 @@ h3, h4, h5, h6 {
   .fp-who-item + .fp-who-item {
     padding: 24px 0;
     border-left: 0;
-    border-bottom: 1px solid var(--fp-line-soft);
+    border-bottom: 1px solid var(--gray-100);
   }
 
   .fp-who-item:last-child {

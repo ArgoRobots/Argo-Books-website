@@ -51,7 +51,7 @@ body {
 
 .section-label {
   display: inline-block;
-  font-size: 0.875rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--primary-blue);
   text-transform: uppercase;
@@ -66,7 +66,7 @@ body {
 }
 
 .section-title {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -74,7 +74,7 @@ body {
 }
 
 .section-desc {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--black);
   line-height: 1.7;
 }
@@ -99,7 +99,7 @@ body {
 
 .hero .hero-gradient-orb {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   filter: blur(80px);
   opacity: 0;
   mix-blend-mode: screen;
@@ -160,8 +160,8 @@ body {
   padding: 8px 16px;
   background: var(--hero-badge-bg);
   border: 1px solid var(--hero-badge-border);
-  border-radius: 50px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
   margin-bottom: 24px;
 }
 
@@ -170,14 +170,14 @@ body {
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: var(--text-6xl);
   font-weight: 700;
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
 
 .hero .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--white);
   max-width: 600px;
   margin: 0 auto 32px;
@@ -199,9 +199,9 @@ body {
   align-items: center;
   gap: 8px;
   padding: 14px 28px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
@@ -213,7 +213,7 @@ body {
 
 .btn-cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--blue-alpha-30);
+  box-shadow: var(--elevation-brand-strong);
 }
 
 .btn-cta-outline {
@@ -255,7 +255,7 @@ body {
 .feature-card {
   background: var(--white);
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--gray-200);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
@@ -264,13 +264,13 @@ body {
 
 .feature-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .feature-card-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   margin-bottom: 16px;
@@ -312,21 +312,21 @@ body {
 }
 
 .feature-card h3 {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 8px;
 }
 
 .feature-card p {
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   color: var(--black);
   line-height: 1.6;
   margin-bottom: 12px;
 }
 
 .feature-card-link {
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--primary-blue);
   display: inline-flex;
@@ -360,7 +360,7 @@ body {
 .why-card {
   background: var(--white);
   padding: 32px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--gray-200);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -368,13 +368,13 @@ body {
 
 .why-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .why-card-icon {
   width: 56px;
   height: 56px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: grid;
   place-items: center;
   margin: 0 auto 20px;
@@ -388,14 +388,14 @@ body {
 }
 
 .why-card h3 {
-  font-size: 1.15rem;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 12px;
 }
 
 .why-card p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--black);
   line-height: 1.7;
 }
@@ -416,7 +416,7 @@ body {
 }
 
 .feature-detail-text h2 {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -424,7 +424,7 @@ body {
 }
 
 .feature-detail-text p {
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   color: var(--black);
   line-height: 1.7;
   margin-bottom: 24px;
@@ -440,7 +440,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
   color: var(--black);
   padding: 8px 0;
   line-height: 1.5;
@@ -459,8 +459,8 @@ body {
 
 .feature-detail-visual img {
   width: 100%;
-  border-radius: 22px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-xl);
 }
 
 /* Reversed layout (image left, text right) */
@@ -517,7 +517,7 @@ body {
   align-self: start;
   width: 44px;
   height: 44px;
-  border-radius: 11px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   background: var(--blue-50);
@@ -543,7 +543,7 @@ body {
 
 .benefit-card h3 {
   grid-column: 2;
-  font-size: 1.05rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--gray-900);
   margin: 1px 0 6px;
@@ -553,7 +553,7 @@ body {
 
 .benefit-card p {
   grid-column: 2;
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
   color: var(--gray-600);
   line-height: 1.65;
   margin: 0;
@@ -578,7 +578,7 @@ body {
 }
 
 .highlight-item h3 {
-  font-size: 2.5rem;
+  font-size: var(--text-5xl);
   font-weight: 700;
   color: var(--primary-blue);
   margin-bottom: 8px;
@@ -586,7 +586,7 @@ body {
 }
 
 .highlight-item p {
-  font-size: 1rem;
+  font-size: var(--text-sm);
   color: var(--black);
 }
 
@@ -608,7 +608,7 @@ body {
 .step-card {
   background: var(--white);
   padding: 32px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--gray-200);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -616,16 +616,16 @@ body {
 
 .step-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px var(--shadow-default);
+  box-shadow: var(--elevation-lg);
 }
 
 .step-number {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   display: grid;
   place-items: center;
@@ -633,14 +633,14 @@ body {
 }
 
 .step-card h3 {
-  font-size: 1.15rem;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 12px;
 }
 
 .step-card p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--black);
   line-height: 1.7;
 }
@@ -671,7 +671,7 @@ body {
 }
 
 .cta-card h2 {
-  font-size: 2.25rem;
+  font-size: var(--text-4xl);
   font-weight: 700;
   color: var(--white);
   margin-bottom: 16px;
@@ -679,7 +679,7 @@ body {
 }
 
 .cta-card p {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: var(--white);
   margin-bottom: 32px;
   line-height: 1.7;
@@ -777,11 +777,11 @@ body {
   }
 
   .hero h1 {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
   }
 
   .hero .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--text-md);
   }
 
   .features-overview,
@@ -798,12 +798,12 @@ body {
   }
 
   .highlight-item h3 {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
   }
 
   .section-title,
   .cta-card h2 {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl);
   }
 
   .section-header {
@@ -811,7 +811,7 @@ body {
   }
 
   .feature-detail-text h2 {
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
   }
 
   .hero-ctas,
@@ -830,6 +830,6 @@ body {
 
 @media (max-width: 400px) {
   .hero h1 {
-    font-size: 1.875rem;
+    font-size: var(--text-2xl);
   }
 }

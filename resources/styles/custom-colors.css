@@ -297,3 +297,83 @@
 [data-theme="dark"] {
   --admin-text: var(--white);
 }
+
+/* ============================================================
+   Scales.
+
+   Sizes, radii and shadows used to be picked per rule, which left the six
+   marketing stylesheets carrying 55 font sizes, 16 corner radii and 44
+   shadows between them. Values a fraction of a pixel apart read as noise
+   rather than hierarchy, so everything below is a step a rule can land on.
+
+   Steps are whole pixels at the 16px root. Nothing here is theme-dependent:
+   the elevation tokens reference the shadow colours above, which are, so
+   they follow dark mode on their own.
+   ============================================================ */
+:root {
+  /* Page type. The floor is 12px; anything smaller belongs to a mockup. */
+  --text-2xs: 0.75rem;    /* 12 - eyebrows, table cells, fine print */
+  --text-xs: 0.875rem;    /* 14 - captions, secondary copy */
+  --text-sm: 1rem;        /* 16 - body default, buttons */
+  --text-md: 1.125rem;    /* 18 - lead paragraphs, card copy */
+  --text-lg: 1.25rem;     /* 20 - hero subtitles */
+  --text-xl: 1.5rem;      /* 24 */
+  --text-2xl: 1.75rem;    /* 28 */
+  --text-3xl: 2rem;       /* 32 */
+  --text-4xl: 2.25rem;    /* 36 - section headings */
+  --text-5xl: 2.5rem;     /* 40 */
+  --text-6xl: 3rem;       /* 48 */
+  --text-7xl: 3.5rem;     /* 56 - home hero */
+
+  /* Type inside the product mockups, which sit below the page floor. A
+     simulated desktop app shown at reduced size needs its own ramp;
+     borrowing the page scale would make the mockups read as page copy
+     rather than as an application. Above 13px they rejoin the page scale. */
+  --demo-text-3xs: 0.5rem;      /* 8 */
+  --demo-text-2xs: 0.5625rem;   /* 9 */
+  --demo-text-xs: 0.625rem;     /* 10 */
+  --demo-text-sm: 0.6875rem;    /* 11 */
+  --demo-text-md: 0.75rem;      /* 12 */
+  --demo-text-lg: 0.8125rem;    /* 13 */
+
+  /* Corner radius. */
+  --radius-xs: 3px;    /* mockup detail: chips, bars, tags */
+  --radius-sm: 8px;    /* small controls */
+  --radius-md: 12px;   /* buttons, inputs, panels */
+  --radius-lg: 16px;   /* cards, device frames, large media */
+  --radius-pill: 50px;
+  --radius-round: 50%;
+
+  /* Elevation. Focus rings, inset accents and the mockups' own lighting are
+     not elevation and stay written out at the rule that needs them. */
+  --elevation-xs: 0 1px 3px var(--shadow-sm);
+  --elevation-sm: 0 2px 8px var(--shadow-sm);
+  --elevation-md: 0 6px 18px var(--shadow-md), 0 1px 3px var(--shadow-sm);
+  --elevation-lg: 0 12px 32px var(--shadow-default);
+  --elevation-xl: 0 20px 46px var(--shadow-lg), 0 4px 12px var(--shadow-sm);
+
+  /* A framed screenshot or mockup: a long shadow plus a hairline edge. */
+  --elevation-frame: 0 30px 60px -15px var(--overlay-medium), 0 0 0 1px var(--gray-200);
+  --elevation-frame-dark: 0 30px 60px -15px var(--overlay-dark), 0 0 0 1px var(--white-alpha-15);
+
+  /* The blue cast under a primary button, at rest and on hover. */
+  --elevation-brand: 0 4px 14px var(--blue-alpha-40);
+  --elevation-brand-strong: 0 8px 25px var(--blue-alpha-50);
+
+  /* A light control sitting on a dark surface, where a blue cast would read
+     as a glow rather than a shadow. The hero's white button uses these. */
+  --elevation-on-dark: 0 10px 30px var(--overlay-dark);
+  --elevation-on-dark-strong: 0 14px 38px var(--overlay-dark);
+
+  /* Ramp members the marketing pages referenced as literals. */
+  --cyan-600: #0891b2;
+  --sky-300: #7dd3fc;
+
+  /* Mockup chrome. Not brand colours: these paint a simulated application
+     window, so they are named for what they depict. */
+  --demo-studio-navy: #0a1652;
+  --demo-terminal-bg: #0c1222;
+  --demo-window-close: #ff5f57;
+  --demo-window-minimise: #ffbd2e;
+  --demo-window-zoom: #28c840;
+}

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../partials/faq.php';
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
+require_once __DIR__ . '/../../partials/fonts.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
 
 // One array drives both the visible accordion and the FAQPage schema.
@@ -103,9 +104,7 @@ $faqs = [
     <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+    <?= argo_font_links('editorial', '    ') ?>
     <link rel="stylesheet" href="../../resources/styles/typography.css">
     <link rel="stylesheet" href="../../features/feature-page.css">
 

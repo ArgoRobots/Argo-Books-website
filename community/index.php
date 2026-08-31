@@ -6,6 +6,7 @@ require_once __DIR__ . '/users/user_functions.php';
 require_once __DIR__ . '/report/ban_check.php';
 
 require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../partials/fonts.php';
 
 // Check for remember me cookie and auto-login user if valid
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
@@ -77,9 +78,7 @@ if (empty($_SESSION['csrf_token'])) {
     <link rel="stylesheet" href="../resources/footer/style.css">
     <link rel="stylesheet" href="../resources/notifications/notifications.css">
     <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <?= argo_font_links('default', '    ') ?>
     <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 

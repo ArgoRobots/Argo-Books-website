@@ -5,6 +5,7 @@ require_once __DIR__ . '/track_referral.php';
 require_once __DIR__ . '/statistics.php';
 require_once __DIR__ . '/resources/icons.php';
 require_once __DIR__ . '/partials/feature-demo.php';
+require_once __DIR__ . '/partials/fonts.php';
 
 track_page_view($_SERVER['REQUEST_URI']);
 
@@ -118,9 +119,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <script defer src="resources/scripts/main.js"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <?= argo_font_links('default', '    ') ?>
     <link rel="stylesheet" href="resources/styles/home.css?v=<?= @filemtime(__DIR__ . '/resources/styles/home.css') ?>">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">

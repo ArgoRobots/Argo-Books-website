@@ -14,6 +14,7 @@
 
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../shared/_base.php';
+require_once __DIR__ . '/../partials/fonts.php';
 
 if (PHP_SAPI !== 'cli') {
     // Referral tracking: capture ?source so a direct landing on the guides hub
@@ -141,12 +142,10 @@ $page_schema_json = json_encode([
 
 $breadcrumb_schema_json = argo_breadcrumb_schema(['Home' => '/', 'Guides' => $canonical_url]);
 
-// Fraunces serif is loaded for this page only. CSP already permits
-// fonts.googleapis.com (style-src) and fonts.gstatic.com (font-src) per
-// the project's .htaccess.
-$extra_head = '<link rel="preconnect" href="https://fonts.googleapis.com">'
-    . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    . '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap">'
+// This hub is the only page on the lighter Fraunces weights, so it asks for the
+// 'editorial-light' set. CSP already permits fonts.googleapis.com (style-src)
+// and fonts.gstatic.com (font-src) per the project's .htaccess.
+$extra_head = argo_font_links('editorial-light', '')
     . '<link rel="stylesheet" href="' . INVGEN_BASE . '/guides/styles/hub.css">'
     . '<link rel="stylesheet" href="' . INVGEN_BASE . '/resources/styles/site-search.css">'
     . '<script src="' . INVGEN_BASE . '/resources/scripts/levenshtein.js"></script>'

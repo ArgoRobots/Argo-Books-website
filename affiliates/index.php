@@ -3,6 +3,7 @@ require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../community/affiliate/affiliate_functions.php';
+require_once __DIR__ . '/../partials/fonts.php';
 
 $hold_days = affiliate_hold_days();
 
@@ -54,9 +55,7 @@ $fmt = function (float $n): string {
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Affiliate Program: Earn <?php echo $commission_rate_pct; ?>% Recurring | Argo Books</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+    <?= argo_font_links('dashboard', '    ') ?>
 
     <script src="../resources/scripts/main.js"></script>
 

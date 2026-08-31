@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../partials/schema.php';
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
+require_once __DIR__ . '/../partials/fonts.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,9 +59,7 @@ require_once __DIR__ . '/../track_referral.php';
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
     <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <?= argo_font_links('default', '    ') ?>
     <link rel="stylesheet" href="../resources/styles/typography.css">
 
     <!-- Page-local additions: live/coming-soon badges and a muted card state

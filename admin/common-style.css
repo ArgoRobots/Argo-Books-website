@@ -245,8 +245,12 @@ body.menu-open::after {
 }
 
 .header-logo {
+  /* The icon is 4:3, not square (16x12, 32x24, 48x36, 64x47), so a 24x24 box
+     stretched it vertically by a third. aspect-ratio reserves the right space
+     before the image loads. */
   width: 24px;
-  height: 24px;
+  height: auto;
+  aspect-ratio: 4 / 3;
 }
 
 .header-title {

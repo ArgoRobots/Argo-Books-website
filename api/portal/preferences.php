@@ -104,7 +104,7 @@ send_json_response(200, [
     'success' => true,
     'preferences' => [
         'sendPaymentReminders' => (bool)($row['reminders_enabled'] ?? false),
-        'remindersEnabledAt' => $row['reminders_enabled_at'] ?? null,
+        'remindersEnabledAt' => portal_iso_datetime($row['reminders_enabled_at'] ?? null),
         'emailOwnerOnPayment' => (bool)($row['notify_owner_on_payment'] ?? false),
         'ownerEmailVerified' => !empty($row['email_verified_at']),
     ],

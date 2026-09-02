@@ -83,7 +83,7 @@ send_json_response(200, [
     // settings after a reinstall or on a second machine.
     'preferences' => [
         'sendPaymentReminders' => (bool)($company['reminders_enabled'] ?? false),
-        'remindersEnabledAt' => $company['reminders_enabled_at'] ?? null,
+        'remindersEnabledAt' => portal_iso_datetime($company['reminders_enabled_at'] ?? null),
         'emailOwnerOnPayment' => (bool)($company['notify_owner_on_payment'] ?? false),
         'ownerEmailVerified' => !empty($company['email_verified_at']),
     ],

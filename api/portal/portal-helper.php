@@ -429,6 +429,27 @@ function record_portal_payment(array $params): array
 }
 
 /**
+ * Convert a MySQL DATETIME to ISO 8601 for JSON responses.
+ *
+ * The desktop app parses these with System.Text.Json, which only accepts
+ * ISO 8601. A raw "2026-09-02 15:59:00" throws and takes the whole response
+ * down with it, not just the one field.
+ *
+ * @param string|null $value MySQL DATETIME value
+ * @return string|null ISO 8601 string, or null when there is no value
+ */
+function portal_iso_datetime(?string $value): ?string
+{
+    if (empty($value)) {
+        return null;
+    }
+
+    $timestamp = strtotime($value);
+
+    return $timestamp === false ? null : date('c', $timestamp);
+}
+
+/**
  * Get the available payment methods for a company
  *
  * @param array $company Company data from portal_companies

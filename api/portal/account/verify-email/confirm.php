@@ -72,19 +72,33 @@ if (!hash_equals($row['code_hash'], $expected)) {
 $pendingEmail = (string)($row['email'] ?? '');
 $writeOwnerEmail = empty($company['owner_email']) && $pendingEmail !== '';
 
-// Re-check uniqueness at confirm time: another account may have claimed the
-// same address between set-initial-email and now.
+// Another company may hold this address, usually one whose file was deleted locally:
+// nothing tells the server that happened, so the record outlives it. Entering the code
+// proves control of the address, so it moves here and is cleared there rather than being
+// refused. The old record is kept, only unlinked, so its invoices and payments survive.
+$previousHolder = null;
 if ($writeOwnerEmail) {
-    $stmt = $pdo->prepare("SELECT id FROM portal_companies WHERE owner_email = ? AND id != ?");
+    $stmt = $pdo->prepare(
+        "SELECT id, company_name FROM portal_companies WHERE owner_email = ? AND id != ?");
     $stmt->execute([$pendingEmail, $company['id']]);
-    if ($stmt->fetch()) {
-        send_error_response(409, 'That email is already used by another portal account.', 'EMAIL_IN_USE');
-    }
+    $previousHolder = $stmt->fetch() ?: null;
 }
 
 $pdo->beginTransaction();
 $pdo->prepare("UPDATE email_verifications SET consumed_at = NOW() WHERE id = ?")->execute([$row['id']]);
 if ($writeOwnerEmail) {
+    if ($previousHolder) {
+        $pdo->prepare(
+            "UPDATE portal_companies SET owner_email = NULL, email_verified_at = NULL WHERE id = ?")
+            ->execute([$previousHolder['id']]);
+        audit_log($pdo, (int)$previousHolder['id'], 'email_changed', 'owner', null, null, null, [
+            'reason' => 'released_to_verified_owner',
+            'old' => $pendingEmail,
+            'new' => null,
+            'moved_to_company_id' => (int)$company['id'],
+        ]);
+    }
+
     $pdo->prepare("UPDATE portal_companies SET owner_email = ?, email_verified_at = NOW() WHERE id = ?")
         ->execute([$pendingEmail, $company['id']]);
     audit_log($pdo, (int)$company['id'], 'email_changed', 'owner', null, null, null, [
@@ -98,8 +112,20 @@ if ($writeOwnerEmail) {
 audit_log($pdo, (int)$company['id'], 'email_registration_verified', 'owner', null, null, null, []);
 $pdo->commit();
 
-send_json_response(200, [
+$response = [
     'success' => true,
     'verifiedAt' => date('c'),
     'ownerEmail' => $writeOwnerEmail ? $pendingEmail : ($company['owner_email'] ?? null),
-]);
+];
+
+if ($previousHolder) {
+    $previousName = trim((string)($previousHolder['company_name'] ?? ''));
+    $response['emailMoved'] = true;
+    $response['message'] = $previousName !== ''
+        ? sprintf(
+            'This email was set up for "%s". Since you confirmed the code, we have moved it to this company and removed it from that one.',
+            $previousName)
+        : 'This email was set up for another company. Since you confirmed the code, we have moved it to this company and removed it from that one.';
+}
+
+send_json_response(200, $response);

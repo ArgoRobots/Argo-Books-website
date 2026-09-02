@@ -29,12 +29,9 @@ if (!$new_email) {
 
 global $pdo;
 
-// Reject if already used by another company
-$stmt = $pdo->prepare("SELECT id FROM portal_companies WHERE owner_email = ? AND id != ?");
-$stmt->execute([$new_email, $company['id']]);
-if ($stmt->fetch()) {
-    send_error_response(409, 'That email is already used by another portal account.', 'EMAIL_IN_USE');
-}
+// No "already in use" rejection: see set-initial-email.php. The address moves to whoever
+// proves they can receive mail at it, rather than staying with a company that may no
+// longer exist.
 
 // 24h cooldown between completed changes
 $stmt = $pdo->prepare("SELECT MAX(completed_at) FROM email_change_requests WHERE company_id = ? AND state = 'completed'");

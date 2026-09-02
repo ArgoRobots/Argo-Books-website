@@ -60,12 +60,10 @@ if (!empty($company['owner_email'])) {
     exit;
 }
 
-// Reject if the chosen email is already used by another portal account.
-$stmt = $pdo->prepare("SELECT id FROM portal_companies WHERE owner_email = ? AND id != ?");
-$stmt->execute([$email, $company['id']]);
-if ($stmt->fetch()) {
-    send_error_response(409, 'That email is already used by another portal account.', 'EMAIL_IN_USE');
-}
+// Deliberately no "already in use" rejection here. A company file deleted on someone's
+// computer never reaches the server, so its portal record holds the address for good and
+// the owner can never use their own email again. Receiving the code proves control of the
+// address, so the address moves at confirm time instead.
 
 // Throttle code sends. Since owner_email is no longer written here, a caller
 // could otherwise loop this endpoint to send unlimited emails. Same limits

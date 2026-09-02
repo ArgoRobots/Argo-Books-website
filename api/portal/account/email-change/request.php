@@ -68,6 +68,7 @@ $stmt->execute([
 $change_id = (int)$pdo->lastInsertId();
 
 $code = null;
+$newCode = null;
 if ($oldAddressProven) {
     $code = refund_generate_code();
     $hash = refund_hash_code($code, 'echange-old-' . $change_id);
@@ -79,6 +80,20 @@ if ($oldAddressProven) {
             old_email_code_attempts = 0
         WHERE id = ?
     ")->execute([$hash, $change_id]);
+} else {
+    // confirm-old.php is what normally issues the new-address code, so skipping that
+    // step means issuing it here or the request sits in old_verified with no code ever
+    // sent. Same expiry and salt confirm-new.php checks against.
+    $newCode = refund_generate_code();
+    $newHash = refund_hash_code($newCode, 'echange-new-' . $change_id);
+    $pdo->prepare("
+        UPDATE email_change_requests
+        SET new_email_code_hash = ?,
+            new_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+            new_email_code_attempts = 0,
+            old_email_verified_at = NOW()
+        WHERE id = ?
+    ")->execute([$newHash, $change_id]);
 }
 
 audit_log($pdo, (int)$company['id'], 'email_change_requested', 'owner', null, null, $change_id, [
@@ -97,6 +112,8 @@ $pdo->commit();
 
 if ($oldAddressProven) {
     refund_email_send_change_old_code($company['owner_email'], $code, $new_email);
+} else {
+    refund_email_send_change_new_code($new_email, $newCode);
 }
 
 send_json_response(200, [
@@ -104,7 +121,8 @@ send_json_response(200, [
     'changeId' => $change_id,
     'state' => $oldAddressProven ? 'pending' : 'old_verified',
     'maskedOldEmail' => refund_mask_email($company['owner_email']),
-    // False means no code was sent to the old address, so the app should go straight to
-    // asking for the new one.
+    // False means no code went to the old address and one has already gone to the new
+    // one, so the app should go straight to asking for that code.
     'oldEmailVerificationRequired' => $oldAddressProven,
+    'maskedNewEmail' => $oldAddressProven ? null : refund_mask_email($new_email),
 ]);

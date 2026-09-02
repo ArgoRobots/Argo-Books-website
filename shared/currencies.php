@@ -93,8 +93,7 @@ function argo_currency_label(string $code): string
  */
 function argo_currency_display_symbol(string $code): string
 {
-    $distinct = ['CAD' => 'CA$', 'AUD' => 'A$'];
-    $symbol = $distinct[$code] ?? (argo_currencies_all()[$code]['symbol'] ?? '$');
+    $symbol = argo_currencies_all()[$code]['symbol'] ?? '$';
 
     return preg_match('/\p{L}$/u', $symbol) ? $symbol . ' ' : $symbol;
 }

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/../partials/fonts.php';
 $pricing = get_pricing_config();
 ?>
 <!DOCTYPE html>
@@ -59,9 +60,7 @@ $pricing = get_pricing_config();
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
     <!-- Brand typefaces (Fraunces display + IBM Plex Sans body), matched to the rest of the site -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <?= argo_font_links('default', '    ') ?>
     <link rel="stylesheet" href="../resources/styles/typography.css">
 </head>
 
@@ -93,6 +92,43 @@ $pricing = get_pricing_config();
 
     <div class="container">
         <div class="version-grid">
+
+            <!-- Version 2.0.14 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.14</span>
+                        <span class="date-tag">September 2 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Recurring expenses and revenue</strong> Set up rent, subscriptions, insurance or a monthly retainer once and Argo Books enters it for you every time it comes round. You stay in charge: each entry arrives marked for review, and you can skip a single month, pause a schedule, or stop it altogether.</li>
+                                <li><strong>Photos straight from your iPhone:</strong> Receipt photos taken on an iPhone (HEIC format) now work exactly like any other picture, with no converting or exporting first.</li>
+                                <li><strong>Open a company by double-clicking it:</strong> Double-click an Argo Books file and it opens in the app, the way you would expect.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>A smaller download:</strong> The installer is about 20 MB smaller, and takes up 100 MB less on your computer. It also makes setting up Argo Books quicker.</li>
+                                <li><strong>Switching currency is much faster:</strong> Changing the currency you work in is faster, even on a slower connection.</li>
+                                <li><strong>Move a receipt to the other side of the books:</strong> Filed a receipt as an expense when it was really revenue? Switch it without starting again.</li>
+                                <li><strong>Pay stubs and receipts open without a connection:</strong> Opening a PDF inside Argo Books no longer needs the internet.</li>
+                                <li><strong>A smoother payment portal email:</strong> Setting and changing the email address for your payment portal is quicker and smoother. And if you used an email for a payment portal in another company, you can use it in a new one: confirm it once and it moves across.</li>
+                                <li><strong>"Email me when a customer pays" has moved:</strong> It now sits on the Payment Portal tab in Settings, beside the other emails sent on your behalf, rather than under Notifications.</li>
+                                <li><strong>Easier menus:</strong> Click anywhere on a section heading in the sidebar to open or close it, instead of aiming for the small arrow.</li>
+                                <li><strong>Finding your way out of the sample company:</strong> The demo company now makes it clear you are looking at example figures, and suggests creating your own company.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Version 2.0.13 -->
             <div class="version-card">

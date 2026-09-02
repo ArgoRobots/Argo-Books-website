@@ -85,9 +85,15 @@ if (!empty($ownerEmail)) {
         $rotatedHash = hash('sha256', $rotatedKey);
         try {
             if ($claimingRecord) {
+                // email_verified_at goes too. The claiming company has proven nothing about
+                // the address, and rows predating that column were backfilled as verified,
+                // so an inherited stamp can demand a confirmation code from an address
+                // nobody ever confirmed. owner_email stays, since it is how the record was
+                // found and is what the new owner asked for.
                 $rotateStmt = $pdo->prepare(
                     'UPDATE portal_companies
-                     SET api_key_hash = ?, company_name = ?, company_logo_url = NULL
+                     SET api_key_hash = ?, company_name = ?, company_logo_url = NULL,
+                         email_verified_at = NULL
                      WHERE id = ?');
                 $rotateStmt->execute([$rotatedHash, $incomingName, $existing['id']]);
             } else {

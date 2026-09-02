@@ -62,17 +62,38 @@ if (!empty($licenseKey)) {
 // Check if company already exists by owner_email
 $ownerEmail = $data['ownerEmail'] ?? '';
 if (!empty($ownerEmail)) {
-    $stmt = $pdo->prepare('SELECT id FROM portal_companies WHERE owner_email = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id, company_name FROM portal_companies WHERE owner_email = ? LIMIT 1');
     $stmt->execute([$ownerEmail]);
     $existing = $stmt->fetch();
 
     if ($existing) {
+        // One portal record per owner email, so a second company on the same address lands
+        // on the first one's record. Previously it kept that record's name and logo, which
+        // meant a new company silently inherited the identity of an older one, including
+        // one deleted locally: the server is never told about a deleted company file.
+        //
+        // A different name means a different company is claiming the record, so it takes
+        // over the name and drops the stale logo reference. A matching name is the same
+        // company re-registering (a company file that lost its key, a restored backup),
+        // so nothing is touched. The logo file itself is left on disk: guessing wrong here
+        // would delete a live company's branding, and an orphan file costs only space.
+        $incomingName = trim((string)($data['companyName'] ?? ''));
+        $claimingRecord = $incomingName !== '' && $incomingName !== $existing['company_name'];
+
         // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
         try {
-            $rotateStmt = $pdo->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
-            $rotateStmt->execute([$rotatedHash, $existing['id']]);
+            if ($claimingRecord) {
+                $rotateStmt = $pdo->prepare(
+                    'UPDATE portal_companies
+                     SET api_key_hash = ?, company_name = ?, company_logo_url = NULL
+                     WHERE id = ?');
+                $rotateStmt->execute([$rotatedHash, $incomingName, $existing['id']]);
+            } else {
+                $rotateStmt = $pdo->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
+                $rotateStmt->execute([$rotatedHash, $existing['id']]);
+            }
             if ($rotateStmt->rowCount() <= 0) {
                 error_log('Portal registration failed: API key rotation UPDATE affected 0 rows for company ID ' . $existing['id']);
                 send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');

@@ -48,34 +48,63 @@ $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE company_
 
 $password_verified = !empty($body['password_verified']) ? 1 : 0;
 
+// The old-email step exists so the current owner can veto a change. That only means
+// something if the current address was ever proven to reach them. An unverified one
+// cannot: the sample company ships with example@samplecompany.com, and a company that
+// set an address but never confirmed the code is in the same position. Demanding a code
+// from an address nobody can read is an unopenable lock, not a security step, so the
+// request starts already past that stage.
+$oldAddressProven = !empty($company['owner_email']) && !empty($company['email_verified_at']);
+
 $pdo->beginTransaction();
-$stmt = $pdo->prepare("INSERT INTO email_change_requests (company_id, old_email, new_email, password_verified) VALUES (?, ?, ?, ?)");
-$stmt->execute([$company['id'], $company['owner_email'], $new_email, $password_verified]);
+$stmt = $pdo->prepare("INSERT INTO email_change_requests (company_id, old_email, new_email, password_verified, state) VALUES (?, ?, ?, ?, ?)");
+$stmt->execute([
+    $company['id'],
+    $company['owner_email'],
+    $new_email,
+    $password_verified,
+    $oldAddressProven ? 'pending' : 'old_verified',
+]);
 $change_id = (int)$pdo->lastInsertId();
 
-$code = refund_generate_code();
-$hash = refund_hash_code($code, 'echange-old-' . $change_id);
-// 10-minute expiry + attempt counter reset, mirroring the refund-code flow.
-$pdo->prepare("
-    UPDATE email_change_requests
-    SET old_email_code_hash = ?,
-        old_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
-        old_email_code_attempts = 0
-    WHERE id = ?
-")->execute([$hash, $change_id]);
+$code = null;
+if ($oldAddressProven) {
+    $code = refund_generate_code();
+    $hash = refund_hash_code($code, 'echange-old-' . $change_id);
+    // 10-minute expiry + attempt counter reset, mirroring the refund-code flow.
+    $pdo->prepare("
+        UPDATE email_change_requests
+        SET old_email_code_hash = ?,
+            old_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+            old_email_code_attempts = 0
+        WHERE id = ?
+    ")->execute([$hash, $change_id]);
+}
 
 audit_log($pdo, (int)$company['id'], 'email_change_requested', 'owner', null, null, $change_id, [
     'new_email' => $new_email,
     'password_verified' => (bool)$password_verified,
+    'old_address_proven' => $oldAddressProven,
 ]);
-audit_log($pdo, (int)$company['id'], 'code_sent', 'system', null, null, $change_id, ['target' => 'old']);
+if ($oldAddressProven) {
+    audit_log($pdo, (int)$company['id'], 'code_sent', 'system', null, null, $change_id, ['target' => 'old']);
+} else {
+    audit_log($pdo, (int)$company['id'], 'email_change_old_skipped', 'system', null, null, $change_id, [
+        'reason' => 'old_address_never_verified',
+    ]);
+}
 $pdo->commit();
 
-refund_email_send_change_old_code($company['owner_email'], $code, $new_email);
+if ($oldAddressProven) {
+    refund_email_send_change_old_code($company['owner_email'], $code, $new_email);
+}
 
 send_json_response(200, [
     'success' => true,
     'changeId' => $change_id,
-    'state' => 'pending',
+    'state' => $oldAddressProven ? 'pending' : 'old_verified',
     'maskedOldEmail' => refund_mask_email($company['owner_email']),
+    // False means no code was sent to the old address, so the app should go straight to
+    // asking for the new one.
+    'oldEmailVerificationRequired' => $oldAddressProven,
 ]);

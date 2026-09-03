@@ -84,14 +84,18 @@ if ($oldAddressProven) {
     // confirm-old.php is what normally issues the new-address code, so skipping that
     // step means issuing it here or the request sits in old_verified with no code ever
     // sent. Same expiry and salt confirm-new.php checks against.
+    //
+    // old_email_verified_at is deliberately left NULL. state='old_verified' records
+    // that the step is done; this column records that the old address answered a code,
+    // which here it never did. revert-email.php restores this value, so stamping it
+    // would hand the old address a verified mark it never earned.
     $newCode = refund_generate_code();
     $newHash = refund_hash_code($newCode, 'echange-new-' . $change_id);
     $pdo->prepare("
         UPDATE email_change_requests
         SET new_email_code_hash = ?,
             new_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
-            new_email_code_attempts = 0,
-            old_email_verified_at = NOW()
+            new_email_code_attempts = 0
         WHERE id = ?
     ")->execute([$newHash, $change_id]);
 }

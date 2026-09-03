@@ -42,11 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // new_email from THIS change request. Without this predicate, a 30-day-old
     // revert link can silently undo a later legitimate change
     // (A->B then B->C; the old A->B link stomps owner back to A).
+    //
+    // email_verified_at is restored to whatever the old address had, not left on the
+    // stamp the new address earned. old_email_verified_at is NULL when the old address
+    // never answered a code, and reverting to it has to put the company back to
+    // unverified rather than let it inherit a mark it never earned.
     $upd = $pdo->prepare(
-        "UPDATE portal_companies SET owner_email = ?
+        "UPDATE portal_companies SET owner_email = ?, email_verified_at = ?
          WHERE id = ? AND owner_email = ?"
     );
-    $upd->execute([$row['old_email'], $row['company_id'], $row['new_email']]);
+    $upd->execute([$row['old_email'], $row['old_email_verified_at'], $row['company_id'], $row['new_email']]);
     if ($upd->rowCount() !== 1) {
         $pdo->rollBack();
         http_response_code(409);

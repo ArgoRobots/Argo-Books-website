@@ -9,6 +9,14 @@ include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
+            <div class="docs-video">
+                <iframe src="https://www.youtube.com/embed/qUT_6kh5eg8?rel=0&amp;modestbranding=1"
+                        title="How to redeem your Argo Books license key"
+                        loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+            </div>
+
             <p>Premium is unlocked with a license key that you enter inside Argo Books. This page covers where to find your key and how to activate it, whether you subscribed here on argorobots.com or bought a key somewhere else.</p>
 
             <h2>Before you start</h2>

@@ -704,7 +704,8 @@ body.docs-page .account-avatar {
   border: none;
 }
 
-.docs-content > p:first-child {
+.docs-content > p:first-child,
+.docs-content > .docs-video + p {
   font-size: var(--text-sm);
   color: var(--black);
   line-height: 1.7;
@@ -1665,4 +1666,25 @@ body.docs-page .account-avatar {
   .docs-content table tbody td {
     padding: 9px 11px;
   }
+}
+
+/* Video walkthrough at the top of a page, above the written steps. */
+.docs-video {
+  width: 100%;
+  max-width: 640px;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 28px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: transparent;
+}
+
+.docs-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }

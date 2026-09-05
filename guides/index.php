@@ -204,7 +204,10 @@ ob_start();
         <li class="guides-hub-entry" data-category="<?= htmlspecialchars($group['key']) ?>">
           <a class="guides-hub-link"
              href="<?= INVGEN_BASE ?>/<?= htmlspecialchars($a['slug']) ?>/"
-             style="--entry-delay: <?= (($position - 1) * 45) ?>ms;">
+             <?php /* Stagger only the entries that can be on screen at load. Past that
+                     the delay is dead time: at 45ms across 96 entries the last one waited
+                     over four seconds, so refreshing near the bottom showed a blank page. */ ?>
+             style="--entry-delay: <?= (min($position - 1, 11) * 45) ?>ms;">
             <span class="guides-hub-num" aria-hidden="true"><?= sprintf('%02d', $position) ?></span>
             <span class="guides-hub-body">
               <span class="guides-hub-headline"><?= htmlspecialchars($a['h1']) ?></span>

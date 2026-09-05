@@ -230,32 +230,6 @@ $body_content = ob_get_clean();
 
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-template/scripts/template-page-tracker.js"></script>';
 
-// Collapsible FAQ click handler. Shares the .faq-item / .faq-question
-// component with /free-invoice-generator/ niche pages; CSS lives in
-// invoice-generator/styles/tool.css.
-$extra_scripts .= <<<'HTML'
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var items = document.querySelectorAll('.template-faqs .faq-item');
-  items.forEach(function (item) {
-    var question = item.querySelector('.faq-question');
-    if (!question) return;
-    question.addEventListener('click', function () {
-      var wasActive = item.classList.contains('active');
-      items.forEach(function (other) {
-        other.classList.remove('active');
-        var btn = other.querySelector('.faq-question');
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-      });
-      if (!wasActive) {
-        item.classList.add('active');
-        question.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
-});
-</script>
-HTML;
 
 include __DIR__ . '/../shared/layout.php';
 

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 $pageTitle = 'API Errors';
 $pageDescription = 'Every error the Argo Books API can return, what causes it, and what to do about it.';
 $currentPage = 'errors';

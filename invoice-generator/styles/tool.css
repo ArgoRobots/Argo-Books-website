@@ -794,6 +794,140 @@ body {
   line-height: 1.55;
 }
 
+/* Two-column guide layout. Below the breakpoint .article-layout is a plain
+   block, so the contents list stays inline between the intro and the first
+   section exactly as before. Above it, the list moves to a sticky right rail.
+   Both columns are grid items in a single row, so the rail's grid area is as
+   tall as the article, which is what gives position:sticky room to travel. */
+/* Three columns so the body stays centred in the page rather than being
+   pushed left to make room. The left column is empty and exists only to
+   balance the rail on the right. */
+@media (min-width: 1280px) {
+  .article-page {
+    max-width: 1440px;
+  }
+
+  /* The body column is fluid rather than fixed, so it widens with the window
+     instead of leaving the extra space in the empty spacer column. Two explicit rows so the rail can span both with grid-row: 1 / -1. With
+     only implicit rows, -1 resolves to the end of the explicit grid, which
+     would leave the rail one row tall and give sticky nowhere to travel. */
+  .article-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    grid-template-rows: auto 1fr;
+    column-gap: 40px;
+    justify-content: center;
+  }
+
+  /* Header and body share the middle column, so they align structurally and
+     need no width arithmetic to keep them in step. */
+  .article-intro-block {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .article-main {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+  }
+
+  .article-toc-rail {
+    grid-column: 3;
+    grid-row: 1 / -1;
+    /* Drop past the breadcrumb so the rail starts level with the headline
+       rather than with the “All guides” link. 14px link at 1.45 line-height
+       plus its 24px bottom margin. */
+    margin-top: 44px;
+    /* No height here on purpose. A grid item stretches to the row by default,
+       which is already the full column height the sticky child needs. Setting
+       height:100% instead makes the item depend on the row while the row is
+       still being sized from the item, and browsers resolve that circularity
+       differently, which showed up as the rail juddering in Edge. */
+  }
+
+  .article-layout .article-toc {
+    position: sticky;
+    top: 56px;
+    margin: 0;
+    padding: 0 0 0 18px;
+    border: 0;
+    border-left: 2px solid var(--gray-200);
+    border-radius: 0;
+    background: none;
+    /* Deliberately no max-height and no inner scroll container. A sticky box
+       that scrolls internally resizes as its scrollbar appears and disappears,
+       and at close to viewport height that flips on every scroll frame, which
+       reads as the rail vibrating. The list below is sized to fit instead. */
+  }
+
+  .article-layout .article-toc .article-toc-title {
+    margin-bottom: 14px;
+  }
+
+  .article-layout .article-toc .article-toc-list {
+    padding-left: 0;
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .article-layout .article-toc .article-toc-list li {
+    counter-increment: toc;
+    margin: 0;
+  }
+
+  .article-layout .article-toc .article-toc-list a {
+    display: block;
+    padding: 5px 0;
+    color: var(--gray-700);
+    font-size: var(--text-2xs);
+    line-height: 1.45;
+  }
+
+  .article-layout .article-toc .article-toc-list a::before {
+    content: counter(toc);
+    display: inline-block;
+    width: 18px;
+    color: var(--gray-400);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .article-layout .article-toc .article-toc-list a:hover {
+    color: var(--primary-blue);
+    text-decoration: none;
+  }
+
+  /* The section currently on screen. The spine segment beside it is filled in
+     rather than adding a background, so the rail stays a rule rather than
+     becoming a box again. Drawn as a positioned pseudo-element stretched top to
+     bottom: a box-shadow with negative spread scales with the element, so it
+     vanished on one-line entries and stubbed on two-line ones. */
+  .article-layout .article-toc .article-toc-list a {
+    position: relative;
+  }
+
+  .article-layout .article-toc .article-toc-list a.is-active {
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+
+  .article-layout .article-toc .article-toc-list a.is-active::after {
+    content: "";
+    position: absolute;
+    /* 18px of nav padding plus its 2px rule. */
+    left: -20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--primary-blue);
+  }
+
+  .article-layout .article-toc .article-toc-list a.is-active::before {
+    color: var(--primary-blue);
+  }
+}
+
 .article-toc {
   margin: 28px 0;
   padding: 18px 22px;
@@ -986,6 +1120,19 @@ body {
   font-size: var(--text-xs);
   line-height: 1.55;
   color: var(--dark-gray);
+}
+
+/* Inline code only. The <pre> above inherits the body font on purpose, since it
+   renders email examples a reader retypes. */
+.article-section :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  color: var(--dark-gray);
+  word-break: break-word;
 }
 
 .pre-copy-btn {

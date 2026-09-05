@@ -314,33 +314,6 @@ if (!empty($data['generator_defaults'])) {
 require_once __DIR__ . '/../shared/_base.php';
 $extra_scripts .= '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
 
-// Collapsible FAQ click handler. One open at a time, matching the main
-// site's pricing-page pattern. Inline (not loaded via main.js) because
-// it is niche-page-only and trivial.
-$extra_scripts .= <<<'HTML'
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var items = document.querySelectorAll('.niche-faqs .faq-item');
-  items.forEach(function (item) {
-    var question = item.querySelector('.faq-question');
-    if (!question) return;
-    question.addEventListener('click', function () {
-      var wasActive = item.classList.contains('active');
-      items.forEach(function (other) {
-        other.classList.remove('active');
-        var btn = other.querySelector('.faq-question');
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-      });
-      if (!wasActive) {
-        item.classList.add('active');
-        question.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
-});
-</script>
-HTML;
-
 include __DIR__ . '/../shared/layout.php';
 
 // -----------------------------------------------------------------------------

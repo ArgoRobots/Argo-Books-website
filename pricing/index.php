@@ -23,14 +23,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited invoices, Windows Hello, AI-powered insights, and more.">
     <meta name="keywords"
-        content="argo books pricing, buy full version, unlimited products, business software pricing, finance tracker, premium subscription">
+        content="argo books pricing, buy full version, unlimited invoices, business software pricing, finance tracker, premium subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Argo Books Pricing: Free Plan and Affordable Premium">
     <meta property="og:description"
-        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited invoices, AI-powered insights, and more.">
     <meta property="og:url" content="https://argorobots.com/pricing/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -40,7 +40,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Argo Books Pricing: Free Plan and Affordable Premium">
     <meta name="twitter:description"
-        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited invoices, AI-powered insights, and more.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -60,7 +60,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "How does the Free plan work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month. You can use it for as long as you like."
+                        "text": "Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: products, customers and transactions with no cap, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month. You can use it for as long as you like."
                     }
                 },
                 {
@@ -267,7 +267,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label">Get Paid Faster</span>
                     <h2>Send unlimited invoices and accept online payments</h2>
-                    <p>The free plan caps invoices at 25 per month. Premium removes that limit entirely, and adds online payment links so customers can pay directly from the invoice by credit card.</p>
+                    <p>The free plan caps invoices at <?= (int) $pricing['free_invoice_monthly_limit'] ?> per month. Premium removes that limit entirely, and adds online payment links so customers can pay directly from the invoice by credit card.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>Unlimited invoices with no monthly cap</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Online payment links via Stripe, PayPal &amp; Square</span></li>
@@ -345,7 +345,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             ob_start(); ?>How does the Free plan work?<?php $q = ob_get_clean();
             ob_start(); ?>
 
-                            <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month.</p>
+                            <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: products, customers and transactions with no cap, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month.</p>
                             <p>You can use it for as long as you like. When your business needs more, upgrading to Premium takes just a few clicks.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

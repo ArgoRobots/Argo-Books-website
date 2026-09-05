@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 $pageTitle = 'API Overview';
 $pageDescription = 'The Argo Books API lets your app send sales, expenses, customers, suppliers, products, categories and refunds into a merchant\'s books, with their permission.';
 $currentPage = 'overview';

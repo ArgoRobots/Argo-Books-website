@@ -3,7 +3,7 @@
 //
 // Editorial hub for the informational articles. Served at
 // argorobots.com/guides/ via Apache DirectoryIndex (no rewrite needed).
-// Globs every article in articles/data/, groups them by `category`, and
+// Globs every article in guides/data/, groups them by `category`, and
 // renders the categories in a fixed display order, sorted within each by
 // `hub_weight`. Add an article with a category and it appears automatically.
 //
@@ -32,11 +32,12 @@ $category_labels = [
     'bookkeeping'       => 'Bookkeeping',
     'spreadsheets'      => 'Spreadsheets & Importing',
     'choosing-software' => 'Choosing Software',
+    'engineering'       => 'Behind the Scenes',
 ];
 
 // Load every article, keyed by category.
 $by_category = [];
-foreach (glob(__DIR__ . '/../articles/data/*.php') as $file) {
+foreach (glob(__DIR__ . '/data/*.php') as $file) {
     $slug = basename($file, '.php');
     if ($slug === '_template') {
         continue;

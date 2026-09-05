@@ -18,7 +18,7 @@
     ],
     "free": {
         "features": [
-            {"label": "Unlimited products, customers, and sales"},
+            {"label": "Track every product, customer and sale"},
             {"label": "See your numbers update in real time"},
             {"label": "Keep every receipt in one place"},
             {"label": "Send {free_invoice_monthly_limit} invoices a month"},

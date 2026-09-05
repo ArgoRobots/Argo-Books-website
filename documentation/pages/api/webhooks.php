@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 require_once __DIR__ . '/../../../api/v1/lib/events.php';
 
 $pageTitle = 'API Webhooks';

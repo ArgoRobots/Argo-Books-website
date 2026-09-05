@@ -82,6 +82,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <script src="<?php echo $resourcePath; ?>resources/scripts/site-search.js"></script>
     <script src="<?php echo $docsPath; ?>search.js"></script>
     <script src="<?php echo $docsPath; ?>main.js" defer></script>
+    <script src="<?php echo $resourcePath; ?>resources/scripts/code-block.js" defer></script>
 
     <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/site-search.css">

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 
 // Render the field tables from the same definitions the API itself is driven by,
 // so this page cannot drift out of date when a field is added or renamed.

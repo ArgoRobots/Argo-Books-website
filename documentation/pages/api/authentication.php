@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 $pageTitle = 'API Authentication';
 $pageDescription = 'How to authenticate against the Argo Books API using a merchant-issued key, what the scopes mean, and why there is no test mode.';
 $currentPage = 'authentication';

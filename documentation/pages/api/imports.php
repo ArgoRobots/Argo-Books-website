@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
-require_once __DIR__ . '/../../code-block.php';
+require_once __DIR__ . '/../../../partials/code-block.php';
 $pageTitle = 'API Imports';
 $pageDescription = 'How data you send through the Argo Books API reaches a merchant\'s books: the pending queue, import batches, reverts, and rejections.';
 $currentPage = 'imports';

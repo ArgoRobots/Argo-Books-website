@@ -73,6 +73,33 @@ ksort($files);
  * actual boolean produces a word here, which matches ua_describe_event(), where
  * only a strict === false says "ended unexpectedly".
  */
+/**
+ * The non-zero counts on a CompanyScale event as one readable cell. Zeroes are dropped so a
+ * file holding three expenses reads as that rather than as a row of noughts, and an entirely
+ * empty file reads as "empty" rather than as a blank cell that looks like missing data.
+ */
+function ua_csv_scale(array $ev): string
+{
+    if (($ev['dataType'] ?? '') !== 'CompanyScale') {
+        return '';
+    }
+
+    $fields = [
+        'expenses' => 'expenses', 'revenues' => 'revenues', 'invoices' => 'invoices',
+        'payments' => 'payments', 'customers' => 'customers', 'suppliers' => 'suppliers',
+        'products' => 'products', 'categories' => 'categories', 'receipts' => 'receipts',
+        'employees' => 'employees', 'bankLines' => 'bank lines',
+    ];
+    $parts = [];
+    foreach ($fields as $key => $label) {
+        if (!empty($ev[$key])) {
+            $parts[] = (int)$ev[$key] . ' ' . $label;
+        }
+    }
+
+    return $parts ? implode(', ', $parts) : 'empty';
+}
+
 function ua_csv_bool(array $ev, string $key): string
 {
     if (!array_key_exists($key, $ev) || !is_bool($ev[$key])) {
@@ -166,6 +193,9 @@ function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$mat
                 'region'           => $fileMeta['region'],
                 'timezone'         => $fileMeta['timezone'],
                 'feature_name'     => $ev['featureName'] ?? '',
+                // Several events carry their whole meaning here: which stage an import died
+                // at, why a scan came back empty, which page rendered with nothing on it.
+                'feature_context'  => $ev['context'] ?? '',
                 'export_type'      => $ev['exportType'] ?? '',
                 'api_name'         => $ev['apiName'] ?? '',
                 'error_category'   => $ev['errorCategory'] ?? '',
@@ -178,6 +208,9 @@ function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$mat
                 'duration_seconds' => $ev['durationSeconds'] ?? '',
                 'active_seconds'   => $ev['activeSeconds'] ?? '',
                 'last_page'        => $ev['lastPage'] ?? '',
+                // CompanyScale counts. Flattened into one column rather than eleven, which
+                // would sit empty on every other row in the file.
+                'file_contents'    => ua_csv_scale($ev),
                 'clean'            => ua_csv_bool($ev, 'clean'),
                 'file_size'        => $ev['fileSize'] ?? '',
                 'success'          => ua_csv_bool($ev, 'success'),
@@ -271,10 +304,11 @@ $columns = array_merge(
     $allMode ? ['auth_id', 'is_founder'] : [],
     [
         'timestamp_utc', 'event_type', 'description', 'severity', 'tier', 'app_version',
-        'platform', 'country', 'region', 'timezone', 'feature_name', 'export_type',
+        'platform', 'country', 'region', 'timezone', 'feature_name', 'feature_context',
+        'export_type',
         'api_name', 'error_category', 'error_code', 'message', 'source_file',
         'line_number', 'method_name', 'duration_ms', 'duration_seconds', 'active_seconds',
-        'last_page', 'clean',
+        'last_page', 'clean', 'file_contents',
         'file_size', 'success', 'telemetry_file',
     ]
 );

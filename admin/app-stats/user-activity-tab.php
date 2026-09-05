@@ -352,6 +352,9 @@ if (!function_exists('ua_kv')) {
 .ua-evt.company .ua-evt-text { color:#6d28d9; font-weight:600; }
 /* Launch timings. Deliberately muted: one per session, and only interesting in bulk. */
 .ua-evt.startup .ua-evt-text { color:#6b7280; font-family:monospace; }
+/* How much is in the file. Its own type rather than 'company': that one is claimed by the
+   CompanyCreated merge, which would otherwise fold the creation into a scale row. */
+.ua-evt.scale .ua-evt-text { color:#0f766e; font-family:monospace; }
 .ua-business { color:#6d28d9; font-weight:700; }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
 [data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text { color:var(--white); }
@@ -369,6 +372,7 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-dl:hover { background:var(--gray-600); color:var(--white); }
 [data-theme="dark"] .ua-evt.company .ua-evt-text { color:#c4b5fd; }
 [data-theme="dark"] .ua-evt.startup .ua-evt-text { color:#9ca3af; }
+[data-theme="dark"] .ua-evt.scale .ua-evt-text { color:#5eead4; }
 [data-theme="dark"] .ua-key { background:var(--gray-700); border-color:var(--gray-600); color:var(--white); }
 [data-theme="dark"] .ua-evt.company .ua-evt-text, [data-theme="dark"] .ua-business { color:#c4b5fd; }
 

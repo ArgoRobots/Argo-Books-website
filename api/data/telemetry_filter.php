@@ -41,6 +41,14 @@ const TELEMETRY_FEATURE_NAMES = [
     'CompanyCreated', 'ChecklistStepCompleted', 'OnboardingCompleted', 'OnboardingSkipped',
     'SampleCompanyOpened',
     'CompanyCreateOpened', 'ReceiptScanOpened', 'InvoiceCreateOpened',
+    'ExpenseCreateOpened', 'RevenueCreateOpened', 'ReportOpened',
+    // The import funnel. Which stage or reason travels in the free-form context field, so a
+    // new failure mode needs no server change.
+    'ImportOpened', 'ImportPreviewShown', 'ImportAbandoned', 'ImportFailed',
+    'ReceiptScanFailed', 'EmptyStateShown', 'WelcomeShown',
+    // The paywall. Shown is the wall someone hit, opened is them acting on it; which limit
+    // or entry point is in the context on both.
+    'UpgradePromptShown', 'UpgradeModalOpened',
     // Payroll reported only its exceptions, so a company could run payroll all year
     // and file its T4s without producing one event.
     'PayRunDrafted',
@@ -239,6 +247,25 @@ function filter_telemetry_event(array $event): ?array
                 // question as country: an English app in a non-English country is what
                 // tells us which translations are actually used rather than just shipped.
                 'language' => telemetry_clean_string($event['language'] ?? null, 64),
+            ];
+
+        case 'CompanyScale':
+            // How much is in the open company file, so a file someone is evaluating is
+            // separable from one they run a business on. Counts only: unlike CompanyProfile
+            // above, nothing here identifies anyone, so it needs no separate disclosure.
+            // Capped well above any plausible file so a corrupt payload cannot skew a chart.
+            return $base + [
+                'expenses'   => telemetry_clean_int($event['expenses'] ?? null, 10000000),
+                'revenues'   => telemetry_clean_int($event['revenues'] ?? null, 10000000),
+                'invoices'   => telemetry_clean_int($event['invoices'] ?? null, 10000000),
+                'payments'   => telemetry_clean_int($event['payments'] ?? null, 10000000),
+                'customers'  => telemetry_clean_int($event['customers'] ?? null, 10000000),
+                'suppliers'  => telemetry_clean_int($event['suppliers'] ?? null, 10000000),
+                'products'   => telemetry_clean_int($event['products'] ?? null, 10000000),
+                'categories' => telemetry_clean_int($event['categories'] ?? null, 10000000),
+                'receipts'   => telemetry_clean_int($event['receipts'] ?? null, 10000000),
+                'employees'  => telemetry_clean_int($event['employees'] ?? null, 10000000),
+                'bankLines'  => telemetry_clean_int($event['bankLines'] ?? null, 10000000),
             ];
 
         case 'Startup':

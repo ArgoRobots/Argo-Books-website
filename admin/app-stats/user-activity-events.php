@@ -69,8 +69,27 @@ if (!function_exists('ua_describe_event')) {
                 // The app sends the enum name. This one lands among real user actions in the
                 // timeline, where "SampleCompanyOpened" reads as a leaked identifier.
                 if ($name === 'SampleCompanyOpened') $name = 'Opened sample company';
-                $extra = !empty($ev['durationMs']) ? ' (' . (int)$ev['durationMs'] . ' ms)' : '';
+                // Without the context the timeline shows "ImportFailed" and no reason.
+                $bits = [];
+                if (!empty($ev['context']))    $bits[] = (string)$ev['context'];
+                if (!empty($ev['durationMs'])) $bits[] = (int)$ev['durationMs'] . ' ms';
+                $extra = $bits ? ' (' . implode(', ', $bits) . ')' : '';
                 return ['feature', $name . $extra];
+
+            case 'CompanyScale':
+                // Only the non-zero counts: a file with three expenses and nothing else
+                // should read as that, not as nine zeroes.
+                $fields = [
+                    'expenses' => 'expenses', 'revenues' => 'revenues', 'invoices' => 'invoices',
+                    'payments' => 'payments', 'customers' => 'customers', 'suppliers' => 'suppliers',
+                    'products' => 'products', 'categories' => 'categories', 'receipts' => 'receipts',
+                    'employees' => 'employees', 'bankLines' => 'bank lines',
+                ];
+                $parts = [];
+                foreach ($fields as $key => $label) {
+                    if (!empty($ev[$key])) $parts[] = (int)$ev[$key] . ' ' . $label;
+                }
+                return ['scale', 'File contents: ' . ($parts ? implode(', ', $parts) : 'empty')];
 
             case 'Export':
                 $type = $ev['exportType'] ?? 'Unknown';

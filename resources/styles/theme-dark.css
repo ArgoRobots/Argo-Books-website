@@ -13,7 +13,13 @@
    surface are overridden individually at the bottom.
    ========================================== */
 
-[data-theme="dark"] {
+/* Qualified with :root so this block is (0,2,0) rather than (0,1,0). Plain
+   [data-theme="dark"] ties with the :root in custom-colors.css, which makes the
+   winner depend on load order, and any page whose own stylesheet @imports
+   custom-colors.css (hub.css, tool.css) re-injects the light values after this
+   file and silently reverts the whole palette. Out-specifying it removes the
+   dependency on link order entirely. */
+:root[data-theme="dark"] {
   /* Tells the browser to render its own furniture dark too: scrollbars, form
      controls, the space past the end of the page. Without it the horizontal
      scrollbar under a code block stays light against the dark block. */
@@ -98,8 +104,24 @@
 [data-theme="dark"] .code-block,
 [data-theme="dark"] .code-copy,
 [data-theme="dark"] .article-section .wfa-score,
-[data-theme="dark"] .article-section .wfa-repo {
+[data-theme="dark"] .article-section .wfa-repo,
+[data-theme="dark"] .tool-callout,
+[data-theme="dark"] .faq-item,
+[data-theme="dark"] .pre-copy-btn {
   background: var(--gray-50);
+}
+
+/* The FAQ and callout blocks appear on the standard guides rather than on the
+   articles with their own stylesheet, so they were missed when this file was
+   written. Their borders already read through --gray-border and invert on their
+   own; only the surface, which names --white, had to be restated. Without this
+   the body text lightens while the card stays white. */
+[data-theme="dark"] .faq-question:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .faq-icon {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .code-block-bar {
@@ -143,6 +165,15 @@
 @media (min-width: 1280px) {
   .article-layout .article-toc {
     top: calc(var(--site-header-h) + 24px);
+  }
+
+  /* At this width the contents stop being a card and become a bare spine, so
+     tool.css clears the background and drops the top padding to zero. The dark
+     surface rule above ties with that on specificity (0,2,0 each) and wins only
+     because this file loads second, which repaints a card the layout removed,
+     flush against the heading. Out-specify it rather than reorder the files. */
+  [data-theme="dark"] .article-layout .article-toc {
+    background: none;
   }
 }
 

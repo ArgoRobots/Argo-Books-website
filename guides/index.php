@@ -154,6 +154,15 @@ $extra_head = argo_font_links('editorial-light', '')
 
 $invgen_ref = 'guides-hub';
 
+// The hub carries the same header controls as the articles it links to, so a
+// reader who picks dark on an article does not land back on a white page.
+$theme_toggle = true;
+$header_nav = [
+  ['label' => 'Guides',        'href' => 'guides/'],
+  ['label' => 'Docs',          'href' => 'documentation/'],
+  ['label' => 'About',         'href' => 'about-us/'],
+];
+
 ob_start();
 ?>
 <main class="guides-hub">

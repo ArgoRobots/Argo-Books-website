@@ -19,8 +19,24 @@
   --hub-num: #6b7280;
   --hub-accent: var(--primary-blue);
   --hub-accent-soft: rgba(59, 130, 246, 0.08);
+  --hub-accent-border: rgba(59, 130, 246, 0.32);
   --hub-serif: 'Fraunces', 'Iowan Old Style', 'Cambria', 'Georgia', serif;
   --hub-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* The text tokens above resolve through --black, which theme-dark.css already
+   inverts, so only the ones holding a literal need restating here. --hub-surface
+   is included because it reads through --white, which stays white by design.
+   Values come from that file's ramp rather than new colours, so the hub and the
+   articles are the same dark grey. */
+:root[data-theme="dark"] {
+  --hub-bg: var(--light-page-bg);
+  --hub-surface: var(--gray-50);
+  --hub-rule: var(--gray-300);
+  --hub-rule-soft: var(--gray-200);
+  --hub-num: var(--gray-500);
+  --hub-accent-soft: rgba(125, 151, 255, 0.14);
+  --hub-accent-border: rgba(125, 151, 255, 0.42);
 }
 
 body:has(.guides-hub) {
@@ -121,6 +137,12 @@ body:has(.guides-hub) {
   color: var(--white);
   background: var(--hub-accent);
   border-color: var(--hub-accent);
+}
+
+/* The accent lifts to a pale blue in dark mode, so white label text on it drops
+   to 2.7:1. The page ground reads 6.9:1 against the same fill. */
+[data-theme="dark"] .guides-hub-pill.is-active {
+  color: var(--light-page-bg);
 }
 
 .guides-hub-pill:focus-visible {
@@ -264,7 +286,7 @@ body:has(.guides-hub) {
 
 .guides-hub-chip--howto {
   color: var(--hub-accent);
-  border-color: rgba(59, 130, 246, 0.32);
+  border-color: var(--hub-accent-border);
   background: var(--hub-accent-soft);
 }
 

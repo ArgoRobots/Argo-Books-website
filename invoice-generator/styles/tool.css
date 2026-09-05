@@ -1491,10 +1491,28 @@ body {
   color: var(--tool-primary);
 }
 
+/* Scoped through .site-header and qualified with img so these land at (0,3,1)
+   and outrank the [data-theme] logo rules in theme-dark.css (0,3,0). Matching
+   on class alone would tie on order and bring the wordmark back in dark. */
+.site-header .site-brand img.site-logo-mark {
+  display: none;
+}
+
 @media (max-width: 540px) {
   .site-header-inner {
     padding: 12px 16px;
     gap: 12px;
+  }
+
+  /* The wordmark plus the section nav plus the theme switch do not fit across a
+     phone, so the brand drops to the mark alone and saves 126px. */
+  .site-header .site-brand img.site-logo-light,
+  .site-header .site-brand img.site-logo-dark {
+    display: none;
+  }
+
+  .site-header .site-brand img.site-logo-mark {
+    display: block;
   }
 
   .site-header-nav {

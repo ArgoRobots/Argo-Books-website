@@ -112,6 +112,11 @@ $site_schema = [
                logo would follow the OS while the page follows the toggle. */ ?>
       <img class="site-logo-light" src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
       <img class="site-logo-dark" src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-white.png" alt="" aria-hidden="true" width="160" height="28">
+      <?php /* The wordmark is 164px wide, which does not leave room for the nav
+               and the theme switch on a phone. Below 540px the mark replaces it.
+               One file for both themes: it is a coloured logo on transparency,
+               legible on either ground. */ ?>
+      <img class="site-logo-mark" src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-books-icon-transparent.png" alt="" aria-hidden="true" width="38" height="28">
       <?php else: ?>
       <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
       <?php endif; ?>

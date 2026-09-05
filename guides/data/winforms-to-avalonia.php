@@ -49,7 +49,7 @@ return [
 
 <p>Argo Books version 1 was a Windows-only WinForms application: 91,089 lines of C# across 246 files. Version 2 is the same product on Avalonia, running on Windows and Linux, with macOS on the way. Every number below was measured from the two codebases.</p>
 
-<p>Reaching more operating systems was the reason I started, and it’s a good reason on its own. What I didn’t expect was that it would end up as one of the smaller benefits. The interesting part is <em>which</em> problems disappeared along the way.</p>
+<p>Reaching more operating systems was the reason I started, and it’s a good reason on its own. What I didn’t expect was that it would end up as one of the smaller benefits. The interesting part is which problems disappeared along the way.</p>
 HTML,
 
   'sections' => [
@@ -173,7 +173,7 @@ HTML,
 
 <p>The volume is part of it too. Version 1 carried 56 <code>.Designer.cs</code> files totalling 20,305 lines against a 91,089-line codebase. Twenty-two percent of the project was a second representation of the interface that had to stay in sync with the first. The code itself is simple enough, and I edited it by hand several times. It’s just a lot of code, and it exists because WinForms has no way to <em>describe</em> a window. It can only record the steps that build one, so every property of every control becomes another statement to store, scroll past and keep in sync. XAML is a description, which is why the same window takes a fraction of the space.</p>
 
-<p>The clearest example was flags. Argo Books shows a country flag beside currency and locale settings, so it ships 195 small PNGs. WinForms surfaces embedded images through a strongly typed resource class, which meant this:</p>
+<p>The clearest example were resource files. Argo Books shows an image of a country flag beside currency and locale settings, so it ships 195 small PNGs. WinForms surfaces embedded images through a strongly typed resource class, which meant this:</p>
 
 {{code:csharp:before|WinForms · Properties/Flags.Designer.cs, 2,013 lines}}
 //------------------------------------------------------------------------------
@@ -241,9 +241,9 @@ HTML,
 
 <p>Then there’s the coupling. 2,142 references isn’t a dependency you swap out on a weekend. Every screen in the application was written against one vendor’s controls, and moving off them was going to be a rewrite whenever it happened.</p>
 
-<p>Charts made the point sharpest. Guna sells its charting components as a <em>separate</em> product, listed at <strong>$99 USD</strong> on top of the control suite, and I bought and used them. They were slow. Not marginally: slow enough that I replaced them inside version 1 rather than wait for the rewrite. In July 2025, across thirteen files, I converted every chart in the application to LiveCharts2, which renders through Skia. The paid components lost to the free ones on performance. LiveCharts2 then came across to Avalonia and still renders every chart in version 2, which is a longer life than the paid library managed inside version 1 alone.</p>
+<p>The bill recurs, too. The control suite is a subscription: <strong>$49 USD a year</strong> for an individual licence, or <strong>$99 USD a year</strong> for a small team. It comes with a 14-day evaluation, after which you can’t keep editing your projects without one. Charts are a second product on top, <strong>$33 USD a year</strong> on their own or <strong>$79 USD a year</strong> bundled with the suite. I paid for both. Whatever you make of those numbers, it’s a cost that repeats for as long as the app exists, to make controls look modern on a framework that isn’t.</p>
 
-<p>And there’s a bill for all of it. The control suite is a subscription, listed at <strong>$49 USD a year</strong> for an individual licence and <strong>$99 USD a year</strong> for a small team, with a 14-day evaluation, after which you can’t keep editing your projects without a licence. The charts are a separate purchase again. Whatever you make of those numbers, it’s a recurring cost, for as long as the app exists, to make controls look modern on top of a framework that isn’t.</p>
+<p>And the charts made the point sharpest, because I didn’t even get to keep them. They were slow. Not marginally: slow enough that I replaced them inside version 1 rather than wait for the rewrite. In July 2025, across thirteen files, I converted every chart in the application to <a href="https://livecharts.dev/" target="_blank" rel="noopener nofollow">LiveCharts2</a>, which is free and renders through Skia. The paid components lost to the free ones on performance. LiveCharts2 then came across to Avalonia and still renders every chart in version 2, which is a longer life than the paid library managed inside version 1 alone.</p>
 
 <p>Avalonia is free and open source, and its controls are the framework’s own, so styling, theming and layout are the same system rather than a suite bolted onto one. Dropping 2,142 references to a paid dependency wasn’t the goal of the migration. It was a side effect of no longer needing one.</p>
 
@@ -288,7 +288,7 @@ public enum HighDpiMode
 
 <p>A framework doesn’t accumulate almost seven years of open issues in one category because nobody cared. It accumulates them because the fix is architectural, and the architecture shipped in 2002.</p>
 
-<p>In practice this is what it looks like from the developer’s side: you tune a form until it looks right, and then it’s wrong somewhere else. Text is clipped at 125%. A panel that fits at 100% has a scrollbar at 150%. Controls land a few pixels out on one machine and fine on another.</p>
+<p>In practice this is what it looks like from the developer’s side: you tune a form until it looks right, and then it renders wrong on a different device or monitor. Text is clipped at 125%. A panel that fits at 100% has a scrollbar at 150%. Controls land a few pixels out on one machine and sit perfectly on another. It’s the programmer’s oldest excuse, "works on my machine", except here it was literally true.</p>
 
 <p>I lost several weeks to this, and I want to show you what I ended up with, because the workaround says more about the problem than any description of it could. Version 1 already asked the framework for DPI awareness at startup, <code>Application.SetHighDpiMode(HighDpiMode.SystemAware)</code>, and it wasn’t enough. So I wrote a helper to correct the difference myself:</p>
 
@@ -331,6 +331,54 @@ AutoScaleDimensions = new SizeF(10F, 25F);
 <p>Avalonia doesn’t wrap native controls. It draws every control itself through Skia, so display scaling is a transform applied to the scene rather than pixel arithmetic repeated per control. A layout described as "this row is as tall as its content, this column takes the remaining space" stays correct at any scale factor, because nothing in it was ever expressed in physical pixels. That’s the difference between owning your rendering and borrowing someone else’s from 2002.</p>
 
 <p>This is the part I’d put in front of anyone still deciding. Theming is a lot of work you can grind through. The designer is a maintenance problem you can live with. Rendering differently on every customer’s display isn’t something you can fix, at any budget, from inside a WinForms app.</p>
+HTML,
+    ],
+
+    [
+      'h2'     => 'Everything is an event, so everything is wiring',
+      'anchor' => 'events',
+      'html'   => <<<'HTML'
+<p>WinForms has one way to make anything happen: subscribe to an event and write a handler. That is fine for a button. It stops being fine when the behaviour you want belongs to the whole application rather than to one control.</p>
+
+<p>Version 1 had <strong>1,031</strong> event subscriptions and <strong>266</strong> handler methods. That is one subscription for every 88 lines of code in the app.</p>
+
+<p>Here is the one that annoyed me most. Clicking somewhere else should close whatever popup panel is open, which is a single rule about the application. In WinForms there is nowhere to put it, so each window got its own copy:</p>
+
+{{code:csharp:before|WinForms · Accountants_Form.cs, and 23 other files}}
+private void ClosePanels()
+{
+    TextBoxManager.HideRightClickPanel();
+    RightClickDataGridViewRowMenu.Hide();
+}
+
+// ...and, in the form's constructor, a filter that has to be told
+// every control a click is allowed to land on without closing:
+PanelCloseFilter panelCloseFilter = new(this, ClosePanels,
+    TextBoxManager.RightClickTextBox_Panel,
+    RightClickDataGridViewRowMenu.Panel);
+{{endcode}}
+
+<p>That method is defined in <strong>24 separate files</strong>, each with its own filter, each wired by hand. The filter itself intercepts raw Win32 mouse messages for the whole application, <code>WM_LBUTTONDOWN</code> and <code>WM_RBUTTONDOWN</code>, and closes the panels unless the click landed inside one of the controls you listed when you set it up.</p>
+
+<p>Which means every window has to enumerate, by hand, every control a click is allowed to land on without dismissing the panel. Miss one and clicking that control closes a panel it should have left alone. Miss the filter entirely and the panel never closes at all. Neither is a crash, neither shows up in a test, and both are the kind of thing you find out about because somebody mentions it in passing.</p>
+
+<p>Version 2 does the same job in one place, for the entire application:</p>
+
+{{code:csharp:after|Avalonia · ViewModels/AppShellViewModel.cs}}
+private void CloseAllPanels()
+{
+    NotificationPanelViewModel.CloseCommand.Execute(null);
+    FileMenuPanelViewModel.CloseCommand.Execute(null);
+    HelpPanelViewModel.CloseCommand.Execute(null);
+    QuickActionsViewModel.CloseCommand.Execute(null);
+    CompanySwitcherPanelViewModel.CloseCommand.Execute(null);
+    ClosePageContextMenus();
+}
+{{endcode}}
+
+<p>One definition, in the shell that owns the panels, wired to one event. Every page in the application inherits the behaviour by existing inside that shell. The 84 context menus in the interface are declared in markup and dismiss themselves, because that is what the control already does.</p>
+
+<p>Across the whole codebase the wiring thinned out by roughly the same factor. Version 2 has 632 subscriptions across two and a half times as much code, so one for every 399 lines against version 1's one per 88. Some of that is MVVM, where a binding replaces a handler outright. Most of it is that behaviour now lives in one place instead of being restated in every window that needs it.</p>
 HTML,
     ],
 
@@ -394,7 +442,7 @@ HTML,
       'html'   => <<<'HTML'
 <p>Version 1 shipped in English. Not as a decision, but because localising a WinForms app means satellite <code>.resx</code> files per window, and with 53 windows and 57 resource files already in play the cost was never worth paying. The version 1 repository contains zero localised resource files.</p>
 
-<p>Version 2 ships in <strong>54 languages</strong>. The strings are JSON, generated and translated by a tool in the repository, and downloaded per version rather than compiled into satellite assemblies.</p>
+<p>Version 2 ships in <strong>54 languages</strong>, one more than version 1 had windows. The strings are JSON, generated and translated by a tool in the repository, and downloaded per version rather than compiled into satellite assemblies.</p>
 
 <p>That wasn’t an Avalonia feature. It became possible because the rewrite pulled the strings out of the UI layer in the first place, which is the same structural change that made the code testable. One decision, two payoffs.</p>
 HTML,
@@ -421,7 +469,7 @@ HTML,
       <tr><th>Theming code</th><td>845 lines of C#</td><td>415 lines of XAML</td></tr>
       <tr class="wfa-row-hi"><th>Test suite</th><td>2,141 lines</td><td>49,943 lines</td></tr>
       <tr><th>View models</th><td>n/a</td><td>129</td></tr>
-      <tr><th>Third-party UI control suite</th><td>2,142 references, $49 USD/year</td><td>none, free and open source</td></tr>
+      <tr><th>Third-party UI control suite</th><td>2,142 references, $82 USD/year with charts</td><td>none, free and open source</td></tr>
       <tr><th>Languages</th><td>1</td><td>54</td></tr>
     </tbody>
   </table>
@@ -457,7 +505,8 @@ HTML,
 
 <div class="wfa-callout">
   <p class="wfa-callout-head">Where to start reading</p>
-  <p>Avalonia’s <a href="https://docs.avaloniaui.net/docs/migration/winforms" target="_blank" rel="noopener nofollow">Windows Forms migration guide</a> is the right first page, and it is honest that the concepts do not map across. The <a href="https://docs.avaloniaui.net/docs/migration/wpf" target="_blank" rel="noopener nofollow">WPF guide</a> is far more detailed, and worth reading anyway for the XAML and styling sections even if you are coming from WinForms. If you are on WPF rather than WinForms, look at <a href="https://avaloniaui.net/xpf" target="_blank" rel="noopener nofollow">Avalonia XPF</a> before you plan a rewrite you may not need.</p>
+  <p>Start with Avalonia’s <a href="https://docs.avaloniaui.net/docs/migration/winforms" target="_blank" rel="noopener nofollow">Windows Forms migration guide</a>, which is honest that the concepts don’t map across. Then the fundamentals: <a href="https://docs.avaloniaui.net/docs/fundamentals/avalonia-xaml" target="_blank" rel="noopener nofollow">XAML</a> and <a href="https://docs.avaloniaui.net/docs/data-binding/introduction-to-data-binding" target="_blank" rel="noopener nofollow">data binding</a> are the two things WinForms has no equivalent of at all, so that’s where the real learning is. The <a href="https://docs.avaloniaui.net/docs/get-started/starter-tutorial" target="_blank" rel="noopener nofollow">starter tutorial</a> is a faster way in than reading either.</p>
+  <p>Coming from WPF instead? Look at <a href="https://avaloniaui.net/xpf" target="_blank" rel="noopener nofollow">Avalonia XPF</a> first, before you plan a rewrite you may not need.</p>
 </div>
 HTML,
     ],
@@ -468,7 +517,7 @@ HTML,
       'html'   => <<<'HTML'
 <p>I want to be precise here, because migration write-ups tend to skip this part.</p>
 
-<p><strong>It was a rewrite, not a port.</strong> I started intending to carry code across, and tens of thousands of lines did move early on. Almost none of it survives in its original form. Once the logic left the window classes and went behind view models and a UI-free core, it was reshaped enough that calling it ported would be generous. Nine months, one developer, alongside running the business. That figure is not a migration estimate, though, and I would not quote it as one: a large share of those nine months went into features version 1 never had.</p>
+<p><strong>It was a rewrite, not a port.</strong> I started intending to carry code across, and tens of thousands of lines did come over early on, pasted in more or less as they were. Almost none of it is still in that form. It got rewritten afterwards, a piece at a time, as the architecture settled and as I noticed how much better I could write it than when I first wrote it in WinForms. A lot of it could have been left alone and would have worked. Between the rewriting and the logic leaving the window classes for view models and a UI-free core, calling the result a port would be generous. Nine months, one developer, alongside running the business. That figure is not a migration estimate, though, and I would not quote it as one: most of those nine months went into features version 1 never had.</p>
 
 <p><strong>And it was a rewrite because the app was WinForms.</strong> If you are coming from WPF, almost none of this applies to you. WPF already has the concepts Avalonia is built on: XAML markup, data binding, MVVM, styles and control templates, resource dictionaries, and resolution independence. Moving that to Avalonia is a translation between two dialects of the same language, and Avalonia’s own documentation has a migration guide for it. There is even <a href="https://avaloniaui.net/xpf" target="_blank" rel="noopener nofollow">Avalonia XPF</a>, a commercial drop-in that swaps the rendering layer underneath WPF while keeping API and binary compatibility, so most WPF apps compile against it unchanged and third-party control suites keep working.</p>
 
@@ -534,7 +583,7 @@ HTML,
     ],
     [
       'q' => 'Does Avalonia have a visual designer like WinForms?',
-      'a' => 'There are previewers and hot reload, but not a drag-and-drop canvas that writes your layout for you. You write XAML by hand. The trade is that XAML is reviewable in a diff, whereas generated designer files churn by the hundreds of lines when you nudge a control.',
+      'a' => 'There are previewers and hot reload, but not a drag-and-drop canvas that writes your layout for you. You write XAML by hand. What you get in exchange is that a screen has one definition instead of two, so there is no split between the controls you dragged onto a canvas and the ones a method builds at runtime, and that the markup means the same thing on every machine. A WinForms designer file records the display scaling it was authored on and recalculates every control when someone opens it on a different monitor, which is not a problem markup can have.',
     ],
     [
       'q' => 'How long does a WinForms to Avalonia migration take?',

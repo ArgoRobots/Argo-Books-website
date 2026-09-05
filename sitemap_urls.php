@@ -168,7 +168,7 @@ function sitemap_build_urls(): array
 
     // --- Articles: editorial hub + each guide ---
     sitemap_add_url($urls, site_url('/guides/'), $root . '/guides/index.php', '0.8', 'weekly');
-    foreach (glob($root . '/articles/data/*.php') as $file) {
+    foreach (glob($root . '/guides/data/*.php') as $file) {
         $slug = basename($file, '.php');
         if ($slug === '_template') continue;
         $data = require $file;

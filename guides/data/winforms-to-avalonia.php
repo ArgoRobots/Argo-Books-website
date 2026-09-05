@@ -454,6 +454,22 @@ HTML,
     ],
 
     [
+      'h2'     => 'What came over without a fight',
+      'anchor' => 'carried-over',
+      'html'   => <<<'HTML'
+<p>Everything above is about what had to be rebuilt. This is the part that didn’t have to be rethought. A large chunk of this application never cared which framework was drawing it, and that chunk survived as design even though almost none of it survived as text.</p>
+
+<p>Version 2 has a project called <code>ArgoBooks.Core</code>. It is <strong>297 files and 70,918 lines</strong>, about 28% of the C# in the application, and it holds <strong>zero references to Avalonia</strong> or to any other UI framework. The data model, validation, services, file handling and platform abstractions all live in it, and none of it would notice if you compiled it against WinForms instead, or into a console application with no interface at all. 44 non-UI types across the two versions still carry the same names they had in version 1.</p>
+
+<p>The clearest case is the report generator. In version 1 it was 29 files and 17,730 lines: a drag-and-drop layout designer with its own undo and redo stack. It is the most intricate code in the old application, and almost none of what makes it intricate is a framework question. Page geometry, element positioning, the undo stack, template serialisation, PDF export. The framework draws the canvas. It doesn’t decide what a page is.</p>
+
+<p>I want to be precise here, because this is easy to oversell in both directions. Very little of that code survives byte for byte. I rewrote most of it as it came across, because I’m a better programmer now than I was when I first wrote it and it was worth improving while I had it open. But <strong>rewriting because you have got better at the job is a different cost from rewriting because the framework has left you no choice.</strong> The first is optional and you can stop at any point. The second is the migration.</p>
+
+<p>So the honest rule, and the one I’d give anyone scoping this work: the code that ported cleanly is the code that never knew what a <code>Form</code> was. That is also why my nine months is useless to you as a number. The cost isn’t proportional to how large your application is. It’s proportional to how much of your logic is sitting inside your window classes.</p>
+HTML,
+    ],
+
+    [
       'h2'     => 'The full ledger',
       'anchor' => 'numbers',
       'html'   => <<<'HTML'

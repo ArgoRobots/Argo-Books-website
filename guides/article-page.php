@@ -460,6 +460,10 @@ ob_start();
 $body_content = article_expand_code_blocks(ob_get_clean());
 $body_content = article_expand_illustrations(article_apply_link_class(article_prefix_internal_links($body_content)));
 
+// Guides opt into the light/dark toggle. Their stylesheets go through the
+// colour tokens, so the dark palette reaches them without per-rule overrides.
+$theme_toggle = true;
+
 $extra_scripts = '';
 
 // Articles that call argo_code_block() pull in the shared component's styling

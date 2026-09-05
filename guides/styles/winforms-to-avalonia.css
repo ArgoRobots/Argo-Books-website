@@ -238,3 +238,23 @@
     }
 }
 
+
+/* ---------------------------------------------- Screenshot theme swap */
+
+/* Both screenshots ship in both themes so a reader on dark mode is not shown a
+   bright white application. Scoped through .wfa-figure-half because
+   `.article-section .wfa-figure-half img` sets display:block and would
+   otherwise outrank a lone class and show both shots at once. */
+.article-section .wfa-figure-half .wfa-shot-dark {
+    display: none;
+}
+
+[data-theme="dark"] .article-section .wfa-figure-half .wfa-shot-light {
+    display: none;
+}
+
+[data-theme="dark"] .article-section .wfa-figure-half .wfa-shot-dark {
+    display: block;
+    /* Already dark, so it skips the dimming applied to light screenshots. */
+    filter: none;
+}

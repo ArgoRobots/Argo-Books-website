@@ -9,16 +9,21 @@
 // Before-and-after screenshots render only once both files exist, so the page
 // is never published with broken images.
 $shot_dir   = __DIR__ . '/../../resources/images/winforms-to-avalonia/';
-$has_shots  = is_file($shot_dir . 'before-winforms.webp') && is_file($shot_dir . 'after-avalonia.webp');
+$has_shots  = is_file($shot_dir . 'before-winforms.webp')
+           && is_file($shot_dir . 'before-winforms-dark.webp')
+           && is_file($shot_dir . 'after-avalonia.webp')
+           && is_file($shot_dir . 'after-avalonia-dark.webp');
 
 $shots_html = $has_shots ? <<<'HTML'
 <figure class="wfa-figure-pair">
   <div class="wfa-figure-half">
-    <img src="/resources/images/winforms-to-avalonia/before-winforms.webp" alt="Argo Books version 1, the main screen in WinForms" width="2000" height="1198">
+    <img class="wfa-shot-light" src="/resources/images/winforms-to-avalonia/before-winforms.webp" alt="Argo Books version 1, the main screen in WinForms" width="2000" height="1273">
+    <img class="wfa-shot-dark" src="/resources/images/winforms-to-avalonia/before-winforms-dark.webp" alt="" aria-hidden="true" width="2000" height="1273">
     <figcaption><span class="wfa-tag wfa-tag-old">Before</span> Version 1, WinForms, Windows only</figcaption>
   </div>
   <div class="wfa-figure-half">
-    <img src="/resources/images/winforms-to-avalonia/after-avalonia.webp" alt="Argo Books version 2, the dashboard in Avalonia" width="2000" height="1273">
+    <img class="wfa-shot-light" src="/resources/images/winforms-to-avalonia/after-avalonia.webp" alt="Argo Books version 2, the dashboard in Avalonia" width="2000" height="1273">
+    <img class="wfa-shot-dark" src="/resources/images/winforms-to-avalonia/after-avalonia-dark.webp" alt="" aria-hidden="true" width="2000" height="1273">
     <figcaption><span class="wfa-tag wfa-tag-new">After</span> Version 2, Avalonia, Windows and Linux</figcaption>
   </div>
 </figure>

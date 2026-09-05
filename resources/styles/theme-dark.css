@@ -1,0 +1,239 @@
+/* ==========================================
+   DARK THEME
+   Loaded only by pages that opt in through $theme_toggle, currently the
+   guides. Everything below redefines tokens rather than restyling components,
+   because 326 of the 333 colour declarations on these pages already go through
+   var(). Invert the palette and almost all of it follows.
+
+   The grey ramp is used strictly by role on these pages, 50 and 100 for
+   surfaces, 200 for borders, 500 and 600 for muted text, 900 for body text,
+   so inverting it is safe. --white is deliberately NOT inverted: it is also
+   the colour of text sitting on coloured buttons, and flipping it would turn
+   that text dark on a dark blue ground. The handful of rules that use it as a
+   surface are overridden individually at the bottom.
+   ========================================== */
+
+[data-theme="dark"] {
+  /* Tells the browser to render its own furniture dark too: scrollbars, form
+     controls, the space past the end of the page. Without it the horizontal
+     scrollbar under a code block stays light against the dark block. */
+  color-scheme: dark;
+
+  /* Surfaces, darkest first. Not pure black: a near-black with a blue cast
+     matches the palette's Slate hue and is easier to read against. */
+  --light-page-bg: #0b1220;
+  --gray-50: #131c2e;
+  --gray-100: #1a2438;
+  --gray-200: #273349;
+  --gray-300: #35425c;
+
+  /* Text and muted text, walking back up the ramp. */
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;
+  --gray-600: #a9b6c8;
+  --gray-700: #c3cddb;
+  --gray-800: #dbe3ec;
+  --gray-900: #eef2f7;
+  --dark-gray: #eef2f7;
+  --black: #ffffff;
+
+  /* Borders. */
+  --gray-border: #273349;
+  --gray-input-border: #35425c;
+
+  /* Brand. The light-mode blue is too dark to read on a dark ground, so the
+     accent lifts and its "dark" variant becomes the lighter of the pair. */
+  --primary-blue: #7d97ff;
+  --primary-blue-dark: #a8b9ff;
+  --blue-600: #7d97ff;
+
+  /* Tinted backgrounds, rebuilt as low-opacity washes rather than pastels. */
+  --blue-e6f3ff: #1b2a4d;
+  --warm-bg: #2a2114;
+  --yellow-warning-bg: #33280f;
+  --yellow-warning-text: #e8c56a;
+
+  /* Semantic tool tokens. These are defined from the palette in tool.css, but
+     that file's :root wins on order, so they are restated here. */
+  --tool-bg: #0b1220;
+  --tool-surface: #131c2e;
+  --tool-text: #eef2f7;
+  --tool-muted: #94a3b8;
+  --tool-border: #273349;
+  --tool-secondary: #1a2438;
+  --tool-secondary-text: #eef2f7;
+
+  /* Table headers, and the copy button's confirmation state. Found by auditing
+     which tokens still reach an article-page element with no dark value. */
+  --gray-bg-light: #1a2438;
+  --emerald-50: #0f2a1e;
+  --emerald-300: #2f6b4f;
+  --emerald-700: #6ee7b7;
+
+  /* Syntax colours. The light set sits at 600 on the palette, which goes muddy
+     on a dark ground, so these lift to roughly 400. */
+  --sky-600: #56b6f2;
+  --emerald-600: #4ade80;
+  --amber-600: #fbbf24;
+  --purple-600: #c4a4fb;
+}
+
+/* ------------------------------------------------------------------
+   The exceptions: rules that name --white as a surface. --white stays
+   white so text on coloured buttons keeps working, so each of these
+   needs a dark surface of its own.
+   ------------------------------------------------------------------ */
+
+[data-theme="dark"] body,
+[data-theme="dark"] .site-header {
+  background: var(--tool-bg);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .site-header {
+  border-bottom-color: var(--gray-200);
+}
+
+[data-theme="dark"] .article-toc,
+[data-theme="dark"] .code-block,
+[data-theme="dark"] .code-copy,
+[data-theme="dark"] .article-section .wfa-score,
+[data-theme="dark"] .article-section .wfa-repo {
+  background: var(--gray-50);
+}
+
+[data-theme="dark"] .code-block-bar {
+  background: var(--gray-100);
+}
+
+[data-theme="dark"] .code-copy:hover {
+  background: var(--gray-200);
+}
+
+/* Screenshots and diagrams are light images. Dimming them slightly stops them
+   glaring against a dark page, and they return to full strength on hover. */
+[data-theme="dark"] .article-section img {
+  filter: brightness(0.88);
+  transition: filter 0.2s ease;
+}
+
+[data-theme="dark"] .article-section img:hover {
+  filter: none;
+}
+
+/* ------------------------------------------------------------------
+   Sticky header. Article-only for now, because this is the only stylesheet
+   the guides load and nothing else. Move it to tool.css to give the
+   calculators and the invoice generator the same behaviour.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* 28px logo + 14px padding top and bottom + a 1px rule. Anything that has
+     to clear the header reads this rather than repeating the number. */
+  --site-header-h: 57px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* The contents rail parks below the header rather than behind it. */
+@media (min-width: 1280px) {
+  .article-layout .article-toc {
+    top: calc(var(--site-header-h) + 24px);
+  }
+}
+
+/* Jumping to a section from the contents would otherwise land the heading
+   underneath the pinned header. */
+.article-section {
+  scroll-margin-top: calc(var(--site-header-h) + 20px);
+}
+
+/* ------------------------------------------------------------------
+   The theme switch: three segments in a pill, one active.
+   ------------------------------------------------------------------ */
+
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-pill);
+  /* A step darker than the active segment sits on. At --gray-50 the track and
+     the white active pill were four values apart and read as one flat shape. */
+  background: var(--gray-100);
+}
+
+.theme-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  /* --gray-500 on the track was around 4.5:1, thin for a 16px line icon. */
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+/* Hover changes the background as well as the colour. Colour alone is easy to
+   miss on an icon this size, and on the unselected segments there was nothing
+   under the cursor to show it had landed. */
+.theme-option:hover {
+  color: var(--gray-900);
+  background: var(--gray-200);
+}
+
+.theme-option.is-active {
+  background: var(--white);
+  color: var(--gray-900);
+  box-shadow: var(--elevation-xs);
+}
+
+/* --white stays white in dark mode, so the active segment needs its own
+   surface or it would be a white pill on a dark bar. */
+[data-theme="dark"] .theme-option.is-active {
+  background: var(--gray-300);
+}
+
+.theme-option svg {
+  display: block;
+}
+
+.theme-option:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 1px;
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-header-nav {
+  margin-left: auto;
+}
+
+/* Logo swap, driven by the theme attribute rather than the OS. Scoped through
+   .site-brand because tool.css sets `.site-brand img { display: block }`, which
+   outranks a lone class selector and would show both logos at once. */
+.site-brand .site-logo-dark {
+  display: none;
+}
+
+[data-theme="dark"] .site-brand .site-logo-light {
+  display: none;
+}
+
+[data-theme="dark"] .site-brand .site-logo-dark {
+  display: block;
+}

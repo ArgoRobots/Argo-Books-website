@@ -34,7 +34,10 @@
   --hub-surface: var(--gray-50);
   --hub-rule: var(--gray-300);
   --hub-rule-soft: var(--gray-200);
-  --hub-num: var(--gray-500);
+  /* The oversized entry numerals and the arrows are decoration, not reading
+     text, so they keep the muted tone the text tokens gave up. At the body
+     colour they would outshout the headlines they sit beside. */
+  --hub-num: #94a3b8;
   --hub-accent-soft: rgba(125, 151, 255, 0.14);
   --hub-accent-border: rgba(125, 151, 255, 0.42);
 }

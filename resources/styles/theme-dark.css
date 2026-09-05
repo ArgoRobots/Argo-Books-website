@@ -33,11 +33,15 @@
   --gray-200: #273349;
   --gray-300: #35425c;
 
-  /* Text and muted text, walking back up the ramp. */
+  /* Text. No muted grey in dark: metadata, breadcrumbs, the Copy label and the
+     contents rail all take the body colour, so nothing reads as grey. They are
+     not #ffffff, which would leave a caption brighter than the prose above it;
+     hierarchy carries on size and weight instead. 400 keeps its value because
+     nothing on these pages sets text from it. */
   --gray-400: #64748b;
-  --gray-500: #94a3b8;
-  --gray-600: #a9b6c8;
-  --gray-700: #c3cddb;
+  --gray-500: #eef2f7;
+  --gray-600: #eef2f7;
+  --gray-700: #eef2f7;
   --gray-800: #dbe3ec;
   --gray-900: #eef2f7;
   --dark-gray: #eef2f7;

@@ -207,7 +207,8 @@ function ua_rows_for_user(array $files, string $authId, array &$seen, bool &$mat
                 'duration_ms'      => $ev['durationMs'] ?? '',
                 'duration_seconds' => $ev['durationSeconds'] ?? '',
                 'active_seconds'   => $ev['activeSeconds'] ?? '',
-                'last_page'        => $ev['lastPage'] ?? '',
+                // Session ends carry the page quit from; page views carry the page visited.
+                'last_page'        => $ev['lastPage'] ?? $ev['pageName'] ?? '',
                 // CompanyScale counts. Flattened into one column rather than eleven, which
                 // would sit empty on every other row in the file.
                 'file_contents'    => ua_csv_scale($ev),

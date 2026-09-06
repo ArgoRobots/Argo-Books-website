@@ -1142,7 +1142,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const time = new Date(error.timestamp).toLocaleString();
       const category = error.ErrorCategory || "Unknown";
       const code = error.ErrorCode || "—";
-      const message = error.Message || "—";
+      // Errors upload no message by design; the call site's description stands in.
+      const message = error.Message || error.Context || "—";
       let source = "—";
       if (error.SourceFile) {
         source = error.SourceFile;

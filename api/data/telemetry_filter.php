@@ -211,6 +211,10 @@ function filter_telemetry_event(array $event): ?array
                 $out['message'] = telemetry_clean_string($event['message'] ?? null, 300);
             }
 
+            // Written by us at the call site, so it carries the same guarantee as warning
+            // text above. On an error it is often the only field saying what was attempted.
+            $out['context'] = telemetry_clean_string($event['context'] ?? null, 200);
+
             return $out;
 
         case 'Export':

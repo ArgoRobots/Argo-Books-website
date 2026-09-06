@@ -91,6 +91,16 @@ if (!function_exists('ua_describe_event')) {
                 }
                 return ['scale', 'File contents: ' . ($parts ? implode(', ', $parts) : 'empty')];
 
+            case 'PageView':
+                $page = $ev['pageName'] ?? 'Unknown';
+                $bits = [];
+                // Both, because the gap between them is the tell: a long visit with little
+                // active time is someone who walked away, not someone stuck on the screen.
+                if (isset($ev['activeSeconds']))   $bits[] = (int)$ev['activeSeconds'] . 's active';
+                if (isset($ev['durationSeconds'])) $bits[] = (int)$ev['durationSeconds'] . 's open';
+                $suffix = $bits ? ' (' . implode(', ', $bits) . ')' : '';
+                return ['page', "Page: {$page}{$suffix}"];
+
             case 'Export':
                 $type = $ev['exportType'] ?? 'Unknown';
                 $bits = [];
@@ -123,8 +133,12 @@ if (!function_exists('ua_describe_event')) {
 
             case 'Startup':
                 $bits = [];
-                if (isset($ev['toFirstPaintMs'])) $bits[] = 'blank screen ' . (int)$ev['toFirstPaintMs'] . ' ms';
-                if (isset($ev['toReadyMs']))      $bits[] = 'ready ' . (int)$ev['toReadyMs'] . ' ms';
+                // All four phases, so a slow launch says which stage was slow rather than
+                // only that it was. The app records them and the filter keeps them.
+                if (isset($ev['toFirstPaintMs']))      $bits[] = 'blank screen ' . (int)$ev['toFirstPaintMs'] . ' ms';
+                if (isset($ev['toServicesReadyMs']))   $bits[] = 'services ' . (int)$ev['toServicesReadyMs'] . ' ms';
+                if (isset($ev['toViewModelsReadyMs'])) $bits[] = 'view models ' . (int)$ev['toViewModelsReadyMs'] . ' ms';
+                if (isset($ev['toReadyMs']))           $bits[] = 'ready ' . (int)$ev['toReadyMs'] . ' ms';
                 if (array_key_exists('coldStart', $ev)) {
                     $bits[] = $ev['coldStart'] ? 'cold' : 'warm';
                 }

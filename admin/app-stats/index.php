@@ -177,6 +177,7 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             $normalized['SourceFile'] = $event['sourceFile'] ?? '';
             $normalized['LineNumber'] = $event['lineNumber'] ?? null;
             $normalized['MethodName'] = $event['methodName'] ?? '';
+            $normalized['Context'] = $event['context'] ?? '';
             // The app stamps severity from its own LogLevel. Warnings are expected,
             // handled conditions, so they get their own bucket and never reach the
             // Errors tab's charts or details table. Events uploaded before the field

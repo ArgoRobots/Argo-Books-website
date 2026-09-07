@@ -160,7 +160,7 @@ app.ActualThemeVariantChanged += OnSystemThemeChanged;
   </div>
 </div>
 
-<p>That’s the whole argument in one feature. WinForms makes you build the system yourself, in imperative code, forever. Avalonia already has the system, and it’s declarative, so the framework carries what you would otherwise carry by hand.</p>
+<p>WinForms makes you build the system yourself, in imperative code, forever. Avalonia already has the system, and it’s declarative, so the framework carries what you would otherwise carry by hand.</p>
 HTML,
     ],
 
@@ -267,7 +267,7 @@ HTML,
 
 <p>WinForms controls are Win32 window handles drawn with GDI+, sized in pixels. That decision predates high-resolution laptops, 4K monitors, fractional display scaling and the ordinary situation of dragging a window from a 150% laptop screen onto a 100% external monitor. Resolution independence isn’t a feature you can add to that model afterwards. It’s a property the model doesn’t have.</p>
 
-<p>Microsoft has tried, repeatedly, and the attempts are visible in the framework’s own surface area. There are now five DPI awareness modes to choose between:</p>
+<p>Microsoft has tried, repeatedly, and the attempts are visible in the framework’s own code. There are now five DPI awareness modes to choose between:</p>
 
 {{code:csharp:before|WinForms · System.Windows.Forms.HighDpiMode}}
 public enum HighDpiMode

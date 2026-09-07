@@ -26,6 +26,11 @@ $comparisons = [
     ['slug' => 'bonsai-alternatives',             'title' => 'Bonsai alternatives',              'hook' => "One flat price instead of Bonsai's per-user billing."],
     ['slug' => 'gnucash-alternatives',            'title' => 'GnuCash alternatives',             'hook' => 'Local data on both sides, without needing an accounting background.'],
     ['slug' => 'argo-books-vs-spreadsheet',       'title' => 'Argo Books vs Spreadsheets',       'hook' => 'For when Excel stops being enough. Import your file and keep the history.'],
+    // Payroll providers. These compete on a different axis to the accounting
+    // tools above: every one of them bills a base fee plus a fee per employee.
+    ['slug' => 'argo-books-vs-wagepoint',         'title' => 'Argo Books vs Wagepoint',          'hook' => 'Canadian payroll without the per-employee fee. Same deductions, flat price.'],
+    ['slug' => 'quickbooks-payroll-alternatives', 'title' => 'QuickBooks Payroll alternatives',  'hook' => 'Payroll billed on top of a subscription, then per head, against one price.'],
+    ['slug' => 'payworks-alternatives',           'title' => 'Payworks alternatives',            'hook' => 'A quoted service contract, against software you download and run yourself.'],
 ];
 ?>
 <!DOCTYPE html>

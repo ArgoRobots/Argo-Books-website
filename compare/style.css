@@ -333,7 +333,10 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   margin-top: 1px;
   color: var(--white);
-  background: linear-gradient(135deg, var(--primary-blue), var(--purple-500));
+  /* Flat brand blue. This was a blue-to-violet 135deg wash, which put a third
+     hue on the page for no reason: the bullets are not related to the chart's
+     blue-and-red, so the violet read as decoration rather than meaning. */
+  background: var(--primary-blue);
 }
 
 .why-check svg {
@@ -578,9 +581,12 @@ h1, h2, h3, h4, h5, h6 {
   vertical-align: top;
 }
 
-/* Argo Premium header cell reads as the recommended pick */
+/* Marks which column is ours, so the table is scannable. Deliberately a flat
+   brand fill rather than a gradient: a 135deg blue-to-violet wash is the single
+   most recognisable generated-UI signature, and a comparison table only works
+   if the reader believes it. Solid separates the column just as clearly. */
 .comparison-table thead th:nth-child(3) {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--purple-500) 100%);
+  background: var(--primary-blue);
 }
 
 .th-sub {
@@ -652,7 +658,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .check-yes svg {
-  color: var(--green-700);
+  color: var(--green-800);
 }
 
 .check-no {
@@ -662,11 +668,27 @@ h1, h2, h3, h4, h5, h6 {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-round);
-  background: var(--gray-100);
+  background: var(--gray-200);
 }
 
 .check-no svg {
-  color: var(--gray-500);
+  color: var(--gray-700);
+}
+
+/* argo_compare_cell() in compare-lib.php renders any value that is not 'yes' or
+   'no' through this class, and it had no rule anywhere, so a qualified answer
+   ("Worksheet", "Add-on", "Paid tiers") rendered as bare text in a column of
+   icons and read as a table someone forgot to finish. */
+.check-partial {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--gray-200);
+  color: var(--gray-700);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 /* The comparison table header used to stick under the site header while

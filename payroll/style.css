@@ -1,0 +1,862 @@
+/* payroll/style.css
+ *
+ * Styles for /payroll/ only.
+ *
+ * The page shell (.hero, .container, .section-header, .section-label,
+ * .section-desc, .cta-section, .dark-section-wrapper) comes from
+ * resources/styles/marketing-sections.css, the same as every other marketing
+ * page. That is deliberate rather than incidental: the site header is
+ * position:absolute with white nav text until it goes sticky, so a page that
+ * invents its own light hero loses its own navigation.
+ *
+ * What is here is the three things this page has that no other page does: the
+ * pay stub, the headcount calculator, and the T4 box grid. Colours come from
+ * resources/styles/custom-colors.css.
+ */
+
+/* ---------- Hero ----------
+ * The shared .hero centres its content. This one is two columns, so the copy
+ * side is reset to the left and the grid is applied to .hero .container.
+ */
+
+.payroll-page .hero {
+    text-align: left;
+}
+
+.pr-hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+}
+
+.pr-hero-copy .hero-badge svg {
+    color: var(--red);
+}
+
+.pr-hero-copy h1 {
+    font-size: var(--text-6xl);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    color: var(--white);
+}
+
+/* Matches the treatment on the comparison pages so the two read as one site. */
+.payroll-page .hero .text-gradient {
+    background: linear-gradient(135deg, var(--sky-400), var(--purple-300));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.pr-hero-copy .hero-subtitle {
+    margin: 0 0 8px;
+    max-width: 32em;
+    color: var(--white-alpha-90);
+}
+
+.pr-price-line {
+    margin: 16px 0 0;
+    font-size: var(--text-lg);
+    color: var(--white-alpha-90);
+}
+
+.pr-price-line strong {
+    color: var(--white);
+}
+
+.pr-hero-copy .hero-ctas {
+    margin-top: 28px;
+    justify-content: flex-start;
+}
+
+.pr-hero-note {
+    margin: 18px 0 0;
+    font-size: var(--text-sm);
+    color: var(--white-alpha-80);
+}
+
+/* ---------- Pay stub ----------
+ * A light card on the dark hero, so it reads as a document lifted out of the
+ * app rather than as another band of hero.
+ */
+
+.pr-stub {
+    position: relative;
+    z-index: 2;
+    background: var(--white);
+    border-radius: 14px;
+    padding: 26px 28px 20px;
+    box-shadow: 0 30px 60px -30px rgba(2, 6, 23, 0.9);
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-700);
+}
+
+.pr-stub-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.pr-stub-title {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.pr-stub-tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: 4px;
+    padding: 3px 8px;
+}
+
+.pr-stub-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 15px;
+    padding: 9px 0;
+}
+
+.pr-stub-gross {
+    font-weight: 600;
+    color: var(--gray-900);
+    padding-top: 16px;
+}
+
+.pr-stub-deductions {
+    border-left: 2px solid var(--gray-200);
+    padding-left: 14px;
+    margin: 4px 0 4px 2px;
+}
+
+.pr-stub-deductions .pr-stub-row {
+    font-size: 14px;
+    padding: 6px 0;
+    color: var(--gray-600);
+}
+
+.pr-stub-net {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--gray-900);
+    border-top: 1px solid var(--gray-200);
+    margin-top: 8px;
+    padding-top: 14px;
+}
+
+.pr-stub-foot {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--gray-200);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--gray-500);
+}
+
+.pr-stub-foot svg {
+    flex: none;
+    margin-top: 2px;
+    color: var(--emerald-600);
+}
+
+/* ---------- Calculator ---------- */
+
+.pr-cost {
+    padding: clamp(56px, 7vw, 90px) 0;
+    background: var(--white);
+}
+
+.pr-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.pr-calc {
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow: var(--elevation-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
+}
+
+.pr-calc-control {
+    padding: 22px 26px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 16px 22px;
+}
+
+.pr-calc-control label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.pr-calc-input {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--gray-input-border);
+    border-radius: 9px;
+    overflow: hidden;
+    background: var(--white);
+}
+
+.pr-step {
+    width: 38px;
+    border: 0;
+    background: var(--white);
+    color: var(--gray-600);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.pr-step:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.pr-calc-input input[type='number'] {
+    width: 62px;
+    border: 0;
+    border-left: 1px solid var(--gray-200);
+    border-right: 1px solid var(--gray-200);
+    padding: 9px 0;
+    text-align: center;
+    font: inherit;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+    background: var(--white);
+    -moz-appearance: textfield;
+}
+
+.pr-calc-input input[type='number']::-webkit-outer-spin-button,
+.pr-calc-input input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pr-calc-control input[type='range'] {
+    width: 100%;
+    accent-color: var(--primary-blue);
+}
+
+/* The table scrolls inside this, rather than the table itself being made
+   display:block. A block-level table stops containing its own rows, so the rows
+   overflow the viewport and drag the whole document wider with them. */
+.pr-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pr-calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.pr-calc-table thead th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--white);
+}
+
+.pr-calc-table tbody th,
+.pr-calc-table tbody td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+    color: var(--gray-700);
+}
+
+.pr-calc-table tbody th {
+    text-align: left;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.pr-calc-table tbody tr:last-child th,
+.pr-calc-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.pr-num {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.pr-plan {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+
+.pr-limit {
+    display: block;
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 3px;
+}
+
+/* Our own row is marked, not sold. A brand-blue fill with every word in blue
+   reads as a "this is the good one" banner dropped into the table, which is the
+   thing a reader discounts. A neutral tint plus one accent rule marks the row
+   while leaving the numbers to make the argument. */
+.pr-calc-argo {
+    background: var(--gray-50);
+}
+
+.pr-calc-argo th:first-child {
+    box-shadow: inset 3px 0 0 var(--premium-500);
+}
+
+.pr-calc-argo th,
+.pr-calc-argo td {
+    color: var(--gray-900);
+}
+
+.pr-calc-argo [data-cell] {
+    font-weight: 700;
+}
+
+.pr-calc-saving {
+    margin: 0;
+    padding: 20px 24px;
+    background: var(--green-50);
+    border-top: 1px solid var(--gray-200);
+    font-size: 16px;
+    color: var(--green-800);
+}
+
+.pr-calc-saving strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-calc-note {
+    margin: 0;
+    padding: 16px 24px 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-500);
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+}
+
+/* ---------- Deadline ---------- */
+
+.pr-deadline {
+    padding: clamp(56px, 7vw, 90px) 0;
+    background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+}
+
+.pr-deadline-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+}
+
+.pr-deadline .section-label.pr-label-light {
+    color: var(--premium-300);
+}
+
+.pr-deadline h2 {
+    color: var(--white);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.pr-deadline p {
+    margin: 18px 0 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--gray-300);
+}
+
+.pr-check-list {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+}
+
+.pr-check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 15px;
+    color: var(--gray-200);
+}
+
+.pr-check-list svg {
+    flex: none;
+    margin-top: 3px;
+    color: var(--success-green);
+}
+
+/* T4 slip */
+
+.pr-t4 {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 22px;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 30px 60px -30px rgba(2, 6, 23, 0.9);
+}
+
+.pr-t4-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--gray-900);
+}
+
+.pr-t4-head span:first-child {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.pr-t4-year {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+.pr-t4-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--gray-200);
+    border: 1px solid var(--gray-200);
+    margin-top: 16px;
+}
+
+.pr-t4-box {
+    background: var(--white);
+    padding: 11px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pr-t4-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-400);
+}
+
+.pr-t4-label {
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--gray-500);
+}
+
+.pr-t4-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-top: 3px;
+}
+
+.pr-t4-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+.pr-t4-foot svg {
+    flex: none;
+    color: var(--premium-500);
+}
+
+/* ---------- Detail cards ---------- */
+
+.pr-detail {
+    padding: clamp(56px, 7vw, 90px) 0;
+    background: var(--whiteBackground);
+}
+
+.pr-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 20px;
+}
+
+.pr-card {
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 24px;
+    background: var(--white);
+}
+
+.pr-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--premium-50);
+    color: var(--premium-600);
+    margin-bottom: 16px;
+}
+
+.pr-card h3 {
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.pr-card p {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--gray-600);
+}
+
+/* ---------- Honest scope ---------- */
+
+.pr-honest {
+    padding: 0 0 clamp(48px, 6vw, 80px);
+    background: var(--whiteBackground);
+}
+
+.pr-honest-box {
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--gray-400);
+    border-radius: 12px;
+    padding: 30px 32px;
+    background: var(--white);
+}
+
+.pr-honest-box h2 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.pr-honest-box ul {
+    margin: 20px 0 0;
+    padding-left: 20px;
+}
+
+.pr-honest-box li {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--gray-700);
+}
+
+.pr-honest-box li strong {
+    color: var(--gray-900);
+}
+
+.pr-honest-close {
+    margin: 22px 0 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--gray-600);
+}
+
+/* ---------- Comparisons ---------- */
+
+.pr-compare {
+    padding: clamp(56px, 7vw, 90px) 0;
+    background: var(--white);
+}
+
+.pr-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.pr-compare-card {
+    display: block;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 22px 24px;
+    text-decoration: none;
+    background: var(--white);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.pr-compare-card:hover {
+    border-color: var(--premium-300);
+    transform: translateY(-2px);
+}
+
+.pr-compare-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+    line-height: 1.3;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.pr-compare-card h3 svg {
+    flex: none;
+    color: var(--premium-500);
+}
+
+.pr-compare-card p {
+    margin: 9px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--gray-600);
+}
+
+/* ---------- FAQ ---------- */
+
+.pr-faq {
+    padding: 0 0 clamp(56px, 7vw, 90px);
+    background: var(--white);
+}
+
+/* ---------- Close ---------- */
+
+.pr-cta-note {
+    font-size: var(--text-sm) !important;
+    color: var(--white-alpha-80) !important;
+    margin-top: 20px !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+
+    .pr-hero-grid,
+    .pr-deadline-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-calc-control {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Four columns that cannot usefully reflow, so the table keeps a workable
+       width and .pr-table-scroll scrolls it. */
+    .pr-calc-table {
+        min-width: 560px;
+    }
+
+    .pr-calc-table tbody th,
+    .pr-calc-table tbody td,
+    .pr-calc-table thead th {
+        padding: 13px 16px;
+    }
+}
+
+/* The shared .hero steps its own type down on narrow screens, but this page
+   sets its own h1 size, so it has to step down too. Without these the 48px
+   heading is wider than a phone and drags the whole document with it. */
+@media (max-width: 600px) {
+    .payroll-page .hero {
+        padding: 120px 0 60px;
+    }
+
+    .pr-hero-copy h1 {
+        font-size: var(--text-4xl);
+    }
+
+    .pr-hero-copy .hero-subtitle {
+        font-size: var(--text-md);
+    }
+
+    .pr-price-line {
+        font-size: var(--text-md);
+    }
+
+    .pr-deadline h2 {
+        font-size: var(--text-3xl);
+    }
+
+    .pr-stub,
+    .pr-t4 {
+        padding: 20px 18px;
+    }
+}
+
+@media (max-width: 560px) {
+    .pr-t4-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-honest-box {
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .pr-hero-copy h1 {
+        font-size: var(--text-2xl);
+    }
+
+    /* Full-width buttons rather than two that wrap awkwardly at this size. */
+    .pr-hero-copy .hero-ctas .btn-cta {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ---------- Dark theme ----------
+ * Only the surfaces this page introduces. The hero, the deadline band and the
+ * closing block are already dark in both themes, so they need nothing here.
+ */
+
+[data-theme='dark'] .pr-cost,
+[data-theme='dark'] .pr-compare,
+[data-theme='dark'] .pr-faq {
+    background: var(--gray-900);
+}
+
+[data-theme='dark'] .pr-detail,
+[data-theme='dark'] .pr-honest {
+    background: var(--gray-900);
+}
+
+[data-theme='dark'] .pr-calc,
+[data-theme='dark'] .pr-card,
+[data-theme='dark'] .pr-compare-card,
+[data-theme='dark'] .pr-honest-box {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+[data-theme='dark'] .pr-card h3,
+[data-theme='dark'] .pr-compare-card h3,
+[data-theme='dark'] .pr-honest-box h2,
+[data-theme='dark'] .pr-honest-box li strong {
+    color: var(--white);
+}
+
+[data-theme='dark'] .pr-card p,
+[data-theme='dark'] .pr-compare-card p,
+[data-theme='dark'] .pr-honest-close {
+    color: var(--gray-400);
+}
+
+[data-theme='dark'] .pr-honest-box li {
+    color: var(--gray-300);
+}
+
+[data-theme='dark'] .pr-honest-box {
+    border-left-color: var(--gray-500);
+}
+
+[data-theme='dark'] .pr-calc-control,
+[data-theme='dark'] .pr-calc-note {
+    background: var(--gray-900);
+    border-color: var(--gray-700);
+}
+
+[data-theme='dark'] .pr-calc-control label {
+    color: var(--gray-200);
+}
+
+[data-theme='dark'] .pr-calc-input,
+[data-theme='dark'] .pr-calc-input input[type='number'],
+[data-theme='dark'] .pr-step {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+    color: var(--gray-100);
+}
+
+[data-theme='dark'] .pr-step:hover {
+    background: var(--gray-700);
+    color: var(--white);
+}
+
+[data-theme='dark'] .pr-calc-table thead th {
+    background: var(--gray-800);
+    border-bottom-color: var(--gray-700);
+    color: var(--gray-400);
+}
+
+[data-theme='dark'] .pr-calc-table tbody th {
+    color: var(--white);
+}
+
+[data-theme='dark'] .pr-calc-table tbody td {
+    color: var(--gray-300);
+}
+
+[data-theme='dark'] .pr-calc-table tbody th,
+[data-theme='dark'] .pr-calc-table tbody td {
+    border-bottom-color: var(--gray-700);
+}
+
+[data-theme='dark'] .pr-calc-argo {
+    background: var(--gray-900);
+}
+
+[data-theme='dark'] .pr-calc-argo th,
+[data-theme='dark'] .pr-calc-argo td {
+    color: var(--white);
+}
+
+[data-theme='dark'] .pr-calc-saving {
+    background: var(--emerald-800);
+    border-top-color: var(--gray-700);
+    color: var(--emerald-100);
+}
+
+[data-theme='dark'] .pr-card-icon {
+    background: var(--premium-700);
+    color: var(--premium-100);
+}
+
+[data-theme='dark'] .pr-compare-card:hover {
+    border-color: var(--premium-400);
+}

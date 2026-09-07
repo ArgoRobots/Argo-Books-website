@@ -363,3 +363,49 @@ function _convert_fixed_fee_to_currency($amountCAD, $currency) {
     }
 }
 
+
+/**
+ * The payroll providers from competitors.json, in file order.
+ *
+ * Payroll vendors price differently from the accounting tools: a monthly base
+ * fee plus a fee per employee per month. That second axis is the whole argument
+ * on /payroll/, so it needs its own accessor rather than being filtered out of
+ * get_competitors() at each call site.
+ *
+ * @return array Slug => competitor entry, for entries marked "category":"payroll"
+ */
+function get_payroll_competitors() {
+    static $payroll = null;
+
+    if ($payroll !== null) {
+        return $payroll;
+    }
+
+    $payroll = [];
+    foreach (get_competitors() as $slug => $brand) {
+        if (($brand['category'] ?? '') === 'payroll') {
+            $payroll[$slug] = $brand;
+        }
+    }
+    return $payroll;
+}
+
+/**
+ * What a payroll provider's plan costs per month for a given headcount.
+ *
+ * base + (per-employee fee x employees). Returns null when the plan is unknown,
+ * so a caller can drop a row rather than print a zero that reads as "free".
+ *
+ * @param string $competitor Slug from competitors.json
+ * @param string $plan       Plan key within that competitor
+ * @param int    $employees  Headcount
+ * @return float|null Monthly cost, or null if the plan isn't defined
+ */
+function payroll_monthly_cost($competitor, $plan, $employees) {
+    $plans = get_competitors()[$competitor]['plans'] ?? [];
+    if (!isset($plans[$plan])) {
+        return null;
+    }
+    $p = $plans[$plan];
+    return (float) ($p['monthly'] ?? 0) + ((float) ($p['per_employee'] ?? 0) * max(0, (int) $employees));
+}

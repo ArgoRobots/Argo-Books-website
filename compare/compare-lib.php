@@ -19,6 +19,11 @@ function argo_compare_index(): array
         'argo-books-vs-freshbooks'     => 'Argo Books vs. FreshBooks',
         'argo-books-vs-xero'           => 'Argo Books vs. Xero',
         'argo-books-vs-spreadsheet'    => 'Argo Books vs. spreadsheets',
+        // Payroll providers. Priced per employee rather than per plan, so they
+        // are compared on /payroll/ as well as here.
+        'argo-books-vs-wagepoint'          => 'Argo Books vs. Wagepoint',
+        'quickbooks-payroll-alternatives'  => 'QuickBooks Payroll alternatives',
+        'payworks-alternatives'            => 'Payworks alternatives',
         'bonsai-alternatives'          => 'Bonsai alternatives',
         'gnucash-alternatives'         => 'GnuCash alternatives',
         'honeybook-alternatives'       => 'HoneyBook alternatives',

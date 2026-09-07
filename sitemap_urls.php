@@ -56,6 +56,10 @@ function sitemap_build_urls(): array
         ['/downloads/',      'downloads/index.php',      '1.0', 'weekly'],
         ['/features/',       'features/index.php',       '0.9', 'monthly'],
         ['/pricing/',        'pricing/index.php',        '0.9', 'monthly'],
+        // Its own landing page rather than a stop on the feature tour: this is
+        // the destination for payroll search and payroll video, and it targets
+        // a different buyer to the rest of the site.
+        ['/payroll/',        'payroll/index.php',        '0.9', 'monthly'],
         ['/documentation/',  'documentation/index.php',  '0.9', 'weekly'],
         ['/integrations/',   'integrations/index.php',   '0.9', 'monthly'],
         ['/about-us/',       'about-us/index.php',       '0.9', 'monthly'],

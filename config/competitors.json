@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load.",
+  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load. Entries with \"category\": \"payroll\" are payroll providers rather than accounting tools: they carry a per_employee fee alongside the monthly base, and /payroll/ multiplies the two out by headcount. Their prices are not published as cleanly as the accounting vendors', so each one carries a VERIFY note naming the page to check.",
   "quickbooks": {
     "name": "QuickBooks",
     "currency": "CAD",
@@ -298,6 +298,75 @@
     "converted_from": "USD",
     "exchange_rate": 1.40315,
     "rate_checked": "2026-08-01"
+  },
+  "wagepoint": {
+    "name": "Wagepoint",
+    "currency": "CAD",
+    "category": "payroll",
+    "_note": "VERIFY against wagepoint.com/pricing before relying on these. Canadian payroll provider, cloud only, priced as a monthly base fee plus a per-employee fee. Solo is capped at one pay run a month. Figures from a 2026 third-party CPA review, not the vendor page.",
+    "plans": {
+      "solo": {
+        "label": "Solo",
+        "monthly": 20,
+        "per_employee": 4,
+        "_limit": "one pay run a month"
+      },
+      "unlimited": {
+        "label": "Unlimited",
+        "monthly": 40,
+        "per_employee": 6
+      }
+    }
+  },
+  "quickbooks-payroll": {
+    "name": "QuickBooks Payroll",
+    "currency": "CAD",
+    "category": "payroll",
+    "_note": "VERIFY against quickbooks.intuit.com/ca/payroll/ before relying on these. Canadian edition, sold as an add-on on top of a QuickBooks Online subscription, so the real monthly cost is this plus the QuickBooks plan itself. Figures from a 2026 third-party review, not the vendor page.",
+    "plans": {
+      "solo": {
+        "label": "Payroll Solo",
+        "monthly": 20,
+        "per_employee": 4,
+        "_limit": "one pay run a month"
+      },
+      "unlimited": {
+        "label": "Payroll Unlimited",
+        "monthly": 40,
+        "per_employee": 6
+      }
+    }
+  },
+  "payworks": {
+    "name": "Payworks",
+    "currency": "CAD",
+    "category": "payroll",
+    "_note": "VERIFY against payworks.ca before relying on these. Canadian workforce-management provider aimed at small and mid-sized employers; quotes are usually given per client rather than published, so treat the base fee as approximate. Figures from a 2026 third-party review.",
+    "plans": {
+      "payroll": {
+        "label": "Payroll",
+        "monthly": 21,
+        "per_employee": 2
+      }
+    }
+  },
+  "knit": {
+    "name": "Knit",
+    "currency": "CAD",
+    "category": "payroll",
+    "_note": "VERIFY against knitpeople.com/pricing before relying on these. Canadian payroll and HR provider. Figures from a 2026 third-party review, not the vendor page.",
+    "plans": {
+      "lite": {
+        "label": "Lite",
+        "monthly": 39,
+        "per_employee": 6
+      },
+      "complete": {
+        "label": "Complete",
+        "monthly": 39,
+        "per_employee": 8
+      }
+    }
   },
   "gnucash": {
     "name": "GnuCash",

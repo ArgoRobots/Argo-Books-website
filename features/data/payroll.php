@@ -14,13 +14,13 @@ $argo_yearly = (int) get_pricing_config()['premium_yearly_price'];
 return [
     'breadcrumb' => 'Payroll',
     'title' => 'Payroll for Canadian Businesses | Argo Books',
-    'meta_description' => 'Run Canadian payroll in Argo Books. CPP, EI and income tax worked out from the CRA\'s own tables for every province, pay stubs for your staff, and T4, RL-1 and ROE paperwork at year end.',
+    'meta_description' => 'Run Canadian payroll in Argo Books. CPP, EI and income tax worked out from the CRA\'s own tables for every province, pay stubs for your staff, and T4s at year end, plus worksheets for the Quebec RL-1 and the Record of Employment.',
     'meta_keywords' => 'Canadian payroll software, small business payroll Canada, CPP EI calculator, T4 software, payroll deductions Canada, RL-1 Quebec payroll, record of employment, desktop payroll software, T4 XML filing',
     'og_title' => 'Payroll for Canadian Businesses | Argo Books',
     'og_description' => 'Pay your staff without a separate payroll service. CPP, EI and income tax from the CRA\'s own tables, pay stubs, and T4s at year end.',
     'offer_price' => $argo_monthly,
     'offer_description' => 'Payroll is included with Premium at $' . $argo_monthly . '/month. Free plan available for the rest of Argo Books.',
-    'feature_list' => 'Canadian payroll deductions, Pay stubs, T4 slips and XML, RL-1 slips for Quebec, Record of Employment worksheet',
+    'feature_list' => 'Canadian payroll deductions, Pay stubs, T4 slips and XML, RL-1 worksheet for Quebec, Record of Employment worksheet',
 
     'h1' => 'Pay your staff,<br>without a payroll service.',
     'hero_sub' => 'Argo Books works out CPP, EI and income tax from the CRA\'s own tables, prints the pay stubs, posts the wages to your books, and has your T4s ready in January.',
@@ -77,10 +77,10 @@ return [
             'flip' => true,
             'eyebrow' => 'Year end',
             'h2' => 'Nothing to add up in January',
-            'lede' => 'The slips are built from the pay runs you already approved, so there is no year to reassemble: T4s as PDFs to hand out and as the XML file the CRA accepts, and RL-1 slips for Quebec staff from the same screen. You still upload the file and make the payment yourself.',
+            'lede' => 'The slips are built from the pay runs you already approved, so there is no year to reassemble: T4s as PDFs to hand out and as the XML file the CRA accepts, and an RL-1 worksheet for Quebec staff from the same screen. You still upload the file and make the payment yourself.',
             'list' => [
                 'T4 slips and summary as PDFs, plus the CRA\'s XML with its transmittal record',
-                'RL-1 slips and summary for Quebec employees',
+                'An RL-1 worksheet and summary for Quebec staff, to key into My Account',
                 'Amendments and cancellations chosen per employee, not all or nothing',
                 'A Record of Employment worksheet when somebody leaves',
             ],
@@ -125,7 +125,7 @@ return [
     'faqs' => [
     [
         'q' => 'Which provinces and territories does payroll cover?',
-        'a' => 'All of them. Argo Books calculates federal and provincial income tax, CPP and EI for every province and territory, and Quebec is handled through its own system: QPP, QPIP, Quebec income tax and the federal abatement, with RL-1 slips at year end. Payroll is Canada only, so it cannot pay staff in the United States or anywhere else.',
+        'a' => 'All of them. Argo Books calculates federal and provincial income tax, CPP and EI for every province and territory, and Quebec is handled through its own system: QPP, QPIP, Quebec income tax and the federal abatement, and an RL-1 worksheet at year end. Payroll is Canada only, so it cannot pay staff in the United States or anywhere else.',
     ],
     [
         'q' => 'Is payroll included in the Free plan?',

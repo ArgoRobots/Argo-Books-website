@@ -72,7 +72,7 @@ return [
         '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month, less than Wave Pro at $' . $wave_pro,
-        '<strong>Canadian payroll included</strong> in that price: CPP, EI, T4s and RL-1s, where Wave charges for payroll separately',
+        '<strong>Canadian payroll included</strong> in that price: CPP, EI and T4s, where Wave charges for payroll separately',
     ],
     'argo_cons' => [
         'No automatic bank transaction import yet',

@@ -55,7 +55,11 @@ return [
     'table_rows' => [
         ['CPP, EI &amp; income tax from CRA tables', 'no', 'yes', 'yes'],
         ['Every province and territory', 'no', 'yes', 'yes'],
-        ['Quebec (QPP, QPIP, RL-1)', 'no', 'yes', 'yes'],
+        ['Quebec deductions (QPP, QPIP)', 'no', 'yes', 'yes'],
+        // Revenu Quebec accepts a software-printed RL-1 only from software it has
+        // certified, and requires XML above five slips. Argo Books produces the
+        // figures on a worksheet; it cannot file them.
+        ['RL-1 slips filed with Revenu Quebec', 'no', 'no', 'yes'],
         ['Pay stubs', 'no', 'yes', 'yes'],
         ['T4 slips &amp; summary (PDF)', 'no', 'yes', 'yes'],
         ['T4 XML for CRA filing', 'no', 'yes', 'yes'],
@@ -101,7 +105,7 @@ return [
     'key_cards' => [
         ['tone' => '', 'icon' => 'users', 'h3' => 'Flat, not per head', 'p' => 'Wagepoint Unlimited is $' . $wp_unl_base . ' plus $' . $wp_unl_per . ' per employee a month. Argo Books is $' . $argo_monthly . ' with no headcount component, so the gap widens with every hire.'],
         ['tone' => 'purple', 'icon' => 'lock', 'h3' => 'Records stay local', 'p' => 'Payroll holds the most sensitive data in a business. Argo Books writes it to your own computer instead of uploading it to a provider.'],
-        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement, calculated separately rather than approximated, with RL-1 slips at year end.'],
+        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement, calculated separately rather than approximated, and the RL-1 figures worked out at year end.'],
     ],
 
     'honest' => [
@@ -122,7 +126,7 @@ return [
                             <p>At five employees on Wagepoint Unlimited the difference is roughly $' . number_format($wp_gap_year) . ' a year. Use the calculator on our <a href="../../payroll/">payroll page</a> with your own headcount.</p>'],
         ['q_html' => 'Does Argo Books file T4s with the CRA like Wagepoint does?', 'a_html' => '<p>No, and this is the main thing to weigh. Argo Books prepares the T4 slips and summary as PDFs and builds the XML submission file the CRA accepts, including the T619 transmittal record. You upload that file through My Business Account and you make the remittance yourself.</p>
                             <p>Wagepoint files and remits on your behalf. If having somebody else responsible for the February deadline is worth the per-employee fee to you, that is a fair reason to choose Wagepoint.</p>'],
-        ['q_html' => 'Does Argo Books handle Quebec payroll?', 'a_html' => '<p>Yes. Quebec administers its own income tax, pension plan and parental insurance, so it is a separate calculation rather than a variation on the federal one. Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement, and produces RL-1 slips and summary at year end. Staff in different provinces can appear on the same pay run.</p>'],
+        ['q_html' => 'Does Argo Books handle Quebec payroll?', 'a_html' => '<p>Yes. Quebec administers its own income tax, pension plan and parental insurance, so it is a separate calculation rather than a variation on the federal one. Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement, and works out the RL-1 figures at year end. Staff in different provinces can appear on the same pay run.</p>'],
         ['q_html' => 'What happens when the CRA changes the rates?', 'a_html' => '<p>Nothing on your side. New tables take effect on 1 January and 1 July each year, and Argo Books fetches the edition covering a pay date the first time it needs it. There is no update to install.</p>
                             <p>If it cannot get that edition it says so and refuses to calculate, rather than quietly using the previous period\'s figures. A wrong deduction is the kind of error nothing downstream catches.</p>'],
         ['q_html' => 'Can I switch from Wagepoint mid-year?', 'a_html' => '<p>You can, but be careful about it. Your year-to-date figures have to carry across correctly or the T4s will be wrong at year end, so the safest points are the start of a calendar year or the start of a quarter.</p>

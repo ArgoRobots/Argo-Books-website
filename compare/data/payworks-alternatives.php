@@ -52,7 +52,11 @@ return [
     'table_rows' => [
         ['CPP, EI &amp; income tax from CRA tables', 'no', 'yes', 'yes'],
         ['Every province and territory', 'no', 'yes', 'yes'],
-        ['Quebec (QPP, QPIP, RL-1)', 'no', 'yes', 'yes'],
+        ['Quebec deductions (QPP, QPIP)', 'no', 'yes', 'yes'],
+        // Revenu Quebec accepts a software-printed RL-1 only from software it has
+        // certified, and requires XML above five slips. Argo Books produces the
+        // figures on a worksheet; it cannot file them.
+        ['RL-1 slips filed with Revenu Quebec', 'no', 'no', 'yes'],
         ['Pay stubs', 'no', 'yes', 'yes'],
         ['T4 slips &amp; summary (PDF)', 'no', 'yes', 'yes'],
         ['T4 XML for CRA filing', 'no', 'yes', 'yes'],
@@ -99,7 +103,7 @@ return [
     'key_cards' => [
         ['tone' => '', 'icon' => 'users', 'h3' => 'Where the base fee bites', 'p' => 'On a two-person payroll, most of a managed service\'s bill is the base fee rather than the work. That is the size where a flat software price makes the clearest difference.'],
         ['tone' => 'purple', 'icon' => 'document-lines', 'h3' => 'Nothing to negotiate', 'p' => 'A published price means you can compare without a call, a quote or a discovery process. Download it and run a pay period you already know the answer to.'],
-        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement calculated separately, with RL-1 slips and summary at year end.'],
+        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement calculated separately, and the RL-1 figures worked out at year end.'],
     ],
 
     'honest' => [
@@ -122,7 +126,7 @@ return [
                             <p>Payworks is a service: it does the remitting and the filing for you. That is the difference the price reflects.</p>'],
         ['q_html' => 'I only pay two people. Is a payroll service worth it?', 'a_html' => '<p>That is the size where it is worth doing the arithmetic. On a two-person payroll most of a managed service\'s monthly bill is the base fee rather than anything to do with the work, and the actual task is a calculation, a pay stub and a remittance on a known date.</p>
                             <p>If you are comfortable making that payment yourself, software is a reasonable answer at that size. If payroll is the thing you most want off your desk, it is not.</p>'],
-        ['q_html' => 'Does Argo Books handle Quebec?', 'a_html' => '<p>Yes. Quebec administers its own income tax, pension plan and parental insurance, so Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement separately from the federal system, and produces RL-1 slips and summary at year end. One pay run can include staff in different provinces.</p>'],
+        ['q_html' => 'Does Argo Books handle Quebec?', 'a_html' => '<p>Yes. Quebec administers its own income tax, pension plan and parental insurance, so Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement separately from the federal system, and works out the RL-1 figures at year end. One pay run can include staff in different provinces.</p>'],
         ['q_html' => 'What about time tracking and scheduling?', 'a_html' => '<p>Argo Books does not do either. Payworks does, and if your crew\'s hours come from a scheduling system that feeds payroll directly, that integration is worth real money and Argo Books will not replace it.</p>
                             <p>Argo Books takes hours as an entry on the pay run, which suits a small team whose hours you already know.</p>'],
         ['q_html' => 'Can I try it before committing?', 'a_html' => '<p>Yes, and it is the right way to evaluate any payroll change. Download Argo Books free, add your people, and enter a pay period you have already run through Payworks. Compare the deductions line by line. Payroll is the one category where a feature list tells you nothing and a matching net pay figure tells you everything.</p>'],

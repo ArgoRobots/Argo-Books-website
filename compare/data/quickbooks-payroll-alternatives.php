@@ -44,7 +44,7 @@ return [
     'why_list' => [
         '<strong>One charge instead of three.</strong> Books, payroll and headcount are a single $' . $argo_monthly . ' CAD a month, rather than a subscription plus an add-on plus a per-person fee.',
         '<strong>Roughly $' . number_format($qb_gap_year) . ' a year less at five employees</strong>, on QuickBooks\' own published rates for the cheapest plans that do the job.',
-        '<strong>Quebec handled as its own system.</strong> QPP, QPIP, Quebec income tax and the federal abatement, with RL-1 slips, rather than an approximation of the federal calculation.',
+        '<strong>Quebec handled as its own system.</strong> QPP, QPIP, Quebec income tax and the federal abatement, rather than an approximation of the federal calculation.',
         '<strong>Your staff records stay on your computer.</strong> Social insurance numbers and salaries are written locally instead of held in a cloud account.',
         '<strong>No price creep.</strong> The pattern people leave QuickBooks over is the annual increase on a plan they are already deep into. A flat desktop price is a different arrangement.',
     ],
@@ -57,7 +57,11 @@ return [
     'table_rows' => [
         ['CPP, EI &amp; income tax from CRA tables', 'no', 'yes', 'yes'],
         ['Every province and territory', 'no', 'yes', 'yes'],
-        ['Quebec (QPP, QPIP, RL-1)', 'no', 'yes', 'yes'],
+        ['Quebec deductions (QPP, QPIP)', 'no', 'yes', 'yes'],
+        // Revenu Quebec accepts a software-printed RL-1 only from software it has
+        // certified, and requires XML above five slips. Argo Books produces the
+        // figures on a worksheet; it cannot file them.
+        ['RL-1 slips filed with Revenu Quebec', 'no', 'no', 'yes'],
         ['Pay stubs', 'no', 'yes', 'yes'],
         ['T4 slips &amp; summary (PDF)', 'no', 'yes', 'yes'],
         ['T4 XML for CRA filing', 'no', 'yes', 'yes'],
@@ -104,7 +108,7 @@ return [
     'key_cards' => [
         ['tone' => '', 'icon' => 'subscription', 'h3' => 'One line, not three', 'p' => 'Books, payroll and headcount are the same $' . $argo_monthly . ' a month in Argo Books. There is no add-on to enable and no plan tier tied to how many people you employ.'],
         ['tone' => 'purple', 'icon' => 'users', 'h3' => 'Hiring is free', 'p' => 'At $' . $qbp_per . ' per employee a month, taking on four people adds about $' . number_format($qbp_per * 4 * 12) . ' a year to a QuickBooks bill. In Argo Books it adds nothing.'],
-        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement calculated separately, with RL-1 slips and summary at year end.'],
+        ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement calculated separately, and the RL-1 figures worked out at year end.'],
     ],
 
     'honest' => [
@@ -130,7 +134,7 @@ return [
                             <p>QuickBooks does file and remit on your behalf. That is a real difference and it is the main reason to stay.</p>'],
         ['q_html' => 'Can I move my QuickBooks data into Argo Books?', 'a_html' => '<p>Partly. Argo Books imports spreadsheets with AI-assisted column matching, so customers, products, and transaction history exported from QuickBooks as CSV can be brought across. Payroll year-to-date figures are the part to be careful with: they have to carry over exactly or your T4s will be wrong at year end.</p>
                             <p>Because of that, the safest time to switch payroll is the start of a calendar year.</p>'],
-        ['q_html' => 'Does Argo Books handle Quebec?', 'a_html' => '<p>Yes. Quebec runs its own income tax, pension plan and parental insurance, so Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement as a separate system, and produces RL-1 slips and summary at year end. Employees in different provinces can sit on the same pay run.</p>'],
+        ['q_html' => 'Does Argo Books handle Quebec?', 'a_html' => '<p>Yes. Quebec runs its own income tax, pension plan and parental insurance, so Argo Books calculates QPP, QPIP, Quebec income tax and the federal abatement as a separate system, and works out the RL-1 figures at year end. Employees in different provinces can sit on the same pay run.</p>'],
         ['q_html' => 'What about bank feeds?', 'a_html' => '<p>QuickBooks has automatic bank transaction import and Argo Books does not yet. What Argo Books has is AI-assisted bank statement import, so you bring the statement in as a file rather than connecting the account.</p>
                             <p>If automatic feeds are central to how you work, that is a genuine reason to stay with QuickBooks.</p>'],
     ],

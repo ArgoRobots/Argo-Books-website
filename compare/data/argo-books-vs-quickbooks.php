@@ -75,7 +75,7 @@ return [
         '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month with no upsells or yearly hikes',
-        '<strong>Canadian payroll included</strong> in that price: CPP, EI, T4s and RL-1s, with no per-employee fee',
+        '<strong>Canadian payroll included</strong> in that price: CPP, EI and T4s, with no per-employee fee',
     ],
     'argo_cons' => [
         'Payroll covers Canada only, so QuickBooks is the better fit if you pay staff elsewhere',
@@ -136,7 +136,7 @@ return [
                             <p>QuickBooks does not offer a free plan. Pricing starts at $' . $qb_easystart . ' CAD/month after a limited trial.</p>'],
         ['q_html' => 'Does Argo Books work offline?', 'a_html' => '<p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
                             <p>QuickBooks Online requires a constant internet connection to access your data.</p>'],
-        ['q_html' => 'Does Argo Books support payroll or tax filing?', 'a_html' => '<p>Payroll, yes, for Canada. Premium works out CPP, EI and income tax for every province and territory, prints the pay stubs, and prepares your T4 slips and the CRA\'s XML file at year end, plus RL-1 slips for Quebec staff. It does not pay staff outside Canada, and it does not file or remit on your behalf: you upload the file and make the payment. Integrated tax filing is still something QuickBooks does and Argo Books does not.</p>
+        ['q_html' => 'Does Argo Books support payroll or tax filing?', 'a_html' => '<p>Payroll, yes, for Canada. Premium works out CPP, EI and income tax for every province and territory, prints the pay stubs, and prepares your T4 slips and the CRA\'s XML file at year end, plus an RL-1 worksheet for Quebec staff. It does not pay staff outside Canada, and it does not file or remit on your behalf: you upload the file and make the payment. Integrated tax filing is still something QuickBooks does and Argo Books does not.</p>
                             <p>We\'re always adding new features based on user feedback.</p>'],
         ['q_html' => 'How does Argo Books pricing compare to QuickBooks?', 'a_html' => '<p>Argo Books is dramatically more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$' . $argo_monthly . ' CAD/month</strong>. QuickBooks starts at $' . $qb_easystart . ' CAD/month for EasyStart and goes up to $' . $qb_advanced . '/month for Advanced, and that\'s before add-ons like payroll.</p>
                             <p>Argo Books has no hidden fees or client limits.</p>'],

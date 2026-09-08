@@ -337,7 +337,7 @@ $faqs = [
                     <ul class="pr-check-list">
                         <li><?= svg_icon('check', 15) ?> T4 slips and summary as PDFs to hand out</li>
                         <li><?= svg_icon('check', 15) ?> The CRA's XML submission, with its T619 transmittal record</li>
-                        <li><?= svg_icon('check', 15) ?> RL-1 slips and summary for Quebec employees</li>
+                        <li><?= svg_icon('check', 15) ?> Quebec RL-1 figures worked out on a worksheet to re-key</li>
                         <li><?= svg_icon('check', 15) ?> Amendments and cancellations chosen per employee</li>
                     </ul>
                 </div>
@@ -377,7 +377,7 @@ $faqs = [
                         <h3>Quebec is a second system, not a variation</h3>
                         <p>
                             Quebec runs its own income tax, pension plan and parental insurance. Argo Books calculates QPP,
-                            QPIP, Quebec income tax and the federal abatement separately, and produces RL-1 slips. Staff in
+                            QPIP, Quebec income tax and the federal abatement separately, and works the RL-1 figures out for you. Staff in
                             different provinces can sit on the same pay run.
                         </p>
                     </article>
@@ -437,6 +437,7 @@ $faqs = [
                         <li><strong>You pay staff outside Canada.</strong> Payroll is Canada only. It cannot run a US or overseas payroll, and it is not going to.</li>
                         <li><strong>You want the filing and the remittance done for you.</strong> Argo Books prepares the slips and the XML and tells you what is owed and when. You upload it and you pay it. A full-service provider does both, and that is worth money to some businesses.</li>
                         <li><strong>You need direct deposit run from the payroll tool.</strong> Argo Books works out the pay and records it. Moving the money is still your bank.</li>
+                        <li><strong>You file RL-1 slips in Quebec.</strong> The deductions are worked out and the RL-1 figures are put on a worksheet, but Revenu Qu&eacute;bec accepts a printed slip only from software it has certified, and requires XML above five slips. Neither exists here, so the Quebec slips are keyed into My Account by hand.</li>
                         <li><strong>You are on macOS.</strong> Windows and Linux today. A Mac build is not out yet.</li>
                     </ul>
                     <p class="pr-honest-close">

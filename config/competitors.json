@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load. Entries with \"category\": \"payroll\" are payroll providers rather than accounting tools: they carry a per_employee fee alongside the monthly base, and /payroll/ multiplies the two out by headcount. Their prices are not published as cleanly as the accounting vendors', so each one carries a VERIFY note naming the page to check.",
+  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. Everything is CAD per month. Where a vendor publishes in USD the entry carries converted_from, exchange_rate and rate_checked, plus usd_ fields holding the vendor's own figures; the CAD number is those converted and rounded. Re-derive the CAD values if the rate moves materially. Update a price and every page referencing it via competitor_price() or {placeholder} updates on the next page load. Entries with \"category\": \"payroll\" are payroll providers rather than accounting tools: they carry a per_employee fee alongside the monthly base, and /payroll/ multiplies the two out by headcount. Their prices are not published as cleanly as the accounting vendors', so each one carries a VERIFY note naming the page to check. Currency: all four payroll vendors are Canada-only products selling Canadian payroll, so their published figures are CAD. None of the four pages says so explicitly, which is worth knowing before anyone re-checks and worries. Treating them as CAD is also the conservative reading: if any turned out to be USD we would be understating a competitor, not overstating one.",
   "quickbooks": {
     "name": "QuickBooks",
     "currency": "CAD",
@@ -303,7 +303,7 @@
     "name": "Wagepoint",
     "currency": "CAD",
     "category": "payroll",
-    "_note": "VERIFY against wagepoint.com/pricing before relying on these. Canadian payroll provider, cloud only, priced as a monthly base fee plus a per-employee fee. Solo is capped at one pay run a month. Figures from a 2026 third-party CPA review, not the vendor page.",
+    "_note": "Checked against wagepoint.com/pricing on 2026-09-07. CAD: Wagepoint serves Canada only, in their own words, so there is no other currency it could be. Cloud only, priced as a monthly base fee plus a per-employee fee. Solo is capped at one pay run a month.",
     "plans": {
       "solo": {
         "label": "Solo",
@@ -322,18 +322,22 @@
     "name": "QuickBooks Payroll",
     "currency": "CAD",
     "category": "payroll",
-    "_note": "VERIFY against quickbooks.intuit.com/ca/payroll/ before relying on these. Canadian edition, sold as an add-on on top of a QuickBooks Online subscription, so the real monthly cost is this plus the QuickBooks plan itself. Figures from a 2026 third-party review, not the vendor page.",
+    "_note": "Checked against quickbooks.intuit.com/ca/payroll/ on 2026-09-07. Canadian edition. Sold as a bundle with QuickBooks Online rather than as a separate add-on, so these are the whole monthly cost of the books and payroll together, which is what Argo Books Premium is compared against. Regular prices, NOT the promotional rate: the page advertises 90% off for six months, and a six-month discount is not what a comparison should quote. Standalone payroll without QuickBooks Online also exists and is not covered here.",
     "plans": {
-      "solo": {
-        "label": "Payroll Solo",
-        "monthly": 20,
-        "per_employee": 4,
-        "_limit": "one pay run a month"
+      "core-easystart": {
+        "label": "Payroll Core + EasyStart",
+        "monthly": 60,
+        "per_employee": 5
       },
-      "unlimited": {
-        "label": "Payroll Unlimited",
-        "monthly": 40,
-        "per_employee": 6
+      "core-essentials": {
+        "label": "Payroll Core + Essentials",
+        "monthly": 100,
+        "per_employee": 5
+      },
+      "premium-plus": {
+        "label": "Payroll Premium + Plus",
+        "monthly": 165,
+        "per_employee": 8
       }
     }
   },
@@ -354,16 +358,16 @@
     "name": "Knit",
     "currency": "CAD",
     "category": "payroll",
-    "_note": "VERIFY against knitpeople.com/pricing before relying on these. Canadian payroll and HR provider. Figures from a 2026 third-party review, not the vendor page.",
+    "_note": "Checked against knitpeople.com/pricing on 2026-09-07. Canadian payroll and HR provider.",
     "plans": {
       "lite": {
         "label": "Lite",
-        "monthly": 39,
+        "monthly": 40,
         "per_employee": 6
       },
       "complete": {
         "label": "Complete",
-        "monthly": 39,
+        "monthly": 50,
         "per_employee": 8
       }
     }

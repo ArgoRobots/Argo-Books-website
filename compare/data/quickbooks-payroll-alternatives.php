@@ -4,9 +4,10 @@
 // Content for /compare/quickbooks-payroll-alternatives/. Layout lives in
 // compare/compare-page.php; the price chart in compare/mockups/.
 //
-// QuickBooks Payroll is an add-on, so every figure here is the Online plan plus
-// the payroll base plus the per-employee fee. The payroll line alone
-// understates it.
+// QuickBooks sells the books and payroll as one bundle, so the figures here are a
+// bundle price plus the per-employee fee. An earlier version of this page added an
+// Online plan to a separate payroll plan and overstated them by $15 a month at five
+// staff, which is the direction that gets a comparison page called out.
 
 if (!defined('ARGO_TEMPLATE_RENDER')) {
     http_response_code(404);
@@ -14,15 +15,15 @@ if (!defined('ARGO_TEMPLATE_RENDER')) {
 }
 
 // Also read by compare/mockups/quickbooks-payroll-alternatives.php.
-$qbo_base    = competitor_price('quickbooks', 'easystart');
-$qbp_base    = competitor_price('quickbooks-payroll', 'unlimited');
-$qbp_per     = get_competitors()['quickbooks-payroll']['plans']['unlimited']['per_employee'];
-$qbp_solo    = competitor_price('quickbooks-payroll', 'solo');
-$qbp_solo_pr = get_competitors()['quickbooks-payroll']['plans']['solo']['per_employee'];
+// The cheapest bundle that includes payroll, which is the like-for-like comparison:
+// Argo Books Premium is also the books and payroll together.
+$qbp_base    = competitor_price('quickbooks-payroll', 'core-easystart');
+$qbp_per     = get_competitors()['quickbooks-payroll']['plans']['core-easystart']['per_employee'];
+$qbp_top     = competitor_price('quickbooks-payroll', 'premium-plus');
+$qbp_top_per = get_competitors()['quickbooks-payroll']['plans']['premium-plus']['per_employee'];
 
-// The whole stack at five people: books plus payroll plus headcount.
-$qb_stack_five = $qbo_base + payroll_monthly_cost('quickbooks-payroll', 'unlimited', 5);
-$qb_gap_year   = ($qb_stack_five - $argo_monthly) * 12;
+$qb_five     = payroll_monthly_cost('quickbooks-payroll', 'core-easystart', 5);
+$qb_gap_year = ($qb_five - $argo_monthly) * 12;
 
 return [
     'competitor' => 'QuickBooks Payroll',
@@ -36,24 +37,24 @@ return [
 
     'hero_eyebrow' => 'QuickBooks Payroll alternative',
     'hero_h1' => '<span class="text-gradient">QuickBooks Payroll</span><br>alternatives',
-    'hero_subtitle' => 'QuickBooks Payroll is an add-on, so the real bill is the QuickBooks Online plan, plus the payroll base fee, plus a few dollars per employee every month. Argo Books does the books and Canadian payroll together for $' . $argo_monthly . ' CAD flat.',
+    'hero_subtitle' => 'The cheapest QuickBooks bundle that includes payroll is $' . $qbp_base . ' a month plus $' . $qbp_per . ' per employee. Argo Books does the books and Canadian payroll together for $' . $argo_monthly . ' CAD flat, with no per-employee fee.',
 
     'differences_h2' => 'What does QuickBooks Payroll actually cost in Canada?',
-    'differences_desc' => 'Three charges, not one. You need a QuickBooks Online subscription from about $' . $qbo_base . ' a month, the payroll add-on from about $' . $qbp_base . ', and then $' . $qbp_per . ' per employee per month on top. At five staff that stack comes to roughly $' . number_format($qb_stack_five) . ' a month. Argo Books includes Canadian payroll in Premium at $' . $argo_monthly . ', with no per-employee component.',
+    'differences_desc' => 'Both bundle the books and payroll, so the comparison is like for like. QuickBooks starts at $' . $qbp_base . ' a month for Payroll Core with EasyStart, plus $' . $qbp_per . ' per employee, which is $' . number_format($qb_five) . ' at five staff. Argo Books Premium is $' . $argo_monthly . ' at five staff and $' . $argo_monthly . ' at fifty, because there is no per-employee component.',
     'why_h3' => 'Why look at Argo Books instead?',
     'why_list' => [
-        '<strong>One charge instead of three.</strong> Books, payroll and headcount are a single $' . $argo_monthly . ' CAD a month, rather than a subscription plus an add-on plus a per-person fee.',
-        '<strong>Roughly $' . number_format($qb_gap_year) . ' a year less at five employees</strong>, on QuickBooks\' own published rates for the cheapest plans that do the job.',
+        '<strong>Hiring does not change the bill.</strong> QuickBooks charges $' . $qbp_per . ' per employee per month on top of the bundle. Argo Books has no headcount component at all, so the gap widens with every person you take on.',
+        '<strong>Roughly $' . number_format($qb_gap_year) . ' a year less at five employees</strong>, against QuickBooks\' own regular published rate rather than its introductory offer.',
         '<strong>Quebec handled as its own system.</strong> QPP, QPIP, Quebec income tax and the federal abatement, rather than an approximation of the federal calculation.',
         '<strong>Your staff records stay on your computer.</strong> Social insurance numbers and salaries are written locally instead of held in a cloud account.',
         '<strong>No price creep.</strong> The pattern people leave QuickBooks over is the annual increase on a plan they are already deep into. A flat desktop price is a different arrangement.',
     ],
-    'callout_title' => 'Three line items',
-    'callout_sub' => 'QuickBooks Online + payroll add-on + $' . $qbp_per . ' per employee, against one flat $' . $argo_monthly,
+    'callout_title' => 'Charged per head',
+    'callout_sub' => '$' . $qbp_base . ' plus $' . $qbp_per . ' per employee, against one flat $' . $argo_monthly,
 
     // Feature, Argo Free, Argo Premium, QuickBooks Payroll.
     'table_argo_sub' => '$' . $argo_monthly . ' CAD/month, books + payroll',
-    'table_competitor_sub' => '~$' . number_format($qb_stack_five) . '/month at 5 staff',
+    'table_competitor_sub' => '$' . $qbp_base . ' + $' . $qbp_per . '/employee',
     'table_rows' => [
         ['CPP, EI &amp; income tax from CRA tables', 'no', 'yes', 'yes'],
         ['Every province and territory', 'no', 'yes', 'yes'],
@@ -80,7 +81,7 @@ return [
     'argo_pros' => [
         '<strong>One flat $' . $argo_monthly . ' CAD a month</strong> covering the books and Canadian payroll together',
         '<strong>No per-employee fee</strong>, so hiring does not change the bill',
-        '<strong>No add-on structure</strong>, so there is no plan to upgrade when you take on staff',
+        '<strong>No headcount component</strong>, so there is no bill that grows when you take on staff',
         '<strong>Staff records held locally</strong> rather than in a cloud account',
         '<strong>Runs offline</strong> as a native desktop app for Windows and Linux',
     ],
@@ -92,7 +93,7 @@ return [
         'Payroll covers Canada only',
     ],
     'competitor_cons' => [
-        '<strong>Three charges stacked</strong>: the QuickBooks Online plan, the payroll add-on, then a fee per employee',
+        '<strong>Priced per employee</strong> on top of the bundle, so the monthly bill grows with every hire',
         '<strong>Priced per head</strong>, so the monthly bill grows every time you hire',
         '<strong>Known for price increases</strong> on plans people have already committed their books to',
     ],
@@ -103,10 +104,10 @@ return [
         'A large accountant network, so most Canadian bookkeepers already know it',
     ],
 
-    'key_h2' => 'The cost is the add-on, not the payroll',
-    'key_desc' => 'QuickBooks calculates Canadian deductions correctly and files for you, and for many businesses that is worth paying for. The problem people bring to a comparison page is rarely the payroll itself. It is that payroll arrives as a third line on a bill that already had two.',
+    'key_h2' => 'The same job, priced per head',
+    'key_desc' => 'QuickBooks calculates Canadian deductions correctly and files for you, and for many businesses that is worth paying for. What people bring to a comparison page is rarely the payroll itself. It is that the bill goes up every time they hire.',
     'key_cards' => [
-        ['tone' => '', 'icon' => 'subscription', 'h3' => 'One line, not three', 'p' => 'Books, payroll and headcount are the same $' . $argo_monthly . ' a month in Argo Books. There is no add-on to enable and no plan tier tied to how many people you employ.'],
+        ['tone' => '', 'icon' => 'subscription', 'h3' => 'One price, whatever the headcount', 'p' => 'Books, payroll and staff are the same $' . $argo_monthly . ' a month in Argo Books. There is no plan tier tied to how many people you employ.'],
         ['tone' => 'purple', 'icon' => 'users', 'h3' => 'Hiring is free', 'p' => 'At $' . $qbp_per . ' per employee a month, taking on four people adds about $' . number_format($qbp_per * 4 * 12) . ' a year to a QuickBooks bill. In Argo Books it adds nothing.'],
         ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Quebec done properly', 'p' => 'QPP, QPIP, Quebec income tax and the federal abatement calculated separately, and the RL-1 figures worked out at year end.'],
     ],
@@ -126,8 +127,9 @@ return [
     ],
 
     'faqs' => [
-        ['q_html' => 'How much is QuickBooks Payroll in Canada?', 'a_html' => '<p>It is an add-on, so there are three parts: a QuickBooks Online subscription from about $' . $qbo_base . ' CAD a month, the payroll add-on from about $' . $qbp_solo . ' for one pay run a month or $' . $qbp_base . ' for unlimited runs, and then about $' . $qbp_per . ' per employee per month.</p>
-                            <p>At five staff that stack is roughly <strong>$' . number_format($qb_stack_five) . ' CAD a month</strong>. Argo Books Premium is $' . $argo_monthly . ' CAD a month including the books and payroll together. Check current rates with Intuit before switching, since add-on pricing changes.</p>'],
+        ['q_html' => 'How much is QuickBooks Payroll in Canada?', 'a_html' => '<p>The cheapest bundle that includes payroll is <strong>Payroll Core with EasyStart</strong> at about $' . $qbp_base . ' CAD a month plus $' . $qbp_per . ' per employee, so $' . number_format($qb_five) . ' at five staff. The top bundle, Payroll Premium with Plus, is about $' . $qbp_top . ' plus $' . $qbp_top_per . ' per employee.</p>
+                            <p>Watch the headline figure: QuickBooks advertises 90% off for the first six months, and a six-month discount is not the price you pay in year two. The rates above are the regular ones.</p>
+                            <p>Argo Books Premium is $' . $argo_monthly . ' CAD a month including the books and payroll together, with no per-employee fee.</p>'],
         ['q_html' => 'Is there a free QuickBooks Payroll alternative?', 'a_html' => '<p>Not for payroll itself. Argo Books has a free tier covering invoicing, expenses, receipt scanning and reports, but Canadian payroll is a Premium feature at $' . $argo_monthly . ' CAD a month.</p>
                             <p>Be sceptical of anything advertising free Canadian payroll. Keeping up with two CRA rate editions a year, Quebec\'s separate system and the T4 filing specification is ongoing work, and software that is not funded to do it is the software that is quietly wrong in February.</p>'],
         ['q_html' => 'Will Argo Books file my T4s with the CRA?', 'a_html' => '<p>No. It prepares the T4 slips and summary as PDFs and builds the XML submission file the CRA accepts, including the T619 transmittal record, so the figures are worked out and the file is ready. You upload it through My Business Account and you make the remittance yourself.</p>

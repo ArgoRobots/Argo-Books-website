@@ -6,15 +6,14 @@
 // $qbo_/$qbp_ variables declared in the matching data file; both are included
 // at global scope by the template.
 //
-// Stacked rather than grouped: the QuickBooks number is three charges added up.
+// Stacked rather than grouped: the QuickBooks number is a bundle plus a fee per head.
 
 $employees = 5;
 $per_total = $qbp_per * $employees;
-$stack     = $qbo_base + $qbp_base + $per_total;
+$stack     = $qbp_base + $per_total;
 
 $scale = 380 / max($stack, 1); // Widest bar fills the usable width.
 
-$w_books   = $qbo_base * $scale;
 $w_payroll = $qbp_base * $scale;
 $w_heads   = $per_total * $scale;
 $w_argo    = max(4, $argo_monthly * $scale);
@@ -26,14 +25,14 @@ $w_argo    = max(4, $argo_monthly * $scale);
                                 <clipPath id="dmClipQbp"><rect x="1" y="1" width="638" height="458" rx="18"/></clipPath>
                                 <!-- One rounded shape for the whole stack; a per-segment rx
                                      rounds the internal joins and notches the bar. -->
-                                <clipPath id="dmClipQbpStack"><rect x="40" y="290" width="<?= $w_books + $w_payroll + $w_heads ?>" height="34" rx="5"/></clipPath>
+                                <clipPath id="dmClipQbpStack"><rect x="40" y="290" width="<?= $w_payroll + $w_heads ?>" height="34" rx="5"/></clipPath>
                             </defs>
                             <g clip-path="url(#dmClipQbp)">
                                 <rect x="0" y="0" width="640" height="460" fill="#ffffff"/>
 
                                 <!-- Title -->
                                 <text x="40" y="54" font-family="Fraunces, Georgia, serif" font-size="21" font-weight="700" fill="#0f172a">Per month, with 5 employees</text>
-                                <text x="40" y="80" font-size="14" fill="#0f172a">QuickBooks bills payroll as a third line, then per person.</text>
+                                <text x="40" y="80" font-size="14" fill="#0f172a">Cheapest bundle with payroll, then a fee for every person.</text>
 
                                 <!-- Argo Books -->
                                 <text x="40" y="150" font-size="13" font-weight="600" fill="#0f172a">Argo Books Premium</text>
@@ -44,22 +43,18 @@ $w_argo    = max(4, $argo_monthly * $scale);
                                 <!-- QuickBooks stack -->
                                 <text x="40" y="278" font-size="13" font-weight="600" fill="#0f172a">QuickBooks Online + Payroll</text>
                                 <g clip-path="url(#dmClipQbpStack)">
-                                    <rect x="40" y="290" width="<?= $w_books ?>" height="34" fill="#fca5a5"/>
-                                    <rect x="<?= 40 + $w_books ?>" y="290" width="<?= $w_payroll ?>" height="34" fill="#f87171"/>
-                                    <rect x="<?= 40 + $w_books + $w_payroll ?>" y="290" width="<?= $w_heads ?>" height="34" fill="#ef4444"/>
-                                    <!-- Hairline joins, so the three charges stay legible. -->
-                                    <rect x="<?= 40 + $w_books - 1 ?>" y="290" width="2" height="34" fill="#ffffff"/>
-                                    <rect x="<?= 40 + $w_books + $w_payroll - 1 ?>" y="290" width="2" height="34" fill="#ffffff"/>
+                                    <rect x="40" y="290" width="<?= $w_payroll ?>" height="34" fill="#f87171"/>
+                                    <rect x="<?= 40 + $w_payroll ?>" y="290" width="<?= $w_heads ?>" height="34" fill="#ef4444"/>
+                                    <!-- Hairline join, so the bundle and the head fee stay legible. -->
+                                    <rect x="<?= 40 + $w_payroll - 1 ?>" y="290" width="2" height="34" fill="#ffffff"/>
                                 </g>
-                                <text x="<?= 40 + ($w_books + $w_payroll + $w_heads) + 12 ?>" y="312" font-size="14" font-weight="700" fill="#0f172a">$<?= number_format($stack) ?></text>
+                                <text x="<?= 40 + ($w_payroll + $w_heads) + 12 ?>" y="312" font-size="14" font-weight="700" fill="#0f172a">$<?= number_format($stack) ?></text>
 
                                 <!-- Stack legend -->
-                                <rect x="40" y="346" width="11" height="11" rx="3" fill="#fca5a5"/>
-                                <text x="58" y="356" font-size="12" fill="#334155">Online plan $<?= $qbo_base ?></text>
-                                <rect x="196" y="346" width="11" height="11" rx="3" fill="#f87171"/>
-                                <text x="214" y="356" font-size="12" fill="#334155">Payroll add-on $<?= $qbp_base ?></text>
-                                <rect x="380" y="346" width="11" height="11" rx="3" fill="#ef4444"/>
-                                <text x="398" y="356" font-size="12" fill="#334155">5 &times; $<?= $qbp_per ?> per employee</text>
+                                <rect x="40" y="346" width="11" height="11" rx="3" fill="#f87171"/>
+                                <text x="58" y="356" font-size="12" fill="#334155">Books and payroll $<?= $qbp_base ?></text>
+                                <rect x="240" y="346" width="11" height="11" rx="3" fill="#ef4444"/>
+                                <text x="258" y="356" font-size="12" fill="#334155">5 &times; $<?= $qbp_per ?> per employee</text>
 
                                 <!-- Divider + footnote -->
                                 <line x1="40" y1="386" x2="600" y2="386" stroke="#f1f5f9" stroke-width="1"/>

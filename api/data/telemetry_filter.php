@@ -55,7 +55,12 @@ const TELEMETRY_FEATURE_NAMES = [
     'PayRunApproved',
     'PayStubsExported',
     'T4SlipsGenerated',
-    'T4XmlGenerated'
+    'T4XmlGenerated',
+    // Record of Employment. The worksheet is somebody keying figures into ROE Web by hand;
+    // the XML is the payroll extract they upload instead. Separated for the same reason the
+    // T4 pair is: one is a filing and one is a preview.
+    'RoeWorksheetGenerated',
+    'RoeXmlGenerated'
 ];
 
 // Business descriptors on a CompanyProfile event. Free text, not enum-checked: these

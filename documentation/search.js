@@ -56,7 +56,7 @@
 
             // Security
             { id: 'encryption', title: 'Encryption', category: 'Security', folder: 'security', keywords: 'encryption aes-256 gcm pbkdf2 security protect data recovery key' },
-            { id: 'password', title: 'Password Protection', category: 'Security', folder: 'security', keywords: 'password protection biometric login fingerprint face windows hello auto-lock locked out recovery security' },
+            { id: 'password', title: 'Password Protection', category: 'Security', folder: 'security', keywords: 'password protection biometric login fingerprint face windows hello touch id mac keychain linux auto-lock locked out recovery security' },
             { id: 'backups', title: 'Regular Backups', category: 'Security', folder: 'security', keywords: 'backup argobk export restore save data loss protection cloud' }
     ];
 

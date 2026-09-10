@@ -23,7 +23,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited invoices, Windows Hello, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited invoices, biometric login, AI-powered insights, and more.">
     <meta name="keywords"
         content="argo books pricing, buy full version, unlimited invoices, business software pricing, finance tracker, premium subscription">
 
@@ -68,7 +68,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "What does Premium unlock?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
+                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login (Windows Hello, Touch ID or your Linux login), and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
                     }
                 },
                 {
@@ -318,7 +318,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <?= svg_icon('shield', 22) ?>
                     </div>
                     <h3>Biometric Login</h3>
-                    <p>Log in with your face or fingerprint via Windows Hello. No passwords to remember, forget, or compromise.</p>
+                    <p>Unlock your books with your fingerprint or face instead of typing your password each time. Works with Windows Hello, Touch ID on a Mac, and your Linux login.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
@@ -352,7 +352,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             ob_start(); ?>What does Premium unlock?<?php $q = ob_get_clean();
             ob_start(); ?>
 
-                            <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
+                            <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login (Windows Hello, Touch ID or your Linux login), and priority customer support.</p>
                             <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong>. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
                         
             <?php $faqs[] = ['q_html' => $q, 'a_html' => ob_get_clean()];

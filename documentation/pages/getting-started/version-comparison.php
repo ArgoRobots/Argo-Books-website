@@ -75,7 +75,7 @@ include __DIR__ . '/../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>Biometric Login (Windows)</td>
+                            <td>Biometric Login</td>
                             <td>—</td>
                             <td>✓</td>
                         </tr>

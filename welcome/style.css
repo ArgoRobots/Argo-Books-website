@@ -1,0 +1,130 @@
+/* Welcome page, opened by the desktop app on first run.
+   Deliberately plain: someone has just installed and wants to use the app, not
+   read a landing page. No pricing, no upgrade prompt, no email capture. */
+
+.wc-hero {
+  background: linear-gradient(150deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+  color: var(--white);
+  padding: 140px 20px 64px;
+  text-align: center;
+}
+
+.wc-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.wc-hero h1 {
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.wc-lead {
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  opacity: 0.88;
+  margin: 0;
+}
+
+.wc-container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px 20px 80px;
+}
+
+.wc-container section + section {
+  margin-top: 52px;
+}
+
+.wc-container h2 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: var(--admin-text);
+}
+
+.wc-container p {
+  line-height: 1.7;
+  margin: 0 0 14px;
+}
+
+.wc-steps {
+  line-height: 1.7;
+  padding-left: 22px;
+  margin: 0 0 14px;
+}
+
+.wc-steps li {
+  margin-bottom: 10px;
+}
+
+.wc-aside {
+  font-size: var(--text-sm);
+  color: var(--admin-text);
+}
+
+/* Cards are links to the matching documentation page, so the whole tile is the
+   target rather than a "learn more" line nobody aims at. */
+/* Four cards in an 820px container: a 240px minimum fits three per row and
+   orphans the fourth. 300px forces a 2x2, which is the shape four items want,
+   and still collapses to one column on a phone. */
+.wc-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.wc-card {
+  display: block;
+  padding: 20px;
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wc-card:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--shadow-default);
+}
+
+.wc-card h3 {
+  margin: 0 0 8px;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.wc-card p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--admin-text);
+}
+
+.wc-links {
+  line-height: 1.9;
+  padding-left: 22px;
+  margin: 0;
+}
+
+[data-theme="dark"] .wc-card {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+}
+
+
+@media (max-width: 640px) {
+  .wc-hero {
+    padding: 120px 16px 48px;
+  }
+
+  .wc-container {
+    padding: 40px 16px 64px;
+  }
+}

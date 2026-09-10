@@ -1239,29 +1239,6 @@ CREATE TABLE IF NOT EXISTS campaign_spend (
     FOREIGN KEY (source_code) REFERENCES referral_links(source_code) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Launch-notification waitlist, collected while the macOS build was unreleased.
--- The macOS build has shipped, so the signup form and api/waitlist/ are gone and
--- nothing writes to this table any more. It is kept solely so the one-off launch
--- announcement can be sent from admin/mac-waitlist/, which tracks who has been
--- emailed in notified_at. Drop the table and delete admin/mac-waitlist/ once that
--- send is done. visitor_id/source_code tied each signup back to referral_events
--- attribution so Mac demand could be measured per traffic source.
-CREATE TABLE IF NOT EXISTS platform_waitlist (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
-    platform VARCHAR(20) NOT NULL DEFAULT 'macos',
-    visitor_id CHAR(36) DEFAULT NULL COMMENT 'argo_visitor_id cookie at signup, joins to referral_events',
-    source_code VARCHAR(50) DEFAULT NULL COMMENT 'First-touch referral source resolved for the visitor',
-    ip_address VARCHAR(45) DEFAULT NULL,
-    user_agent VARCHAR(255) DEFAULT NULL,
-    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
-    notified_at DATETIME DEFAULT NULL COMMENT 'Set when the launch announcement is sent',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uniq_email_platform (email, platform, environment),
-    INDEX idx_platform_created (platform, created_at),
-    INDEX idx_ip_created (ip_address, created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- ============================================================
 -- Affiliate program

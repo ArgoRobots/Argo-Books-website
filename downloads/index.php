@@ -161,98 +161,94 @@ $systemRequirements = getSystemRequirements();
     </section>
 
     <div class="container">
+        <?php
+        // One shape for every platform: a version tag when there is a build, then a button per
+        // download with its own size on it. The size sits on the button rather than beside the
+        // version because macOS ships two builds of different sizes, and a single figure up
+        // there could only ever have been right for one of them.
+        //
+        // A build with no file in the version folder shows a disabled button rather than
+        // vanishing. An absent button reads as an oversight and leaves someone wondering
+        // whether they missed it; a button that says so answers the question. What it must not
+        // do is link anywhere, which is what the Intel one did before that build existed.
+        $platformCards = [
+            [
+                'class' => 'platform-windows',
+                'name'  => 'Windows',
+                'desc'  => 'For Windows 10 and later',
+                'icon'  => svg_icon('windows'),
+                'builds' => [
+                    ['key' => 'windows', 'slug' => 'win', 'label' => 'Download for Windows'],
+                ],
+                'help' => null,
+            ],
+            [
+                'class' => 'platform-macos',
+                'name'  => 'macOS',
+                'desc'  => 'For macOS 14 Sonoma and later',
+                'icon'  => svg_icon('apple'),
+                'builds' => [
+                    ['key' => 'macos-arm64', 'slug' => 'mac-arm64', 'label' => 'Apple Silicon'],
+                    ['key' => 'macos-x64',   'slug' => 'mac-intel', 'label' => 'Intel'],
+                ],
+                // Only worth asking when there are two answers. The browser cannot tell them
+                // apart: Safari and Chrome both report an Intel user agent on Apple Silicon.
+                'help' => ['id' => 'macInstallHelp', 'text' => 'Which one do I need?', 'min_builds' => 2],
+            ],
+            [
+                'class' => 'platform-linux',
+                'name'  => 'Linux',
+                'desc'  => 'Ubuntu, Debian, Fedora &amp; more (AppImage)',
+                'icon'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="' . getPlatformIconPath('linux') . '"/></svg>',
+                'builds' => [
+                    ['key' => 'linux', 'slug' => 'linux', 'label' => 'Download for Linux'],
+                ],
+                'help' => ['id' => 'linuxInstallHelp', 'text' => 'Installation instructions', 'min_builds' => 1],
+            ],
+        ];
+        ?>
         <div class="platform-grid">
-            <!-- Windows -->
-            <div class="platform-card platform-windows">
-                <div class="platform-icon">
-                    <?= svg_icon('windows') ?>
+            <?php foreach ($platformCards as $card): ?>
+                <?php
+                $available = array_values(array_filter(
+                    $card['builds'],
+                    fn($build) => isset($latestVersion['platforms'][$build['key']])
+                ));
+                ?>
+                <div class="platform-card <?php echo $card['class']; ?>">
+                    <div class="platform-icon"><?= $card['icon'] ?></div>
+                    <div class="platform-info">
+                        <h2><?php echo $card['name']; ?></h2>
+                        <p class="platform-desc"><?= $card['desc'] ?></p>
+                        <?php if ($available): ?>
+                            <div class="version-details">
+                                <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="platform-actions">
+                        <?php foreach ($card['builds'] as $build): ?>
+                            <?php $file = $latestVersion['platforms'][$build['key']] ?? null; ?>
+                            <?php if ($file): ?>
+                                <a href="../download/avalonia/<?php echo $build['slug']; ?>"
+                                   class="btn btn-blue download-btn"
+                                   data-platform="<?php echo $build['key']; ?>">
+                                    <?= svg_icon('download', null, 'btn-icon') ?>
+                                    <?php echo $build['label']; ?> &middot; <?php echo formatFileSize($file['filesize']); ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="btn btn-blue download-btn disabled" aria-disabled="true">
+                                    <?= svg_icon('download', null, 'btn-icon') ?>
+                                    <?php echo $build['label']; ?> &middot; Not available
+                                </span>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <?php if ($card['help'] && count($card['builds']) >= $card['help']['min_builds']): ?>
+                            <button type="button" class="install-help-link" id="<?php echo $card['help']['id']; ?>"><?php echo $card['help']['text']; ?></button>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <div class="platform-info">
-                    <h2>Windows</h2>
-                    <p class="platform-desc">For Windows 10 and later</p>
-                    <?php if ($latestVersion && isset($latestVersion['platforms']['windows'])): ?>
-                        <div class="version-details">
-                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
-                            <span class="file-size"><?php echo formatFileSize($latestVersion['platforms']['windows']['filesize']); ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div class="platform-actions">
-                    <a href="../download/avalonia/win" class="btn btn-blue download-btn" data-platform="windows">
-                        <?= svg_icon('download', null, 'btn-icon') ?>
-                        Download for Windows
-                    </a>
-                </div>
-            </div>
-
-            <!-- macOS ships as two builds, so the card offers a button each rather than
-                 guessing. The browser cannot tell the two apart: Safari and Chrome both
-                 report an Intel user agent on Apple Silicon for compatibility, so picking
-                 automatically would hand half of Mac users a download that will not open. -->
-            <div class="platform-card platform-macos">
-                <div class="platform-icon">
-                    <?= svg_icon('apple') ?>
-                </div>
-                <div class="platform-info">
-                    <h2>macOS</h2>
-                    <p class="platform-desc">For macOS 14 Sonoma and later</p>
-                    <?php
-                    // The two builds are different downloads with different sizes, so the size
-                    // goes on each button rather than up here next to the version.
-                    $macBuilds = [
-                        ['key' => 'macos-arm64', 'slug' => 'mac-arm64', 'label' => 'Apple Silicon'],
-                        ['key' => 'macos-x64',   'slug' => 'mac-intel', 'label' => 'Intel'],
-                    ];
-                    $macAvailable = array_values(array_filter(
-                        $macBuilds,
-                        fn($mac) => isset($latestVersion['platforms'][$mac['key']])
-                    ));
-                    ?>
-                    <?php if ($macAvailable): ?>
-                        <div class="version-details">
-                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div class="platform-actions">
-                    <?php foreach ($macAvailable as $mac): ?>
-                        <?php $build = $latestVersion['platforms'][$mac['key']]; ?>
-                        <a href="../download/avalonia/<?php echo $mac['slug']; ?>" class="btn btn-blue download-btn" data-platform="<?php echo $mac['key']; ?>">
-                            <?= svg_icon('download', null, 'btn-icon') ?>
-                            <?php echo $mac['label']; ?> &middot; <?php echo formatFileSize($build['filesize']); ?>
-                        </a>
-                    <?php endforeach; ?>
-                    <?php if (count($macAvailable) > 1): ?>
-                        <button type="button" class="install-help-link" id="macInstallHelp">Which one do I need?</button>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Linux -->
-            <div class="platform-card platform-linux">
-                <div class="platform-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="<?php echo getPlatformIconPath('linux'); ?>"/>
-                    </svg>
-                </div>
-                <div class="platform-info">
-                    <h2>Linux</h2>
-                    <p class="platform-desc">Ubuntu, Debian, Fedora & more (AppImage)</p>
-                    <?php if ($latestVersion && isset($latestVersion['platforms']['linux'])): ?>
-                        <div class="version-details">
-                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
-                            <span class="file-size"><?php echo formatFileSize($latestVersion['platforms']['linux']['filesize']); ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div class="platform-actions">
-                    <a href="../download/avalonia/linux" class="btn btn-blue download-btn" data-platform="linux">
-                        <?= svg_icon('download', null, 'btn-icon') ?>
-                        Download for Linux
-                    </a>
-                    <button type="button" class="install-help-link" id="linuxInstallHelp">Installation instructions</button>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
 
         <!-- Post-download walkthrough: the browser's "keep" steps (when the browser

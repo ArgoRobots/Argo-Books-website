@@ -34,7 +34,7 @@ return [
     'why_h3' => 'Why choose Argo Books over Square Invoices?',
     'why_list' => [
         '<strong>Your whole books, not just billing.</strong> Expenses, receipts, inventory, reports and forecasting are built in, where Square Invoices covers the invoice and the payment.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your records open instantly with no internet, and your data stays on your machine rather than on Square\'s servers.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open instantly with no internet, and your data stays on your machine rather than on Square\'s servers.',
         '<strong>AI that\'s built in.</strong> Receipt scanning turns a photo into a filed expense, and spreadsheet import brings your history across in one go.',
         '<strong>You are not tied to one processor.</strong> Argo Books connects to your own Stripe, PayPal or Square account, so you keep your rates and your relationship.',
         '<strong>Free to start, and honest about it.</strong> Both are free. Argo\'s free tier includes AI receipt scanning and inventory, which invoicing tools generally do not.',
@@ -65,7 +65,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>Full bookkeeping</strong>: expenses, revenue, inventory, reports and forecasting',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics',
         '<strong>Bring your own processor</strong>, including Square itself, so you keep your own rates',
     ],

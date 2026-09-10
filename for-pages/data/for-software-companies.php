@@ -21,7 +21,7 @@ return [
 
     'breadcrumb' => 'For Software Companies',
     'title' => 'Argo Books for Software and SaaS Companies: Stripe Revenue Straight Into Your Books',
-    'meta_description' => 'Accounting software for software and SaaS companies. Connect Stripe with a read-only key and import charges, fees, tax, refunds, and payouts straight into your books. Free desktop app for Windows and Linux.',
+    'meta_description' => 'Accounting software for software and SaaS companies. Connect Stripe with a read-only key and import charges, fees, tax, refunds, and payouts straight into your books. Free desktop app for Windows, macOS, and Linux.',
     'meta_keywords' => 'accounting software for saas, saas bookkeeping software, stripe accounting software, accounting software for software companies, indie hacker bookkeeping, stripe to accounting import',
     'og_title' => 'Argo Books for Software and SaaS Companies: Stripe Revenue Straight Into Your Books',
     'og_description' => 'Connect Stripe with a read-only key. Charges become revenue, processing fees become expenses, refunds and payouts sort themselves out.',
@@ -31,7 +31,7 @@ return [
 
     'h1' => 'Accounting software for software and SaaS companies',
     'hero_sub' => 'Your revenue already lives in Stripe. Connect it with a read-only key and Argo Books turns every charge into a proper book entry: sales, processing fees, tax, discounts, customers, and refunds.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'expenses',
 
     'features_label' => 'Made for Software Companies',

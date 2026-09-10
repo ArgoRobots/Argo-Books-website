@@ -37,7 +37,7 @@ return [
     'why_list' => [
         '<strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.',
         '<strong>A free plan that does more.</strong> All the core features forever, plus inventory and AI receipt scanning at no extra cost. Wave\'s free Starter charges extra for receipt scanning.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Wave is cloud-only.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Wave is cloud-only.',
         '<strong>AI that\'s included, not upsold.</strong> Receipt scanning, spreadsheet import, and predictive analytics come built in. Wave charges about $' . $wave_receipt_mo . '/month for receipt scanning on its free plan.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month, less than Wave Pro at $' . $wave_pro . ' CAD/month. No per-add-on fees.',
     ],
@@ -69,7 +69,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan that does more</strong>, with inventory and AI receipt scanning included at no extra cost',
         '<strong>No accounting jargon</strong>, built for business owners rather than accountants',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month, less than Wave Pro at $' . $wave_pro,
         '<strong>Canadian payroll included</strong> in that price: CPP, EI and T4s, where Wave charges for payroll separately',

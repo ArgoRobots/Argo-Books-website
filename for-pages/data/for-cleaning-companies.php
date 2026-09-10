@@ -18,7 +18,7 @@ return [
 
     'breadcrumb' => 'For Cleaning Companies',
     'title' => 'Argo Books for Cleaning Companies: Recurring Invoices and Real Numbers',
-    'meta_description' => 'Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows and Linux.',
+    'meta_description' => 'Accounting software for residential and commercial cleaning companies. Built for recurring invoices, supply costs, and same-day billing. Free desktop app for Windows, macOS, and Linux.',
     'meta_keywords' => 'accounting software for cleaning companies, cleaning business bookkeeping, janitorial accounting software, residential cleaning invoicing, recurring invoice software cleaning',
     'og_title' => 'Argo Books for Cleaning Companies: Recurring Invoices and Real Numbers',
     'og_description' => 'Recurring invoices, marked-up supplies, and same-day billing, without the bookkeeping headache. Free desktop app.',
@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for cleaning companies',
     'hero_sub' => 'Built for recurring invoices, supply costs, and the difference between a profitable client and one that\'s quietly losing you money.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'customers',
 
     'features_label' => 'Made for Cleaning Companies',

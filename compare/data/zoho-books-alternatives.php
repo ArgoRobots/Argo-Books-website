@@ -40,7 +40,7 @@ return [
     'why_h3' => 'Why choose Argo Books over Zoho Books?',
     'why_list' => [
         '<strong>A free plan with no revenue cap.</strong> All the core features forever, no trial and no credit card. Zoho Books has a free plan too, but it\'s capped by your annual revenue.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Zoho Books is cloud-only.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. Zoho Books is cloud-only.',
         '<strong>Genuinely simple.</strong> Invoicing, expenses, receipts, inventory, and forecasting in one clean app with no accounting jargon. Zoho Books is powerful, but that power comes with density and a learning curve.',
         '<strong>Standalone, not a suite.</strong> Argo is one focused tool, not a slice of a 40-app ecosystem full of cross-sells and add-ons.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month, with AI receipt scanning included in one flat plan.',
@@ -69,7 +69,7 @@ return [
     'pros_cons_h2' => 'Argo Books vs Zoho Books: pros &amp; cons',
     'argo_pros' => [
         '<strong>Free plan with no revenue cap</strong>, every core feature, no trial and no credit card',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux',
         '<strong>Genuinely simple</strong>, built for business owners rather than accountants',
         '<strong>Standalone</strong>, one focused tool rather than a slice of a 40-app suite',
         '<strong>Canadian (CAD)</strong> with AI receipt scanning included in one flat $' . $argo_monthly . '/mo plan',

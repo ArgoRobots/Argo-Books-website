@@ -18,9 +18,10 @@ function getSystemRequirements()
 
 // Platform file patterns for Avalonia builds
 $avaloniaPatterns = [
-    'windows' => 'Argo Books Installer V.{version}.exe',
-    'macos'   => 'ArgoBooks-{version}-osx-arm64.zip',
-    'linux'   => 'ArgoBooks-{version}-linux-x64.AppImage',
+    'windows'     => 'Argo Books Installer V.{version}.exe',
+    'macos-arm64' => 'ArgoBooks-{version}-osx-arm64.zip',
+    'macos-x64'   => 'ArgoBooks-{version}-osx-x64.zip',
+    'linux'       => 'ArgoBooks-{version}-linux-x64.AppImage',
 ];
 
 // Get latest version information from filesystem
@@ -88,17 +89,17 @@ $systemRequirements = getSystemRequirements();
     <meta name="author" content="Argo">
 
     <!-- SEO Meta Tags -->
-    <!-- Platform wording here has to match the page: there is no macOS build yet,
-         only a waitlist. The title and description are what Google prints in the
-         SERP and what link previews and crawlers read, so promising a Mac download
-         here sends Mac users to a signup form they didn't ask for. -->
+    <!-- Platform wording here has to match the page. The title and description are what
+         Google prints in the SERP and what link previews and crawlers read, so a Mac user
+         arriving from search has to find the download the snippet promised. Which of the two
+         Mac builds to take is the card's job, not the snippet's. -->
     <meta name="description"
-        content="Download Argo Books free for Windows and Linux. Simple bookkeeping software for small businesses, with easy invoicing, expense tracking, and financial reports. Mac users can join the waitlist.">
+        content="Download Argo Books free for Windows, macOS, and Linux. Simple bookkeeping software for small businesses, with easy invoicing, expense tracking, and financial reports.">
     <meta name="keywords"
-        content="argo books download, bookkeeping software, Windows, Linux, free accounting software, small business software, invoice software">
+        content="argo books download, bookkeeping software, Windows, macOS, Mac, Linux, free accounting software, small business software, invoice software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Download Argo Books | Windows & Linux">
+    <meta property="og:title" content="Download Argo Books | Windows, macOS & Linux">
     <meta property="og:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:url" content="https://argorobots.com/downloads/">
@@ -108,7 +109,7 @@ $systemRequirements = getSystemRequirements();
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Download Argo Books | Windows & Linux">
+    <meta name="twitter:title" content="Download Argo Books | Windows, macOS & Linux">
     <meta name="twitter:description"
         content="Download Argo Books for your platform. Free bookkeeping software with invoicing, expense tracking, and financial reports.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
@@ -126,7 +127,7 @@ $systemRequirements = getSystemRequirements();
     <link rel="canonical" href="https://argorobots.com/downloads/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
-    <title>Download Argo Books | Windows & Linux</title>
+    <title>Download Argo Books | Windows, macOS & Linux</title>
 
     <script src="../resources/scripts/main.js"></script>
 
@@ -184,8 +185,10 @@ $systemRequirements = getSystemRequirements();
                 </div>
             </div>
 
-            <!-- macOS: no build yet, so the action is a launch-notification
-                 waitlist signup (api/waitlist/subscribe.php). -->
+            <!-- macOS ships as two builds, so the card offers a button each rather than
+                 guessing. The browser cannot tell the two apart: Safari and Chrome both
+                 report an Intel user agent on Apple Silicon for compatibility, so picking
+                 automatically would hand half of Mac users a download that will not open. -->
             <div class="platform-card platform-macos">
                 <div class="platform-icon">
                     <?= svg_icon('apple') ?>
@@ -193,25 +196,28 @@ $systemRequirements = getSystemRequirements();
                 <div class="platform-info">
                     <h2>macOS</h2>
                     <p class="platform-desc">For macOS 14 Sonoma and later</p>
-                    <div class="version-details">
-                        <span class="version-tag">Coming soon</span>
-                    </div>
+                    <?php
+                    // Either build is enough to say which version this page is offering.
+                    $macBuild = $latestVersion['platforms']['macos-arm64']
+                        ?? $latestVersion['platforms']['macos-x64']
+                        ?? null;
+                    ?>
+                    <?php if ($latestVersion && $macBuild): ?>
+                        <div class="version-details">
+                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="platform-actions">
-                    <form class="waitlist-form" id="macWaitlistForm" autocomplete="off" novalidate>
-                        <div class="waitlist-fields">
-                            <input type="email" name="email" class="waitlist-email" placeholder="you@example.com"
-                                   required aria-label="Email address for the Mac release notification">
-                            <button type="submit" class="btn btn-blue waitlist-submit">Notify me</button>
-                        </div>
-                        <!-- Honeypot: hidden from real users, bots autofill it -->
-                        <input type="text" name="website" class="waitlist-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-                        <p class="waitlist-note" id="macWaitlistNote">One email when the Mac version ships. Nothing else.</p>
-                    </form>
-                    <div class="waitlist-success" id="macWaitlistSuccess" hidden>
-                        <?= svg_icon('check', 16) ?>
-                        <span>You're on the list</span>
-                    </div>
+                    <a href="../download/avalonia/mac-arm64" class="btn btn-blue download-btn" data-platform="macos-arm64">
+                        <?= svg_icon('download', null, 'btn-icon') ?>
+                        Apple Silicon
+                    </a>
+                    <a href="../download/avalonia/mac-intel" class="btn btn-blue download-btn" data-platform="macos-x64">
+                        <?= svg_icon('download', null, 'btn-icon') ?>
+                        Intel
+                    </a>
+                    <button type="button" class="install-help-link" id="macInstallHelp">Which one do I need?</button>
                 </div>
             </div>
 
@@ -319,6 +325,24 @@ $systemRequirements = getSystemRequirements();
 
     </main>
 
+    <!-- Which Mac build? The Apple menu is the only place a user can check, and the
+         browser cannot answer it for them. -->
+    <div class="install-modal" id="macInstallModal">
+        <div class="install-modal-backdrop"></div>
+        <div class="install-modal-content" role="dialog" aria-modal="true" aria-labelledby="macInstallModalTitle">
+            <button class="install-modal-close" aria-label="Close">&times;</button>
+            <h2 id="macInstallModalTitle">Apple Silicon or Intel?</h2>
+            <ol class="install-modal-steps">
+                <li>Open the <strong>Apple menu</strong> in the top-left corner of your screen.</li>
+                <li>Choose <strong>About This Mac</strong>.</li>
+                <li>Look at the <strong>Chip</strong> or <strong>Processor</strong> line.</li>
+                <li>A chip starting with <strong>Apple</strong> (M1, M2, M3, M4) means Apple Silicon. Anything listing an <strong>Intel</strong> processor means Intel.</li>
+            </ol>
+            <p class="install-modal-alt">Every Mac sold since late 2020 is Apple Silicon.</p>
+            <p class="install-modal-note">Downloaded the wrong one? It simply won't open, and nothing is installed. Grab the other build instead. See the <a href="../documentation/pages/getting-started/installation.php">full installation guide</a> for more.</p>
+        </div>
+    </div>
+
     <!-- Linux installation instructions modal -->
     <div class="install-modal" id="linuxInstallModal">
         <div class="install-modal-backdrop"></div>
@@ -373,86 +397,32 @@ $systemRequirements = getSystemRequirements();
             });
         });
 
-        // macOS waitlist signup ("notify me when the Mac version ships")
-        (function () {
-            const form = document.getElementById('macWaitlistForm');
-            const success = document.getElementById('macWaitlistSuccess');
-            const note = document.getElementById('macWaitlistNote');
-            if (!form || !success || !note) return;
-            const defaultNote = note.textContent;
+        // Install-help modals: Linux permissions, and which Mac build to take.
+        function wireInstallModal(triggerId, modalId) {
+            const modal = document.getElementById(modalId);
+            const trigger = document.getElementById(triggerId);
+            if (!modal || !trigger) return;
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const emailInput = form.querySelector('.waitlist-email');
-                const submitBtn = form.querySelector('.waitlist-submit');
-                const email = (emailInput.value || '').trim();
-                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    note.textContent = 'Please enter a valid email address.';
-                    note.classList.add('waitlist-note-error');
-                    emailInput.focus();
-                    return;
-                }
-                note.textContent = defaultNote;
-                note.classList.remove('waitlist-note-error');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Adding…';
+            function close() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
 
-                fetch('../api/waitlist/subscribe.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        email: email,
-                        platform: 'macos',
-                        website: form.querySelector('.waitlist-hp').value || ''
-                    })
-                }).then(function (res) {
-                    return res.json().catch(function () { return {}; }).then(function (data) {
-                        return { ok: res.ok, data: data };
-                    });
-                }).then(function (r) {
-                    if (r.ok && r.data.success) {
-                        form.hidden = true;
-                        success.hidden = false;
-                        if (typeof gtag !== 'undefined') {
-                            gtag('event', 'mac_waitlist_signup', { 'event_category': 'software' });
-                        }
-                    } else {
-                        note.textContent = (r.data && r.data.error) || 'Something went wrong. Please try again.';
-                        note.classList.add('waitlist-note-error');
-                    }
-                }).catch(function () {
-                    note.textContent = 'Something went wrong. Please try again.';
-                    note.classList.add('waitlist-note-error');
-                }).finally(function () {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Notify me';
-                });
-            });
-        })();
-
-        // Linux installation instructions modal
-        const installModal = document.getElementById('linuxInstallModal');
-        const installHelpLink = document.getElementById('linuxInstallHelp');
-
-        function closeInstallModal() {
-            installModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        if (installModal && installHelpLink) {
-            installHelpLink.addEventListener('click', function() {
-                installModal.classList.add('active');
+            trigger.addEventListener('click', function() {
+                modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             });
-            installModal.querySelector('.install-modal-close').addEventListener('click', closeInstallModal);
-            installModal.querySelector('.install-modal-backdrop').addEventListener('click', closeInstallModal);
+            modal.querySelector('.install-modal-close').addEventListener('click', close);
+            modal.querySelector('.install-modal-backdrop').addEventListener('click', close);
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && installModal.classList.contains('active')) {
-                    closeInstallModal();
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    close();
                 }
             });
         }
+
+        wireInstallModal('linuxInstallHelp', 'linuxInstallModal');
+        wireInstallModal('macInstallHelp', 'macInstallModal');
     </script>
 </body>
 

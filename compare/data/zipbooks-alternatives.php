@@ -36,7 +36,7 @@ return [
     'why_list' => [
         '<strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.',
         '<strong>A more capable free plan.</strong> Both are free to start, but Argo\'s Free tier adds AI receipt scanning and inventory that ZipBooks\' free plan doesn\'t include.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. ZipBooks is cloud-only.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine. ZipBooks is cloud-only.',
         '<strong>AI that\'s built in.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included, features ZipBooks doesn\'t offer at all.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month, less than ZipBooks Smarter, with no per-client fees or upsells.',
     ],
@@ -66,7 +66,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>No accounting jargon</strong>, built for business owners rather than accountants',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month, cheaper than ZipBooks Smarter, with no upsells',
     ],

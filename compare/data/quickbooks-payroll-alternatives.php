@@ -83,13 +83,13 @@ return [
         '<strong>No per-employee fee</strong>, so hiring does not change the bill',
         '<strong>No headcount component</strong>, so there is no bill that grows when you take on staff',
         '<strong>Staff records held locally</strong> rather than in a cloud account',
-        '<strong>Runs offline</strong> as a native desktop app for Windows and Linux',
+        '<strong>Runs offline</strong> as a native desktop app for Windows, macOS, and Linux',
     ],
     'argo_cons' => [
         'You upload the T4 XML and remit the source deductions yourself',
         'No direct deposit, so paying staff is still a bank transfer you make',
         'No automatic bank transaction import yet, which QuickBooks does well',
-        'No mobile app, and no Mac build yet',
+        'No mobile app, so payroll runs on a desktop',
         'Payroll covers Canada only',
     ],
     'competitor_cons' => [

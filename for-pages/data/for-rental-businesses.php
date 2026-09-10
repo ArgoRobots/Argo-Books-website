@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for rental businesses',
     'hero_sub' => 'Built around what you rent, who has it, when it\'s coming back, and what they owe. Rental management is included, not an add-on.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'rental',
 
     'features_label' => 'Made for Rental Businesses',
@@ -36,7 +36,7 @@ return [
         ['icon' => 'package-detail', 'h3' => 'Track what\'s out, who has it, and when it\'s coming back', 'p' => 'Argo Books has rental management built in. Add an item to your fleet, log it out to a customer with a rental period and rate, and when it comes back, the invoice already knows what\'s owed. No spreadsheet, no sticky notes on the office wall.'],
         ['icon' => 'credit-card', 'h3' => 'Deposit, rental fee, damage hold, all on the right line', 'p' => 'Bill the security deposit as its own line, the rental at the daily or weekly rate, and any late-return or damage charge as a separate line when the item comes back. Refund the deposit, apply it against damage, or roll the leftover into the next rental. The customer sees exactly what they paid.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt when you buy stock for the fleet', 'p' => 'Take a photo of the supplier receipt when you buy a new generator, a new tent, or a new case of replacement parts. Argo Books pulls the vendor, date, and amount automatically. Tag it Fleet Purchase or Repair so when you look at margins next quarter, the numbers are sitting where you put them.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers small fleets', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed in the yard, no monthly subscription climbing every year, no website to wait on when you\'re checking out a customer. The free tier covers most small fleets forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers small fleets', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed in the yard, no monthly subscription climbing every year, no website to wait on when you\'re checking out a customer. The free tier covers most small fleets forever.'],
     ],
 
     'honest_h3' => 'What Argo Books isn\'t',

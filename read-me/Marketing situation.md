@@ -7,7 +7,7 @@ Related: [Google Ads economics.md](Google%20Ads%20economics.md), [Email outreach
 ## Where things stand
 
 - Solo founder, bootstrapping. Argo Books has been in development for about 2 years.
-- Windows and Linux only. No macOS build yet.
+- Windows, macOS, and Linux. The macOS build shipped 2026-09-09; see [macOS](#macos) for what is still outstanding.
 - **2 paying customers.** Both signed up around May, both auto-renewed and the subscriptions are still active, although they don't use the app.
   - Customer 1 came from a YouTube video (the receipt scanning one).
   - Customer 2 came from Google search.
@@ -131,18 +131,20 @@ Programmatic SEO pages, clean site structure, all pages indexed in Google Search
 
 ## macOS
 
-Not shipped. A Mac signup list went live on the downloads page about a week ago with 3 signups, one of which is a family friend, which may not have real intent.
+**Shipped 2026-09-09.** The downloads page offers macOS alongside Windows and Linux, and the launch-notification signup form is gone from it.
 
-Build, signing, and release do not need owned hardware. GitHub Actions provides hosted macOS runners (Apple Silicon on current images), so `codesign`, `notarytool`, and DMG packaging can all run in CI with the Developer ID certificate stored as a repo secret. Still needs an Apple Developer Program membership (\$99/year USD) for the certificate and notarization.
+What changed since this section was written as a "should we?" question:
 
-Manual testing does need a Mac, and specifically Apple Silicon (M1 or newer):
+- **The hardware was bought.** Development and testing now happen on an Apple Silicon MacBook Air, which is what the build is verified on.
+- **Touch ID is implemented.** It goes through Apple's LocalAuthentication framework, as predicted here, paired with the login keychain for the stored password. Verified on real hardware, which is the one part that could never have been rented or automated.
+- **Two architectures are offered**, Apple Silicon and Intel, so the download page asks which Mac the visitor has rather than guessing. The browser cannot tell them apart: Safari and Chrome both report an Intel user agent on Apple Silicon.
 
-- **Test on what customers actually run.** Nearly all Macs sold in the last several years are Apple Silicon, so the shipped build should be `osx-arm64` and tested natively on arm64. An Intel Mac can only really test the x64 build, which runs on Apple Silicon through Rosetta 2 translation rather than natively. Apple has also stopped adding Intel support in new macOS releases, so an Intel machine goes stale fast.
-- **The fingerprint login feature needs real Touch ID hardware.** CI runners and cloud Mac services have no biometric sensor, so this path cannot be automated or rented. It also needs a separate macOS implementation: the Windows Hello APIs have no macOS equivalent, so the Mac side goes through Apple's LocalAuthentication framework.
+Still outstanding before this is a release anyone else can install:
 
-**The build itself is not the hard part.** Argo Books is Avalonia on .NET 10, so producing a macOS binary is a publish target (`osx-arm64`), which takes a few minutes. The actual costs are a Mac to test on and the Apple Developer membership.
+- **Apple Developer Program membership (\$99/year USD)**, for the Developer ID certificate and notarization. Without it macOS refuses a downloaded copy as "damaged", so this is not skippable.
+- **The appcast has an empty `url` on its macOS enclosure**, so no Mac has ever received an update. The first macOS release has to fill it in and sign the stapled zip.
 
-Given 2 paying customers and little macOS demand, the hardware purchase is a real cost. The signup list is the right way to gather that evidence before spending. Although, it's known that macOS is popular among small business owners in general. I plan on buying a Mac in the coming months.
+**Marketing action outstanding: the waitlist has not been told.** The signups are still in the database and visible at `/admin/mac-waitlist/`. They asked to be emailed when the Mac build landed, it has landed, and nobody has sent that email. It is the warmest list on the site, small as it is, and the one piece of the launch that is pure upside.
 
 ## Honest read
 

@@ -365,11 +365,14 @@ php_value upload_max_filesize 10M
 
     # --- Avalonia (cross-platform) download routes ---
 
+    # The macOS slugs are listed longest-first so mac-arm64 is not swallowed by mac.
+    # Bare "mac" stays valid: it was the public slug before there were two Mac builds.
+
     # Versioned: /download/avalonia/2.1.0/win
-    RewriteRule ^download/avalonia/([0-9]+\.[0-9]+\.[0-9]+)/(win|mac|linux)/?$ get_avalonia_installer.php?version=$1&platform=$2 [L,QSA]
+    RewriteRule ^download/avalonia/([0-9]+\.[0-9]+\.[0-9]+)/(win|mac-arm64|mac-intel|mac|linux)/?$ get_avalonia_installer.php?version=$1&platform=$2 [L,QSA]
 
     # Latest: /download/avalonia/win
-    RewriteRule ^download/avalonia/(win|mac|linux)/?$ get_avalonia_installer.php?platform=$1 [L,QSA]
+    RewriteRule ^download/avalonia/(win|mac-arm64|mac-intel|mac|linux)/?$ get_avalonia_installer.php?platform=$1 [L,QSA]
 
     # --- Free invoice generator niche pages ---
 

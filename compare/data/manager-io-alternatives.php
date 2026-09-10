@@ -65,7 +65,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>No accounting jargon</strong>, built for business owners rather than bookkeepers',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics',
         '<strong>Modern interface</strong> designed around the tasks you actually do each week',
     ],
@@ -119,7 +119,7 @@ return [
                             <p>Manager.io is built around traditional double-entry accounting and expects familiarity with journals and a chart of accounts.</p>'],
         ['q_html' => 'What does Argo Books have that Manager.io does not?', 'a_html' => '<p>AI receipt scanning, AI spreadsheet import and predictive cash flow analytics, none of which Manager.io offers.</p>
                             <p>Argo Books also has a more modern interface built around everyday tasks rather than accounting structures.</p>'],
-        ['q_html' => 'What platforms does Argo Books run on?', 'a_html' => '<p>Argo Books runs natively on Windows and Linux, like Manager.io\'s desktop edition.</p>'],
+        ['q_html' => 'What platforms does Argo Books run on?', 'a_html' => '<p>Argo Books runs natively on Windows, macOS, and Linux, like Manager.io\'s desktop edition.</p>'],
     ],
 
     'cta_h2' => 'Ready for local books without the learning curve?',

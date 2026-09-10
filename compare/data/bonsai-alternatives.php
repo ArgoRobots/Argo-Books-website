@@ -37,7 +37,7 @@ return [
         '<strong>One price, not one price per person.</strong> Bonsai bills per user, so a second person doubles your cost. Argo Books Premium is $' . $argo_monthly . ' CAD/month regardless of headcount.',
         '<strong>Invoicing is not an upgrade.</strong> Bonsai\'s Basic tier has no invoicing at all, so the real comparison starts at Essentials. Argo includes invoicing on the free plan.',
         '<strong>Your actual books.</strong> Expenses, receipts, inventory, financial reports and forecasting, where Bonsai focuses on client and project management.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your records open with no internet, and your data stays on your machine.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your records open with no internet, and your data stays on your machine.',
         '<strong>Priced in CAD.</strong> Bonsai publishes in US dollars, so what a Canadian actually pays moves with the exchange rate.',
     ],
     'callout_title' => 'Flat beats per-user',
@@ -66,7 +66,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>One flat price</strong> per business rather than per user, so adding people costs nothing',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, plus AI receipt scanning',
         '<strong>Priced in CAD</strong> at $' . $argo_monthly . '/month, so the amount never moves with the exchange rate',
     ],

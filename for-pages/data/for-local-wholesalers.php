@@ -21,12 +21,12 @@ return [
     'meta_description' => 'Accounting software for local wholesalers supplying restaurants, retailers, and specialty shops. Inventory, net-30 terms, standing orders, built in. Free desktop app.',
     'meta_keywords' => 'accounting software for wholesalers, wholesale distribution bookkeeping, small wholesaler accounting, local distributor software, inventory and invoicing software wholesale',
     'og_title' => 'Argo Books for Local Wholesalers: Inventory, Net-30, and Standing Orders',
-    'og_description' => 'Inventory, net-30 invoicing, and standing orders for local distributors. Free desktop app for Windows and Linux.',
+    'og_description' => 'Inventory, net-30 invoicing, and standing orders for local distributors. Free desktop app for Windows, macOS, and Linux.',
     'twitter_description' => 'Inventory, net-30 invoicing, and standing orders for local distributors.',
 
     'h1' => 'Accounting software for local wholesalers',
     'hero_sub' => 'Built for net-30 invoicing, standing orders, and the inventory that has to be on the truck Tuesday morning. Inventory management is included, not an upsell.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'inventory',
 
     'features_label' => 'Made for Local Wholesalers',
@@ -36,7 +36,7 @@ return [
         ['icon' => 'package', 'h3' => 'Inventory and reorder points, built in', 'p' => 'Track stock levels for every SKU, set a reorder point on the items that move, and Argo Books flags what\'s running low before the standing customer calls asking. Receive new stock, log it against the supplier, and the inventory and the books update together.'],
         ['icon' => 'calendar', 'h3' => 'Net-30, net-60, and standing orders', 'p' => 'Set payment terms when you send the invoice. The due date is calculated, the receivables report shows what\'s overdue versus what\'s still inside its window, and standing orders generate themselves on schedule so nothing slips because a regular customer was off your radar this week.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt from the manufacturer or the freight bill', 'p' => 'Take a photo of the supplier invoice or the freight bill when stock comes in. Argo Books pulls the vendor, date, and amount automatically. Tag it Inventory Purchase, Freight, or Returns so the cost-of-goods picture lines up with what you actually paid.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers small distributors', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed in the warehouse or on the route, no monthly subscription climbing every year, no website to load when you\'re packing a truck. The free tier covers most small distributors forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers small distributors', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed in the warehouse or on the route, no monthly subscription climbing every year, no website to load when you\'re packing a truck. The free tier covers most small distributors forever.'],
     ],
 
     'honest_h3' => 'What Argo Books isn\'t',

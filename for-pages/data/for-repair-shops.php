@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for repair shops',
     'hero_sub' => 'Built for the way you actually bill: the diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'customers',
 
     'features_label' => 'Made for Repair Shops',
@@ -35,7 +35,7 @@ return [
     'benefits' => [
         ['icon' => 'document-lines', 'h3' => 'Diagnostic fee, parts, and labor on one clean invoice', 'p' => 'Itemize the diagnostic fee, each part at the price the customer pays, and labor in hours at your shop rate. The customer sees exactly what they paid for, which cuts the awkward conversation at pickup down to a thank-you and a card swipe.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt from the parts supplier or hardware store', 'p' => 'Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Parts, Shop Supplies, Tools, or Fluids so when you actually look at margins next quarter, the numbers are sitting where you put them.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline at the bench, your data stays on your computer', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed to log a repair or build an invoice, no monthly subscription climbing every year, no website timing out when the shop wifi flakes. The free tier covers most one- and two-person shops forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline at the bench, your data stays on your computer', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed to log a repair or build an invoice, no monthly subscription climbing every year, no website timing out when the shop wifi flakes. The free tier covers most one- and two-person shops forever.'],
         ['icon' => 'credit-card', 'h3' => 'Get paid before the customer drives off', 'p' => 'Hand over the keys, swipe the card through Stripe or Square, and the invoice is marked paid. Or email the invoice on the spot and the customer can pay from the parking lot. Either way, you don\'t carry the balance home.'],
     ],
 

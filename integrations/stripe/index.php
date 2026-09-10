@@ -75,7 +75,7 @@ $faqs = [
             "@type": "SoftwareApplication",
             "name": "Argo Books",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows, Linux",
+            "operatingSystem": "Windows, macOS, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "0",

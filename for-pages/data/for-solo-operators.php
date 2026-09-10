@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for solo operators with inventory',
     'hero_sub' => 'Built for one person doing all the jobs: materials, finished goods, customer sales, and the receipts that keep your taxes honest.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'ai-receipts',
 
     'features_label' => 'Made for Solo Operators',
@@ -36,7 +36,7 @@ return [
         ['icon' => 'package-detail', 'h3' => 'Raw materials and finished goods, tracked together', 'p' => 'Track wax, fragrance, jars, and wicks as raw materials. Track your candle line as finished products. When you batch a hundred, record the materials used and the count produced. Inventory always reflects what\'s actually on the shelf, not what was there last spring.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt from the supplier or the craft store', 'p' => 'Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Materials, Packaging, Shipping Supplies, or Booth Fees so when tax time comes, every deductible expense is sitting in a category.'],
         ['icon' => 'pie-chart', 'h3' => 'See your margin per product, not just per month', 'p' => 'Argo Books shows the gap between what each product cost you to make and what it sold for. Slow-margin items show up as slow. The bestsellers tell you what to make more of. You stop pricing based on vibes and start pricing based on what actually works.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline at the craft fair, free tier covers solo operators', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed at the market booth, no monthly subscription climbing every year, no website to load when the venue wifi is gone. The free tier covers most solo operators forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline at the craft fair, free tier covers solo operators', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed at the market booth, no monthly subscription climbing every year, no website to load when the venue wifi is gone. The free tier covers most solo operators forever.'],
     ],
 
     'honest_h3' => 'What Argo Books isn\'t',

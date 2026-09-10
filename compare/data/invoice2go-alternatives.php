@@ -37,7 +37,7 @@ return [
     'why_list' => [
         '<strong>No invoice caps to work around.</strong> Invoice2Go Starter allows 2 invoices a month and Professional allows 5. Argo Books Premium does not cap invoices at all.',
         '<strong>Your actual books, not just invoicing.</strong> Expenses, receipts, inventory, reports and forecasting are all included, where Invoice2Go stops at billing.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly with no internet, and your data stays on your machine.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly with no internet, and your data stays on your machine.',
         '<strong>AI that\'s built in.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included rather than as an upsell.',
         '<strong>One predictable price in CAD.</strong> Invoice2Go publishes in USD. The figures here are converted to CAD so the comparison is like for like.',
     ],
@@ -67,7 +67,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>No invoice caps</strong> on Premium, so billing volume never forces an upgrade',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>Full bookkeeping</strong>: expenses, inventory, reports and forecasting, not just invoices',
         '<strong>Priced in CAD</strong> at $' . $argo_monthly . '/month, so the amount never moves with the exchange rate',
     ],
@@ -119,7 +119,7 @@ return [
                             <p>Invoice2Go is focused on invoicing and payments rather than keeping your books.</p>'],
         ['q_html' => 'Does Argo Books work offline?', 'a_html' => '<p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption.</p>
                             <p>Invoice2Go is cloud-based and needs a connection to reach your invoices.</p>'],
-        ['q_html' => 'What platforms does Argo Books run on?', 'a_html' => '<p>Argo Books runs natively on Windows and Linux. Because it\'s a desktop app, it\'s fast and responsive, with no browser tabs and no loading spinners.</p>
+        ['q_html' => 'What platforms does Argo Books run on?', 'a_html' => '<p>Argo Books runs natively on Windows, macOS, and Linux. Because it\'s a desktop app, it\'s fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Invoice2Go is web and mobile based.</p>'],
     ],
 

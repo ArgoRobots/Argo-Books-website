@@ -18,14 +18,14 @@ return [
 
     'breadcrumb' => 'For Landscapers',
     'title' => 'Argo Books for Landscapers: Bookkeeping Built for the Way You Bill',
-    'meta_description' => 'Accounting software for landscaping businesses. Built for deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free download for Windows and Linux.',
+    'meta_description' => 'Accounting software for landscaping businesses. Built for deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free download for Windows, macOS, and Linux.',
     'meta_keywords' => 'accounting software for landscapers, landscaping bookkeeping software, lawn care accounting, landscaper invoicing software, free accounting software landscaping',
     'og_title' => 'Argo Books for Landscapers: Bookkeeping Built for the Way You Bill',
     'og_description' => 'Deposits, materials, and seasonal cashflow, without the bookkeeping headache. Free desktop app for landscaping businesses.',
 
     'h1' => 'Accounting software for landscaping businesses',
     'hero_sub' => 'Built for the way you actually bill: deposits, materials, and seasonal cashflow, without the bookkeeping headache.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'invoices',
 
     'features_label' => 'Made for Landscapers',
@@ -62,7 +62,7 @@ return [
                             <p>You only need internet when you actually send an invoice or take a payment.</p>'],
         ['q_html' => 'Can I bill a deposit and final balance on the same invoice?', 'a_html' => '<p>Two ways: send a single invoice with the deposit listed at the top and a balance due, or send a deposit invoice now and a balance invoice when the job\'s done.</p>
                             <p>Both work. The second is what most landscapers use for multi-week installs.</p>'],
-        ['q_html' => 'Is there a phone app?', 'a_html' => '<p>Not yet. Argo Books is a desktop application for Windows and Linux.</p>
+        ['q_html' => 'Is there a phone app?', 'a_html' => '<p>Not yet. Argo Books is a desktop application for Windows, macOS, and Linux.</p>
                             <p>If you need to send an invoice in the field, you can take receipt photos on your phone and import them when you\'re back at the laptop.</p>'],
         ['q_html' => 'Can I run payroll for my crew?', 'a_html' => '<p>Yes, for Canadian staff. Enter each person\'s hours and Argo Books works out CPP, EI and federal and provincial income tax from the CRA\'s own tables, for every province and territory, then prints the pay stubs and records the wages in your books.</p>
                             <p>Seasonal crews coming and going are handled, including the Record of Employment worksheet when someone finishes for the year, and at year end it prepares your T4 slips and the file the CRA needs. Payroll is part of Premium at $' . $argo_monthly . ' CAD/month, with no per-employee fee. It does not cover staff outside Canada.</p>'],

@@ -36,7 +36,7 @@ return [
     'why_list' => [
         '<strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no ERP modules to install or configure and no accounting jargon to learn.',
         '<strong>A genuinely usable free plan.</strong> All the core finance features forever, no credit card. Odoo\'s free plan is limited to a single app, so a second module already means paying per user.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, with no server to host or maintain.',
         '<strong>AI that\'s included, not upsold.</strong> Receipt scanning, spreadsheet import, and predictive analytics come built in, with no consultant or implementation project required.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month, flat. No per-user fees, so your cost doesn\'t climb as your team grows.',
     ],
@@ -67,7 +67,7 @@ return [
     'argo_pros' => [
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month for your whole team, with no per-user fees',
         '<strong>All your finances in one app</strong>: invoicing, expenses, inventory, and reporting, with no ERP modules to configure',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with no server to host',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with no server to host',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>Simple from day one</strong>, no consultant or implementation project to get started',
     ],

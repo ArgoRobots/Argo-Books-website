@@ -5,12 +5,15 @@
  * Filesystem layout:
  *   resources/downloads/{version}/
  *     Argo Books Installer V.{version}.exe        (Windows)
- *     ArgoBooks-{version}-osx-arm64.zip            (macOS, future)
- *     ArgoBooks-{version}-linux-x64.AppImage       (Linux, future)
+ *     ArgoBooks-{version}-osx-arm64.zip           (macOS, Apple Silicon)
+ *     ArgoBooks-{version}-osx-x64.zip             (macOS, Intel)
+ *     ArgoBooks-{version}-linux-x64.AppImage      (Linux)
  *
  * URL examples:
  *   /download/avalonia/win           -> latest Windows installer
- *   /download/avalonia/mac           -> latest macOS zip
+ *   /download/avalonia/mac-arm64     -> latest macOS zip, Apple Silicon
+ *   /download/avalonia/mac-intel     -> latest macOS zip, Intel
+ *   /download/avalonia/mac           -> alias for mac-arm64, see below
  *   /download/avalonia/linux         -> latest Linux AppImage
  *   /download/avalonia/2.1.0/win     -> specific version Windows installer
  */
@@ -21,9 +24,14 @@ require_once __DIR__ . '/track_referral_event.php';
 // Platform file patterns: platform key => filename pattern
 // {version} is replaced at runtime
 $platformPatterns = [
-    'win'   => 'Argo Books Installer V.{version}.exe',
-    'mac'   => 'ArgoBooks-{version}-osx-arm64.zip',
-    'linux' => 'ArgoBooks-{version}-linux-x64.AppImage',
+    'win'       => 'Argo Books Installer V.{version}.exe',
+    'mac-arm64' => 'ArgoBooks-{version}-osx-arm64.zip',
+    'mac-intel' => 'ArgoBooks-{version}-osx-x64.zip',
+    // Kept because it is the slug that has been public since before there were two macOS
+    // builds. Apple Silicon is the safer default of the two: it is every Mac sold since
+    // 2020, and an Intel owner who lands here has the picker on the downloads page.
+    'mac'       => 'ArgoBooks-{version}-osx-arm64.zip',
+    'linux'     => 'ArgoBooks-{version}-linux-x64.AppImage',
 ];
 
 // MIME types per extension
@@ -168,7 +176,7 @@ if (!isset($_SESSION['referral_source'])
 // Platform is required
 if (!$requestedPlatform || !isset($platformPatterns[$requestedPlatform])) {
     http_response_code(400);
-    die('Missing or invalid platform. Use: win, mac, or linux');
+    die('Missing or invalid platform. Use: win, mac-arm64, mac-intel, or linux');
 }
 
 // Validate the version format before it is ever used to build a filesystem path.

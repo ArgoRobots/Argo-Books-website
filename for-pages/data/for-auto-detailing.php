@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for auto detailing',
     'hero_sub' => 'Built for tiered packages, ceramic coating jobs, and the supply receipts that quietly add up. From the express wash to the full multi-day correction.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'invoices',
 
     'features_label' => 'Made for Detailers',
@@ -36,7 +36,7 @@ return [
         ['icon' => 'document-lines', 'h3' => 'Base package and add-ons on one clean invoice', 'p' => 'Express, Full, or Ceramic Coating on the top line. Pet hair, heavy dirt, headlight restoration, or engine bay each on their own line. The customer sees the base price and what the extras added, which keeps the up-charge conversation short and the bill itemized.'],
         ['icon' => 'refresh', 'h3' => 'Recurring invoices for memberships and fleet accounts', 'p' => 'Monthly maintenance memberships and weekly fleet washes both run on the same recurring engine. Set the client, the package, and the frequency once, and the invoice goes out on time every cycle.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt from the detail supply house or the gas station', 'p' => 'Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Supplies, Ceramic Products, Fuel, or Equipment so you can actually see what the supply stack costs you each month and price the next package accordingly.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline in the driveway, free tier covers solo detailers', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed in the customer\'s driveway, no monthly subscription climbing every year. Mobile detailers can build the invoice with no signal, send it when they\'re back in coverage. The free tier covers most solo detailers forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline in the driveway, free tier covers solo detailers', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed in the customer\'s driveway, no monthly subscription climbing every year. Mobile detailers can build the invoice with no signal, send it when they\'re back in coverage. The free tier covers most solo detailers forever.'],
     ],
 
     'honest_h3' => 'What Argo Books isn\'t',

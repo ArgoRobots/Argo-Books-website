@@ -18,7 +18,7 @@ return [
 
     'breadcrumb' => 'For Contractors',
     'title' => 'Argo Books for Contractors: Bookkeeping Built for Progress Billing',
-    'meta_description' => 'Accounting software for general contractors and tradespeople. Built for progress billing, materials, and change orders. Free desktop app for Windows and Linux.',
+    'meta_description' => 'Accounting software for general contractors and tradespeople. Built for progress billing, materials, and change orders. Free desktop app for Windows, macOS, and Linux.',
     'meta_keywords' => 'accounting software for contractors, contractor bookkeeping software, construction invoicing software, contractor accounting app, free accounting software contractor',
     'og_title' => 'Argo Books for Contractors: Bookkeeping Built for Progress Billing',
     'og_description' => 'Deposits, mid-job draws, materials, and change orders, without the bookkeeping headache. Free desktop app for contractors.',
@@ -28,7 +28,7 @@ return [
 
     'h1' => 'Accounting software<br>for contractors',
     'hero_sub' => 'Built for progress billing: deposits, mid-job draws, materials, and change orders, without the bookkeeping headache.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card, and your books stay on your own computer.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card, and your books stay on your own computer.',
     'demo' => 'invoices',
 
     'features_label' => 'Made for Contractors',

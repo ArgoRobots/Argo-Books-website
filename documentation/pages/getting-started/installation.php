@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Installation Guide';
-$pageDescription = 'Learn how to download and install Argo Books on Windows or Linux. The macOS build is coming soon.';
+$pageDescription = 'Learn how to download and install Argo Books on Windows, macOS, or Linux.';
 $currentPage = 'installation';
 $pageCategory = 'getting-started';
 
@@ -24,7 +24,16 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <h2>macOS</h2>
-            <p><strong>Coming soon.</strong> There is no macOS build of Argo Books yet, so there is nothing to install on a Mac at the moment. You can leave your email on the <a class="link" href="../../../downloads/">downloads page</a> to be notified once the Mac version ships. Installation steps will be added here at the same time.</p>
+            <ol class="steps-list">
+                <li>Download the <strong>.zip</strong> for your Mac from the <a class="link" href="../../../downloads/">downloads page</a>. Choose <strong>Apple Silicon</strong> or <strong>Intel</strong> to match your machine; if you are not sure, open the Apple menu and choose <strong>About This Mac</strong>, then read the Chip or Processor line</li>
+                <li>Double-click the downloaded .zip to unpack it, which produces <strong>Argo Books.app</strong></li>
+                <li>Drag <strong>Argo Books.app</strong> into your <strong>Applications</strong> folder</li>
+                <li>Double-click it to launch Argo Books</li>
+            </ol>
+
+            <div class="info-box">
+                <strong>Tip:</strong> macOS requires 14 Sonoma or later. Downloading the build for the wrong processor is harmless: it simply will not open, and you can take the other one instead.
+            </div>
 
             <h2>Linux</h2>
             <ol class="steps-list">

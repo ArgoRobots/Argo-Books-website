@@ -44,7 +44,7 @@ return [
         '<strong>Payroll is not a separate subscription.</strong> The same $' . $argo_monthly . ' covers invoicing, expenses, receipt scanning, reports and inventory. With Wagepoint you are paying for payroll on top of whatever keeps your books.',
         '<strong>Your staff data stays on your computer.</strong> Names, social insurance numbers and salaries are written to your own machine rather than held by a payroll provider. Wagepoint is cloud only.',
         '<strong>The wages are already in your books.</strong> Approving a run posts the payroll expense directly, so payday matches your bank statement without an export or an integration in between.',
-        '<strong>It works offline.</strong> A desktop app for Windows and Linux, so a pay run does not depend on a connection or on a provider being up.',
+        '<strong>It works offline.</strong> A desktop app for Windows, macOS, and Linux, so a pay run does not depend on a connection or on a provider being up.',
     ],
     'callout_title' => 'The per-employee fee',
     'callout_sub' => 'At five people, Wagepoint Unlimited runs about $' . number_format($wp_gap_year) . ' a year more than Argo Books',
@@ -86,7 +86,7 @@ return [
         'You upload the T4 XML and make the remittance yourself; Wagepoint does both for you',
         'No direct deposit, so paying staff is still a bank transfer you make',
         'Records of Employment are prepared but not filed, since only Service Canada issues them through ROE Web',
-        'Windows and Linux only, with no mobile app and no Mac build yet',
+        'Desktop only, with no mobile app for running payroll away from your computer',
     ],
     'competitor_cons' => [
         '<strong>Priced per employee</strong>, so the monthly bill grows every time you hire',

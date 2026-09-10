@@ -39,7 +39,7 @@ return [
     'why_list' => [
         '<strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.',
         '<strong>A genuinely free plan.</strong> All the core features forever, no trial and no credit card. Sage 50 has no free plan, only a time-limited trial.',
-        '<strong>Modern and cross-platform.</strong> A native desktop app that runs on Windows and Linux, with a clean modern interface. Sage 50 is powerful, but it\'s Windows-only and its interface looks and feels its age.',
+        '<strong>Modern and cross-platform.</strong> A native desktop app that runs on Windows, macOS, and Linux, with a clean modern interface. Sage 50 is powerful, but it\'s Windows-only and its interface looks and feels its age.',
         '<strong>AI that\'s included, not upsold.</strong> Receipt scanning, bank-statement import, and spreadsheet import are built into Premium at $' . $argo_monthly . '/mo. On Sage 50 that same document capture is a paid add-on, AutoEntry, at about $' . $sage_autoentry . ' CAD/month for 500 credits.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month. No annual lock-in and none of Sage\'s four-figure yearly bills.',
     ],
@@ -56,7 +56,7 @@ return [
         ['Invoicing &amp; payments', 'yes', 'yes', 'yes'],
         ['Inventory management', 'yes', 'yes', 'yes'],
         ['Desktop app (offline-capable)', 'yes', 'yes', 'yes'],
-        ['Runs on Windows &amp; Linux', 'yes', 'yes', 'no'],
+        ['Runs on Windows, macOS &amp; Linux', 'yes', 'yes', 'no'],
         ['No accounting knowledge required', 'yes', 'yes', 'no'],
         ['AI receipt scanning', 'yes', 'yes', 'no'],
         ['AI spreadsheet import', 'yes', 'yes', 'no'],
@@ -70,7 +70,7 @@ return [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month vs Sage from around $' . $sage_pro . '/month (billed yearly)',
         '<strong>Modern and simple</strong>, built for business owners with no accounting degree required',
-        '<strong>Truly cross-platform</strong>, runs on Windows and Linux from one app',
+        '<strong>Truly cross-platform</strong>, runs on Windows, macOS, and Linux from one app',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
     ],
     'argo_cons' => [
@@ -95,7 +95,7 @@ return [
     'key_desc' => 'Both tools are desktop accounting apps, but they focus on different things. Sage 50 shines at deep, complex accounting for established businesses. Argo Books focuses on being simple, affordable, and cross-platform.',
     'key_cards' => [
         ['tone' => '', 'icon' => 'dollar', 'h3' => 'A fraction of the cost', 'p' => 'Sage 50 runs from about $814/year up to $5,636/year, billed annually. Argo Books has a free version with core features, and Premium is just $' . $argo_monthly . ' CAD/month.'],
-        ['tone' => 'purple', 'icon' => 'bolt', 'h3' => 'Modern &amp; cross-platform', 'p' => 'Sage 50 is powerful but Windows-only with a steep learning curve. Argo Books is the opposite: so simple that anyone can keep their own books from day one, with no training and no accounting background, on Windows or Linux.'],
+        ['tone' => 'purple', 'icon' => 'bolt', 'h3' => 'Modern &amp; cross-platform', 'p' => 'Sage 50 is powerful but Windows-only with a steep learning curve. Argo Books is the opposite: so simple that anyone can keep their own books from day one, with no training and no accounting background, on Windows, macOS, or Linux.'],
         ['tone' => 'green', 'icon' => 'map-pin', 'h3' => 'Made in Canada', 'p' => 'Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.'],
     ],
 

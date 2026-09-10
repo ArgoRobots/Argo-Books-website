@@ -66,7 +66,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>No accounting jargon</strong>, built for business owners rather than bookkeepers',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux, with your data stored locally',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux, with your data stored locally',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics',
         '<strong>Modern invoicing</strong> with templates and a payment link your customer can click',
     ],

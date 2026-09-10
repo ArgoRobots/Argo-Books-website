@@ -2033,7 +2033,7 @@ function generate_draft_for_lead($pdo, $lead)
         $subject = 'Partnership idea for your audience';
         $body =
             $greeting . "\n\n"
-            . "I'm Evan, the developer of Argo Books, a free, simple bookkeeping and accounting app for small businesses. It runs on Windows and Linux, and is easy to use.\n\n"
+            . "I'm Evan, the developer of Argo Books, a free, simple bookkeeping and accounting app for small businesses. It runs on Windows, macOS, and Linux, and is easy to use.\n\n"
             . "I think your audience would be a good fit, so I'd like to invite you to join our affiliate program. You'd earn 50% recurring commission on the first 12 months of Premium for anyone who upgrades through your referral link. It's free to join, with a real-time dashboard and PayPal payouts: https://argorobots.com/affiliates\n\n"
             . "I can give you Premium access to Argo Books so you can try it yourself and see whether it's a fit for your audience.\n\n"
             . "If you're interested, just reply and I'll send over the details.\n\n"
@@ -2077,7 +2077,7 @@ function generate_draft_for_lead($pdo, $lead)
         $body =
             $greeting . "\n\n"
             . $articleRef . " and thought Argo Books might be worth adding.\n\n"
-            . "I'm Evan, the developer. Argo Books is a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. It is a desktop app for Windows and Linux, so unlike the cloud tools that usually fill these lists, the data stays on the user's own computer. It has a genuinely free tier with no user cap.\n\n"
+            . "I'm Evan, the developer. Argo Books is a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. It is a desktop app for Windows, macOS, and Linux, so unlike the cloud tools that usually fill these lists, the data stays on the user's own computer. It has a genuinely free tier with no user cap.\n\n"
             . "Happy to send whatever would help, a short blurb in your format, screenshots, or a feature list, and I'd gladly add a link to your article from our site. If your roundup uses affiliate links, we also have an affiliate program, 50% recurring on a referral's first 12 months: https://argorobots.com/affiliates\n\n"
             . "You can see it here: https://argorobots.com/\n\n"
             . "If you think it's a fit, just reply and I'll send what you need.\n\n"

@@ -24,7 +24,7 @@ $shots_html = $has_shots ? <<<'HTML'
   <div class="wfa-figure-half">
     <img class="wfa-shot-light" src="/resources/images/winforms-to-avalonia/after-avalonia.webp" alt="Argo Books version 2, the dashboard in Avalonia" width="2000" height="1273">
     <img class="wfa-shot-dark" src="/resources/images/winforms-to-avalonia/after-avalonia-dark.webp" alt="" aria-hidden="true" width="2000" height="1273">
-    <figcaption><span class="wfa-tag wfa-tag-new">After</span> Version 2, Avalonia, Windows and Linux</figcaption>
+    <figcaption><span class="wfa-tag wfa-tag-new">After</span> Version 2, Avalonia, Windows, macOS, and Linux</figcaption>
   </div>
 </figure>
 HTML : '';
@@ -52,7 +52,7 @@ return [
   'intro_html' => <<<'HTML'
 <p>Most framework comparisons are written by someone who built a to-do list in both. This one comes out of a production accounting application with paying customers, rebuilt over nine months by one developer.</p>
 
-<p>Argo Books version 1 was a Windows-only WinForms application: 91,089 lines of C# across 246 files. Version 2 is the same product on Avalonia, running on Windows and Linux, with macOS on the way. Every number below was measured from the two codebases.</p>
+<p>Argo Books version 1 was a Windows-only WinForms application: 91,089 lines of C# across 246 files. Version 2 is the same product on Avalonia, running on Windows, macOS, and Linux. Every number below was measured from the two codebases.</p>
 
 <p>Reaching more operating systems was the reason I started, and it’s a good reason on its own. What I didn’t expect was that it would end up as one of the smaller benefits. The interesting part is which problems disappeared along the way.</p>
 HTML,
@@ -480,7 +480,7 @@ HTML,
     </thead>
     <tbody>
       <tr><th>Framework</th><td>WinForms on .NET 9</td><td>Avalonia on .NET 10</td></tr>
-      <tr><th>Operating systems</th><td>Windows only, permanently</td><td>Windows and Linux, macOS on the way</td></tr>
+      <tr><th>Operating systems</th><td>Windows only, permanently</td><td>Windows, macOS, and Linux</td></tr>
       <tr><th>C# files</th><td>246</td><td>1,053</td></tr>
       <tr><th>Lines of C#</th><td>91,089</td><td>252,438</td></tr>
       <tr><th>Markup</th><td>none</td><td>171 files, 48,864 lines</td></tr>
@@ -496,7 +496,7 @@ HTML,
   </table>
 </div>
 
-<p class="wfa-note">Version 2 is a much larger application, not a reskin. Invoicing, an online payment portal, Canadian payroll, bank statement import, revenue forecasting and 54 languages have no equivalent in version 1 at all, so most of the growth in C# is new product rather than migrated code. Windows and Linux are released today. macOS builds from the same source and hasn’t shipped yet.</p>
+<p class="wfa-note">Version 2 is a much larger application, not a reskin. Invoicing, an online payment portal, Canadian payroll, bank statement import, revenue forecasting and 54 languages have no equivalent in version 1 at all, so most of the growth in C# is new product rather than migrated code. Windows, macOS, and Linux all ship from the same source.</p>
 HTML,
     ],
 
@@ -574,7 +574,7 @@ HTML,
 
 <p>There’s also a plainer commercial argument I should say out loud, because it’s the one that pays for the nine months. Every Mac and Linux user was somebody I had nothing to sell. Not a harder sale or a worse conversion rate: no product at all. And you never notice them, because they don’t show up in your analytics as lost customers. They just never arrive.</p>
 
-<p>I know that demand is real because the Mac build isn’t out yet and people are already signing up to be told when it lands. That’s a waitlist for software that doesn’t exist, on a platform I couldn’t have shipped to under any circumstances a year ago. Every one of those signups was worth exactly nothing to version 1.</p>
+<p>I know that demand was real because people signed up to be told when the Mac build landed, months before there was one. That was a waitlist for software that didn’t exist, on a platform I couldn’t have shipped to under any circumstances a year ago. Every one of those signups was worth exactly nothing to version 1. They have something to download now.</p>
 
 <p>Reaching more operating systems is the benefit I can point at on a download page, and the one that shows up in revenue. The rest of that list is the reason I’d have done it anyway.</p>
 HTML,
@@ -585,7 +585,7 @@ HTML,
   // The natural next step for a reader of this piece is the app itself, not the
   // invoice generator.
   'callout_after_section_index' => 5,
-  'tool_callout_text' => 'Argo Books runs on Windows and Linux, and your data stays on your computer.',
+  'tool_callout_text' => 'Argo Books runs on Windows, macOS, and Linux, and your data stays on your computer.',
   'tool_callout_cta'  => 'Download Argo Books',
   'tool_callout_url'  => '/downloads/',
 
@@ -596,7 +596,7 @@ HTML,
     ],
     [
       'q' => 'Is Avalonia ready for production desktop apps?',
-      'a' => 'Argo Books is an accounting product with paying customers, released on Avalonia for Windows and Linux, with macOS on the way, and with encrypted local files, AI receipt scanning, invoicing, payroll and charts across every screen. The framework wasn’t the limiting factor at any point in the nine months, and I never hit something Avalonia couldn’t do and had to design around.',
+      'a' => 'Argo Books is an accounting product with paying customers, released on Avalonia for Windows, macOS, and Linux, and with encrypted local files, AI receipt scanning, invoicing, payroll and charts across every screen. The framework wasn’t the limiting factor at any point in the nine months, and I never hit something Avalonia couldn’t do and had to design around.',
     ],
     [
       'q' => 'Why does my WinForms app look wrong on different monitors?',

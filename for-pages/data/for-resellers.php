@@ -18,7 +18,7 @@ return [
 
     'breadcrumb' => 'For Resellers',
     'title' => 'Argo Books for Resellers: Cost of Goods, Sourcing Receipts, and Real Margins',
-    'meta_description' => 'Accounting software for online resellers and thrift flippers. Track cost of goods, sourcing receipts, and margins by channel. Free desktop app for Windows and Linux.',
+    'meta_description' => 'Accounting software for online resellers and thrift flippers. Track cost of goods, sourcing receipts, and margins by channel. Free desktop app for Windows, macOS, and Linux.',
     'meta_keywords' => 'accounting software for resellers, ebay reseller bookkeeping, amazon fba accounting, thrift flipper accounting, online reseller tax software',
     'og_title' => 'Argo Books for Resellers: Cost of Goods, Sourcing Receipts, and Real Margins',
     'og_description' => 'Track what every item cost you, where it sold, and what\'s left in inventory. Free desktop app for resellers.',
@@ -26,7 +26,7 @@ return [
 
     'h1' => 'Accounting software for resellers',
     'hero_sub' => 'Track what every item cost you, where it sold, and what the margin actually was. Sourcing receipts, inventory, and the tax-time picture, all in one app.',
-    'hero_facts' => 'Free desktop app for Windows and Linux. No account, no credit card.',
+    'hero_facts' => 'Free desktop app for Windows, macOS, and Linux. No account, no credit card.',
     'demo' => 'inventory',
 
     'features_label' => 'Made for Resellers',
@@ -36,7 +36,7 @@ return [
         ['icon' => 'shopping-bag', 'h3' => 'Every item, from purchase to sale', 'p' => 'Add an item to inventory at the price you paid: the thrift price, the auction-lot unit cost, the wholesale per-piece. When it sells, log the sale at the price you got. The cost-of-goods number that flows into your taxes is exactly what you spent, not an estimate.'],
         ['icon' => 'receipt-scan-detail', 'h3' => 'Snap a receipt from the thrift store, the auction, or the wholesale lot', 'p' => 'Take a photo and Argo Books pulls the vendor, date, and amount automatically. Tag it Sourcing, Shipping Supplies, or Vehicle so when the year wraps up, every deductible expense is sitting in a category, not in a shoebox.'],
         ['icon' => 'bar-chart', 'h3' => 'See the margin before tax time, not after', 'p' => 'Argo Books shows revenue, cost of goods, and the gap between them in real time. You stop running the business on vibes. Slow-selling categories show up as slow. Profitable ones get more shelf space.'],
-        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers solo resellers', 'p' => 'Argo Books runs natively on Windows and Linux. No internet needed in the garage or at the auction, no monthly subscription climbing every year. The free tier covers most side-hustle and solo full-time resellers forever.'],
+        ['icon' => 'shield-check', 'h3' => 'Works offline, free tier covers solo resellers', 'p' => 'Argo Books runs natively on Windows, macOS, and Linux. No internet needed in the garage or at the auction, no monthly subscription climbing every year. The free tier covers most side-hustle and solo full-time resellers forever.'],
     ],
 
     'honest_h3' => 'What Argo Books isn\'t',

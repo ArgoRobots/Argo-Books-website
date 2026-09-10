@@ -38,7 +38,7 @@ return [
     'why_list' => [
         '<strong>It actually keeps your books.</strong> Invoicing, expenses, receipts, inventory, and reports in one clean app. HoneyBook isn\'t accounting software, so with it you\'d still need a separate tool for your books.',
         '<strong>A genuinely free plan.</strong> All the core features forever, no trial and no credit card. HoneyBook has no free plan, just a 7-day trial.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, while HoneyBook is cloud-only.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, while HoneyBook is cloud-only.',
         '<strong>AI built into your books.</strong> Receipt scanning, spreadsheet import, and predictive analytics come included, aimed at your bookkeeping rather than your client pipeline.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month. No per-client fees, and no HoneyBook-style $' . $hb_starter . '+ CAD/month floor.',
     ],
@@ -67,7 +67,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>Real bookkeeping and invoicing in one app</strong>, so you\'re not stitching together separate tools',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux',
         '<strong>AI included</strong>: receipt scanning, spreadsheet import, and predictive analytics',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month with no per-client fees',
     ],

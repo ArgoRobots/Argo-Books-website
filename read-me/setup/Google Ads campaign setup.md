@@ -265,14 +265,16 @@ Exclude both device types:
 
 A -100% bid adjustment means "never show on this device".
 
-### The Mac problem (no exclusion available)
+### Mac traffic (no longer a problem)
 
-You cannot exclude macOS on a Search campaign. Google Search targets only by device type (computer, mobile, tablet), never by operating system. Operating-system targeting exists only in Display, Video, and App campaigns. So Mac desktops still see and click the ads, and there is no setting to stop it.
+This used to be a section about wasted spend. Google Search cannot target or exclude by operating system at all: it targets device type only (computer, mobile, tablet), and OS targeting exists only in Display, Video, and App campaigns. So Mac desktops saw the ads, clicked them, and landed on a page with nothing to download.
 
-Two partial mitigations, both already in place:
+Since the macOS build shipped on 2026-09-09, that click converts like any other. Nothing needs excluding, and there is nothing left to mitigate.
 
-- **Ad copy.** Put "for Windows" in a headline or description so Mac users self-select out before they click. This is the closest thing to a Mac exclusion on Search.
-- **The downloads-page waitlist.** The macOS card on `/downloads/` collects an email instead of a dead-end "Coming soon", so Mac visitors who click through are captured for a future Mac launch rather than lost. See `admin/mac-waitlist/`.
+Two things follow from that:
+
+- **Do not put "for Windows" in ad copy.** Earlier advice here said to, so Mac users would self-select out before costing a click. Doing that now turns away qualified traffic. The headlines and descriptions above never carried it, so there is nothing to undo, but do not add it back.
+- **Mac is worth its own keywords.** "accounting software for mac" is a real search with real intent, and `/accounting-software-for-mac/` already exists to land it on. It was not worth bidding on while there was nothing to sell those visitors.
 
 ## Conversion tracking setup
 

@@ -50,7 +50,7 @@ HTML,
 <p>When people say "accounting software for Mac," they're really talking about two different kinds of product. Knowing which one you're looking at saves a lot of confusion.</p>
 {{illustration:compare-scale}}
 <p><strong>Browser-based cloud tools.</strong> These live on a website. You log in through Safari or Chrome, and your data sits on the company's servers. There's nothing to install, and because it's just a web page, it works the same on a Mac as anywhere else. Xero, Wave, FreshBooks, and QuickBooks Online all fit here. The upsides are real: you can log in from any device, and updates happen automatically. The trade-offs are just as real: you need a working internet connection to do your books, your data lives with the provider, and you're usually paying a monthly subscription for as long as you use it.</p>
-<p><strong>Native and cross-platform desktop apps.</strong> These install on your Mac and run as actual applications. Your books live in a file on your own machine, so they open fast and keep working offline. Some desktop apps are Mac-only; others are cross-platform, meaning the same app runs on macOS, Windows, and Linux, which is handy if you have a mix of machines or might switch later. Check the platform list before you fall for one: a fair number of cross-platform apps, including this site's own Argo Books, ship Windows and Linux builds without a macOS one. The upside is ownership and independence from your connection; the trade-off is that you're responsible for backing up your own file, and native apps tend to have fewer instant third-party connections than the big cloud platforms.</p>
+<p><strong>Native and cross-platform desktop apps.</strong> These install on your Mac and run as actual applications. Your books live in a file on your own machine, so they open fast and keep working offline. Some desktop apps are Mac-only; others are cross-platform, meaning the same app runs on macOS, Windows, and Linux, which is handy if you have a mix of machines or might switch later. Check the platform list before you fall for one: a fair number of apps that call themselves cross-platform ship Windows and Linux builds without a macOS one. The upside is ownership and independence from your connection; the trade-off is that you're responsible for backing up your own file, and native apps tend to have fewer instant third-party connections than the big cloud platforms.</p>
 <p>Neither path is automatically better. A consultant who works from cafes on three devices may love the cloud. A shop owner who wants their books on their own Mac and no monthly fee creeping up may want a native app. The point is that both exist for Mac, so pick the one that fits how you actually work.</p>
 HTML,
     ],
@@ -93,11 +93,11 @@ HTML,
       'h2' => 'Where Argo Books fits (and where it doesn\'t)',
       'anchor' => 'where-argo-fits',
       'html' => <<<'HTML'
-<p>Since you're reading this on the Argo Books site, here's the straight version, starting with the part that matters most to you: <strong>Argo Books does not have a Mac build today.</strong> It's a genuine offline desktop app, but the builds that exist right now are Windows and Linux. If you're on a Mac and nothing else, this is not your tool today, and the rest of this guide is the more useful part of the page. If you also run a Windows or Linux machine, or you're weighing what to move to later, here's what it does and doesn't do.</p>
+<p>Since you're reading this on the Argo Books site, here's the straight version, starting with the part that matters most to you: <strong>Argo Books runs natively on a Mac.</strong> It's a genuine offline desktop app rather than a browser tab in a wrapper, with builds for both Apple Silicon and Intel Macs running macOS 14 Sonoma or later. Here's what it does and doesn't do.</p>
 <p><strong>What it's good at:</strong></p>
 <ul>
 <li>It's a real installed app that works offline. Your books are stored locally on your own machine, not on someone else's server, so you keep working whether or not you have a connection.</li>
-<li>It's cross-platform between Windows and Linux, so there's no Windows-only lock-in. Move between those machines, or run a mix, and your books come with you.</li>
+<li>It's cross-platform across macOS, Windows, and Linux, so there's no lock-in to any of them. Move between machines, or run a mix, and your books come with you.</li>
 <li>It's free to start, and Premium is a flat ${argo_premium_monthly}/month or ${argo_premium_yearly}/year in Canadian dollars, not a price that quietly climbs. The free tier covers up to {argo_free_invoice_limit} invoices and {argo_free_receipt_scan_limit} receipt scans a month; Premium lifts that to unlimited invoices and {argo_receipt_scan_limit} receipt scans a month and adds predictive cash-flow analytics, biometric login, and priority support.</li>
 <li>It covers the core small-business jobs: invoicing and taking payments and refunds, AI receipt scanning, expense and revenue tracking, inventory and cost of goods sold, and a report builder for profit and loss, balance sheet, and tax-ready reports. It also tracks sales tax you collected against tax you paid and gives you a summary.</li>
 </ul>
@@ -107,9 +107,8 @@ HTML,
 <li>The only live third-party integration is Stripe, for importing your Stripe sales, fees, and customers. There's no built-in sync with Etsy, Shopify, Amazon, Square, or PayPal. More integrations are planned, but if you need automatic marketplace syncing today, look elsewhere or plan to import.</li>
 <li>It tracks your sales tax so you can see what you owe, but it does not file or remit tax for you. That part is still on you or your accountant.</li>
 <li>Prices are in Canadian dollars, since Argo is based in Canada.</li>
-<li>There's no macOS build, so it can't be your answer if a Mac is the only computer you work on.</li>
 </ul>
-<p>Put simply: Argo Books suits someone on Windows or Linux who does their own books and wants a real offline app that keeps data on their machine, is cheap, and has inventory and cost of goods sold built in. If you're Mac-only, or your top need is hands-off marketplace syncing or a live bank feed, one of the other options in this guide is the more honest match.</p>
+<p>Put simply: Argo Books suits someone who does their own books and wants a real offline app that keeps data on their machine, is cheap, and has inventory and cost of goods sold built in. If your top need is hands-off marketplace syncing or a live bank feed, one of the other options in this guide is the more honest match.</p>
 HTML,
     ],
 
@@ -143,14 +142,14 @@ HTML,
 
   'callout_after_section_index' => 2,
 
-  'tool_callout_text' => 'Argo Books is an offline desktop app for Windows and Linux that keeps your data on your own machine. No macOS build yet, but if you run either of those, see how invoicing works, free to start.',
+  'tool_callout_text' => 'Argo Books is an offline desktop app for macOS, Windows, and Linux that keeps your data on your own machine. See how invoicing works, free to start.',
   'tool_callout_cta' => 'See invoicing in Argo Books',
   'tool_callout_url' => '/features/invoicing/',
 
   'faqs' => [
     [
       'q' => 'Is there still good accounting software for Mac now that QuickBooks dropped its Mac desktop app?',
-      'a' => 'Yes, you have real choices. Since QuickBooks discontinued its dedicated Mac desktop product, Mac users mostly get steered to browser-based cloud tools like Xero, Wave, FreshBooks, or QuickBooks Online, and those all run fine in Safari or Chrome. But you don\'t have to use the cloud. There are also true desktop apps that install and run natively on macOS, and they store your books in a file on your own machine and keep working offline. Worth knowing before you shortlist: plenty of cross-platform desktop apps ship Windows and Linux builds only, so check the platform list rather than assuming. Argo Books, this site\'s own app, is in that group today. So the market didn\'t leave Mac users behind, it just split into cloud tools and native apps. Pick the kind that matches how you work.',
+      'a' => 'Yes, you have real choices. Since QuickBooks discontinued its dedicated Mac desktop product, Mac users mostly get steered to browser-based cloud tools like Xero, Wave, FreshBooks, or QuickBooks Online, and those all run fine in Safari or Chrome. But you don\'t have to use the cloud. There are also true desktop apps that install and run natively on macOS, and they store your books in a file on your own machine and keep working offline. Worth knowing before you shortlist: plenty of apps that call themselves cross-platform ship Windows and Linux builds only, so check the platform list rather than assuming. Argo Books, this site\'s own app, does ship a native macOS build. So the market didn\'t leave Mac users behind, it just split into cloud tools and native apps. Pick the kind that matches how you work.',
     ],
     [
       'q' => 'What is the difference between cloud accounting and a desktop app on a Mac?',
@@ -158,11 +157,11 @@ HTML,
     ],
     [
       'q' => 'Can I use accounting software on my Mac without an internet connection?',
-      'a' => 'Only with the right kind of tool. Browser-based cloud accounting generally needs a live connection to do anything, because the software and your data both live online. If you want to work offline, on a plane, at a market with no signal, or in a workshop with no wifi, you need a native desktop app that stores your books locally on your Mac. Check the platform list first, though: some offline desktop apps, including this site\'s own Argo Books, currently ship Windows and Linux builds only. If offline work matters to you, test it before you commit, because tools vary a lot. Our guide on offline accounting software goes into more detail.',
+      'a' => 'Only with the right kind of tool. Browser-based cloud accounting generally needs a live connection to do anything, because the software and your data both live online. If you want to work offline, on a plane, at a market with no signal, or in a workshop with no wifi, you need a native desktop app that stores your books locally on your Mac. Check the platform list first, though: some offline desktop apps ship Windows and Linux builds only. Argo Books, this site\'s own app, runs natively on macOS. If offline work matters to you, test it before you commit, because tools vary a lot. Our guide on offline accounting software goes into more detail.',
     ],
     [
       'q' => 'Does Argo Books run on a Mac?',
-      'a' => 'Not today. Argo Books ships native builds for Windows and Linux, and there is no macOS build, so if a Mac is the only computer you work on it is not the right tool for you and the other options in this guide are the useful ones. If you do run Windows or Linux as well, it is a real installed desktop app: it works offline, stores your data locally on your own machine rather than on someone else\'s server, and moves between those two platforms without lock-in. It is free to start, and Premium is a flat price in Canadian dollars. The other honest limits: it imports data rather than running a live bank feed, and Stripe is its only live third-party integration.',
+      'a' => 'Yes. Argo Books ships a native macOS build for both Apple Silicon and Intel Macs, running macOS 14 Sonoma or later, alongside the Windows and Linux ones. It is a real installed desktop app: it works offline, stores your data locally on your own machine rather than on someone else\'s server, and moves between platforms without lock-in. It is free to start, and Premium is a flat price in Canadian dollars. The other honest limits: it imports data rather than running a live bank feed, and Stripe is its only live third-party integration.',
     ],
     [
       'q' => 'Should a Mac user pick cloud or offline accounting software?',

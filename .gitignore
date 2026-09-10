@@ -27,3 +27,11 @@ reset_admin_password.php
 package-lock.json
 # Brainstorming visual companion scratch
 .superpowers/
+
+# macOS Finder metadata. Written into any directory Finder opens, so these appear
+# throughout the tree once the repo is worked on from a Mac. The desktop app repo
+# has ignored these for a while; this one had not needed to until now.
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes

@@ -38,7 +38,7 @@ return [
     'why_list' => [
         '<strong>Everything in one clean app.</strong> Invoicing, expenses, receipts, inventory, and forecasting together, with no accounting jargon and no double-entry to learn.',
         '<strong>A genuinely free plan.</strong> All the core features forever, no trial and no credit card. FreshBooks only gives you a 30-day trial.',
-        '<strong>Yours, and offline.</strong> A native desktop app for Windows and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine.',
+        '<strong>Yours, and offline.</strong> A native desktop app for Windows, macOS, and Linux. Your books open instantly and keep working with no internet, and your data stays on your machine.',
         '<strong>AI that\'s included, not upsold.</strong> Receipt scanning, spreadsheet import, and predictive analytics come built in, not features FreshBooks offers at all.',
         '<strong>One predictable price.</strong> Everything in Premium for $' . $argo_monthly . ' CAD/month. No per-client fees and no client limits on any plan.',
     ],
@@ -70,7 +70,7 @@ return [
     'argo_pros' => [
         '<strong>Free forever plan</strong> with every core feature, no trial and no credit card',
         '<strong>No accounting jargon</strong>, built for business owners rather than accountants',
-        '<strong>Works offline</strong> as a native desktop app for Windows and Linux',
+        '<strong>Works offline</strong> as a native desktop app for Windows, macOS, and Linux',
         '<strong>AI built in</strong>: receipt scanning, spreadsheet import, and predictive analytics included',
         '<strong>One flat price</strong>, Premium is $' . $argo_monthly . ' CAD/month with no per-client fees or client limits',
     ],

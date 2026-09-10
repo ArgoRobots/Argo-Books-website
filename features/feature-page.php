@@ -141,7 +141,7 @@ function argo_feature_split(array $b): void
             "@type": "SoftwareApplication",
             "name": "Argo Books",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows, Linux",
+            "operatingSystem": "Windows, macOS, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "<?= $d['offer_price'] ?? '0' ?>",

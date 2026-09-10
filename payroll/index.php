@@ -438,7 +438,6 @@ $faqs = [
                         <li><strong>You want the filing and the remittance done for you.</strong> Argo Books prepares the slips and the XML and tells you what is owed and when. You upload it and you pay it. A full-service provider does both, and that is worth money to some businesses.</li>
                         <li><strong>You need direct deposit run from the payroll tool.</strong> Argo Books works out the pay and records it. Moving the money is still your bank.</li>
                         <li><strong>You file RL-1 slips in Quebec.</strong> The deductions are worked out and the RL-1 figures are put on a worksheet, but Revenu Qu&eacute;bec accepts a printed slip only from software it has certified, and requires XML above five slips. Neither exists here, so the Quebec slips are keyed into My Account by hand.</li>
-                        <li><strong>You are on macOS.</strong> Windows and Linux today. A Mac build is not out yet.</li>
                     </ul>
                     <p class="pr-honest-close">
                         If any of those matter more to you than the per-employee bill, one of the providers in the table
@@ -503,7 +502,7 @@ $faqs = [
                     </p>
                     <div class="cta-buttons">
                         <a href="../downloads/?source=payroll-footer" class="btn-cta btn-cta-primary">
-                            <span>Download for Windows or Linux</span><?= svg_icon('arrow-right', 18) ?>
+                            <span>Download for Windows, macOS, or Linux</span><?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../pricing/" class="btn-cta btn-cta-ghost"><span>See pricing</span></a>
                     </div>

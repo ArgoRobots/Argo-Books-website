@@ -83,7 +83,7 @@ return [
         'No managed service, so remittances and T4 filing stay your responsibility',
         'No direct deposit, time tracking, scheduling or HR administration',
         'No account manager to call, which established employers often want',
-        'Windows and Linux only, with no Mac build yet',
+        'Desktop only, with no mobile app for running payroll away from your computer',
         'Payroll covers Canada only',
     ],
     'competitor_cons' => [

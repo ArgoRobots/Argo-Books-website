@@ -5,6 +5,32 @@ require_once __DIR__ . '/../track_referral.php';
 require_once __DIR__ . '/../partials/fonts.php';
 
 track_referral_event('downloads_page');
+/**
+ * macOS-only download-link suffix carrying the visitor's install token.
+ *
+ * Windows and Linux recover the token from the downloaded filename that
+ * serveFile() builds in get_avalonia_installer.php: the Windows installer reads
+ * it during install, and on Linux the AppImage *is* the executable, so the name
+ * survives. On macOS the download is a .zip the user expands, and the extracted
+ * "Argo Books.app" carries none of the archive's name, so the token is gone by
+ * first run and the install reports as unattributed.
+ *
+ * Putting it in the query string instead means the browser records it as the
+ * download's source URL, which macOS stores on the file as the
+ * com.apple.metadata:kMDItemWhereFroms attribute. FirstRunReporter reads it back
+ * from there. Nothing server-side consumes ?t; the token is still derived from
+ * the cookie when the filename is built.
+ */
+function macInstallTokenQuery(): string
+{
+    $visitor_id = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
+    if (!$visitor_id || !preg_match('/^[0-9a-f-]{36}$/i', $visitor_id)) {
+        return '';
+    }
+    $token = referral_install_token($visitor_id);
+    return $token === '' ? '' : '?t=' . urlencode($token);
+}
+
 // Load system requirements from JSON
 function getSystemRequirements()
 {
@@ -217,7 +243,7 @@ $systemRequirements = getSystemRequirements();
                 <div class="platform-actions">
                     <?php foreach ($macAvailable as $mac): ?>
                         <?php $build = $latestVersion['platforms'][$mac['key']]; ?>
-                        <a href="../download/avalonia/<?php echo $mac['slug']; ?>" class="btn btn-blue download-btn" data-platform="<?php echo $mac['key']; ?>">
+                        <a href="../download/avalonia/<?php echo $mac['slug'] . macInstallTokenQuery(); ?>" class="btn btn-blue download-btn" data-platform="<?php echo $mac['key']; ?>">
                             <?= svg_icon('download', null, 'btn-icon') ?>
                             <?php echo $mac['label']; ?> &middot; <?php echo formatFileSize($build['filesize']); ?>
                         </a>

@@ -7,7 +7,7 @@ Related: [Google Ads economics.md](Google%20Ads%20economics.md), [Email outreach
 ## Where things stand
 
 - Solo founder, bootstrapping. Argo Books has been in development for about 2 years.
-- Windows, macOS, and Linux. The macOS build shipped 2026-09-09; see [macOS](#macos) for what is still outstanding.
+- Windows, macOS, and Linux. The macOS build shipped 2026-09-09, signed and notarized, for Apple Silicon and Intel; see [macOS](#macos).
 - **2 paying customers.** Both signed up around May, both auto-renewed and the subscriptions are still active, although they don't use the app.
   - Customer 1 came from a YouTube video (the receipt scanning one).
   - Customer 2 came from Google search.
@@ -119,7 +119,7 @@ About CA\$300 spent, 0 attributable customers. Details in [Google Ads economics.
 16 connections, 53 profile views, 943 post impressions (879 of those from the latest post), 4 posts. Messaged startup/business/accounting influencers about the affiliate program. Nothing has come of it, at least that we can measure.
 
 ### Directory listings: done, no measurable traffic
-Already listed on G2, Capterra, Product Hunt, and roughly 30 cheap Product Hunt copycats. None of it brought traffic.
+Already listed on G2, Capterra, Product Hunt, and roughly 30 cheap Product Hunt copycats. None of it brought traffic. G2 and the other main listings were updated in September 2026 to include macOS.
 
 That result is expected, and it clarifies what a listing is actually for. The value was never the directory's own visitors, it's that the directory's pages rank in Google.
 
@@ -139,12 +139,9 @@ What changed since this section was written as a "should we?" question:
 - **Touch ID is implemented.** It goes through Apple's LocalAuthentication framework, as predicted here, paired with the login keychain for the stored password. Verified on real hardware, which is the one part that could never have been rented or automated.
 - **Two architectures are offered**, Apple Silicon and Intel, so the download page asks which Mac the visitor has rather than guessing. The browser cannot tell them apart: Safari and Chrome both report an Intel user agent on Apple Silicon.
 
-Still outstanding before this is a release anyone else can install:
-
-- **Apple Developer Program membership (\$99/year USD)**, for the Developer ID certificate and notarization. Without it macOS refuses a downloaded copy as "damaged", so this is not skippable.
-- **The appcast has an empty `url` on its macOS enclosure**, so no Mac has ever received an update. The first macOS release has to fill it in and sign the stapled zip.
-
-**Marketing action outstanding: the waitlist has not been told.** The signups are still in the database and visible at `/admin/mac-waitlist/`. They asked to be emailed when the Mac build landed, it has landed, and nobody has sent that email. It is the warmest list on the site, small as it is, and the one piece of the launch that is pure upside.
+- **Signed, notarized, and updating.** The Apple Developer Program membership is in place, every build is signed and notarized, and the appcast carries a separate macOS item per architecture. Updating from 2.0.13 to 2.0.14 was tested on a real Mac and works.
+- **The waitlist has been told.** The launch announcement was emailed to everyone on it, after which the waitlist admin page and the `platform_waitlist` table were removed.
+- **Install attribution on Mac comes through a welcome page, from 2.0.15.** The token in the downloaded filename cannot survive on a Mac: the browser expands the .zip, and current macOS keeps no record of the source URL. On first launch the app opens `/welcome/`, and the browser's own cookie links that install to the visit that downloaded it. Mac installs before 2.0.15 show as unattributed in the per-source funnel, though they still count in the totals.
 
 ## Honest read
 

@@ -197,27 +197,34 @@ $systemRequirements = getSystemRequirements();
                     <h2>macOS</h2>
                     <p class="platform-desc">For macOS 14 Sonoma and later</p>
                     <?php
-                    // Either build is enough to say which version this page is offering.
-                    $macBuild = $latestVersion['platforms']['macos-arm64']
-                        ?? $latestVersion['platforms']['macos-x64']
-                        ?? null;
+                    // The two builds are different downloads with different sizes, so the size
+                    // goes on each button rather than up here next to the version.
+                    $macBuilds = [
+                        ['key' => 'macos-arm64', 'slug' => 'mac-arm64', 'label' => 'Apple Silicon'],
+                        ['key' => 'macos-x64',   'slug' => 'mac-intel', 'label' => 'Intel'],
+                    ];
+                    $macAvailable = array_values(array_filter(
+                        $macBuilds,
+                        fn($mac) => isset($latestVersion['platforms'][$mac['key']])
+                    ));
                     ?>
-                    <?php if ($latestVersion && $macBuild): ?>
+                    <?php if ($macAvailable): ?>
                         <div class="version-details">
                             <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
                 <div class="platform-actions">
-                    <a href="../download/avalonia/mac-arm64" class="btn btn-blue download-btn" data-platform="macos-arm64">
-                        <?= svg_icon('download', null, 'btn-icon') ?>
-                        Apple Silicon
-                    </a>
-                    <a href="../download/avalonia/mac-intel" class="btn btn-blue download-btn" data-platform="macos-x64">
-                        <?= svg_icon('download', null, 'btn-icon') ?>
-                        Intel
-                    </a>
-                    <button type="button" class="install-help-link" id="macInstallHelp">Which one do I need?</button>
+                    <?php foreach ($macAvailable as $mac): ?>
+                        <?php $build = $latestVersion['platforms'][$mac['key']]; ?>
+                        <a href="../download/avalonia/<?php echo $mac['slug']; ?>" class="btn btn-blue download-btn" data-platform="<?php echo $mac['key']; ?>">
+                            <?= svg_icon('download', null, 'btn-icon') ?>
+                            <?php echo $mac['label']; ?> &middot; <?php echo formatFileSize($build['filesize']); ?>
+                        </a>
+                    <?php endforeach; ?>
+                    <?php if (count($macAvailable) > 1): ?>
+                        <button type="button" class="install-help-link" id="macInstallHelp">Which one do I need?</button>
+                    <?php endif; ?>
                 </div>
             </div>
 

@@ -39,10 +39,23 @@
             <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
             <enclosure url="https://argorobots.com/resources/downloads/2.0.14/ArgoBooks-2.0.14-osx-arm64.zip"
                        sparkle:version="2.0.14"
-                       sparkle:os="macos"
+                       sparkle:os="macos-arm64"
                        type="application/zip"
                        length="118840544"
                        sparkle:edSignature="WjGY+3t2WZVlF5DTngUT8GDGmfjAtL2D1grRsvbvPfX69pdwBnZ08P8OwPSKRbmi8hMspm05lGKyQOaA8NBdAw==" />
+        </item>
+
+        <item>
+            <title>Version 2.0.14</title>
+            <sparkle:version>2.0.14</sparkle:version>
+            <sparkle:releaseNotesLink>https://argorobots.com/whats-new/</sparkle:releaseNotesLink>
+            <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
+            <enclosure url="https://argorobots.com/resources/downloads/2.0.14/ArgoBooks-2.0.14-osx-x64.zip"
+                       sparkle:version="2.0.14"
+                       sparkle:os="macos-x64"
+                       type="application/zip"
+                       length="148047275"
+                       sparkle:edSignature="F30tgwGHp4sGFdVDMQO7l/IjB7zHfjunE8IJa5y4544mJzynVZUomJ0BSADOm6QoUbZowvz7CxX/QRWBQlIpCg==" />
         </item>
     </channel>
 </rss>

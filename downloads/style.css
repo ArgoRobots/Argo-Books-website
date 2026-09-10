@@ -205,7 +205,10 @@ body {
 }
 
 /* Positioned absolutely (inside the card's bottom padding) so the download
-   button stays vertically aligned with the buttons in the other cards */
+   buttons stay vertically aligned with the buttons in the other cards.
+   Both cards that carry a help link need this: .install-help-link is absolute,
+   so without a positioned ancestor it escapes the card and anchors to the page. */
+.platform-macos .platform-actions,
 .platform-linux .platform-actions {
     position: relative;
 }

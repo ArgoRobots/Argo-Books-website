@@ -1239,12 +1239,13 @@ CREATE TABLE IF NOT EXISTS campaign_spend (
     FOREIGN KEY (source_code) REFERENCES referral_links(source_code) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Launch-notification waitlist for platforms we haven't shipped yet (today:
--- the macOS build). Signups come from the downloads page via
--- api/waitlist/subscribe.php; admin/mac-waitlist/ lists and exports them.
--- visitor_id/source_code tie each signup back to referral_events attribution
--- so Mac demand can be measured per traffic source. notified_at is reserved
--- for the one-off launch announcement send.
+-- Launch-notification waitlist, collected while the macOS build was unreleased.
+-- The macOS build has shipped, so the signup form and api/waitlist/ are gone and
+-- nothing writes to this table any more. It is kept solely so the one-off launch
+-- announcement can be sent from admin/mac-waitlist/, which tracks who has been
+-- emailed in notified_at. Drop the table and delete admin/mac-waitlist/ once that
+-- send is done. visitor_id/source_code tied each signup back to referral_events
+-- attribution so Mac demand could be measured per traffic source.
 CREATE TABLE IF NOT EXISTS platform_waitlist (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,

@@ -303,8 +303,12 @@ h3, h4, h5, h6 {
   max-width: none;
 }
 
+/* Nested corners look right when they are concentric, not when they match:
+   inner radius = outer radius - gap. The frame is --radius-lg (16px) with 26px
+   of padding, so anything much above 0 here reads as too round. --radius-md
+   (12px) was almost as curved as the frame despite sitting 26px inside it. */
 .fp-hero-demo .invoice-window {
-  border-radius: var(--radius-md);
+  border-radius: 4px;
 }
 
 .fp-hero-demo .app-body {

@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sandbox appcast. Only Debug builds read this file: NetSparkleUpdateService picks it by
+    name when ApiConfig.IsSandbox is true, so nothing here can reach a released user even if
+    dev.argorobots.com and argorobots.com serve the same directory.
+
+    ONE ITEM PER OPERATING SYSTEM. NetSparkle reads a single enclosure per <item>, so an item
+    carrying three enclosures parses into one update whose platform is whichever enclosure
+    came first. That is why a macOS client found nothing here: it read the Windows enclosure,
+    saw an entry that was not for macOS, and had no other item to consider.
+
+    Signatures are made with the sandbox Ed25519 key, a different pair from the production
+    one, and are what a Debug build is compiled to trust.
+-->
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
     <channel>
-        <title>Argo Books Avalonia Updates</title>
-        <link>https://argorobots.com</link>
-        <description>Updates for Argo Books (cross-platform)</description>
+        <title>Argo Books Avalonia Updates (sandbox)</title>
+        <link>https://dev.argorobots.com</link>
+        <description>Updates for Argo Books (cross-platform), sandbox channel</description>
         <language>en</language>
+
+        <!-- macOS. length is the real byte count and the signature covers those exact bytes,
+             so a rebuilt zip has to be re-signed and both values updated. -->
         <item>
-            <title>Version 2.0.8</title>
-            <sparkle:version>2.0.8</sparkle:version>
+            <title>Version 2.0.14 (macOS)</title>
+            <sparkle:version>2.0.14</sparkle:version>
             <sparkle:releaseNotesLink>https://argorobots.com/whats-new/</sparkle:releaseNotesLink>
-            <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
-
-            <!-- Windows -->
-            <enclosure url="https://dev.argorobots.com/resources/downloads/2.0.8/Argo%20Books%20Installer%20V.2.0.8.exe"
-                       sparkle:version="2.0.8"
-                       sparkle:os="windows"
-                       type="application/octet-stream"
-                       length="0"
-                       sparkle:edSignature="QLJy8J4suSblWOu/wJH8EtznmRNuk2gp/HV5zmPkOmFLC0MP43yKh1a4kdCM5byEmVnGSD/HSJpvA+gwWDL0Dg==" />
-
-            <!-- macOS -->
-            <enclosure url=""
-                       sparkle:version="2.0.8"
+            <pubDate>Tue, 09 Sep 2026 12:00:00 +0000</pubDate>
+            <enclosure url="https://dev.argorobots.com/resources/downloads/2.0.14/ArgoBooks-2.0.14-osx-arm64.zip"
+                       sparkle:version="2.0.14"
                        sparkle:os="macos"
-                       type="application/octet-stream"
-                       length="0"
-                       sparkle:edSignature="" />
-
-            <!-- Linux -->
-            <enclosure url="https://dev.argorobots.com/resources/downloads/2.0.8/ArgoBooks-2.0.8-linux-x64.AppImage"
-                       sparkle:version="2.0.8"
-                       sparkle:os="linux"
-                       type="application/octet-stream"
-                       length="0"
-                       sparkle:edSignature="/T8kyJF+4cFlCCw9+4ylCGLlOjk0HkPXC6lmNp2qBF/rNE2CDqNnWBeB0t2SyeIVwZutsvKb51IyPQYTpbN9AQ==" />
+                       type="application/zip"
+                       length="121687509"
+                       sparkle:edSignature="PDoMHEks67dAUNZcqCUprab0RzUbI/Bw6YkWvQ7UN8d3YvLxMWPMbnXn+2zGDJJ156J7cn+9vpnfcqYUsFHsBA==" />
         </item>
+
+        <!-- Windows and Linux are deliberately absent rather than present-but-empty. An entry
+             with no URL is still an entry: a client on that platform would match it, then have
+             nothing to download. Nothing is the honest answer while only macOS is under test. -->
     </channel>
 </rss>

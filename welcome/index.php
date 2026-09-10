@@ -83,7 +83,7 @@ if (welcome_valid_uuid($machine_uuid) && welcome_valid_uuid($visitor_id)) {
                 </p>
                 <p>
                     Would you rather look around first? Choose
-                    <strong>Skip Tutorial</strong>, then <strong>Explore Sample Company</strong>.
+                    <strong>Explore Sample Company</strong>, just below Create New Company.
                     That opens a company already filled in with invoices, expenses and stock,
                     so you can try things without entering anything first. Nothing you do to
                     it touches real data.

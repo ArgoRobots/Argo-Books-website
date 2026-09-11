@@ -80,23 +80,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Get default from email (makes 'from' field optional)
-$defaultFromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', '');
-$defaultFromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
-
-// Use defaults if not provided in request
-if (empty($data['from']) && !empty($defaultFromEmail)) {
-    $data['from'] = $defaultFromEmail;
-}
-if (empty($data['fromName']) && !empty($defaultFromName)) {
-    $data['fromName'] = $defaultFromName;
-}
+// The sender is always INVOICE_DEFAULT_FROM_EMAIL; a 'from' in the request only
+// becomes the Reply-To (see pin_client_email_sender()).
 
 // Validate required fields (matching Argo Books client field names)
 $requiredFields = ['to', 'subject', 'html'];
-if (empty($defaultFromEmail)) {
-    $requiredFields[] = 'from'; // Only required if no default configured
-}
 $missingFields = [];
 foreach ($requiredFields as $field) {
     if (empty($data[$field])) {

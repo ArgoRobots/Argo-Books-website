@@ -571,7 +571,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formHtml = `
           <form class="inline-edit-form" action="javascript:void(0);" data-comment-id="${commentId}">
             <div class="form-group">
-              <textarea name="comment_content" class="mentionable" rows="4" required>${commentText}</textarea>
+              <textarea name="comment_content" class="mentionable" rows="4" required></textarea>
             </div>
             <div class="form-actions">
               <button type="button" id="cancel-edit" class="btn btn-gray">Cancel</button>
@@ -585,6 +585,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Get the textarea and initialize mentions BEFORE setting focus
         const textarea = commentContent.querySelector("textarea");
+        // Set as a value, not markup: comment text can contain "</textarea>"
+        textarea.value = commentText;
 
         // Initialize mentions system for the new textarea
         initializeMentionsForTextarea(textarea);
@@ -642,10 +644,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   commentContent.innerHTML = data.comment.processed_content;
                 } else {
                   // If no processed_content provided, use the raw content with line breaks
-                  commentContent.innerHTML = data.comment.content.replace(
-                    /\n/g,
-                    "<br>"
-                  );
+                  const escaped = document.createElement("div");
+                  escaped.textContent = data.comment.content;
+                  commentContent.innerHTML = escaped.innerHTML.replace(/\n/g, "<br>");
                 }
 
                 // Show the comment controls again

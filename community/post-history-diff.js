@@ -79,15 +79,16 @@ function compareContent(currentEntry, nextEntry) {
 
     // Process aligned paragraphs
     for (const pair of alignedParagraphs) {
+      // Paragraphs come from textContent, so they are raw post text again
       if (pair.type === "equal") {
         // Just add the unchanged paragraph
-        htmlResult += pair.value + "<br>";
+        htmlResult += sanitizeHtml(pair.value) + "<br>";
       } else if (pair.type === "insert") {
         // New paragraph added
-        htmlResult += `<span class="diff-add">${pair.value}</span><br>`;
+        htmlResult += `<span class="diff-add">${sanitizeHtml(pair.value)}</span><br>`;
       } else if (pair.type === "delete") {
         // Paragraph deleted
-        htmlResult += `<span class="diff-del">${pair.value}</span><br>`;
+        htmlResult += `<span class="diff-del">${sanitizeHtml(pair.value)}</span><br>`;
       } else if (pair.type === "replace") {
         // Paragraph changed - use character-level diff for this
         htmlResult += diffText(pair.oldValue, pair.newValue, true) + "<br>";
@@ -269,11 +270,11 @@ function compareMetadataFields(currentEntry, nextEntry) {
  * @return {string} HTML with differences highlighted
  */
 function diffText(oldText, newText, characterLevel = false) {
-  if (oldText === newText) return newText;
-
   // Sanitize both strings to prevent HTML issues
   oldText = sanitizeHtml(oldText || "");
   newText = sanitizeHtml(newText || "");
+
+  if (oldText === newText) return newText;
 
   // If either string is empty, handle as a special case
   if (!oldText) return `<span class="diff-add">${newText}</span>`;

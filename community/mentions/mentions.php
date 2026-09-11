@@ -11,8 +11,9 @@ function process_mentions($content)
     // First remove any existing mention spans or links
     $clean_content = preg_replace('/<(?:span|a) class="link"[^>]*>(@\w+)<\/(?:span|a)>/', '$1', $content);
 
-    // Then process mentions properly - create actual clickable links
-    $pattern = '/@(\w+)/';
+    // Then process mentions properly - create actual clickable links.
+    // An @ inside a tag (e.g. in a formatted link's href) is left alone.
+    $pattern = '/@(\w+)(?![^<>]*>)/';
     $processed_content = preg_replace_callback(
         $pattern,
         function ($matches) {

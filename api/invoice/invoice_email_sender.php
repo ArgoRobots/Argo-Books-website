@@ -17,7 +17,7 @@ class InvoiceEmailSender
 
     public function __construct()
     {
-        $this->defaultFromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
+        $this->defaultFromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', '') ?: 'noreply@argorobots.com';
         $this->defaultFromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
         $this->logEnabled = filter_var(env('INVOICE_LOG_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
         $this->logFile = env('INVOICE_LOG_FILE', __DIR__ . '/../../logs/invoice_emails.log');
@@ -34,9 +34,10 @@ class InvoiceEmailSender
         $timestamp = date('c');
 
         try {
-            // Get sender info
-            $fromEmail = $data['from'] ?? $this->defaultFromEmail;
-            $fromName = $data['fromName'] ?? $this->defaultFromName;
+            $sender = pin_client_email_sender($data, $this->defaultFromEmail, $this->defaultFromName);
+            $fromEmail = $sender['fromEmail'];
+            $fromName = $sender['fromName'];
+            $data['replyTo'] = $sender['replyTo'];
             $toEmail = $data['to'];
             $toName = $data['toName'] ?? '';
             $subject = $data['subject'];

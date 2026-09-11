@@ -142,3 +142,27 @@ function argo_send_html_email(string $to, string $subject, string $html, array $
         return ['success' => false, 'method' => 'smtp', 'error' => $e->getMessage()];
     }
 }
+
+/**
+ * Sender fields for mail a desktop client asks us to relay (invoices, purchase
+ * orders). The From address is always ours: the relay is authorised for the
+ * whole argorobots.com domain, so a client-chosen From would let any caller send
+ * as any address on it. The merchant keeps their display name, and the address
+ * they sent as "from" becomes the Reply-To unless they gave one.
+ *
+ * @return array{fromEmail: string, fromName: string, replyTo: ?string}
+ */
+function pin_client_email_sender(array $data, string $defaultFromEmail, string $defaultFromName): array
+{
+    $fromName = trim((string) ($data['fromName'] ?? ''));
+    $replyTo = trim((string) ($data['replyTo'] ?? ''));
+    if ($replyTo === '') {
+        $replyTo = trim((string) ($data['from'] ?? ''));
+    }
+
+    return [
+        'fromEmail' => $defaultFromEmail,
+        'fromName' => $fromName !== '' ? $fromName : $defaultFromName,
+        'replyTo' => $replyTo !== '' && strcasecmp($replyTo, $defaultFromEmail) !== 0 ? $replyTo : null,
+    ];
+}

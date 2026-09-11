@@ -70,6 +70,10 @@ CREATE TABLE IF NOT EXISTS community_users (
     verification_code VARCHAR(10),
     reset_token VARCHAR(100),
     reset_token_expiry DATETIME,
+    email_change_new_email VARCHAR(100) DEFAULT NULL,
+    email_change_code VARCHAR(10) DEFAULT NULL,
+    email_change_expires_at DATETIME DEFAULT NULL,
+    email_change_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
     last_login DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -82,6 +86,14 @@ CREATE TABLE IF NOT EXISTS community_users (
     email_pref_unsubscribe_token CHAR(48) DEFAULT NULL,
     UNIQUE KEY uk_email_pref_unsubscribe_token (email_pref_unsubscribe_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the email-change code columns (pending address,
+-- code, expiry, guess count):
+--   ALTER TABLE community_users
+--     ADD COLUMN email_change_new_email VARCHAR(100) DEFAULT NULL AFTER reset_token_expiry,
+--     ADD COLUMN email_change_code VARCHAR(10) DEFAULT NULL AFTER email_change_new_email,
+--     ADD COLUMN email_change_expires_at DATETIME DEFAULT NULL AFTER email_change_code,
+--     ADD COLUMN email_change_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER email_change_expires_at;
 
 -- Create posts table
 CREATE TABLE IF NOT EXISTS community_posts (

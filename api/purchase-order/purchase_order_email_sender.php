@@ -19,7 +19,7 @@ class PurchaseOrderEmailSender
 
     public function __construct()
     {
-        $this->defaultFromEmail = env('PO_DEFAULT_FROM_EMAIL', env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com'));
+        $this->defaultFromEmail = env('PO_DEFAULT_FROM_EMAIL', '') ?: (env('INVOICE_DEFAULT_FROM_EMAIL', '') ?: 'noreply@argorobots.com');
         $this->defaultFromName = env('PO_DEFAULT_FROM_NAME', env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books'));
         $this->logEnabled = filter_var(env('PO_LOG_ENABLED', env('INVOICE_LOG_ENABLED', true)), FILTER_VALIDATE_BOOLEAN);
         $this->logFile = env('PO_LOG_FILE', __DIR__ . '/../../logs/purchase_order_emails.log');
@@ -36,8 +36,10 @@ class PurchaseOrderEmailSender
         $timestamp = date('c');
 
         try {
-            $fromEmail = $data['from'] ?? $this->defaultFromEmail;
-            $fromName = $data['fromName'] ?? $this->defaultFromName;
+            $sender = pin_client_email_sender($data, $this->defaultFromEmail, $this->defaultFromName);
+            $fromEmail = $sender['fromEmail'];
+            $fromName = $sender['fromName'];
+            $data['replyTo'] = $sender['replyTo'];
             $toEmail = $data['to'];
             $toName = $data['toName'] ?? '';
             $subject = $data['subject'];

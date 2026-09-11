@@ -3,6 +3,7 @@
 namespace {
     require_once __DIR__ . '/../../db_connect.php';
     require_once __DIR__ . '/../../email_sender.php';
+    require_once __DIR__ . '/../../rate_limit_helper.php';
 
     /**
      * Register a new user with verification code
@@ -296,6 +297,11 @@ namespace {
     {
         global $pdo;
 
+        // Keyed on the address, not the IP, so the form can't flood one inbox from many IPs
+        if (check_and_record_rate_limit(strtolower(trim($email)), PASSWORD_RESET_EMAIL_MAX, PASSWORD_RESET_EMAIL_WINDOW, PASSWORD_RESET_EMAIL_PREFIX)) {
+            return false;
+        }
+
         // Find user by email
         $stmt = $pdo->prepare('SELECT id, username FROM community_users WHERE email = ?');
         $stmt->execute([$email]);
@@ -348,7 +354,96 @@ namespace {
         $stmt = $pdo->prepare('UPDATE community_users SET password_hash = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?');
         $success = $stmt->execute([$password_hash, $user['id']]);
 
+        if ($success) {
+            // A stolen remember-me cookie may be the reason for the reset
+            $stmt = $pdo->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
+            $stmt->execute([$user['id']]);
+        }
+
         return $success;
+    }
+
+    const PASSWORD_RESET_EMAIL_MAX = 3;
+    const PASSWORD_RESET_EMAIL_WINDOW = 3600;
+    const PASSWORD_RESET_EMAIL_PREFIX = 'community_password_reset_email';
+
+    // A six-digit code is only safe with few guesses and a short life
+    const EMAIL_CHANGE_MAX_ATTEMPTS = 5;
+    const EMAIL_CHANGE_CODE_MINUTES = 30;
+
+    /**
+     * Start an email change: store the new address with a fresh code, replacing
+     * any earlier request. The current address stays as it is until the code
+     * comes back.
+     *
+     * @param int $user_id User ID
+     * @param string $new_email Address the code will be sent to
+     * @return string The 6-digit code to email to $new_email
+     */
+    function start_email_change($user_id, $new_email)
+    {
+        global $pdo;
+
+        $code = generate_verification_code();
+        $stmt = $pdo->prepare('UPDATE community_users
+            SET email_change_new_email = ?, email_change_code = ?,
+                email_change_expires_at = NOW() + INTERVAL ? MINUTE, email_change_attempts = 0
+            WHERE id = ?');
+        $stmt->execute([$new_email, $code, EMAIL_CHANGE_CODE_MINUTES, $user_id]);
+
+        return $code;
+    }
+
+    /**
+     * Check an email-change code. Every guess counts, the code stops working
+     * after EMAIL_CHANGE_MAX_ATTEMPTS guesses or EMAIL_CHANGE_CODE_MINUTES, and a
+     * correct code works once.
+     *
+     * @param int $user_id User ID
+     * @param string $code Code the user typed
+     * @param string|null $new_email Set on 'ok' to the address the code was sent to
+     * @return string 'ok', 'invalid', 'expired', 'too_many_attempts' or 'no_code'
+     */
+    function verify_email_change_code($user_id, $code, &$new_email = null)
+    {
+        global $pdo;
+
+        $stmt = $pdo->prepare('SELECT email_change_code, email_change_new_email,
+                email_change_expires_at > NOW() AS still_valid
+            FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $row = $stmt->fetch();
+
+        if (!$row || $row['email_change_code'] === null) {
+            return 'no_code';
+        }
+        if (!$row['still_valid']) {
+            return 'expired';
+        }
+
+        // One statement, so parallel guesses can't all read a count under the cap
+        $stmt = $pdo->prepare('UPDATE community_users SET email_change_attempts = email_change_attempts + 1
+            WHERE id = ? AND email_change_code IS NOT NULL AND email_change_attempts < ?');
+        $stmt->execute([$user_id, EMAIL_CHANGE_MAX_ATTEMPTS]);
+        if ($stmt->rowCount() === 0) {
+            return 'too_many_attempts';
+        }
+
+        if (!hash_equals((string) $row['email_change_code'], (string) $code)) {
+            return 'invalid';
+        }
+
+        $stmt = $pdo->prepare('UPDATE community_users
+            SET email_change_code = NULL, email_change_new_email = NULL,
+                email_change_expires_at = NULL, email_change_attempts = 0
+            WHERE id = ? AND email_change_code = ?');
+        $stmt->execute([$user_id, $row['email_change_code']]);
+        if ($stmt->rowCount() !== 1) {
+            return 'invalid';
+        }
+
+        $new_email = $row['email_change_new_email'];
+        return 'ok';
     }
 
     /**

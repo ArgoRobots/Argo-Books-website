@@ -59,6 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        // Each request resets the code's guess count, so requests are capped too
+        if (check_and_record_rate_limit((string) $user_id, 5, 3600, 'community_email_change')) {
+            $_SESSION['change_email_error'] = 'Too many email change requests. Please try again later.';
+            header('Location: change_email.php');
+            exit;
+        }
+
         $stmt = $pdo->prepare('SELECT password_hash FROM community_users WHERE id = ?');
         $stmt->execute([$user_id]);
         $password_data = $stmt->fetch();
@@ -77,21 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $verification_code = generate_verification_code();
-        $stmt = $pdo->prepare('UPDATE community_users SET verification_code = ?, email_verified = 0 WHERE id = ?');
+        $verification_code = start_email_change($user_id, $new_email);
+        $email_sent = send_verification_email($new_email, $verification_code, $user['username']);
 
-        if ($stmt->execute([$verification_code, $user_id])) {
-            $email_sent = send_verification_email($new_email, $verification_code, $user['username']);
-
-            if ($email_sent) {
-                $_SESSION['pending_email'] = $new_email;
-                $_SESSION['email_change_pending'] = true;
-                $_SESSION['change_email_success'] = 'Verification email sent to ' . htmlspecialchars($new_email) . '. Please enter the verification code below.';
-            } else {
-                $_SESSION['change_email_error'] = 'Failed to send verification email. Please try again.';
-            }
+        if ($email_sent) {
+            $_SESSION['pending_email'] = $new_email;
+            $_SESSION['email_change_pending'] = true;
+            $_SESSION['change_email_success'] = 'Verification email sent to ' . htmlspecialchars($new_email) . '. Please enter the verification code below.';
         } else {
-            $_SESSION['change_email_error'] = 'Failed to initiate email change. Please try again.';
+            $_SESSION['change_email_error'] = 'Failed to send verification email. Please try again.';
         }
 
         header('Location: change_email.php');
@@ -111,18 +112,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare('SELECT verification_code FROM community_users WHERE id = ?');
-        $stmt->execute([$user_id]);
-        $db_data = $stmt->fetch();
+        // $new_email is the address stored with the code, not the session's copy
+        $result = verify_email_change_code($user_id, $verification_code, $new_email);
 
-        if (!$db_data || $db_data['verification_code'] !== $verification_code) {
-            $_SESSION['change_email_error'] = 'Invalid verification code';
+        if ($result !== 'ok') {
+            if ($result === 'invalid') {
+                $_SESSION['change_email_error'] = 'Invalid verification code';
+            } else {
+                unset($_SESSION['pending_email'], $_SESSION['email_change_pending']);
+                $_SESSION['change_email_error'] = $result === 'expired'
+                    ? 'That verification code has expired. Please request a new one.'
+                    : 'That verification code can no longer be used. Please request a new one.';
+            }
             header('Location: change_email.php');
             exit;
         }
 
-        $new_email = $_SESSION['pending_email'];
-        $stmt = $pdo->prepare('UPDATE community_users SET email = ?, email_verified = 1, verification_code = NULL WHERE id = ?');
+        $stmt = $pdo->prepare('UPDATE community_users SET email = ?, email_verified = 1 WHERE id = ?');
 
         if ($stmt->execute([$new_email, $user_id])) {
             $stmt = $pdo->prepare('UPDATE community_posts SET user_email = ? WHERE user_id = ?');

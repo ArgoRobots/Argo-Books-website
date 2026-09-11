@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/user_functions.php';
+require_once __DIR__ . '/../../rate_limit_helper.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
@@ -22,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter your email address';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address';
+    } elseif (check_and_record_rate_limit(get_client_ip(), 5, 900, 'community_password_reset')) {
+        $error = 'Too many reset requests. Please wait a few minutes and try again.';
     } else {
         // Attempt to send password reset link
         $result = request_password_reset($email);

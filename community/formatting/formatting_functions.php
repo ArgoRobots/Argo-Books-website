@@ -8,9 +8,11 @@
  */
 function render_formatted_text($text)
 {
+    // Escape first, so the only HTML in the result is what the formatter builds.
+    // Escaping after formatting and then un-escaping our own tags also
+    // un-escaped the same sequences when a user typed them.
+    $text = htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
     $text = process_formatting($text);
-    $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    $text = restore_formatting_tags($text);
     $text = final_cleanup($text);
 
     // Wrap the formatted text in a div so we can apply a specific class
@@ -18,9 +20,30 @@ function render_formatted_text($text)
 }
 
 /**
- * Process all formatting on raw input
+ * Process all formatting on already-escaped input
  */
 function process_formatting($text)
+{
+    // Links go first, behind placeholders, so the rules below can't reach into a URL
+    $links = [];
+    $text = process_links($text, $links);
+
+    $text = format_inline($text);
+
+    // Blockquotes (multi-line support). ">" arrives escaped as "&gt;".
+    $text = preg_replace_callback('/(^(?:&gt;)+\s*.*(\n(?:&gt;)+\s*.*)*)/m', function ($matches) {
+        $content = preg_replace('/^(?:&gt;)+\s*/m', '', $matches[0]);
+        return "<blockquote>" . trim($content) . "</blockquote>";
+    }, $text);
+
+    $text = process_lists($text);
+    return strtr($text, $links);
+}
+
+/**
+ * Bold, italic and code
+ */
+function format_inline($text)
 {
     // Bold: **text** to <strong>text</strong>
     $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
@@ -29,17 +52,7 @@ function process_formatting($text)
     $text = preg_replace('/_([^_\n]+)_/', '<em>$1</em>', $text);
 
     // Code: `code` to <code>code</code>
-    $text = preg_replace('/`(.+?)`/s', '<code>$1</code>', $text);
-
-    // Blockquotes (multi-line support)
-    $text = preg_replace_callback('/(^>+\s*.*(\n>+\s*.*)*)/m', function ($matches) {
-        $content = preg_replace('/^>+\s*/m', '', $matches[0]);
-        return "<blockquote>" . trim($content) . "</blockquote>";
-    }, $text);
-
-    $text = process_lists($text);
-    $text = process_links($text);
-    return $text;
+    return preg_replace('/`(.+?)`/s', '<code>$1</code>', $text);
 }
 
 /**
@@ -65,25 +78,30 @@ function process_lists($text)
 /**
  * Process links with Markdown syntax [text](url)
  * 
- * @param string $text The text to process
- * @return string Text with processed links
+ * @param string $text The already-escaped text to process
+ * @param array $links Receives placeholder => link HTML, for process_formatting() to put back
+ * @return string Text with each link replaced by its placeholder
  */
-function process_links($text)
+function process_links($text, array &$links = [])
 {
-    // Process links with Markdown syntax [text](url)
-    $text = preg_replace_callback('/\[([^\]]+)\]\(([^)]+)\)/', function ($matches) {
-        $link_text = $matches[1];
-        $url = $matches[2];
+    // A fresh random token per call, so a user can't type a placeholder
+    $token = bin2hex(random_bytes(8));
+
+    return preg_replace_callback('/\[([^\]]+)\]\(([^)]+)\)/', function ($matches) use (&$links, $token) {
+        $link_text = format_inline($matches[1]);
+        $url = trim(htmlspecialchars_decode($matches[2], ENT_QUOTES));
 
         if (is_allowed_url($url)) {
-            return '<a href="' . htmlspecialchars($url) . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($link_text) . '</a>';
+            $html = '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener noreferrer">' . $link_text . '</a>';
         } else {
             // Return just the text if link is not allowed
-            return htmlspecialchars($link_text) . ' <span class="invalid-link-warning">(Link to disallowed domain removed)</span>';
+            $html = $link_text . ' <span class="invalid-link-warning">(Link to disallowed domain removed)</span>';
         }
-    }, $text);
 
-    return $text;
+        $placeholder = 'LINK' . $token . 'N' . count($links) . 'E';
+        $links[$placeholder] = $html;
+        return $placeholder;
+    }, $text);
 }
 
 /**
@@ -97,7 +115,13 @@ function is_allowed_url($url)
     // Parse the URL to get the host
     $parsed_url = parse_url($url);
 
-    if (!isset($parsed_url['host'])) {
+    if ($parsed_url === false || !isset($parsed_url['host'])) {
+        return false;
+    }
+
+    // The host list means nothing if the scheme can be javascript: or data:
+    $scheme = strtolower($parsed_url['scheme'] ?? '');
+    if ($scheme !== 'http' && $scheme !== 'https') {
         return false;
     }
 
@@ -251,36 +275,6 @@ function is_allowed_url($url)
     }
 
     return false;
-}
-
-/**
- * Restore our formatting tags after HTML escaping
- */
-function restore_formatting_tags($text)
-{
-    $replacements = [
-        '&lt;strong&gt;' => '<strong>',
-        '&lt;/strong&gt;' => '</strong>',
-        '&lt;em&gt;' => '<em>',
-        '&lt;/em&gt;' => '</em>',
-        '&lt;blockquote&gt;' => '<blockquote>',
-        '&lt;/blockquote&gt;' => '</blockquote>',
-        '&lt;ul&gt;' => '<ul>',
-        '&lt;/ul&gt;' => '</ul>',
-        '&lt;ol&gt;' => '<ol>',
-        '&lt;/ol&gt;' => '</ol>',
-        '&lt;li&gt;' => '<li>',
-        '&lt;/li&gt;' => '</li>',
-        '&lt;code&gt;' => '<code>',
-        '&lt;/code&gt;' => '</code>',
-        '&lt;a href=&quot;' => '<a href="',
-        '&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;' => '" target="_blank" rel="noopener noreferrer">',
-        '&lt;/a&gt;' => '</a>',
-        '&lt;span class=&quot;invalid-link-warning&quot;&gt;' => '<span class="invalid-link-warning">',
-        '&lt;/span&gt;' => '</span>'
-    ];
-
-    return str_replace(array_keys($replacements), array_values($replacements), $text);
 }
 
 /**

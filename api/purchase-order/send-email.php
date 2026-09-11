@@ -87,22 +87,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Defaults for from address.
-$defaultFromEmail = env('PO_DEFAULT_FROM_EMAIL', env('INVOICE_DEFAULT_FROM_EMAIL', ''));
-$defaultFromName = env('PO_DEFAULT_FROM_NAME', env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books'));
-
-if (empty($data['from']) && !empty($defaultFromEmail)) {
-    $data['from'] = $defaultFromEmail;
-}
-if (empty($data['fromName']) && !empty($defaultFromName)) {
-    $data['fromName'] = $defaultFromName;
-}
+// The sender is always PO_DEFAULT_FROM_EMAIL (or INVOICE_DEFAULT_FROM_EMAIL); a
+// 'from' in the request only becomes the Reply-To (see pin_client_email_sender()).
 
 // Required fields. POs are plaintext bodies, so `text` is required (no `html`).
 $requiredFields = ['to', 'subject', 'text'];
-if (empty($defaultFromEmail)) {
-    $requiredFields[] = 'from';
-}
 $missingFields = [];
 foreach ($requiredFields as $field) {
     if (empty($data[$field])) {

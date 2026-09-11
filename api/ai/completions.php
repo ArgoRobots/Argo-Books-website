@@ -105,22 +105,11 @@ if ($isReceiptWork) {
     $maxTokens = max(1, (int)($_ENV['RECEIPT_SCAN_MAX_OUTPUT_TOKENS'] ?? 32000));
 }
 
-// Installed desktop builds pin a model id that Google has since retired (e.g.
-// gemini-2.5-flash); empty requests also need a default. Remap both to a current
-// model so existing installs keep working without a forced app update instead of
-// failing every AI call. Vision requests (receipt scans include an image) get the
-// accuracy tier; text-only calls get the cheaper general model.
-$retiredModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash-001'];
-if ($requestedModel === '' || in_array($requestedModel, $retiredModels, true)) {
-    $requestedModel = $base64Image
-        ? ($_ENV['GEMINI_MODEL_EXTRACTION'] ?? 'gemini-3.5-flash')
-        : ($_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite');
-}
-
-// Validate model: Gemini is the only supported provider
-$geminiModels = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-pro'];
-if (!in_array($requestedModel, $geminiModels, true)) {
-    send_error_response(400, 'Unsupported model. Supported: ' . implode(', ', $geminiModels), 'INVALID_MODEL');
+// Retired ids and empty requests get the default; free (device) requests always do.
+require_once __DIR__ . '/_models.php';
+$requestedModel = ai_resolve_model(is_string($requestedModel) ? $requestedModel : '', !empty($base64Image), (bool) $license);
+if ($requestedModel === null) {
+    send_error_response(400, 'Unsupported model. Supported: ' . implode(', ', AI_SUPPORTED_MODELS), 'INVALID_MODEL');
 }
 
 $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';

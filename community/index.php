@@ -155,7 +155,7 @@ if (empty($_SESSION['csrf_token'])) {
                 <div class="selection-controls">
                     <div class="checkbox">
                         <input type="checkbox" id="select-all-posts" name="select-all-posts">
-                        <label for="select-all-posts">Select All</a></label>
+                        <label for="select-all-posts">Select All</label>
                     </div>
                     <span class="selected-count">0 selected</span>
                 </div>

@@ -225,8 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const usernameFeedback = document.getElementById('username-feedback');
             const emailFeedback = document.getElementById('email-feedback');
             const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
-            const termsGroup = document.getElementById('terms-group');
-            const termsFeedback = document.getElementById('terms-feedback');
+            const termsCheckbox = document.getElementById('terms');
             const passwordPolicies = document.querySelector('.password-policies');
 
             // Show password policies on focus
@@ -366,17 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Terms checkbox validation
             function validateTerms() {
-                if (termsCheckbox.checked) {
-                    termsFeedback.textContent = "";
-                    termsGroup.classList.remove('invalid');
-                    termsGroup.classList.add('valid');
-                    return true;
-                } else {
-                    termsFeedback.textContent = "You must agree to the Terms and Privacy Policy";
-                    termsGroup.classList.add('invalid');
-                    termsGroup.classList.remove('valid');
-                    return false;
-                }
+                return termsCheckbox.checked;
             }
 
             // Form validation

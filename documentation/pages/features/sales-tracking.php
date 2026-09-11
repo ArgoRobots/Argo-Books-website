@@ -33,11 +33,15 @@ include __DIR__ . '/../../docs-header.php';
             <ol class="steps-list">
                 <li>Go to "Expenses" (under the Expenses section) or "Revenue" (under the Revenue section) in the navigation menu</li>
                 <li>Click the "Add Expense" or "Add Revenue" button</li>
-                <li>Select a product, enter the quantity and unit price</li>
-                <li>Choose the date, category, and optionally assign a customer or supplier</li>
+                <li>On each line, pick an item or type a new one, pick or type its category, then enter the quantity and price</li>
+                <li>Choose the date, and optionally assign a customer or supplier</li>
                 <li>Attach a receipt if available (optional)</li>
                 <li>Click "Save" to record the transaction</li>
             </ol>
+
+            <div class="info-box">
+                <strong>New items:</strong> An item or category you type that doesn't exist yet is created when you save, so there's no need to set up products first. A new item takes the price from its line.
+            </div>
 
             <h2>Multi-Item Transactions</h2>
             <p>A single transaction can include multiple products. Click the "Add item" button to add additional line items to the same transaction. This is useful for recording orders or invoices that contain several products at once.</p>

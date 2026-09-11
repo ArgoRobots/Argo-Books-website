@@ -52,6 +52,10 @@ include __DIR__ . '/../../docs-header.php';
                 <li>Save the product</li>
             </ol>
 
+            <div class="info-box">
+                <strong>Tip:</strong> You don't have to add products here first. Type a new item and category on an expense or revenue line and Argo Books creates both when you save, with the item priced at that line's price. Come back here later to fill in the other details.
+            </div>
+
             <h2>Product Fields</h2>
             <p>When adding or editing a product, you can set the following:</p>
             <ul>

@@ -55,7 +55,7 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Resize:</strong> Select an element and drag the corner handles to resize</li>
                 <li><strong>Customize:</strong> Use the properties panel to adjust colors, fonts, borders, and alignment</li>
                 <li><strong>Alignment Tools:</strong> Align and distribute multiple elements using the toolbar</li>
-                <li><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y to undo or redo changes. See <a class="link" href="../reference/keyboard_shortcuts.php">Keyboard Shortcuts</a> for the rest</li>
+                <li><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y (Cmd+Z and Cmd+Y on a Mac) to undo or redo changes. See <a class="link" href="../reference/keyboard_shortcuts.php">Keyboard Shortcuts</a> for the rest</li>
             </ul>
 
             <h3>Multi-Page Reports</h3>

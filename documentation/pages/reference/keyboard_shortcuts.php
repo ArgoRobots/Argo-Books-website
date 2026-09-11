@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Keyboard Shortcuts';
-$pageDescription = 'Reference guide for keyboard shortcuts in Argo Books, including the Report Generator layout designer.';
+$pageDescription = 'Reference guide for keyboard shortcuts in Argo Books on Windows, Linux and Mac, including the Report Generator layout designer.';
 $currentPage = 'keyboard_shortcuts';
 $pageCategory = 'reference';
 
@@ -10,20 +10,23 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <h2>Application Shortcuts</h2>
-            <p>These shortcuts are available throughout the application:</p>
+            <p>These shortcuts are available throughout the application. On a Mac, use <strong>Cmd</strong> (&#8984;) wherever Windows and Linux use <strong>Ctrl</strong>.</p>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Shortcut</th>
+                            <th>Windows &amp; Linux</th>
+                            <th>Mac</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>Ctrl + K</strong></td><td>Open search / quick actions</td></tr>
-                        <tr><td><strong>Ctrl + Scroll</strong></td><td>Zoom a chart or an invoice preview</td></tr>
-                        <tr><td><strong>F11</strong></td><td>Enter or leave full screen</td></tr>
-                        <tr><td><strong>Esc</strong></td><td>Close the open dialog or panel, or leave full screen</td></tr>
+                        <tr><td><strong>Ctrl + K</strong></td><td><strong>Cmd + K</strong></td><td>Open search / quick actions</td></tr>
+                        <tr><td><strong>Ctrl + S</strong></td><td><strong>Cmd + S</strong></td><td>Save your company</td></tr>
+                        <tr><td><strong>Ctrl + Shift + S</strong></td><td><strong>Cmd + Shift + S</strong></td><td>Save your company under a new name or in a new place (Save As)</td></tr>
+                        <tr><td><strong>Ctrl + Scroll</strong></td><td><strong>Cmd + Scroll</strong>, or pinch on the trackpad</td><td>Zoom a chart or an invoice preview</td></tr>
+                        <tr><td><strong>F11</strong></td><td>The green button at the top left of the window</td><td>Enter or leave full screen</td></tr>
+                        <tr><td><strong>Esc</strong></td><td><strong>Esc</strong></td><td>Close the open dialog or panel, or leave full screen</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -33,27 +36,28 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <div class="info-box">
-                <strong>Full screen:</strong> <strong>F11</strong> hides the title bar and fills the screen, and pressing it again returns you. <strong>Esc</strong> also leaves full screen, but only when nothing else is using it: if a dialog is open, Esc closes the dialog and you stay full screen. If you would rather use the mouse, the restore button in the top right corner also brings the window back.
+                <strong>Full screen:</strong> <strong>F11</strong> hides the title bar and fills the screen, and pressing it again returns you. <strong>Esc</strong> also leaves full screen, but only when nothing else is using it: if a dialog is open, Esc closes the dialog and you stay full screen. If you would rather use the mouse, the restore button in the top right corner also brings the window back. On a Mac, the F11 key belongs to macOS, which uses it to show the desktop, so use the green button at the top left of the window instead.
             </div>
 
             <h2>Report Generator Layout Designer</h2>
-            <p>The following shortcuts are available when working in the layout designer (Step 2) of the Report Generator.</p>
+            <p>The following shortcuts are available when working in the layout designer (Step 2) of the Report Generator. Here <strong>Ctrl + S</strong> (<strong>Cmd + S</strong> on a Mac) saves the layout as a template rather than saving your company.</p>
 
             <h3>General Actions</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Shortcut</th>
+                            <th>Windows &amp; Linux</th>
+                            <th>Mac</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>Ctrl + Z</strong></td><td>Undo last action</td></tr>
-                        <tr><td><strong>Ctrl + Y</strong></td><td>Redo last undone action</td></tr>
-                        <tr><td><strong>Ctrl + Shift + Z</strong></td><td>Redo last undone action (alternative)</td></tr>
-                        <tr><td><strong>Ctrl + S</strong></td><td>Save the current layout as a template</td></tr>
-                        <tr><td><strong>Ctrl + G</strong></td><td>Show or hide the alignment grid</td></tr>
+                        <tr><td><strong>Ctrl + Z</strong></td><td><strong>Cmd + Z</strong></td><td>Undo last action</td></tr>
+                        <tr><td><strong>Ctrl + Y</strong></td><td><strong>Cmd + Y</strong></td><td>Redo last undone action</td></tr>
+                        <tr><td><strong>Ctrl + Shift + Z</strong></td><td><strong>Cmd + Shift + Z</strong></td><td>Redo last undone action (alternative)</td></tr>
+                        <tr><td><strong>Ctrl + S</strong></td><td><strong>Cmd + S</strong></td><td>Save the current layout as a template</td></tr>
+                        <tr><td><strong>Ctrl + G</strong></td><td><strong>Cmd + G</strong></td><td>Show or hide the alignment grid</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -63,21 +67,22 @@ include __DIR__ . '/../../docs-header.php';
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Shortcut</th>
+                            <th>Windows &amp; Linux</th>
+                            <th>Mac</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>Ctrl + A</strong></td><td>Select all elements on the current page</td></tr>
-                        <tr><td><strong>Ctrl + D</strong></td><td>Duplicate selected element(s)</td></tr>
-                        <tr><td><strong>Delete</strong> or <strong>Backspace</strong></td><td>Delete selected element(s)</td></tr>
-                        <tr><td><strong>Esc</strong></td><td>Clear the selection</td></tr>
+                        <tr><td><strong>Ctrl + A</strong></td><td><strong>Cmd + A</strong></td><td>Select all elements on the current page</td></tr>
+                        <tr><td><strong>Ctrl + D</strong></td><td><strong>Cmd + D</strong></td><td>Duplicate selected element(s)</td></tr>
+                        <tr><td><strong>Delete</strong> or <strong>Backspace</strong></td><td><strong>Delete</strong></td><td>Delete selected element(s)</td></tr>
+                        <tr><td><strong>Esc</strong></td><td><strong>Esc</strong></td><td>Clear the selection</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="info-box">
-                <strong>Note:</strong> The canvas shortcuts above act on the current selection, so click an element first. Ctrl + A extends a selection to everything on the page rather than starting one from nothing.
+                <strong>Note:</strong> The canvas shortcuts above act on the current selection, so click an element first. Ctrl + A (Cmd + A on a Mac) extends a selection to everything on the page rather than starting one from nothing.
             </div>
 
             <h3>Element Movement (Fine Control)</h3>

@@ -123,7 +123,7 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Chart Interactions</h2>
             <p>All charts support the following interactions:</p>
             <ul>
-                <li><strong>Zoom:</strong> Ctrl+scroll to zoom into specific time periods</li>
+                <li><strong>Zoom:</strong> Ctrl+scroll (Cmd+scroll or a trackpad pinch on a Mac) to zoom into specific time periods</li>
                 <li><strong>Right-click menu:</strong> Save as Image, Export to Google Sheets, Export to Excel, or Reset Zoom</li>
             </ul>
 

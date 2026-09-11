@@ -533,6 +533,10 @@ $isDocsLanding = true;
     </footer>
 
     <script>
+        if (/Mac/.test(navigator.userAgentData?.platform || navigator.platform)) {
+            document.querySelector('.hero-search .search-shortcut').textContent = '⌘K';
+        }
+
         // Keyboard shortcut for search
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {

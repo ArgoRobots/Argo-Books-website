@@ -63,10 +63,13 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
         echo json_encode(['success' => false, 'error' => 'CODE_EXPIRED']);
         return;
     }
-    if ((int)$code_row['attempts'] >= 5) {
-        $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='too_many_code_attempts', updated_at=NOW() WHERE id = ?")
-            ->execute([$request_id]);
-        audit_log($pdo, (int)$company['id'], 'cancelled_by_system', 'system', null, $request_id, null, ['reason' => 'too_many_code_attempts']);
+    $attempt = refund_claim_code_attempt($pdo, (int)$code_row['id']);
+    if ($attempt === null) {
+        $cancel = $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='too_many_code_attempts', updated_at=NOW() WHERE id = ? AND state = 'pending_code'");
+        $cancel->execute([$request_id]);
+        if ($cancel->rowCount() > 0) {
+            audit_log($pdo, (int)$company['id'], 'cancelled_by_system', 'system', null, $request_id, null, ['reason' => 'too_many_code_attempts']);
+        }
         http_response_code(429);
         echo json_encode(['success' => false, 'error' => 'TOO_MANY_ATTEMPTS']);
         return;
@@ -74,20 +77,27 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
 
     $expected = refund_hash_code($code, (string)$request_id);
     if (!hash_equals($code_row['code_hash'], $expected)) {
-        $pdo->prepare("UPDATE refund_email_codes SET attempts = attempts + 1 WHERE id = ?")->execute([$code_row['id']]);
         audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, $request_id, null, [
-            'attempts' => (int)$code_row['attempts'] + 1,
+            'attempts' => $attempt,
         ]);
         http_response_code(401);
         echo json_encode([
             'success' => false,
             'error' => 'WRONG_CODE',
-            'attemptsRemaining' => max(0, 5 - ((int)$code_row['attempts'] + 1)),
+            'attemptsRemaining' => max(0, 5 - $attempt),
         ]);
         return;
     }
 
-    $pdo->prepare("UPDATE refund_email_codes SET consumed_at = NOW() WHERE id = ?")->execute([$code_row['id']]);
+    // Only one request may consume the code, or two correct guesses sent in
+    // parallel would both go on to issue the refund.
+    $consume = $pdo->prepare("UPDATE refund_email_codes SET consumed_at = NOW() WHERE id = ? AND consumed_at IS NULL");
+    $consume->execute([$code_row['id']]);
+    if ($consume->rowCount() === 0) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'error' => 'NO_ACTIVE_CODE']);
+        return;
+    }
     audit_log($pdo, (int)$company['id'], 'code_verified', 'owner', null, $request_id, null, []);
 
     // ----- Velocity check -----

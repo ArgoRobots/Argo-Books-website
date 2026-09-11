@@ -118,9 +118,9 @@ function authenticate_license_request(): ?array
         $stmt = $pdo->prepare("
             SELECT status, end_date
             FROM premium_subscriptions
-            WHERE subscription_id = ?
+            WHERE subscription_id = ? AND environment = ?
         ");
-        $stmt->execute([$premiumKey['subscription_id']]);
+        $stmt->execute([$premiumKey['subscription_id'], current_environment()]);
         $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$subscription) {
@@ -426,6 +426,40 @@ function record_portal_payment(array $params): array
         'reference_number' => $referenceNumber,
         'message' => 'Payment recorded successfully'
     ];
+}
+
+/**
+ * The payment row already recorded for this provider payment on this invoice,
+ * or null. Scoped to the invoice so a payment made on one invoice can't be
+ * presented as paying another.
+ */
+function find_recorded_portal_payment(string $providerPaymentId, int $companyId, string $invoiceId): ?array
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'SELECT reference_number, processing_fee FROM portal_payments
+         WHERE provider_payment_id = ? AND company_id = ? AND invoice_id = ? AND amount > 0
+         LIMIT 1'
+    );
+    $stmt->execute([$providerPaymentId, $companyId, $invoiceId]);
+    return $stmt->fetch() ?: null;
+}
+
+/**
+ * The processing fee that checkout stamped on a Stripe PaymentIntent, or 0 when
+ * it is missing (PaymentIntents created before the stamp) or can't be part of
+ * $amount.
+ *
+ * @param array|\ArrayAccess $metadata PaymentIntent metadata
+ */
+function stripe_metadata_processing_fee($metadata, float $amount): float
+{
+    $fee = $metadata['processing_fee'] ?? null;
+    if (!is_numeric($fee)) {
+        return 0.00;
+    }
+    $fee = round((float) $fee, 2);
+    return ($fee > 0 && $fee < $amount) ? $fee : 0.00;
 }
 
 /**

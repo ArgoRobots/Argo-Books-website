@@ -211,7 +211,7 @@ Promotes refund requests from `cooling_off` to `processing` once their cooling-o
 
 ### What It Does
 
-Queries Stripe for refund requests stuck in `processing` for more than 30 minutes and updates their state based on the provider's response. Catches refunds where the provider succeeded but our callback never fired.
+Queries Stripe for refund requests stuck in `processing` for more than 30 minutes and updates their state based on the provider's response. Catches refunds where the provider succeeded but our callback never fired. A refund it finds succeeded is also written to the portal payment records, so it still syncs to the desktop app.
 
 ---
 

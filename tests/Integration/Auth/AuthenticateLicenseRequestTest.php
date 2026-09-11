@@ -91,6 +91,16 @@ final class AuthenticateLicenseRequestTest extends DatabaseTestCase
         $this->assertNull(authenticate_license_request());
     }
 
+    public function test_returns_null_when_subscription_belongs_to_the_other_environment(): void
+    {
+        $key = $this->seedActiveLicense('PREM-AUTH-ENVS-AAAA-HHHH');
+        $this->pdo->prepare("UPDATE premium_subscriptions SET environment = 'production' WHERE subscription_id = ?")
+            ->execute(['PREM-AUTH-ENVS-AAAA-HHHH']);
+
+        $_SERVER['HTTP_X_LICENSE_KEY'] = $key;
+        $this->assertNull(authenticate_license_request());
+    }
+
     public function test_returns_auth_payload_when_active_and_future(): void
     {
         $key = $this->seedActiveLicense('PREM-AUTH-OKKK-AAAA-EEEE');

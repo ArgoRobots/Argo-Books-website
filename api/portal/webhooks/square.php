@@ -69,18 +69,9 @@ switch ($eventType) {
         $squareAmount = floatval($payment['amount_money']['amount'] ?? 0) / 100;
         $squareCurrency = strtoupper($payment['amount_money']['currency'] ?? 'USD');
         $squareOrderId = $payment['order_id'] ?? '';
-        $squareReferenceId = $payment['reference_id'] ?? '';
-        $squareNote = $payment['note'] ?? '';
 
-        // Try to extract invoice reference from reference_id or note
-        $invoiceRef = $squareReferenceId ?: $squareNote;
-
-        if (!empty($paymentId) && $paymentId !== 'unknown' && $squareAmount > 0 && !empty($invoiceRef)) {
-            $stmt = $pdo->prepare(
-                'SELECT company_id, invoice_id, customer_name FROM portal_invoices WHERE invoice_id = ? LIMIT 1'
-            );
-            $stmt->execute([$invoiceRef]);
-            $invoiceRecord = $stmt->fetch();
+        if (!empty($paymentId) && $paymentId !== 'unknown' && $squareAmount > 0) {
+            $invoiceRecord = square_find_portal_invoice($pdo, $data, current_environment());
 
             if ($invoiceRecord) {
                 record_portal_payment([

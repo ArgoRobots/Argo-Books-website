@@ -60,6 +60,21 @@ final class ValidateLicenseTest extends DatabaseTestCase
         $this->assertSame('valid', $result['status']);
     }
 
+    public function test_rejects_a_key_whose_subscription_belongs_to_the_other_environment(): void
+    {
+        // Tests run as sandbox, so a production subscription is the "other" one.
+        $subId = 'PREM-TEST-SUB4-GGGG-HHHH';
+        $this->seedSubscription($subId, (new \DateTime('+90 days'))->format('Y-m-d H:i:s'));
+        $this->pdo->prepare("UPDATE premium_subscriptions SET environment = 'production' WHERE subscription_id = ?")
+            ->execute([$subId]);
+        $key = $this->seedRedeemedKey(self::DEVICE, $subId);
+
+        $result = validate_license($key, self::DEVICE);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('invalid_key', $result['status']);
+    }
+
     public function test_returns_invalid_when_subscription_row_missing(): void
     {
         // Redeemed key pointing at a non-existent subscription_id

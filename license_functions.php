@@ -292,12 +292,23 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
         $subscription = null;
         if ($subscription_id) {
             $stmt = $pdo->prepare("
-                SELECT subscription_id, status, end_date
+                SELECT subscription_id, status, end_date, environment
                 FROM premium_subscriptions
                 WHERE subscription_id = ?
             ");
             $stmt->execute([$subscription_id]);
             $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        // Paid for on the other site, e.g. a sandbox checkout on dev. Falling
+        // through to the recreate path below would mint a subscription in this
+        // environment for free.
+        if ($subscription && $subscription['environment'] !== current_environment()) {
+            return [
+                'success' => false,
+                'status' => 'invalid_key',
+                'message' => 'Invalid license key.'
+            ];
         }
 
         if (!$subscription) {
@@ -522,9 +533,9 @@ function validate_license($key, $device_id) {
         $stmt = $pdo->prepare("
             SELECT subscription_id, status, end_date
             FROM premium_subscriptions
-            WHERE subscription_id = ?
+            WHERE subscription_id = ? AND environment = ?
         ");
-        $stmt->execute([$premium_key['subscription_id']]);
+        $stmt->execute([$premium_key['subscription_id'], current_environment()]);
         $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$subscription) {

@@ -56,10 +56,11 @@ if (!function_exists('receipt_scan_quota_identity')) {
                     $stmt = $pdo->prepare("
                         SELECT id FROM premium_subscriptions
                         WHERE subscription_id = ?
+                        AND environment = ?
                         AND status IN ('active', 'cancelled')
                         AND end_date > NOW()
                     ");
-                    $stmt->execute([$premiumKey['subscription_id']]);
+                    $stmt->execute([$premiumKey['subscription_id'], current_environment()]);
                     if ($stmt->fetch()) {
                         return ['tier' => 'premium', 'limit' => (int)$config['receipt_scan_monthly_limit'], 'identifier' => $licenseKey];
                     }
@@ -69,10 +70,11 @@ if (!function_exists('receipt_scan_quota_identity')) {
                 $stmt = $pdo->prepare("
                     SELECT id FROM premium_subscriptions
                     WHERE subscription_id = ?
+                    AND environment = ?
                     AND status IN ('active', 'cancelled')
                     AND end_date > NOW()
                 ");
-                $stmt->execute([$licenseKey]);
+                $stmt->execute([$licenseKey, current_environment()]);
                 if ($stmt->fetch()) {
                     return ['tier' => 'premium', 'limit' => (int)$config['receipt_scan_monthly_limit'], 'identifier' => $licenseKey];
                 }

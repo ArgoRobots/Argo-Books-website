@@ -25,6 +25,7 @@ require_once PROJECT_ROOT . '/api/portal/portal-helper.php';
 require_once PROJECT_ROOT . '/email_sender.php';
 require_once PROJECT_ROOT . '/api/portal/webhooks/_square_helpers.php';
 require_once PROJECT_ROOT . '/api/portal/webhooks/_stripe_refund_db.php';
+require_once PROJECT_ROOT . '/api/portal/_refund_helpers.php';
 require_once PROJECT_ROOT . '/cron/lib/renewal_helpers.php';
 require_once PROJECT_ROOT . '/cron/lib/purge_helpers.php';
 

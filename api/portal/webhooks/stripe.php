@@ -62,8 +62,14 @@ switch ($event->type) {
         break;
 
     case 'charge.refunded':
-        $charge = $event->data->object;
-        handle_refund($charge);
+        try {
+            apply_stripe_charge_refunds($pdo, $event->data->object, $is_production, $event->account ?? null);
+        } catch (\Throwable $e) {
+            // Rows are keyed by refund id, so a Stripe retry can't double-apply.
+            error_log('Portal Stripe webhook: charge.refunded failed: ' . $e->getMessage());
+            http_response_code(500);
+            exit;
+        }
         break;
 
     default:
@@ -100,6 +106,7 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
         'invoice_id' => $invoiceId,
         'customer_name' => $metadata['customer_name'] ?? '',
         'amount' => $amount,
+        'processing_fee' => stripe_metadata_processing_fee($metadata, $amount),
         'currency' => $currency,
         'payment_method' => 'stripe',
         'provider_payment_id' => $paymentIntent->id,
@@ -110,102 +117,3 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
     ]);
 }
 
-/**
- * Handle a refund
- */
-function handle_refund(\Stripe\Charge $charge): void
-{
-    global $is_production, $pdo;
-    $providerPaymentId = $charge->payment_intent;
-
-    if (empty($providerPaymentId)) {
-        // Charges without a payment_intent (rare, legacy direct charges)
-        // can't be tied to a portal payment record; skip silently.
-        error_log("Portal Stripe webhook: skipping charge.refunded for {$charge->id}: no payment_intent");
-        return;
-    }
-
-    // Currency divisor logic stays here because it depends on the SDK Charge.
-    // Use the original payment's currency (already stored in our DB) so refunds
-    // honour the exact currency used at capture time even if Stripe normalised.
-    $stmt = $pdo->prepare(
-        'SELECT currency FROM portal_payments
-         WHERE provider_payment_id = ? AND amount > 0 LIMIT 1'
-    );
-    $stmt->execute([$providerPaymentId]);
-    $row = $stmt->fetch();
-    if (!$row) {
-        // No matching portal payment: likely a charge that didn't originate
-        // from the customer portal (e.g. license/subscription, or a refund
-        // for a deleted/migrated record). Log so support can trace
-        // disappearing-refund tickets.
-        error_log("Portal Stripe webhook: charge.refunded for {$charge->id} (PI {$providerPaymentId}) has no matching portal payment row");
-        return;
-    }
-    $refundCurrency = strtoupper($row['currency'] ?? 'USD');
-    $zeroDecimalCurrencies = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
-    $divisor = in_array($refundCurrency, $zeroDecimalCurrencies) ? 1 : 100;
-
-    // Iterate individual Refund objects rather than using the cumulative
-    // $charge->amount_refunded. The webhook ships every refund-on-this-charge
-    // and we want distinct negative-payment rows per refund. A second
-    // partial refund would otherwise hit the unique-key dedup on a single
-    // payment-intent-keyed row and silently get dropped.
-    if (isset($charge->refunds) && !empty($charge->refunds->data)) {
-        foreach ($charge->refunds->data as $refundObj) {
-            $refundAmount = ($refundObj->amount ?? 0) / $divisor;
-            if ($refundAmount <= 0) continue;
-            apply_stripe_refund_to_db(
-                $pdo,
-                $providerPaymentId,
-                $refundAmount,
-                $charge->id,
-                $is_production,
-                $refundObj->id
-            );
-        }
-    } else {
-        // Fallback: no per-refund detail in the event (rare). Process the
-        // cumulative amount under a single row keyed by payment intent.
-        $refundAmount = $charge->amount_refunded / $divisor;
-        apply_stripe_refund_to_db($pdo, $providerPaymentId, $refundAmount, $charge->id, $is_production);
-    }
-
-    // Reconcile against refund_requests if this refund was initiated by our
-    // /api/portal/refunds/ flow (refund metadata carries argo_request_id).
-    // Idempotent: no-op if already completed; transitions processing/cooling_off
-    // → completed otherwise. The companion record_into_portal_payments insert
-    // already happened at execute-time, so this is purely a state transition.
-    try {
-        if (isset($charge->refunds) && !empty($charge->refunds->data)) {
-            require_once __DIR__ . '/../_audit.php';
-            require_once __DIR__ . '/../_refund_helpers.php';
-            foreach ($charge->refunds->data as $refundObj) {
-                $argoRequestId = $refundObj->metadata['argo_request_id'] ?? null;
-                if ($argoRequestId !== null && is_numeric($argoRequestId)) {
-                    $stmt = $pdo->prepare("SELECT * FROM refund_requests WHERE id = ?");
-                    $stmt->execute([(int)$argoRequestId]);
-                    $req = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($req && $req['state'] !== 'completed' && $req['state'] !== 'cancelled') {
-                        // CAS guard so a race with the synchronous execute
-                        // path can't fire two completion notifications. Only
-                        // the UPDATE that flips the state actually notifies.
-                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
-                        $upd->execute([$refundObj->id, (int)$argoRequestId]);
-                        if ($upd->rowCount() > 0) {
-                            audit_log($pdo, (int)$req['company_id'], 'completed', 'webhook', null, (int)$argoRequestId, null, [
-                                'provider_refund_id' => $refundObj->id,
-                                'reconciled_via_webhook' => true,
-                            ]);
-                            $req['state'] = 'completed';
-                            $req['provider_refund_id'] = $refundObj->id;
-                            refund_notify_completion($pdo, $req);
-                        }
-                    }
-                }
-            }
-        }
-    } catch (\Throwable $e) {
-        error_log('refund_requests reconciliation in stripe webhook failed: ' . $e->getMessage());
-    }
-}

@@ -21,6 +21,23 @@ function refund_hash_code(string $code, string $salt): string {
     return hash('sha256', $code . '|' . $salt);
 }
 
+/**
+ * Spend one guess on a refund verification code. The limit check and the
+ * increment are one UPDATE, so parallel requests that all read the same count
+ * can't each get a guess. Returns the attempt number used, or null once $max
+ * guesses are spent.
+ */
+function refund_claim_code_attempt(PDO $pdo, int $code_id, int $max = 5): ?int {
+    $upd = $pdo->prepare("UPDATE refund_email_codes SET attempts = attempts + 1 WHERE id = ? AND attempts < ?");
+    $upd->execute([$code_id, $max]);
+    if ($upd->rowCount() === 0) {
+        return null;
+    }
+    $stmt = $pdo->prepare("SELECT attempts FROM refund_email_codes WHERE id = ?");
+    $stmt->execute([$code_id]);
+    return (int)$stmt->fetchColumn();
+}
+
 /** Mask an email for display (ev**@argobooks.app). */
 function refund_mask_email(string $email): string {
     $at = strpos($email, '@');
@@ -499,6 +516,33 @@ function refund_record_ledger(PDO $pdo, array $req, string $refund_id, ?array $c
          WHERE company_id = ? AND invoice_id = ?'
     )->execute([$refundAmount, $refundAmount, $req['company_id'], $req['invoice_id']]);
 
+    return true;
+}
+
+/**
+ * Finish a refund that the stale-processing cron found succeeded at the
+ * provider. Returns true when this call moved the request to completed.
+ */
+function refund_complete_from_stale_cron(PDO $pdo, array $req, array $company, string $refund_id): bool {
+    // Ledger first, same as refund_execute_against_provider: the webhook that
+    // would normally write this row never arrived, and without it the desktop
+    // never sees the refund.
+    refund_record_ledger($pdo, $req, $refund_id, $company);
+
+    // CAS guard so a webhook arriving in the same window doesn't
+    // produce a second completion notification.
+    $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+    $upd->execute([$refund_id, $req['id']]);
+    if ($upd->rowCount() === 0) {
+        return false;
+    }
+    audit_log($pdo, (int)$req['company_id'], 'completed', 'system', null, (int)$req['id'], null, [
+        'reconciled_via_stale_cron' => true,
+        'provider_refund_id' => $refund_id,
+    ]);
+    $req['state'] = 'completed';
+    $req['provider_refund_id'] = $refund_id;
+    refund_notify_completion($pdo, $req);
     return true;
 }
 

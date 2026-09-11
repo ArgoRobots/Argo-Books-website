@@ -87,10 +87,11 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
                 $stmt = $pdo->prepare("
                     SELECT id FROM premium_subscriptions
                     WHERE subscription_id = ?
+                    AND environment = ?
                     AND status IN ('active', 'cancelled')
                     AND end_date > NOW()
                 ");
-                $stmt->execute([$premiumKey['subscription_id']]);
+                $stmt->execute([$premiumKey['subscription_id'], current_environment()]);
                 if ($stmt->fetch()) {
                     return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
                 }
@@ -100,10 +101,11 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
             $stmt = $pdo->prepare("
                 SELECT id FROM premium_subscriptions
                 WHERE subscription_id = ?
+                AND environment = ?
                 AND status IN ('active', 'cancelled')
                 AND end_date > NOW()
             ");
-            $stmt->execute([$license_key]);
+            $stmt->execute([$license_key, current_environment()]);
             if ($stmt->fetch()) {
                 return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
             }

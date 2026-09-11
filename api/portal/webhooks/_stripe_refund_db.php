@@ -10,12 +10,10 @@ declare(strict_types=1);
  * refund amount from the SDK Charge object; currency-divisor logic stays
  * out of this function.
  *
- * Call ONCE PER INDIVIDUAL Refund (Stripe Refund.id). When a charge has
- * multiple partial refunds, the webhook ships the cumulative amount on
- * $charge->amount_refunded but also lists each individual refund in
- * $charge->refunds->data. Iterate that list and call this function per
- * refund. Keying by individual refund ID (instead of payment intent) lets
- * multiple partial refunds coexist as separate negative-payment rows.
+ * Call ONCE PER INDIVIDUAL Refund (Stripe Refund.id), as
+ * apply_stripe_charge_refunds() does. Keying by individual refund ID (instead
+ * of payment intent) lets multiple partial refunds coexist as separate
+ * negative-payment rows, and matches the key the desktop refund flow writes.
  *
  * The original payment row is only flipped to status='refunded' once the
  * sum of all refund amounts against it covers the original payment amount;
@@ -136,4 +134,115 @@ function apply_stripe_refund_to_db(
     ]);
 
     return true;
+}
+
+/**
+ * Apply a charge.refunded event: one ledger row per refund on the charge,
+ * then complete any refund_requests those refunds were issued for.
+ */
+function apply_stripe_charge_refunds(
+    PDO $pdo,
+    \Stripe\Charge $charge,
+    bool $isProduction,
+    ?string $connectedAccount = null
+): void {
+    $providerPaymentId = $charge->payment_intent;
+
+    if (empty($providerPaymentId)) {
+        // Charges without a payment_intent (rare, legacy direct charges)
+        // can't be tied to a portal payment record; skip silently.
+        error_log("Portal Stripe webhook: skipping charge.refunded for {$charge->id}: no payment_intent");
+        return;
+    }
+
+    // Use the original payment's currency (already stored in our DB) so refunds
+    // honour the exact currency used at capture time even if Stripe normalised.
+    $stmt = $pdo->prepare(
+        'SELECT currency FROM portal_payments
+         WHERE provider_payment_id = ? AND amount > 0 LIMIT 1'
+    );
+    $stmt->execute([$providerPaymentId]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        // No matching portal payment: likely a charge that didn't originate
+        // from the customer portal (e.g. license/subscription, or a refund
+        // for a deleted/migrated record). Log so support can trace
+        // disappearing-refund tickets.
+        error_log("Portal Stripe webhook: charge.refunded for {$charge->id} (PI {$providerPaymentId}) has no matching portal payment row");
+        return;
+    }
+    $refundCurrency = strtoupper($row['currency'] ?? 'USD');
+    $zeroDecimalCurrencies = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+    $divisor = in_array($refundCurrency, $zeroDecimalCurrencies) ? 1 : 100;
+
+    // Always one row per Refund, keyed by its id. The desktop refund flow
+    // writes the same key, so a refund it already recorded is a no-op here,
+    // and each partial refund gets its own row.
+    $refunds = stripe_charge_refunds($charge, $connectedAccount);
+    foreach ($refunds as $refundObj) {
+        $refundAmount = ($refundObj->amount ?? 0) / $divisor;
+        if ($refundAmount <= 0) continue;
+        apply_stripe_refund_to_db(
+            $pdo,
+            $providerPaymentId,
+            $refundAmount,
+            $charge->id,
+            $isProduction,
+            $refundObj->id
+        );
+    }
+
+    // Reconcile against refund_requests if this refund was initiated by our
+    // /api/portal/refunds/ flow (refund metadata carries argo_request_id).
+    // Idempotent: no-op if already completed; transitions processing/cooling_off
+    // → completed otherwise.
+    try {
+        require_once __DIR__ . '/../_audit.php';
+        require_once __DIR__ . '/../_refund_helpers.php';
+        foreach ($refunds as $refundObj) {
+            $argoRequestId = $refundObj->metadata['argo_request_id'] ?? null;
+            if ($argoRequestId !== null && is_numeric($argoRequestId)) {
+                $stmt = $pdo->prepare("SELECT * FROM refund_requests WHERE id = ?");
+                $stmt->execute([(int)$argoRequestId]);
+                $req = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($req && $req['state'] !== 'completed' && $req['state'] !== 'cancelled') {
+                    // CAS guard so a race with the synchronous execute
+                    // path can't fire two completion notifications. Only
+                    // the UPDATE that flips the state actually notifies.
+                    $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                    $upd->execute([$refundObj->id, (int)$argoRequestId]);
+                    if ($upd->rowCount() > 0) {
+                        audit_log($pdo, (int)$req['company_id'], 'completed', 'webhook', null, (int)$argoRequestId, null, [
+                            'provider_refund_id' => $refundObj->id,
+                            'reconciled_via_webhook' => true,
+                        ]);
+                        $req['state'] = 'completed';
+                        $req['provider_refund_id'] = $refundObj->id;
+                        refund_notify_completion($pdo, $req);
+                    }
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log('refund_requests reconciliation in stripe webhook failed: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Every refund on the charge. Since API version 2022-11-15 a Charge no longer
+ * includes `refunds`, and webhook payloads use the endpoint's API version, so
+ * the list usually has to be fetched from the connected account that owns the
+ * charge. Throws on API failure so the webhook can ask Stripe to retry.
+ *
+ * @return \Stripe\Refund[]
+ */
+function stripe_charge_refunds(\Stripe\Charge $charge, ?string $connectedAccount): array
+{
+    if (isset($charge->refunds) && empty($charge->refunds->has_more)) {
+        return $charge->refunds->data;
+    }
+
+    $opts = $connectedAccount ? ['stripe_account' => $connectedAccount] : [];
+    $list = \Stripe\Refund::all(['charge' => $charge->id, 'limit' => 100], $opts);
+    return iterator_to_array($list->autoPagingIterator(), false);
 }

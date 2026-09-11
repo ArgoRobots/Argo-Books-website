@@ -80,10 +80,11 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
                     SELECT status, end_date
                     FROM premium_subscriptions
                     WHERE subscription_id = ?
+                    AND environment = ?
                     AND status IN ('active', 'cancelled')
                     AND end_date > NOW()
                 ");
-                $stmt->execute([$premiumKey['subscription_id']]);
+                $stmt->execute([$premiumKey['subscription_id'], current_environment()]);
                 if ($stmt->fetch()) {
                     return ['tier' => 'premium', 'limit' => PHP_INT_MAX, 'identifier' => $license_key];
                 }

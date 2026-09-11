@@ -47,6 +47,14 @@ $amount = floatval($data['amount']);
 $referenceNumber = generate_reference_number();
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 
+// payment_intent.succeeded can be recorded before the browser gets here, and
+// by then it has already cleared the balance. Checking the amount against that
+// balance would tell a customer who has been charged that the payment failed,
+// so an already-recorded payment is confirmed against Stripe alone.
+$alreadyRecorded = $method === 'stripe'
+    && is_string($data['payment_intent_id'] ?? null)
+    && find_recorded_portal_payment($data['payment_intent_id'], (int) $invoice['company_id'], $invoice['invoice_id']) !== null;
+
 // Calculate processing fee if enabled for this invoice
 $passProcessingFee = !empty($invoice['pass_processing_fee']);
 $processingFee = 0.00;
@@ -67,26 +75,28 @@ $invoiceStatus = $invoice['status'] ?? '';
 if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($passProcessingFee) {
-    if (abs($amountCents - $expectedTotalCents) > 1) {
-        send_error_response(400, 'Payment amount must equal the balance due plus processing fee.', 'INVALID_AMOUNT_WITH_FEE');
+if (!$alreadyRecorded) {
+    if ($passProcessingFee) {
+        if (abs($amountCents - $expectedTotalCents) > 1) {
+            send_error_response(400, 'Payment amount must equal the balance due plus processing fee.', 'INVALID_AMOUNT_WITH_FEE');
+        }
+    } else {
+        if ($amountCents > $balanceDueCents + 1) {
+            send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
+        }
     }
-} else {
-    if ($amountCents > $balanceDueCents + 1) {
-        send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
+    if (in_array($invoiceStatus, ['paid', 'cancelled'])) {
+        send_error_response(400, 'This invoice is not payable.', 'NOT_PAYABLE');
     }
-}
-if (in_array($invoiceStatus, ['paid', 'cancelled'])) {
-    send_error_response(400, 'This invoice is not payable.', 'NOT_PAYABLE');
-}
-if ($balanceDueCents <= 0) {
-    send_error_response(400, 'This invoice has no balance due.', 'NO_BALANCE');
+    if ($balanceDueCents <= 0) {
+        send_error_response(400, 'This invoice has no balance due.', 'NO_BALANCE');
+    }
 }
 
 try {
     switch ($method) {
         case 'stripe':
-            process_stripe_payment($invoice, $data, $amount, $referenceNumber, $processingFee);
+            process_stripe_payment($invoice, $data, $amount, $referenceNumber, $processingFee, $alreadyRecorded);
             break;
         case 'paypal':
             process_paypal_payment($invoice, $data, $amount, $referenceNumber, $processingFee);
@@ -103,7 +113,7 @@ try {
 /**
  * Process a confirmed Stripe payment
  */
-function process_stripe_payment(array $invoice, array $data, float $amount, string $referenceNumber, float $processingFee = 0.00): void
+function process_stripe_payment(array $invoice, array $data, float $amount, string $referenceNumber, float $processingFee = 0.00, bool $alreadyRecorded = false): void
 {
     global $is_production;
 
@@ -143,6 +153,13 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
     if (abs($paidAmountCents - $expectedCents) > 1) { // 1 cent tolerance
         error_log("Portal Stripe amount mismatch for invoice " . $invoice['invoice_id'] . " (PI: $paymentIntentId)");
         send_error_response(400, 'Payment amount mismatch.', 'AMOUNT_MISMATCH');
+    }
+
+    if ($alreadyRecorded) {
+        // The balance the fee was computed from is gone, so take the fee
+        // checkout charged. record_portal_payment fills in a missing fee on a
+        // duplicate and never lowers one.
+        $processingFee = stripe_metadata_processing_fee($paymentIntent->metadata, $amount);
     }
 
     $result = record_portal_payment([

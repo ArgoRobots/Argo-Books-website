@@ -92,7 +92,7 @@ $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 try {
     switch ($method) {
         case 'stripe':
-            handle_stripe_checkout($invoice, $amountCents, $currency, $requestedAmount, $data);
+            handle_stripe_checkout($invoice, $amountCents, $currency, $requestedAmount, $data, $processingFee);
             break;
         case 'paypal':
             handle_paypal_checkout($invoice, $requestedAmount, $currency, $data);
@@ -111,7 +111,7 @@ try {
 /**
  * Create a Stripe PaymentIntent using Stripe Connect (money goes to the business's Stripe account)
  */
-function handle_stripe_checkout(array $invoice, int $amountCents, string $currency, float $amount, array $data): void
+function handle_stripe_checkout(array $invoice, int $amountCents, string $currency, float $amount, array $data, float $processingFee = 0.00): void
 {
     global $is_production;
 
@@ -135,6 +135,9 @@ function handle_stripe_checkout(array $invoice, int $amountCents, string $curren
             'portal_invoice_id' => $invoice['invoice_id'],
             'portal_company_id' => $invoice['company_id'],
             'customer_name' => $invoice['customer_name'],
+            // Read back by the webhook and process-payment, which can't
+            // recompute it once the payment has cleared the balance.
+            'processing_fee' => number_format($processingFee, 2, '.', ''),
         ],
         'description' => 'Invoice ' . $invoice['invoice_id'] . ' - ' . ($invoice['company_name'] ?? ''),
     ];

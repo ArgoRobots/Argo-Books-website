@@ -85,7 +85,7 @@ return [
     'argo_cons' => [
         'You upload the T4 XML and make the remittance yourself; Wagepoint does both for you',
         'No direct deposit, so paying staff is still a bank transfer you make',
-        'Records of Employment are prepared but not filed, since only Service Canada issues them through ROE Web',
+        'Records of Employment come out as a file you upload to ROE Web yourself, rather than being filed for you',
         'Desktop only, with no mobile app for running payroll away from your computer',
     ],
     'competitor_cons' => [

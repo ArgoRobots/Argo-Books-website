@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Payroll Year-End';
-$pageDescription = 'Produce T4 slips and CRA XML, Quebec RL-1 slips, and ROE worksheets from Argo Books, and see what you owe CRA and when.';
+$pageDescription = 'Produce T4 slips and CRA XML, Quebec RL-1 slips, and Records of Employment for ROE Web from Argo Books, and see what you owe CRA and when.';
 $currentPage = 'payroll-year-end';
 $pageCategory = 'features';
 
@@ -10,11 +10,11 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <p>Once your pay runs are recorded, Argo Books produces the forms you have to give employees and
-            file with the government: T4 slips, the T4 summary, Quebec RL-1 slips, and a Record of
-            Employment worksheet.</p>
+            file with the government: T4 slips, the T4 summary, Quebec RL-1 slips, and the Record of
+            Employment file.</p>
 
             <div class="info-box">
-                <p><strong>Note:</strong> Argo Books does not file on your behalf. It generates the slips and the upload file; you submit them through CRA or Revenu Québec yourself.</p>
+                <p><strong>Note:</strong> Argo Books does not file on your behalf. It generates the slips and the upload file; you submit them through CRA, Revenu Québec or ROE Web yourself.</p>
             </div>
 
             <h2>Remittance Due</h2>
@@ -65,11 +65,23 @@ include __DIR__ . '/../../docs-header.php';
 
             <h2>Record of Employment</h2>
             <p>An ROE is due within five days of an interruption of earnings, not at year end, so it is
-            offered from the employee's row rather than from the year-end tool. Argo Books produces a
-            worksheet containing the figures ROE Web asks for, which you then key in.</p>
+            offered from the employee's row rather than from the year-end tool. Argo Books fills in what
+            your pay runs already know, including the last day paid and the insurable hours and earnings for
+            each pay period, and saves the file ROE Web accepts as an upload.</p>
+            <ol class="steps-list">
+                <li>On the Employees page, click the Record of Employment button on the employee's row</li>
+                <li>Check the figures under "From your pay runs"</li>
+                <li>Choose the reason for issuing, and whether you expect them back</li>
+                <li>Enter who Service Canada should call about this ROE: someone at your company, not the employee</li>
+                <li>Click "Save ROE XML" and upload the file to ROE Web</li>
+            </ol>
 
             <div class="info-box">
-                <p><strong>Note:</strong> The worksheet leaves block 16, the reason for issuing, blank. Argo Books has no way to know why someone stopped being paid, and that field affects an employee's benefit eligibility, so it is left for you to complete.</p>
+                <p><strong>Note:</strong> Argo Books never fills in block 16, the reason for issuing. It has no way to know whether someone quit, was let go or went on leave, and that answer affects their benefit claim, so you choose it every time.</p>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Tip:</strong> Not ready to submit? "Save as draft" makes a file ROE Web loads without submitting it, so you can check it there first. If you would rather key the figures in by hand, "View worksheet" shows them on one sheet.</p>
             </div>
 
             <h2>Before You File</h2>

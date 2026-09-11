@@ -14,13 +14,13 @@ $argo_yearly = (int) get_pricing_config()['premium_yearly_price'];
 return [
     'breadcrumb' => 'Payroll',
     'title' => 'Payroll for Canadian Businesses | Argo Books',
-    'meta_description' => 'Run Canadian payroll in Argo Books. CPP, EI and income tax worked out from the CRA\'s own tables for every province, pay stubs for your staff, and T4s at year end, plus worksheets for the Quebec RL-1 and the Record of Employment.',
+    'meta_description' => 'Run Canadian payroll in Argo Books. CPP, EI and income tax worked out from the CRA\'s own tables for every province, pay stubs for your staff, and T4s at year end, plus an RL-1 worksheet for Quebec and the Record of Employment file for ROE Web.',
     'meta_keywords' => 'Canadian payroll software, small business payroll Canada, CPP EI calculator, T4 software, payroll deductions Canada, RL-1 Quebec payroll, record of employment, desktop payroll software, T4 XML filing',
     'og_title' => 'Payroll for Canadian Businesses | Argo Books',
     'og_description' => 'Pay your staff without a separate payroll service. CPP, EI and income tax from the CRA\'s own tables, pay stubs, and T4s at year end.',
     'offer_price' => $argo_monthly,
     'offer_description' => 'Payroll is included with Premium at $' . $argo_monthly . '/month. Free plan available for the rest of Argo Books.',
-    'feature_list' => 'Canadian payroll deductions, Pay stubs, T4 slips and XML, RL-1 worksheet for Quebec, Record of Employment worksheet',
+    'feature_list' => 'Canadian payroll deductions, Pay stubs, T4 slips and XML, RL-1 worksheet for Quebec, Record of Employment XML for ROE Web',
 
     'h1' => 'Pay your staff,<br>without a payroll service.',
     'hero_sub' => 'Argo Books works out CPP, EI and income tax from the CRA\'s own tables, prints the pay stubs, posts the wages to your books, and has your T4s ready in January.',
@@ -82,7 +82,7 @@ return [
                 'T4 slips and summary as PDFs, plus the CRA\'s XML with its transmittal record',
                 'An RL-1 worksheet and summary for Quebec staff, to key into My Account',
                 'Amendments and cancellations chosen per employee, not all or nothing',
-                'A Record of Employment worksheet when somebody leaves',
+                'A Record of Employment file for ROE Web when somebody leaves',
             ],
             'img' => '../../resources/images/features/payroll-year-end.svg',
             'img_alt' => 'An Argo Books year end screen showing a T4 slip with its boxes filled in, and the slips, summary and CRA XML file ready to export',
@@ -145,7 +145,7 @@ return [
     ],
     [
         'q' => 'Can it produce a Record of Employment?',
-        'a' => 'It produces the worksheet, not the ROE itself. Service Canada issues ROEs through ROE Web, so a printed sheet is not a filing. What Argo Books does is gather the earnings and hours for the right number of pay periods, which is the part that otherwise means adding up 27 periods by hand on a five day deadline.',
+        'a' => 'Yes. When somebody stops being paid, Argo Books builds the ROE file that ROE Web accepts as an upload. It gathers the earnings and hours for the right number of pay periods, which is the part that otherwise means adding up 27 periods by hand on a five day deadline. You choose the reason for issuing, since only you know why they left, and you upload the file yourself.',
     ],
     [
         'q' => 'Can I pay hourly staff, or people on different schedules?',

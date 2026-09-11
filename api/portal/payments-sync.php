@@ -46,7 +46,8 @@ function handle_pull_payments(int $companyId): void
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
                     rr.provider AS refund_provider,
-                    rr.provider_payment_id AS refund_source_provider_payment_id
+                    rr.provider_payment_id AS refund_source_provider_payment_id,
+                    rr.line_items_json AS refund_line_items_json
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
@@ -63,7 +64,8 @@ function handle_pull_payments(int $companyId): void
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
                     rr.provider AS refund_provider,
-                    rr.provider_payment_id AS refund_source_provider_payment_id
+                    rr.provider_payment_id AS refund_source_provider_payment_id,
+                    rr.line_items_json AS refund_line_items_json
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
@@ -81,7 +83,8 @@ function handle_pull_payments(int $companyId): void
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
                     rr.provider AS refund_provider,
-                    rr.provider_payment_id AS refund_source_provider_payment_id
+                    rr.provider_payment_id AS refund_source_provider_payment_id,
+                    rr.line_items_json AS refund_line_items_json
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
@@ -147,6 +150,7 @@ function handle_pull_payments(int $companyId): void
             'refundedProviderPaymentId' => $refundedProviderPaymentId,
             'refundRequestId' => $row['refund_request_id'] ? (int)$row['refund_request_id'] : null,
             'refundReason' => $row['refund_reason'] ?? null,
+            'depositAmount' => $isRefund ? refund_deposit_amount($row['refund_line_items_json'] ?? null) : null,
         ];
     }
 
@@ -156,6 +160,29 @@ function handle_pull_payments(int $companyId): void
         'count' => count($payments),
         'syncTimestamp' => date('c')
     ]);
+}
+
+/**
+ * The part of a refund that gave back the invoice's security deposit, from the lines picked in
+ * the desktop's refund form. A deposit isn't revenue, so the desktop keeps that part off it.
+ * Null when the refund wasn't made through the form (e.g. the Stripe Dashboard).
+ */
+function refund_deposit_amount(?string $lineItemsJson): ?float
+{
+    if ($lineItemsJson === null || $lineItemsJson === '') {
+        return null;
+    }
+    $items = json_decode($lineItemsJson, true);
+    if (!is_array($items)) {
+        return null;
+    }
+    $sum = 0.0;
+    foreach ($items as $item) {
+        if (is_array($item) && ($item['kind'] ?? null) === 'deposit') {
+            $sum += abs((float) ($item['amount'] ?? 0));
+        }
+    }
+    return $sum;
 }
 
 /**

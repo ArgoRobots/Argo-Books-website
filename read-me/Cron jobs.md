@@ -41,7 +41,15 @@ around 525,000 rows a year on its own, and two of them are on that schedule.
 4. Sends email receipts for successful renewals
 5. Sends failure notifications for failed payments
 6. Suspends subscriptions after 3 consecutive failures
-7. Marks non-auto-renew subscriptions as expired
+7. Marks non-auto-renew subscriptions as expired (this environment's only)
+
+### Overlap Protection
+
+Takes an exclusive lock on `cron/logs/subscription_renewal.lock` and exits
+immediately if a previous run still holds it, recording the skip in `cron_runs`.
+Both the charged path and the fully-credit-covered path also check for a
+completed renewal payment in the last 23 hours before doing anything, so a
+manual re-run cannot charge a card or spend credit twice.
 
 ### Manual Execution
 

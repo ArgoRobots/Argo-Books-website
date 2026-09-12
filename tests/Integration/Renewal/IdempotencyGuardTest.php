@@ -27,6 +27,15 @@ final class IdempotencyGuardTest extends DatabaseTestCase
         $this->assertFalse(recently_renewed($this->pdo, self::SUB_ID));
     }
 
+    public function test_returns_true_for_credit_covered_renewal_within_window(): void
+    {
+        // The fully-credit-covered branch of the renewal cron writes
+        // payment_type='credit' and relies on this guard to stop an overlapping
+        // run extending the subscription and deducting the credit a second time.
+        $this->insertRenewalPayment(2, 'completed', 'credit');
+        $this->assertTrue(recently_renewed($this->pdo, self::SUB_ID));
+    }
+
     public function test_returns_false_for_initial_payment_within_window(): void
     {
         // payment_type=initial shouldn't satisfy the renewal idempotency guard.

@@ -109,11 +109,13 @@ You need to create a MySQL database and import the schema.
 
 macOS ships neither PHP (removed in macOS 12) nor MySQL, so Homebrew provides both.
 
-There is no Apache or nginx here, and none is needed. The root `.htaccess` holds only
-security rules (deny rules, headers, CSP) and no routing rewrites, so PHP's built-in
-server can serve the site by itself. It also serves from `/` rather than a subfolder,
-which matches production and sidesteps the subfolder detection in
-`resources/scripts/main.js`.
+There is no Apache or nginx here. PHP's built-in server stands in, with `router.php`
+supplying the parts of `.htaccess` it would otherwise ignore, chiefly the roughly 120
+rewrite rules that route `/v1`, the `/api` surface, the portal and invoice token URLs,
+`/download/avalonia/...`, and every guide article slug at the web root. None of those
+paths exist on disk, so without the router they 404 locally while working in
+production. It also serves from `/` rather than a subfolder, which matches production
+and sidesteps the subfolder detection in `resources/scripts/main.js`.
 
 #### Step 1: Install Homebrew
 
@@ -214,9 +216,21 @@ Then open http://localhost:8000. Stop it with Ctrl+C.
 time by default, and the header fetches `community/get_avatar_info.php` while the page
 request is still open; on a single worker those two deadlock and the page hangs.
 
-`router.php` reinstates the deny rules from `.htaccess`, which the built-in server
-ignores completely. Without it, `http://localhost:8000/.env` is served as plain text. It
-is only ever loaded by `php -S` and does nothing in production, where Apache reads
+`router.php` stands in for `.htaccess`, which the built-in server ignores completely.
+It parses the file at request time rather than duplicating it, so the two cannot drift,
+and covers three things:
+
+- The rewrite rules, without which every guide article, API route and token URL 404s.
+- The deny rules. Without them `http://localhost:8000/.env` is served as plain text.
+- `mod_dir`'s `DirectorySlash` 301 and a real 404. The built-in server serves a
+  directory's `index.php` at the unslashed URL, which leaves the browser resolving
+  `href="style.css"` as `/style.css`, and when a path matches nothing it walks up the
+  tree for an `index.php` and serves the homepage with a 200.
+
+Rules guarded by a `RewriteCond` are skipped: the only ones are the canonical host and
+scheme redirects, which `.htaccess` already scopes to the production hostname.
+
+It is only ever loaded by `php -S` and does nothing in production, where Apache reads
 `.htaccess` directly.
 
 For local mail, `brew install mailpit && brew services start mailpit` is the macOS

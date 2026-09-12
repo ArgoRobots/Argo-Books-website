@@ -113,33 +113,37 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
  */
 function getOrCreateUsageRecord($pdo, $identifier, $monthly_limit) {
     $usage_month = date('Y-m-01');
+    $environment = current_environment();
 
     $stmt = $pdo->prepare("
         SELECT id, send_count, monthly_limit
         FROM invoice_send_usage
-        WHERE license_key = ? AND usage_month = ?
+        WHERE license_key = ? AND usage_month = ? AND environment = ?
     ");
-    $stmt->execute([$identifier, $usage_month]);
+    $stmt->execute([$identifier, $usage_month, $environment]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($record) {
         return $record;
     }
 
+    // environment has to be supplied explicitly, not left to the column default:
+    // it is part of the unique key, so the ON DUPLICATE KEY clause only matches
+    // the right row when all three key columns are in the INSERT.
     $stmt = $pdo->prepare("
-        INSERT INTO invoice_send_usage (license_key, usage_month, send_count, monthly_limit)
-        VALUES (?, ?, 0, ?)
+        INSERT INTO invoice_send_usage (license_key, usage_month, send_count, monthly_limit, environment)
+        VALUES (?, ?, 0, ?, ?)
         ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)
     ");
-    $stmt->execute([$identifier, $usage_month, $monthly_limit]);
+    $stmt->execute([$identifier, $usage_month, $monthly_limit, $environment]);
 
     // Re-select to get the actual row (handles concurrent insert race)
     $stmt = $pdo->prepare("
         SELECT id, send_count, monthly_limit
         FROM invoice_send_usage
-        WHERE license_key = ? AND usage_month = ?
+        WHERE license_key = ? AND usage_month = ? AND environment = ?
     ");
-    $stmt->execute([$identifier, $usage_month]);
+    $stmt->execute([$identifier, $usage_month, $environment]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $record ?: [
@@ -223,9 +227,9 @@ try {
         $stmt = $pdo->prepare("
             UPDATE invoice_send_usage
             SET send_count = send_count + 1
-            WHERE license_key = ? AND usage_month = ? AND send_count < ?
+            WHERE license_key = ? AND usage_month = ? AND environment = ? AND send_count < ?
         ");
-        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
+        $stmt->execute([$identifier, $usage_month, current_environment(), $monthly_limit]);
 
         if ($stmt->rowCount() === 0) {
             // Another request incremented past the limit concurrently

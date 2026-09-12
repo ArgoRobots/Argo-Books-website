@@ -439,15 +439,37 @@ CREATE INDEX idx_remember_tokens_token ON remember_tokens(token);
 CREATE INDEX idx_remember_tokens_user_id ON remember_tokens(user_id);
 
 -- Receipt scan usage tracking table (for rate limiting Premium tier: 500 scans/month)
+-- environment is part of the unique key: the free-tier row key is device_<hash>
+-- with no environment component, so without it a scan made while testing against
+-- dev would eat the same monthly allowance as real production usage on that device.
 CREATE TABLE IF NOT EXISTS receipt_scan_usage (
     id INT PRIMARY KEY AUTO_INCREMENT,
     license_key VARCHAR(255) NOT NULL,
     usage_month DATE NOT NULL COMMENT 'First day of the month (e.g., 2025-01-01)',
     scan_count INT NOT NULL DEFAULT 0,
     monthly_limit INT NOT NULL DEFAULT 500,
+    environment VARCHAR(10) NOT NULL DEFAULT 'production' COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_license_month (license_key, usage_month),
+    UNIQUE KEY unique_license_month_env (license_key, usage_month, environment),
+    INDEX idx_license_key (license_key),
+    INDEX idx_usage_month (usage_month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- AI import usage tracking (api/ai-import/usage.php). One row per identity, per
+-- month, per environment. license_key holds either a real key or device_<hash>
+-- for free users; bank-statement imports use the same row shape with a "bank:"
+-- prefix on the identifier so they get a counter separate from spreadsheet imports.
+CREATE TABLE IF NOT EXISTS ai_import_usage (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    license_key VARCHAR(255) NOT NULL COMMENT 'License key, device_<hash>, or either prefixed with "bank:"',
+    usage_month DATE NOT NULL COMMENT 'First day of the month (e.g., 2025-01-01)',
+    scan_count INT NOT NULL DEFAULT 0,
+    monthly_limit INT NOT NULL DEFAULT 100,
+    environment VARCHAR(10) NOT NULL DEFAULT 'production' COMMENT 'sandbox or production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_license_month_env (license_key, usage_month, environment),
     INDEX idx_license_key (license_key),
     INDEX idx_usage_month (usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -824,15 +846,20 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Invoice send usage tracking for free-tier limits
+-- environment is part of the unique key for the same reason as receipt_scan_usage
+-- and ai_import_usage: the free-tier row key is device_<hash> with no environment
+-- component, so without it a send made while testing against dev would eat the
+-- same monthly allowance as real production usage on that device.
 CREATE TABLE IF NOT EXISTS invoice_send_usage (
     id INT AUTO_INCREMENT PRIMARY KEY,
     license_key VARCHAR(255) NOT NULL COMMENT 'License key or device_<hash> for free users',
     usage_month DATE NOT NULL,
     send_count INT NOT NULL DEFAULT 0,
     monthly_limit INT NOT NULL DEFAULT 5,
+    environment VARCHAR(10) NOT NULL DEFAULT 'production' COMMENT 'sandbox or production',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_license_month (license_key, usage_month)
+    UNIQUE KEY unique_license_month_env (license_key, usage_month, environment)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exchange rates cache (persistent: historical rates never change)

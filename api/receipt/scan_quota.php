@@ -115,27 +115,29 @@ if (!function_exists('receipt_scan_quota_consume')) {
     {
         $usageMonth = date('Y-m-01');
 
+        $environment = current_environment();
+
         // INSERT IGNORE rather than a read-then-insert: two first-of-the-month requests
         // would otherwise both see no row and both try to create it.
         $stmt = $pdo->prepare("
-            INSERT IGNORE INTO receipt_scan_usage (license_key, usage_month, scan_count, monthly_limit)
-            VALUES (?, ?, 0, ?)
+            INSERT IGNORE INTO receipt_scan_usage (license_key, usage_month, scan_count, monthly_limit, environment)
+            VALUES (?, ?, 0, ?, ?)
         ");
-        $stmt->execute([$identifier, $usageMonth, $limit]);
+        $stmt->execute([$identifier, $usageMonth, $limit, $environment]);
 
         $stmt = $pdo->prepare("
             UPDATE receipt_scan_usage
             SET scan_count = scan_count + 1
-            WHERE license_key = ? AND usage_month = ? AND scan_count < ?
+            WHERE license_key = ? AND usage_month = ? AND environment = ? AND scan_count < ?
         ");
-        $stmt->execute([$identifier, $usageMonth, $limit]);
+        $stmt->execute([$identifier, $usageMonth, $environment, $limit]);
         $allowed = $stmt->rowCount() > 0;
 
         $stmt = $pdo->prepare("
             SELECT scan_count FROM receipt_scan_usage
-            WHERE license_key = ? AND usage_month = ?
+            WHERE license_key = ? AND usage_month = ? AND environment = ?
         ");
-        $stmt->execute([$identifier, $usageMonth]);
+        $stmt->execute([$identifier, $usageMonth, $environment]);
         $count = (int)($stmt->fetchColumn() ?: 0);
 
         return ['allowed' => $allowed, 'scan_count' => $count, 'limit' => $limit];
@@ -157,9 +159,9 @@ if (!function_exists('receipt_scan_quota_refund')) {
             $stmt = $pdo->prepare("
                 UPDATE receipt_scan_usage
                 SET scan_count = scan_count - 1
-                WHERE license_key = ? AND usage_month = ? AND scan_count > 0
+                WHERE license_key = ? AND usage_month = ? AND environment = ? AND scan_count > 0
             ");
-            $stmt->execute([$identifier, date('Y-m-01')]);
+            $stmt->execute([$identifier, date('Y-m-01'), current_environment()]);
         } catch (PDOException $e) {
             // A failed refund must not turn an upstream error into a 500. The user has
             // already lost the scan; log it and let the original failure surface.

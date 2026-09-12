@@ -35,8 +35,8 @@ function fetch_eligible_licenses(PDO $pdo, ?array $idFilter = null): array
           lk.id, lk.email, lk.license_key,
           lk.created_at AS purchased_at,
           GREATEST(
-            COALESCE((SELECT MAX(updated_at) FROM receipt_scan_usage WHERE license_key = lk.license_key), '1970-01-01'),
-            COALESCE((SELECT MAX(updated_at) FROM invoice_send_usage  WHERE license_key = lk.license_key), '1970-01-01')
+            COALESCE((SELECT MAX(updated_at) FROM receipt_scan_usage WHERE license_key = lk.license_key AND environment = ?), '1970-01-01'),
+            COALESCE((SELECT MAX(updated_at) FROM invoice_send_usage  WHERE license_key = lk.license_key AND environment = ?), '1970-01-01')
           ) AS last_active_at
         FROM license_keys lk
         WHERE lk.activated = 1
@@ -48,11 +48,14 @@ function fetch_eligible_licenses(PDO $pdo, ?array $idFilter = null): array
           )
     ";
 
-    $params = [];
+    // The first two placeholders are the environment filters inside the
+    // last_active_at subqueries, so they have to stay at the head of the
+    // parameter list, ahead of the optional id filter appended below.
+    $params = [current_environment(), current_environment()];
     if ($idFilter !== null && count($idFilter) > 0) {
         $placeholders = implode(',', array_fill(0, count($idFilter), '?'));
         $sql .= " AND lk.id IN ($placeholders)";
-        $params = array_values(array_map('intval', $idFilter));
+        $params = array_merge($params, array_values(array_map('intval', $idFilter)));
     }
 
     $sql .= " ORDER BY lk.created_at ASC LIMIT 500";

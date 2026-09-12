@@ -309,16 +309,17 @@ function get_license_usage($license_keys)
 
     $usage_month = date('Y-m-01');
     $placeholders = implode(',', array_fill(0, count($license_keys), '?'));
+    $tail = [$usage_month, current_environment()];
 
     try {
-        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM receipt_scan_usage WHERE license_key IN ($placeholders) AND usage_month = ?");
-        $stmt->execute(array_merge($license_keys, [$usage_month]));
+        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM receipt_scan_usage WHERE license_key IN ($placeholders) AND usage_month = ? AND environment = ?");
+        $stmt->execute(array_merge($license_keys, $tail));
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $usage[$row['license_key']]['receipt_scans'] = (int)$row['scan_count'];
         }
 
-        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM ai_import_usage WHERE license_key IN ($placeholders) AND usage_month = ?");
-        $stmt->execute(array_merge($license_keys, [$usage_month]));
+        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM ai_import_usage WHERE license_key IN ($placeholders) AND usage_month = ? AND environment = ?");
+        $stmt->execute(array_merge($license_keys, $tail));
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             if (!isset($usage[$row['license_key']])) $usage[$row['license_key']] = ['receipt_scans' => 0];
             $usage[$row['license_key']]['ai_imports'] = (int)$row['scan_count'];
@@ -350,13 +351,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
 
     $usage_month = date('Y-m-01');
     $placeholders = implode(',', array_fill(0, count($license_keys), '?'));
-    $params = array_merge($license_keys, [$usage_month]);
+    $params = array_merge($license_keys, [$usage_month, current_environment()]);
 
     try {
-        $stmt = $pdo->prepare("UPDATE receipt_scan_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt = $pdo->prepare("UPDATE receipt_scan_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ? AND environment = ?");
         $stmt->execute($params);
 
-        $stmt = $pdo->prepare("UPDATE ai_import_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt = $pdo->prepare("UPDATE ai_import_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ? AND environment = ?");
         $stmt->execute($params);
 
         echo json_encode(['success' => true]);

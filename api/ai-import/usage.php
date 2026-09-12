@@ -139,26 +139,28 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
  */
 function getOrCreateUsageRecord($pdo, $license_key, $monthly_limit) {
     $usage_month = date('Y-m-01');
+    $environment = current_environment();
 
     // Try to get existing record
     $stmt = $pdo->prepare("
         SELECT id, scan_count, monthly_limit
         FROM ai_import_usage
-        WHERE license_key = ? AND usage_month = ?
+        WHERE license_key = ? AND usage_month = ? AND environment = ?
     ");
-    $stmt->execute([$license_key, $usage_month]);
+    $stmt->execute([$license_key, $usage_month, $environment]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($record) {
         return $record;
     }
 
-    // Create new record for this month
+    // Create new record for this month. INSERT IGNORE so two concurrent
+    // first-of-the-month requests don't collide on the unique key.
     $stmt = $pdo->prepare("
-        INSERT INTO ai_import_usage (license_key, usage_month, scan_count, monthly_limit)
-        VALUES (?, ?, 0, ?)
+        INSERT IGNORE INTO ai_import_usage (license_key, usage_month, scan_count, monthly_limit, environment)
+        VALUES (?, ?, 0, ?, ?)
     ");
-    $stmt->execute([$license_key, $usage_month, $monthly_limit]);
+    $stmt->execute([$license_key, $usage_month, $monthly_limit, $environment]);
 
     return [
         'id' => $pdo->lastInsertId(),
@@ -249,9 +251,9 @@ try {
         $stmt = $pdo->prepare("
             UPDATE ai_import_usage
             SET scan_count = scan_count + 1
-            WHERE license_key = ? AND usage_month = ? AND scan_count < ?
+            WHERE license_key = ? AND usage_month = ? AND environment = ? AND scan_count < ?
         ");
-        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
+        $stmt->execute([$identifier, $usage_month, current_environment(), $monthly_limit]);
 
         if ($stmt->rowCount() === 0) {
             $response = buildResponse($import_count, $monthly_limit, $tier, false);

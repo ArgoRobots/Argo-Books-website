@@ -73,26 +73,28 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
  */
 function getOrCreateUsageRecord($pdo, $license_key, $monthly_limit) {
     $usage_month = date('Y-m-01');
+    $environment = current_environment();
 
     // Try to get existing record
     $stmt = $pdo->prepare("
         SELECT id, scan_count, monthly_limit
         FROM receipt_scan_usage
-        WHERE license_key = ? AND usage_month = ?
+        WHERE license_key = ? AND usage_month = ? AND environment = ?
     ");
-    $stmt->execute([$license_key, $usage_month]);
+    $stmt->execute([$license_key, $usage_month, $environment]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($record) {
         return $record;
     }
 
-    // Create new record for this month
+    // Create new record for this month. INSERT IGNORE because the free-tier row
+    // key is shared with completions.php, which may create it concurrently.
     $stmt = $pdo->prepare("
-        INSERT INTO receipt_scan_usage (license_key, usage_month, scan_count, monthly_limit)
-        VALUES (?, ?, 0, ?)
+        INSERT IGNORE INTO receipt_scan_usage (license_key, usage_month, scan_count, monthly_limit, environment)
+        VALUES (?, ?, 0, ?, ?)
     ");
-    $stmt->execute([$license_key, $usage_month, $monthly_limit]);
+    $stmt->execute([$license_key, $usage_month, $monthly_limit, $environment]);
 
     return [
         'id' => $pdo->lastInsertId(),
